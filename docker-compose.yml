@@ -1,0 +1,67 @@
+version: "3.7"
+services:
+  x-backend: &backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+      args:
+        RUBY_VERSION: "3.4.4"
+        PG_MAJOR: "17"
+    environment: &env
+      RAILS_ENV: ${RAILS_ENV:-development}
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      DB_PORT: 5432
+      DB_HOST: db
+      RAILS_MAX_THREADS: 5
+      # ----
+      # Dev tools
+      # ----
+      HISTFILE: /usr/local/hist/.bash_history
+      IRB_HISTFILE: /usr/local/hist/.irb_history
+      PSQL_HISTFILE: /usr/local/hist/.psql_history
+      EDITOR: vi
+    tmpfs:
+      - /tmp
+      - /app/tmp/pids
+
+  db:
+    image: "postgres:17.5-alpine3.22"
+    volumes:
+      - pro-rails-postgres-db:/var/lib/postgresql/data
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
+      PSQL_HISTFILE: /root/log/.psql_history
+    healthcheck:
+      test: pg_isready -U postgres -h 127.0.0.1
+      interval: 5s
+
+  rails:
+    <<: *backend
+    command: /bin/bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    volumes:
+      - .:/pro-rails:cached
+      - pro-rails-cache:/pro-rails/tmp/cache
+      - pro-rails-bundle:/usr/local/bundle
+      - pro-rails-builds:/pro-rails/app/assets/builds
+      - pro-rails-assets:/app/public/assets
+      - pro-rails-storage:/pro-rails/storage
+      - pro-rails-history:/usr/local/hist
+    ports:
+      - 3000:3000
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pro-rails-postgres-db:
+  pro-rails-bundle:
+  pro-rails-cache:
+  pro-rails-builds:
+  pro-rails-assets:
+  pro-rails-storage:
+  pro-rails-history:
