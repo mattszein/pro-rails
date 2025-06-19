@@ -1,5 +1,4 @@
 # syntax=docker/dockerfile:1
-# check=error=true
 
 ARG RUBY_VERSION=3.4.4
 ARG DISTRO_NAME=bookworm
@@ -19,6 +18,9 @@ RUN apt-get update -qq \
   git \
   vim \
   libyaml-dev \
+  pkg-config \
+  libjemalloc2 \ 
+  libvips \
   && apt-get clean \
   && rm -rf /var/cache/apt/archives/* \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \

@@ -25,5 +25,15 @@ module ProRails
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+    config.generators do |g|
+      g.assets false
+      g.helper false
+      g.orm :active_record
+      g.stylesheets false
+      g.javascripts false
+      g.test_framework nil
+    end
+
+    config.assets.paths << Rails.root.join("app/components")
   end
 end
