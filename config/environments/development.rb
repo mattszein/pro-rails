@@ -79,6 +79,14 @@ Rails.application.configure do
   config.view_component.show_previews = true
   config.view_component.generate.stimulus_controller = true
 
+
+  config.lookbook.project_name = "Pro Rails App Template"
+  config.lookbook.debug_menu = true
+  config.lookbook.preview_embeds.policy = "ALLOWALL"
+  config.lookbook.preview_display_options = {
+    theme: ["light", "dark"] # dynamic 'theme' display option
+  }
+
   config.importmap.cache_sweepers << Rails.root.join("app/components")
   config.turbo.signed_stream_verifier_key = ENV.fetch("TURBO_RAILS_KEY", "turbo_rails_key")
 end
