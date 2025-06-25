@@ -1,0 +1,13 @@
+<div data-controller="core--form--counter-component" class="inline">
+  <%= render(Core::Form::ButtonComponent.new(nil,"Decrement", {size: :none}, type: "button", class: "p-2", data: { action: "click->core--form--counter-component#decrement" })) do %>
+    <svg class="h-3 w-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 2">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h16"/>
+    </svg>
+    <% end %>
+<%= render_input %>
+<%= render(Core::Form::ButtonComponent.new(nil,"Increment", {size: :none}, type: "button", class: "p-2 hover:fill-white", data: { action: "click->core--form--counter-component#increment" })) do %>
+  <svg class="h-3 w-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
+    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
+  </svg>
+<% end %>
+<div>

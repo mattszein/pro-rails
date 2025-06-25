@@ -1,0 +1,21 @@
+<aside
+  data-closer-target="sidebar"
+  class="<%= sidebar_classes %>"
+  aria-label="Sidenav"
+  data-transition-enter="transition ease-out duration-100"
+  data-transition-enter-start="transform opacity-0 scale-95"
+  data-transition-enter-end="transform opacity-100 scale-100"
+  data-transition-leave="transition ease-in duration-75"
+  data-transition-leave-start="transform opacity-100 scale-100"
+  data-transition-leave-end="transform opacity-0 scale-95"
+>
+  <div class="overflow-y-auto py-5 px-3 h-full bg-white dark:bg-gray-800 gap-2">
+    <ul class="flex flex-col mx-auto gap-2 mb-2">
+      <% navigation_items.each do |item| %>
+        <li class="items-center justify-center">
+          <%= render(Core::SidebarLinkComponent.new(**item)) %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+</aside>
