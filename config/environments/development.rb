@@ -79,7 +79,6 @@ Rails.application.configure do
   config.view_component.show_previews = true
   config.view_component.generate.stimulus_controller = true
 
-
   config.lookbook.project_name = "Pro Rails App Template"
   config.lookbook.debug_menu = true
   config.lookbook.preview_embeds.policy = "ALLOWALL"

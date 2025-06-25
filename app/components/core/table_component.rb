@@ -9,7 +9,6 @@ class Core::TableComponent < ViewComponent::Base
   end
 
   def before_render
-    puts content
     content
   end
 

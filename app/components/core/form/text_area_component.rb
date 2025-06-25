@@ -12,7 +12,7 @@ class Core::Form::TextAreaComponent < ViewComponent::Form::TextAreaComponent
     custom_style = options&.delete(:custom_style) || {}
     options_merged = DEFAULT.merge(custom_style)
     @theme = options_merged[:theme]
-    super(form, object_name, method_name, options)
+    super
   end
 
   def html_class

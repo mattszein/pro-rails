@@ -19,7 +19,7 @@ class Core::Form::ToggleComponent < ViewComponent::Form::CheckBoxComponent
     options_merged = DEFAULT.merge(custom_style)
     @theme = options_merged[:theme]
     @size = options_merged[:size]
-    super(form, object_name, method_name, checked_value, unchecked_value, options)
+    super
   end
 
   def html_class

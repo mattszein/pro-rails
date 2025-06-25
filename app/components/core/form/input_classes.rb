@@ -17,7 +17,7 @@ module Core::Form::InputClasses
     options_merged = DEFAULT.merge(custom_style)
     @theme = options_merged[:theme]
     @size = options_merged[:size]
-    super(form, object_name, method_name, options)
+    super
   end
 
   def html_class

@@ -18,7 +18,7 @@ class Core::Form::LabeledComponent < ViewComponent::Form::LabelComponent
     options_merged = DEFAULT.merge(custom_style)
     @theme = options_merged[:theme]
     @style = options_merged[:style]
-    super(form, object_name, method_name, content_or_options, options)
+    super
   end
 
   def html_class
