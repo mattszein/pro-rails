@@ -1,9 +1,14 @@
-import { Application } from "@hotwired/stimulus"
+import { Application, defaultSchema } from "@hotwired/stimulus"
 
-const application = Application.start()
+const customSchema = {
+  ...defaultSchema,
+  keyMappings: { ...defaultSchema.keyMappings, backspace: "backspace" }
+}
+
+const application = Application.start(document.documentElement, customSchema)
 
 // Configure Stimulus development experience
 application.debug = false
-window.Stimulus   = application
+window.Stimulus = application
 
 export { application }

@@ -23,7 +23,7 @@ services:
       PSQL_HISTFILE: /usr/local/hist/.psql_history
       EDITOR: vi
     tmpfs:
-      - /tmp
+      - /tmp:exec
       - /app/tmp/pids
 
   db:
