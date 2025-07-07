@@ -3,7 +3,20 @@ class ApplicationController < ActionController::Base
   allow_browser versions: :modern
 
   include ErrorResponseActions
+  before_action :set_sidebar_open
 
   def index
   end
+
+  private
+
+  def set_sidebar_open
+    value = cookies["sidebar"]
+    @sidebar_open = !value.nil? && value == "1"
+  end
+
+  def current_account
+    rodauth.rails_account
+  end
+  helper_method :current_account # skip if inheriting from ActionController::API
 end

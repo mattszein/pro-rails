@@ -1,9 +1,10 @@
 class Core::SidebarLinkComponent < ViewComponent::Base
   attr_reader :label, :path, :icon, :active_paths, :options
 
+  include Rails.application.routes.url_helpers
   def initialize(label:, path:, icon:, active_paths: [], options: {})
     @label = label
-    @path = path.is_a?(Symbol) ? send(path) : path
+    @path = path
     @icon = icon
     @active_paths = active_paths
     @options = options

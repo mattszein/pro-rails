@@ -71,3 +71,11 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
+
+gem "rodauth-rails", "~> 2.1"
+# Enables Sequel to use Active Record's database connection
+gem "sequel-activerecord_connection", "~> 2.0", require: false
+# Used by Rodauth for password hashing
+gem "bcrypt", "~> 3.1", require: false
+# Used by Rodauth for rendering built-in view and email templates
+gem "tilt", "~> 2.4", require: false

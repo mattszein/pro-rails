@@ -1,4 +1,4 @@
-<%= render(Core::LinkComponent.new(url: path, options: link_options)) do %>
+<%= render(Core::LinkComponent.new(url: path.is_a?(Symbol) ? send(path) : path, options: link_options)) do %>
   <%= render_icon %>
   <span class="sr-only"><%= label %></span>
 <% end %>
