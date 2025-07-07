@@ -44,7 +44,7 @@ gem "freezolite" # Freezolite add frozen_string_literals to true to every file i
 gem "view_component"
 gem "view_component-form"
 
-gem "tailwindcss-rails", "~> 4.2"
+gem "tailwindcss-rails", "~> 4.3"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
