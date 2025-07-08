@@ -15,6 +15,8 @@ services:
       DB_PORT: 5432
       DB_HOST: db
       RAILS_MAX_THREADS: 5
+      MAILER_ADDRESS: "maildev"
+      MAILER_PORT: 1025
       # ----
       # Dev tools
       # ----
@@ -56,6 +58,21 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      maildev:
+        condition: service_started
+
+  maildev:
+    image: maildev/maildev
+    restart: always
+    environment:
+      MAILDEV_SMTP_PORT: 1025
+      MAILDEV_WEB_PORT: 8025
+      MAILDEV_MAIL_DIRECTORY: /home/node/data
+    volumes:
+      - pro-rails-mc-data:/home/node
+    ports:
+      - "1025:1025"
+      - "8025:8025"
 
 volumes:
   pro-rails-postgres-db:
@@ -65,3 +82,4 @@ volumes:
   pro-rails-assets:
   pro-rails-storage:
   pro-rails-history:
+  pro-rails-mc-data:

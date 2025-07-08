@@ -4,18 +4,18 @@ module ApplicationHelper
       {
         label: "Home",
         path: :dashboard_path,
-        icon: :home,
+        icon: :home
       },
       {
         label: "Settings",
-        path: :dashboard_path, # Replace with actual path  
-        icon: :settings,
+        path: :dashboard_path, # Replace with actual path
+        icon: :settings
       },
       {
         label: "Log out",
         path: rodauth.logout_path,
         icon: :logout,
-        options: { data: { turbo_prefetch: "false" } }
+        options: {data: {turbo_prefetch: "false"}}
       }
     ]
   end

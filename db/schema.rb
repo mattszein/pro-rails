@@ -42,6 +42,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_03_011723) do
     t.integer "status", default: 1, null: false
     t.citext "email", null: false
     t.string "password_hash"
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.index ["email"], name: "index_accounts_on_email", unique: true, where: "(status = ANY (ARRAY[1, 2]))"
     t.check_constraint "email ~ '^[^,;@ \r\n]+@[^,@; \r\n]+.[^,@; \r\n]+$'::citext", name: "valid_email"
   end
