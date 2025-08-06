@@ -45,6 +45,7 @@ gem "view_component"
 gem "view_component-form"
 
 gem "tailwindcss-rails", "~> 4.2"
+gem "inline_svg"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem

@@ -23,6 +23,10 @@ class CustomFormBuilder < ViewComponent::Form::Builder
     render_component("form::NumberField", @object_name, method, objectify_options(options))
   end
 
+  def password_field(method, options = {})
+    render_component("form::PasswordField", @object_name, method, objectify_options(options))
+  end
+
   def text_area(method, options = {})
     render_component("form::TextArea", @object_name, method, objectify_options(options))
   end

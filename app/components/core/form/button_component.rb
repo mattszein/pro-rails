@@ -34,6 +34,6 @@ class Core::Form::ButtonComponent < ViewComponent::Form::ButtonComponent
   end
 
   def html_class
-    class_names("border focus:ring-0 focus:outline-none focus:shadow-sm rounded-lg font-medium text-center font-semibold hover:text-white dark:hover:text-white transition-colors duration-200", THEME_MAPPINGS[@theme], SIZE_MAPPINGS[@size], @fullw ? "w-full" : "")
+    class_names("border focus:ring-0 focus:outline-none focus:shadow-sm rounded-lg font-medium text-center font-semibold hover:text-white dark:hover:text-white transition-colors duration-200 cursor-pointer", THEME_MAPPINGS[@theme], SIZE_MAPPINGS[@size], @fullw ? "w-full" : "")
   end
 end

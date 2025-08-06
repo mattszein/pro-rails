@@ -23,7 +23,7 @@ class RodauthMain < Rodauth::Rails::Auth
     # verify_login_change_table :user_login_change_keys
     # reset_password_table :user_password_reset_keys
     # remember_table :user_remember_keys
-
+    use_multi_phase_login? true
     # The secret key used for hashing public-facing tokens for various features.
     # Defaults to Rails `secret_key_base`, but you can use your own secret key.
     # hmac_secret "b5e36518c7c74ec38a58bbc79b9d47c5df5b7ae7360c1416862573d359ba68b84f0aff5339d3d76117a2d44997641b4bb5dcadacc3629b0f329ab46b7b6cc1fe"

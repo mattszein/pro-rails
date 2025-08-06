@@ -46,7 +46,7 @@ services:
     <<: *backend
     command: /bin/bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
     volumes:
-      - .:/pro-rails:cached
+      - .:/pro-rails
       - pro-rails-cache:/pro-rails/tmp/cache
       - pro-rails-bundle:/usr/local/bundle
       - pro-rails-builds:/pro-rails/app/assets/builds
