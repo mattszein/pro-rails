@@ -28,7 +28,7 @@
       <%= yield %>
     </main>
     <% if @current_account %>
-      <%= render(Core::SidebarComponent.new(open: @sidebar_open, navigation_items: sidebar_links())) %>
+      <%= render(Core::SidebarComponent.new(open: @sidebar_open, navigation_items: sidebar_links)) %>
     <% end %>
      <% flash.each do |type, msg| %>
       <%= render(Core::AlertComponent.new(type: type.to_sym, title: (type == "notice") ? "Info" : "Error", message: msg)) %>

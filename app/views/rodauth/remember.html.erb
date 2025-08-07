@@ -1,5 +1,5 @@
-<%= render(Core::CardComponent.new()) do %>
-<%= form_with url: rodauth.remember_path, method: :post, data: { turbo: false }, class: "w-full max-w-sm" do |form| %>
+<%= render(Core::CardComponent.new) do %>
+<%= form_with url: rodauth.remember_path, method: :post, data: {turbo: false}, class: "w-full max-w-sm" do |form| %>
   <fieldset class="mb-6 space-y-2">
     <div class="flex items-center space-x-2">
       <%= form.radio_button rodauth.remember_param, rodauth.remember_remember_param_value, id: "remember-remember", class: "dark:bg-gray-900 dark:border-gray-600 dark:checked:bg-current dark:checked:border-current dark:checked:text-emerald-400 dark:focus:ring-emerald-400 dark:focus:ring-offset-gray-900" %>
@@ -15,7 +15,7 @@
     </div>
   </fieldset>
   <div class="mt-6">
-    <%= form.button "Remember", {fullw: true} %> 
+    <%= form.button "Remember", {fullw: true} %>
   </div>
 <% end %>
 <% end %>

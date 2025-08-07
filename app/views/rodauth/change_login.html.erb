@@ -1,22 +1,22 @@
-<%= form_with url: rodauth.change_login_path, method: :post, data: { turbo: false }, class: "w-full max-w-sm" do |form| %>
-  <%= form.labeled :login, "Email"  do %> 
-    <%= form.text_field :email, {id: "login", required: true, autofocus: true, placeholder: " ", autocomplete: "email", value: params[rodauth.login_param], aria: ({ invalid: true, describedby: "login_error_message" } if rodauth.field_error(rodauth.login_param)) } %>
+<%= form_with url: rodauth.change_login_path, method: :post, data: {turbo: false}, class: "w-full max-w-sm" do |form| %>
+  <%= form.labeled :login, "Email"  do %>
+    <%= form.text_field :email, {id: "login", required: true, autofocus: true, placeholder: " ", autocomplete: "email", value: params[rodauth.login_param], aria: ({invalid: true, describedby: "login_error_message"} if rodauth.field_error(rodauth.login_param))} %>
   <% end %>
   <%= error_tag(rodauth.field_error(rodauth.login_param), id: "login_error_message") if rodauth.field_error(rodauth.login_param) %>
    <% if rodauth.require_login_confirmation? %>
-    <%= form.labeled :login_confirm, "Email Confirm"  do %> 
-      <%= form.text_field :login_confirm, {id: "login-confirm", required: true, autofocus: true, placeholder: " ", autocomplete: "email", value: params[rodauth.login_confirm_param], aria: ({ invalid: true, describedby: "login-confirm_error_message" } if rodauth.field_error(rodauth.login_param)) } %>
+    <%= form.labeled :login_confirm, "Email Confirm"  do %>
+      <%= form.text_field :login_confirm, {id: "login-confirm", required: true, autofocus: true, placeholder: " ", autocomplete: "email", value: params[rodauth.login_confirm_param], aria: ({invalid: true, describedby: "login-confirm_error_message"} if rodauth.field_error(rodauth.login_param))} %>
     <% end %>
     <%= error_tag(rodauth.field_error(rodauth.login_confirm_param), id: "login-confirm_error_message") if rodauth.field_error(rodauth.login_confirm_param) %>
   <% end %>
 
   <% if rodauth.change_login_requires_password? %>
-    <%= form.labeled :password, "Password"  do %> 
-      <%= form.password_field :password, {required: true , placeholder: " ", value: "", id: "password", autocomplete: rodauth.password_field_autocomplete_value, aria: ({ invalid: true, describedby: "password_error_message" } if rodauth.field_error(rodauth.password_param))} %>
+    <%= form.labeled :password, "Password"  do %>
+      <%= form.password_field :password, {required: true, placeholder: " ", value: "", id: "password", autocomplete: rodauth.password_field_autocomplete_value, aria: ({invalid: true, describedby: "password_error_message"} if rodauth.field_error(rodauth.password_param))} %>
     <% end %>
   <% end %>
 
   <div class="mt-6">
-    <%= form.button "Change Login", {fullw: true} %> 
+    <%= form.button "Change Login", {fullw: true} %>
   </div>
 <% end %>

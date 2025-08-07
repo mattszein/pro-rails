@@ -1,4 +1,4 @@
-<%= form_with url: rodauth.logout_path, method: :post, data: { turbo: false }, class: "w-full max-w-sm" do |form| %>
+<%= form_with url: rodauth.logout_path, method: :post, data: {turbo: false}, class: "w-full max-w-sm" do |form| %>
   <% if rodauth.features.include?(:active_sessions) %>
     <div class="mb-6 flex items-center space-x-2">
       <%= form.check_box rodauth.global_logout_param, id: "global-logout", class: "rounded dark:bg-gray-900 dark:border-gray-600 dark:checked:bg-current dark:checked:border-current dark:checked:text-emerald-400 dark:focus:ring-emerald-400 dark:focus:ring-offset-gray-900", include_hidden: false %>
@@ -6,5 +6,5 @@
     </div>
   <% end %>
 
-  <%= form.button "Logout", {fullw: true} %> 
+  <%= form.button "Logout", {fullw: true} %>
 <% end %>

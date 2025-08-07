@@ -1,5 +1,5 @@
-<%= render(Core::CardComponent.new()) do %>
-<%= form_with url: rodauth.verify_login_change_path, method: :post, data: { turbo: false }, class: "w-full max-w-sm" do |form| %>
-    <%= form.button "Verify Login Change", {fullw: true} %> 
+<%= render(Core::CardComponent.new) do %>
+<%= form_with url: rodauth.verify_login_change_path, method: :post, data: {turbo: false}, class: "w-full max-w-sm" do |form| %>
+    <%= form.button "Verify Login Change", {fullw: true} %>
 <% end %>
 <% end %>

@@ -6,7 +6,7 @@ class CreateRodauthEmailAuth < ActiveRecord::Migration[8.0]
       t.string :key, null: false
       t.datetime :deadline, null: false
       t.datetime :email_last_sent, null: false, default: -> { "CURRENT_TIMESTAMP" }
-      t.datetime :create_at, null: false, default: -> { "CURRENT_TIMESTAMP" }
+      t.datetime :created_at, null: false, default: -> { "CURRENT_TIMESTAMP" }
     end
   end
 end

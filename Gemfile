@@ -58,6 +58,7 @@ group :development, :test do
   gem "rubocop-rspec"
   gem "standard", ">= 1.35.1"
   gem "standard-rails"
+  gem "erb_lint", require: false
 end
 
 group :development do

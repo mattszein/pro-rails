@@ -1,4 +1,4 @@
-<%= form_with url: rodauth.email_auth_request_path, method: :post, data: { turbo: false }, class: "w-full max-w-sm" do |form| %>
+<%= form_with url: rodauth.email_auth_request_path, method: :post, data: {turbo: false}, class: "w-full max-w-sm" do |form| %>
   <%= form.hidden_field rodauth.login_param, value: params[rodauth.login_param] %>
-  <%= form.button "Send Login Via Email", {fullw: true} %> 
+  <%= form.button "Send Login Via Email", {fullw: true} %>
 <% end %>
