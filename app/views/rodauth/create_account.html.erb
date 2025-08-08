@@ -4,7 +4,6 @@
       <%= form.text_field :email, {required: true, autofocus: true, placeholder: " ", value: params[rodauth.login_param], aria: ({invalid: true, describedby: "login_error_message"} if rodauth.field_error(rodauth.login_param))} %>
     <% end %>
     <%= error_tag(rodauth.field_error(rodauth.login_param), id: "login_error_message") if rodauth.field_error(rodauth.login_param) %>
-
     <%= form.labeled :password, "Password"  do %>
       <%= form.password_field :password, {required: true, placeholder: " "} %>
     <% end %>

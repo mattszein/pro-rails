@@ -1,5 +1,5 @@
 <%= render(Core::CardComponent.new) do %>
-<%= form_with url: rodauth.email_auth_path, method: :post, data: {turbo: false}, class: "w-full max-w-sm" do |form| %>
-  <%= form.button "Login", {fullw: true} %>
-<% end %>
+  <%= form_with url: rodauth.email_auth_path, method: :post, data: {turbo: false}, class: "w-full max-w-sm" do |form| %>
+    <%= form.button "Login", {fullw: true} %>
+  <% end %>
 <% end %>

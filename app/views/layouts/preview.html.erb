@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html class="<%= lookbook_display(:theme) %>">
-<head>
-  <title>Component Preview</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <head>
+    <title>Component Preview</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
@@ -12,12 +12,12 @@
     </script>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
-</head>
-<body class="bg-white dark:bg-gray-900 antialiased %>">
-  <div class="container mx-auto mt-8 p-6">
-    <div class="mx-auto" style="max-width: <%= lookbook_display(:max_width, "100%") %>">
-      <%= yield %>
+  </head>
+  <body class="bg-white dark:bg-gray-900 antialiased %>">
+    <div class="container mx-auto mt-8 p-6">
+      <div class="mx-auto" style="max-width: <%= lookbook_display(:max_width, "100%") %>">
+        <%= yield %>
+      </div>
     </div>
-  </div>
-</body>
+  </body>
 </html>

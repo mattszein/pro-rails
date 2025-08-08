@@ -482,6 +482,7 @@ DEPENDENCIES
   debug
   erb_lint
   freezolite
+  htmlbeautifier
   importmap-rails
   inline_svg
   jbuilder

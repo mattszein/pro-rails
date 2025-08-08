@@ -59,6 +59,7 @@ group :development, :test do
   gem "standard", ">= 1.35.1"
   gem "standard-rails"
   gem "erb_lint", require: false
+  gem "htmlbeautifier"
 end
 
 group :development do
