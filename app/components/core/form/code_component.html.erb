@@ -3,10 +3,9 @@
 <div data-core--form--code-component-target="parent">
 <% length %>
 <% (1..length).each do |n| %>
-  <input id="code_<%=n%>" type="text" data-action="input->core--form--code-component#handle_input paste->core--form--code-component#handle_paste keydown.backspace->core--form--code-component#handle_delete" maxlength="1" autocomplete="off" class="w-[38px] text-center bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:outline-hidden focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-500 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none dark:border-b-gray-700 dark:text-gray-400 dark:focus:ring-gray-600 dark:focus:border-b-gray-600">
+  <input id="code_<%= n %>" type="text" data-action="input->core--form--code-component#handle_input paste->core--form--code-component#handle_paste keydown.backspace->core--form--code-component#handle_delete" maxlength="1" autocomplete="off" class="w-[38px] text-center bg-transparent border-t-transparent border-b-2 border-x-transparent border-b-gray-200 text-sm focus:outline-hidden focus:border-t-transparent focus:border-x-transparent focus:border-b-blue-500 focus:ring-0 disabled:opacity-50 disabled:pointer-events-none dark:border-b-gray-700 dark:text-gray-400 dark:focus:ring-gray-600 dark:focus:border-b-gray-600">
 <% end %>
 </div>
-<input type="hidden" data-core--form--code-component-target="code" name="<%=input_name%>">
+<input type="hidden" data-core--form--code-component-target="code" name="<%= input_name %>">
 <button id="button-code" type="submit" class="hidden" data-core--form--code-component-target="button"></button>
 </div>
-

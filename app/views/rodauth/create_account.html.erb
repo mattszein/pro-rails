@@ -1,0 +1,18 @@
+<%= render(Core::CardComponent.new) do %>
+  <%= form_with url: rodauth.create_account_path, method: :post, data: {turbo: false}, class: "w-full max-w-sm" do |form| %>
+    <%= form.labeled :login, "Email"  do %>
+      <%= form.text_field :email, {required: true, autofocus: true, placeholder: " ", value: params[rodauth.login_param], aria: ({invalid: true, describedby: "login_error_message"} if rodauth.field_error(rodauth.login_param))} %>
+    <% end %>
+    <%= error_tag(rodauth.field_error(rodauth.login_param), id: "login_error_message") if rodauth.field_error(rodauth.login_param) %>
+    <%= form.labeled :password, "Password"  do %>
+      <%= form.password_field :password, {required: true, placeholder: " "} %>
+    <% end %>
+    <%= error_tag(rodauth.field_error(rodauth.password_param), id: "password_error_message") if rodauth.field_error(rodauth.password_param) %>
+    <%= form.labeled :password, "Password confirm"  do %>
+      <%= form.password_field "password-confirm", {required: true, placeholder: " "} %>
+    <% end %>
+    <div class="mt-6">
+      <%= form.button "Login", {fullw: true} %>
+    </div>
+  <% end %>
+<% end %>

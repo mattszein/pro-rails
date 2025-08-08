@@ -76,13 +76,21 @@ GEM
       public_suffix (>= 2.0.2, < 7.0)
     ast (2.4.3)
     base64 (0.3.0)
+    bcrypt (3.1.20)
     bcrypt_pbkdf (1.1.1)
     benchmark (0.4.1)
+    better_html (2.1.1)
+      actionview (>= 6.0)
+      activesupport (>= 6.0)
+      ast (~> 2.0)
+      erubi (~> 1.4)
+      parser (>= 2.4)
+      smart_properties
     bigdecimal (3.2.2)
     bindex (0.8.1)
     bootsnap (1.18.6)
       msgpack (~> 1.2)
-    brakeman (7.0.2)
+    brakeman (7.1.0)
       racc
     builder (3.3.0)
     capybara (3.40.0)
@@ -108,6 +116,13 @@ GEM
     drb (2.2.3)
     ed25519 (1.4.0)
     erb (5.0.1)
+    erb_lint (0.9.0)
+      activesupport
+      better_html (>= 2.0.1)
+      parser (>= 2.7.1.4)
+      rainbow
+      rubocop (>= 1)
+      smart_properties
     erubi (1.13.1)
     et-orbi (1.2.11)
       tzinfo
@@ -132,6 +147,9 @@ GEM
       actionpack (>= 6.0.0)
       activesupport (>= 6.0.0)
       railties (>= 6.0.0)
+    inline_svg (1.10.0)
+      activesupport (>= 3.0)
+      nokogiri (>= 1.6)
     io-console (0.8.0)
     irb (1.15.2)
       pp (>= 0.6.0)
@@ -285,6 +303,18 @@ GEM
       io-console (~> 0.5)
     require-hooks (0.2.2)
     rexml (3.4.1)
+    roda (3.93.0)
+      rack
+    rodauth (2.39.0)
+      roda (>= 2.6.0)
+      sequel (>= 4)
+    rodauth-model (0.4.0)
+      rodauth (~> 2.28)
+    rodauth-rails (2.1.0)
+      railties (>= 5.1, < 8.1)
+      roda (~> 3.76)
+      rodauth (~> 2.36)
+      rodauth-model (~> 0.2)
     rouge (4.5.2)
     rspec-core (3.13.4)
       rspec-support (~> 3.13.0)
@@ -339,6 +369,12 @@ GEM
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
+    sequel (5.94.0)
+      bigdecimal
+    sequel-activerecord_connection (2.0.0)
+      activerecord (>= 5.0, < 8.1)
+      sequel (~> 5.38)
+    smart_properties (1.17.0)
     solid_cable (3.0.8)
       actioncable (>= 7.2)
       activejob (>= 7.2)
@@ -392,6 +428,7 @@ GEM
     thruster (0.1.13)
     thruster (0.1.13-aarch64-linux)
     thruster (0.1.13-x86_64-linux)
+    tilt (2.6.0)
     timeout (0.4.3)
     turbo-rails (2.0.16)
       actionpack (>= 7.1.0)
@@ -438,12 +475,16 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
+  bcrypt (~> 3.1)
   bootsnap
-  brakeman
+  brakeman (~> 7.1.0)
   capybara
   debug
+  erb_lint
   freezolite
+  htmlbeautifier
   importmap-rails
+  inline_svg
   jbuilder
   kamal
   listen
@@ -452,9 +493,11 @@ DEPENDENCIES
   propshaft
   puma (>= 5.0)
   rails (~> 8.0.2)
+  rodauth-rails (~> 2.1)
   rspec-rails
   rubocop-rspec
   selenium-webdriver
+  sequel-activerecord_connection (~> 2.0)
   solid_cable
   solid_cache
   solid_queue
@@ -463,6 +506,7 @@ DEPENDENCIES
   stimulus-rails
   tailwindcss-rails (~> 4.2)
   thruster
+  tilt (~> 2.4)
   turbo-rails
   tzinfo-data
   view_component

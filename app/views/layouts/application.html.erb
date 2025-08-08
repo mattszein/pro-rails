@@ -7,24 +7,26 @@
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-
     <%= yield :head %>
-
     <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
     <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
-
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
-
-  <body>
-    <main class="container mx-auto mt-28 px-5 flex">
+  <body class="antialiased bg-gray-50 dark:bg-black" data-controller="closer">
+    <%= render partial: "partials/navbar" %>
+    <main class="pt-20 h-full mx-auto flex justify-center dark:text-gray-200">
       <%= yield %>
     </main>
+    <% if @current_account %>
+      <%= render(Core::SidebarComponent.new(open: @sidebar_open, navigation_items: sidebar_links)) %>
+    <% end %>
+    <% flash.each do |type, msg| %>
+      <%= render(Core::AlertComponent.new(type: type.to_sym, title: (type == "notice") ? "Info" : "Error", message: msg)) %>
+    <% end %>
   </body>
 </html>

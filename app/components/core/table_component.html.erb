@@ -10,9 +10,9 @@
     <% @rows.each.with_index(0) do |row, index| %>
       <% puts row %>
       <tr id="<%= row.class.method_defined?(:id) ? dom_id(row) : index %>">
-      <% @columns.each do |col| %>
-        <td class="px-4 py-2"><%= view_context.capture(row, &col.td_block) %></td>
-      <% end %>
+        <% @columns.each do |col| %>
+          <td class="px-4 py-2"><%= view_context.capture(row, &col.td_block) %></td>
+        <% end %>
       </tr>
     <% end %>
   </tbody>

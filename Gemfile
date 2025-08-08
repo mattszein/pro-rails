@@ -45,18 +45,21 @@ gem "view_component"
 gem "view_component-form"
 
 gem "tailwindcss-rails", "~> 4.2"
+gem "inline_svg"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[mri windows], require: "debug/prelude"
 
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
-  gem "brakeman", require: false
+  gem "brakeman", "~> 7.1.0", require: false
 
   gem "rspec-rails"
   gem "rubocop-rspec"
   gem "standard", ">= 1.35.1"
   gem "standard-rails"
+  gem "erb_lint", require: false
+  gem "htmlbeautifier"
 end
 
 group :development do
@@ -71,3 +74,11 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
+
+gem "rodauth-rails", "~> 2.1"
+# Enables Sequel to use Active Record's database connection
+gem "sequel-activerecord_connection", "~> 2.0", require: false
+# Used by Rodauth for password hashing
+gem "bcrypt", "~> 3.1", require: false
+# Used by Rodauth for rendering built-in view and email templates
+gem "tilt", "~> 2.4", require: false
