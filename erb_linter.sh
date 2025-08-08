@@ -19,7 +19,7 @@ run_command() {
 
   if command_exists docker-compose && service_exists; then
     echo "  → Running in Docker container (rails service)..."
-    docker-compose exec rails bash -c "$cmd"
+    docker-compose run --rm --no-deps rails bash -c "$cmd"
     return $?
   else
     if command_exists docker-compose; then

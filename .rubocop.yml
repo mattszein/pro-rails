@@ -23,5 +23,6 @@ inherit_from:
   - .rubocop/strict.yml
 
 AllCops:
+  NewCops: enable
   SuggestExtensions: false
   TargetRubyVersion: 3.4
