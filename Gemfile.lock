@@ -74,6 +74,21 @@ GEM
       uri (>= 0.13.1)
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
+    anycable (1.6.0)
+      anycable-core (= 1.6.0)
+      grpc (~> 1.6)
+    anycable-core (1.6.0)
+      anyway_config (~> 2.2)
+      base64 (>= 0.2)
+      google-protobuf (~> 4)
+      stringio (~> 3)
+    anycable-rails (1.6.0)
+      anycable
+      anycable-rails-core (= 1.6.0)
+    anycable-rails-core (1.6.0)
+      actioncable (>= 7.0, < 9.0)
+      anycable-core (~> 1.6.0)
+      globalid
     anyway_config (2.7.2)
       ruby-next-core (~> 1.0)
     ast (2.4.3)
@@ -141,6 +156,38 @@ GEM
       raabro (~> 1.4)
     globalid (1.2.1)
       activesupport (>= 6.1)
+    google-protobuf (4.31.1)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.31.1-aarch64-linux-gnu)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.31.1-aarch64-linux-musl)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.31.1-x86_64-linux-gnu)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.31.1-x86_64-linux-musl)
+      bigdecimal
+      rake (>= 13)
+    googleapis-common-protos-types (1.20.0)
+      google-protobuf (>= 3.18, < 5.a)
+    grpc (1.74.1)
+      google-protobuf (>= 3.25, < 5.0)
+      googleapis-common-protos-types (~> 1.0)
+    grpc (1.74.1-aarch64-linux-gnu)
+      google-protobuf (>= 3.25, < 5.0)
+      googleapis-common-protos-types (~> 1.0)
+    grpc (1.74.1-aarch64-linux-musl)
+      google-protobuf (>= 3.25, < 5.0)
+      googleapis-common-protos-types (~> 1.0)
+    grpc (1.74.1-x86_64-linux-gnu)
+      google-protobuf (>= 3.25, < 5.0)
+      googleapis-common-protos-types (~> 1.0)
+    grpc (1.74.1-x86_64-linux-musl)
+      google-protobuf (>= 3.25, < 5.0)
+      googleapis-common-protos-types (~> 1.0)
     htmlbeautifier (1.4.3)
     htmlentities (4.3.4)
     i18n (1.14.7)
@@ -478,6 +525,7 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
+  anycable-rails (~> 1.6)
   anyway_config (~> 2.0)
   bcrypt (~> 3.1)
   bootsnap
