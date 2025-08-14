@@ -1,0 +1,15 @@
+<div class="w-full">
+  <div class="flex justify-between items-center pb-2">
+    <h1 class="text-xl font-semibold">Accounts</h1>
+  </div>
+
+  <%= render Core::CardComponent.new({padding: :none}) do %>
+    <div class="flex p-4 gap-4">
+      <%= render Core::TableComponent.new(rows: @accounts) do |table| %>
+        <%= table.column("Email") { |account| account.email } %>
+        <%= table.column("Actions") { |account| link_to "Show", adminit_account_path(account), class: "text-indigo-500 font-bold" } %>
+      <% end %>
+
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,20 @@
+<div class="md:flex items-center justify-between mb-4">
+  <h1 class="text-xl">
+    <%= link_to "Accounts", adminit_accounts_path, class: "text-indigo-500" %>
+  </h1>
+</div>
+
+<div class="flex flex-col gap-6">
+<%= render(Core::CardComponent.new({padding: :sm})) do %>
+<dl class="text-gray-900 dark:text-white dark:divide-gray-700 text-left grid grid-cols-3 gap-4">
+    <div>
+        <dt class="text-gray-500 md:text-md dark:text-gray-400">Id</dt>
+        <dd class="text-md font-semibold"><%= @account.id %></dd>
+    </div>
+    <div>
+        <dt class="text-gray-500 md:text-md dark:text-gray-400">Name</dt>
+        <dd class="text-md font-semibold"><%= @account.email %></dd>
+    </div>
+</dl>
+<% end %>
+<div>
