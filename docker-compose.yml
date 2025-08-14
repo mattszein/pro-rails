@@ -17,6 +17,7 @@ services:
       RAILS_MAX_THREADS: 5
       MAILER_ADDRESS: "maildev"
       MAILER_PORT: 1025
+      REDIS_URL: redis://redis:6379/1
       ANYCABLE_SECRET: anycable_key
       CABLE_URL: ws://localhost:8080/cable
       # ----
@@ -93,7 +94,8 @@ services:
       ANYCABLE_TURBO_STREAMS: true
       ANYCABLE_SECRET: anycable_key
       ANYCABLE_JWT_ID_KEY: anycable_key
-      ANYCABLE_BROADCAST_ADAPTER: "redisx"
+      ANYCABLE_BROADCAST_ADAPTER: "redis"
+      ANYCABLE_BROKER: "memory"
       ANYCABLE_REDIS_CHANNEL: __anycable__
     depends_on:
       redis:

@@ -34,4 +34,9 @@ module ApplicationHelper
   def error_tag(content, options = {})
     content_tag(:span, content, class: "block mt-1 text-red-600 text-xs dark:text-red-400", id: options[:id])
   end
+
+  TICKET_STATUS_THEME = {open: :green, closed: :red, in_progress: :yellow}
+  def ticket_status_theme(status)
+    TICKET_STATUS_THEME[status.to_sym]
+  end
 end

@@ -4,4 +4,8 @@
       <%= icon "adminit/accounts", {} %>
       <span class="opacity-100 text-gray-600 dark:text-white ml-2 text-md group-hover/drawer:opacity-100 group-hover/drawer:transition-opacity">Accounts</span>
   <% end %>
+    <%= render(Core::LinkComponent.new(url: adminit_tickets_path, options: {class: link_style, custom_style: {style: :no_style}})) do %>
+      <%= icon "adminit/tickets", {} %>
+      <span class="text-gray-600 ml-2 text-md">Tickets</span>
+    <% end %>
 </nav>

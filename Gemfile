@@ -47,6 +47,7 @@ gem "view_component-form"
 gem "tailwindcss-rails", "~> 4.2"
 gem "inline_svg"
 
+gem "redis", "~> 5.4", ">= 5.4.1"
 gem "anyway_config", "~> 2.0"
 gem "anycable-rails", "~> 1.6"
 

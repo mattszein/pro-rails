@@ -38,3 +38,5 @@
 
 /config/*.local.yml
 /config/credentials/local.*
+
+/vendor/javascript/*
