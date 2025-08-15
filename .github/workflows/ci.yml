@@ -65,11 +65,20 @@ jobs:
           - 5432:5432
         options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=3
 
-    #  redis:
-    #    image: redis
-    #    ports:
-    #      - 6379:6379
-    #    options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+        options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
+      anycable:
+        image: anycable/anycable-go:1.6.3-alpine
+        ports: ["8080:8080"]
+        options: --add-host=host.docker.internal:host-gateway
+        env:
+          ANYCABLE_HOST: "0.0.0.0"
+          ANYCABLE_REDIS_URL: redis://host.docker.internal:6379/0
+          ANYCABLE_RPC_HOST: host.docker.internal:50051
+          ANYCABLE_WEBSOCKET_URL: "ws://host.docker.internal:8080/cable"
     steps:
       - name: Install packages
         run: sudo apt-get update && sudo apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev pkg-config google-chrome-stable
@@ -87,7 +96,7 @@ jobs:
         env:
           RAILS_ENV: test
           DATABASE_URL: postgres://postgres:postgres@localhost:5432
-          # REDIS_URL: redis://localhost:6379/0
+          REDIS_URL: redis://localhost:6379/0
         run: bin/rails db:test:prepare test test:system
 
       - name: Keep screenshots from failed system tests

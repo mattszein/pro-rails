@@ -19,7 +19,7 @@ services:
       MAILER_PORT: 1025
       REDIS_URL: redis://redis:6379/1
       ANYCABLE_SECRET: anycable_key
-      CABLE_URL: ws://localhost:8080/cable
+      ANYCABLE_CABLE_URL: ws://localhost:8080/cable
       # ----
       # Dev tools
       # ----
