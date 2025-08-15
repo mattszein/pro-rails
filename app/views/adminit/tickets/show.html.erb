@@ -1,0 +1,13 @@
+<div class="w-full">
+  <div class="flex justify-between items-center pb-2">
+    <%= link_to "Back to Tickets", adminit_tickets_path, class: "text-indigo-500" %>
+<div class="flex gap-2 items-center px-4">
+    <%= render(Core::LinkComponent.new(name: "Edit", url: edit_adminit_ticket_path(@ticket), options: {data: {turbo_frame: "modal"}, custom_style: {style: :as_button, theme: :edit, size: :sm}})) %>
+    <%= render(Core::LinkComponent.new(name: "Delete", url: adminit_ticket_path(@ticket), options: {custom_style: {style: :as_button, theme: :delete, size: :sm}, method: :delete, data: {turbo: true, turbo_method: :delete, turbo_confirm: "Are you sure?"}})) %>
+
+  </div>
+  </div>
+
+  <%= turbo_stream_from dom_id @ticket %>
+  <%= render @ticket %>
+</div>

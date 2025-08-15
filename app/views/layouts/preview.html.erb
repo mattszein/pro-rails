@@ -11,6 +11,7 @@
       sessionStorage.setItem('lookbook', 'true');
     </script>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= action_cable_with_jwt_meta_tag %>
     <%= javascript_importmap_tags %>
   </head>
   <body class="bg-white dark:bg-gray-900 antialiased %>">

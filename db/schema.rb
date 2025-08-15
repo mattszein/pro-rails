@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_08_011545) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_14_181451) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -54,9 +54,24 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_08_011545) do
     t.check_constraint "email ~ '^[^,;@ \r\n]+@[^,@; \r\n]+.[^,@; \r\n]+$'::citext", name: "valid_email"
   end
 
+  create_table "tickets", force: :cascade do |t|
+    t.string "title"
+    t.text "description"
+    t.integer "priority"
+    t.integer "status", default: 0
+    t.bigint "created_id"
+    t.bigint "assigned_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["assigned_id"], name: "index_tickets_on_assigned_id"
+    t.index ["created_id"], name: "index_tickets_on_created_id"
+  end
+
   add_foreign_key "account_email_auth_keys", "accounts", column: "id"
   add_foreign_key "account_login_change_keys", "accounts", column: "id"
   add_foreign_key "account_password_reset_keys", "accounts", column: "id"
   add_foreign_key "account_remember_keys", "accounts", column: "id"
   add_foreign_key "account_verification_keys", "accounts", column: "id"
+  add_foreign_key "tickets", "accounts", column: "assigned_id"
+  add_foreign_key "tickets", "accounts", column: "created_id"
 end

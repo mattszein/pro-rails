@@ -17,6 +17,9 @@ services:
       RAILS_MAX_THREADS: 5
       MAILER_ADDRESS: "maildev"
       MAILER_PORT: 1025
+      REDIS_URL: redis://redis:6379/1
+      ANYCABLE_SECRET: anycable_key
+      ANYCABLE_CABLE_URL: ws://localhost:8080/cable
       # ----
       # Dev tools
       # ----
@@ -60,6 +63,43 @@ services:
         condition: service_healthy
       maildev:
         condition: service_started
+      redis:
+        condition: service_healthy
+      ws:
+        condition: service_started
+
+  redis:
+    image: redis:8.2.0-alpine3.22
+    volumes:
+      - pro-rails-redis:/data
+    ports:
+      - 6379:6379
+    healthcheck:
+      test: redis-cli ping
+      interval: 1s
+      timeout: 3s
+      retries: 30
+
+  ws:
+    image: anycable/anycable-go:1.6.3-alpine
+    ports:
+      - "8080:8080"
+      - "8090:8090"
+    environment:
+      ANYCABLE_HOST: "0.0.0.0"
+      ANYCABLE_PORT: 8080
+      ANYCABLE_REDIS_URL: redis://redis:6379/0
+      ANYCABLE_RPC_HOST: anycable:50051
+      ANYCABLE_DEBUG: true
+      ANYCABLE_TURBO_STREAMS: true
+      ANYCABLE_SECRET: anycable_key
+      ANYCABLE_JWT_ID_KEY: anycable_key
+      ANYCABLE_BROADCAST_ADAPTER: "redis"
+      ANYCABLE_BROKER: "memory"
+      ANYCABLE_REDIS_CHANNEL: __anycable__
+    depends_on:
+      redis:
+        condition: service_healthy
 
   maildev:
     image: maildev/maildev
@@ -83,3 +123,4 @@ volumes:
   pro-rails-storage:
   pro-rails-history:
   pro-rails-mc-data:
+  pro-rails-redis:

@@ -1,0 +1,3 @@
+<% flash.each do |type, msg| %>
+  <%= render(Core::AlertComponent.new(type: type.to_sym, title: (type == "notice") ? "Info" : "Error", message: msg)) %>
+<% end %>

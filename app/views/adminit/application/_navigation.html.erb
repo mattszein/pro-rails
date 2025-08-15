@@ -1,0 +1,11 @@
+<nav class="opacity-0 flex invisible group-hover/drawer:visible group-hover/drawer:opacity-100 transition-opacity easy-in-out duration-300 flex-col w-full px-4">
+  <% link_style = "flex gap-2 items-center p-3 hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 rounded-sm w-full group/link" %>
+    <%= render(Core::LinkComponent.new(url: adminit_accounts_path, options: {class: link_style, custom_style: {style: :no_style}})) do %>
+      <%= icon "adminit/accounts", {} %>
+      <span class="opacity-100 text-gray-600 dark:text-white ml-2 text-md group-hover/drawer:opacity-100 group-hover/drawer:transition-opacity">Accounts</span>
+  <% end %>
+    <%= render(Core::LinkComponent.new(url: adminit_tickets_path, options: {class: link_style, custom_style: {style: :no_style}})) do %>
+      <%= icon "adminit/tickets", {} %>
+      <span class="text-gray-600 ml-2 text-md">Tickets</span>
+    <% end %>
+</nav>

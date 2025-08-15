@@ -1,0 +1,14 @@
+<div id="<%= dom_id account %>">
+  <%= render(Core::CardComponent.new({padding: :sm})) do %>
+  <dl class="flex flex-col text-gray-900 dark:text-white dark:divide-gray-700 text-left gap-4 divide-y divide-gray-200">
+      <div>
+          <dt class="text-gray-500 md:text-md dark:text-gray-400">Email</dt>
+          <dd class="text-md font-semibold"><%= account.email %></dd>
+      </div>
+      <div>
+          <dt class="text-gray-500 md:text-md dark:text-gray-400">Status</dt>
+          <dd class="text-md font-semibold"><%= render(Core::BadgeComponent.new("Active", options: {})) %></dd>
+      </div>
+  </dl>
+  <% end %>
+</div>

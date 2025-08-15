@@ -1,0 +1,28 @@
+<%= form_with(model: [:adminit, ticket], data: {turbo: true}) do |form| %>
+  <% if ticket.errors.any? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+      <h2><%= pluralize(ticket.errors.count, "error") %> prohibited this ticket from being saved:</h2>
+
+      <ul>
+        <% ticket.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+    <%= form.labeled :title do %>
+      <%= form.text_field :title, {autofocus: true, required: true, placeholder: " ", class: "w-full"} %>
+    <% end %>
+    <div class="mt-6">
+    <%= form.label :description, class: "sr-only" %>
+    <%= form.text_area :description, rows: 4, placeholder: "Write your ticket description here", class: "w-full mt-4" %>
+    </div>
+    <div class="mt-6">
+    <%= form.label :priority, class: "mr-2" %>
+    <%= form.counter :priority, {value: ticket&.priority || 5, min: 1, max: 5} %>
+    </div>
+    <%= form.hidden_field :created_id, value: current_account.id %>
+  <div class="mt-6">
+    <%= form.button "Save", {theme: :create, fullw: true} %>
+  </div>
+<% end %>

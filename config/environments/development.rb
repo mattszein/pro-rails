@@ -93,5 +93,5 @@ Rails.application.configure do
   }
 
   config.importmap.cache_sweepers << Rails.root.join("app/components")
-  config.turbo.signed_stream_verifier_key = ENV.fetch("TURBO_RAILS_KEY", "turbo_rails_key")
+  config.turbo.signed_stream_verifier_key = ENV.fetch("ANYCABLE_SECRET", "anycable_key")
 end

@@ -15,6 +15,7 @@
     <link rel="apple-touch-icon" href="/icon.png">
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= action_cable_with_jwt_meta_tag %>
     <%= javascript_importmap_tags %>
   </head>
   <body class="antialiased bg-gray-50 dark:bg-black" data-controller="closer">
@@ -25,8 +26,8 @@
     <% if @current_account %>
       <%= render(Core::SidebarComponent.new(open: @sidebar_open, navigation_items: sidebar_links)) %>
     <% end %>
-    <% flash.each do |type, msg| %>
-      <%= render(Core::AlertComponent.new(type: type.to_sym, title: (type == "notice") ? "Info" : "Error", message: msg)) %>
-    <% end %>
+    <div id="flashes_id">
+      <%= render "shared/flashes" %>
+    </div>
   </body>
 </html>

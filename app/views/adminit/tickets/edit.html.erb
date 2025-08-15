@@ -1,0 +1,5 @@
+<%= render(Core::ModalComponent.new(title: "Editing Ticket")) do %>
+  <%= turbo_frame_tag "ticket_form" do %>
+    <%= render "form", ticket: @ticket %>
+  <% end %>
+<% end %>
