@@ -96,6 +96,7 @@ jobs:
           RAILS_ENV: test
           DATABASE_URL: postgres://postgres:postgres@localhost:5432
           REDIS_URL: redis://localhost:6379/0
+          ANYCABLE_SECRET: anycable_key
         run: |
           export ANYCABLE_WEBSOCKET_URL="ws://$(hostname):8080/cable"
           bin/rails db:test:prepare test test:system
