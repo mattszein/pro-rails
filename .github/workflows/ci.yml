@@ -78,7 +78,6 @@ jobs:
           ANYCABLE_HOST: "0.0.0.0"
           ANYCABLE_REDIS_URL: redis://host.docker.internal:6379/0
           ANYCABLE_RPC_HOST: host.docker.internal:50051
-          ANYCABLE_WEBSOCKET_URL: "ws://host.docker.internal:8080/cable"
     steps:
       - name: Install packages
         run: sudo apt-get update && sudo apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev pkg-config google-chrome-stable
@@ -97,7 +96,9 @@ jobs:
           RAILS_ENV: test
           DATABASE_URL: postgres://postgres:postgres@localhost:5432
           REDIS_URL: redis://localhost:6379/0
-        run: bin/rails db:test:prepare test test:system
+        run: |
+          export ANYCABLE_WEBSOCKET_URL="ws://$(hostname):8080/cable"
+          bin/rails db:test:prepare test test:system
 
       - name: Keep screenshots from failed system tests
         uses: actions/upload-artifact@v4
