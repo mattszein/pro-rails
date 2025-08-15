@@ -20,13 +20,10 @@ default: &default # Turn on/off access logs ("Started..." and "Finished...")
   # http_broadcast_url: "http://localhost:8090/_broadcast"
   # Must be the same as in your AnyCable server config
   secret: <%= ENV.fetch("ANYCABLE_SECRET") { 'anycable_key' } %>
+  websocket_url: <%= ENV.fetch("CABLE_URL", "ws://localhost:8080/cable") %>
 
 development:
   <<: *default
-  # WebSocket endpoint of your AnyCable server for clients to connect to
-  # Make sure you have the `action_cable_meta_tag` in your HTML layout
-  # to propogate this value to the client app
-  websocket_url: <%= ENV.fetch("CABLE_URL", "ws://localhost:8080/cable") %>
 
 test:
   <<: *default
