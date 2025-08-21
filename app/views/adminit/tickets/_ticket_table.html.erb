@@ -1,4 +1,4 @@
-  <tr id="<%= dom_id ticket %>">
+  <tr id="<%= dom_id ticket, "admin" %>">
     <td class="px-4 py-2"><%= ticket.title %></td>
     <td class="px-4 py-2"><%= ticket.description %></td>
     <td class="px-4 py-2"><%= render(Core::BadgeComponent.new(ticket.status, options: {custom_style: {theme: ticket_status_theme(ticket.status)}})) %></td>

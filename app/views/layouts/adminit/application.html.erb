@@ -23,14 +23,14 @@
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= action_cable_with_jwt_meta_tag %>
     <%= javascript_importmap_tags %>
-
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
   </head>
   <body class="min-h-screen bg-indigo-50 dark:bg-black">
     <div class="md:flex w-full min-h-screen z-30">
       <%= render(Core::DrawerComponent.new(title: "RailsApp | Menu")) do %>
         <%= render "navigation" %>
       <% end %>
-      <main class="flex-grow pt-16 pl-8 pr-8 overflow-x-scroll" role="main">
+      <main class="flex-grow pt-16 px-8 overflow-x-scroll" role="main">
         <%= turbo_frame_tag "modal", target: "_top" %>
         <%= yield %>
       </main>

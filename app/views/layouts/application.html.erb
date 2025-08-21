@@ -20,7 +20,8 @@
   </head>
   <body class="antialiased bg-gray-50 dark:bg-black" data-controller="closer">
     <%= render partial: "partials/navbar" %>
-    <main class="pt-20 h-full mx-auto flex justify-center dark:text-gray-200">
+    <main class="pt-20 px-8 h-full mx-auto flex justify-center dark:text-gray-200">
+      <%= turbo_frame_tag "modal", target: "_top" %>
       <%= yield %>
     </main>
     <% if @current_account %>

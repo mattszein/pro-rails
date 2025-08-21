@@ -26,6 +26,9 @@
 #     en:
 #       "yes": yup
 #       enabled: "ON"
-
 en:
-  hello: "Hello world"
+  authentication:
+    unauthenticated: "You need to sign in before continuing."
+  adminit:
+    authorization:
+      unauthorized: "You are not worthy!"

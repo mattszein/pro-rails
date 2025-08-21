@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_14_181451) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_18_141836) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -50,8 +50,31 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_14_181451) do
     t.citext "email", null: false
     t.string "password_hash"
     t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.bigint "role_id"
     t.index ["email"], name: "index_accounts_on_email", unique: true, where: "(status = ANY (ARRAY[1, 2]))"
+    t.index ["role_id"], name: "index_accounts_on_role_id"
     t.check_constraint "email ~ '^[^,;@ \r\n]+@[^,@; \r\n]+.[^,@; \r\n]+$'::citext", name: "valid_email"
+  end
+
+  create_table "permissions", force: :cascade do |t|
+    t.string "resource"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["resource"], name: "index_permissions_on_resource", unique: true
+  end
+
+  create_table "permissions_roles", id: false, force: :cascade do |t|
+    t.bigint "permission_id", null: false
+    t.bigint "role_id", null: false
+    t.index ["permission_id", "role_id"], name: "index_permissions_roles_on_permission_id_and_role_id", unique: true
+    t.index ["permission_id"], name: "index_permissions_roles_on_permission_id"
+    t.index ["role_id"], name: "index_permissions_roles_on_role_id"
+  end
+
+  create_table "roles", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "tickets", force: :cascade do |t|
@@ -72,6 +95,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_14_181451) do
   add_foreign_key "account_password_reset_keys", "accounts", column: "id"
   add_foreign_key "account_remember_keys", "accounts", column: "id"
   add_foreign_key "account_verification_keys", "accounts", column: "id"
+  add_foreign_key "accounts", "roles"
   add_foreign_key "tickets", "accounts", column: "assigned_id"
   add_foreign_key "tickets", "accounts", column: "created_id"
 end
