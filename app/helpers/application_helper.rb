@@ -39,4 +39,8 @@ module ApplicationHelper
   def ticket_status_theme(status)
     TICKET_STATUS_THEME[status.to_sym]
   end
+
+  def form_classes
+    "w-full max-w-sm space-y-4"
+  end
 end

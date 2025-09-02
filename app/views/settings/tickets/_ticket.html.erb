@@ -13,7 +13,7 @@
             <!-- Main Ticket Details -->
             <div class="lg:col-span-2 space-y-6">
                 <!-- Ticket Info Card -->
-                <%= render(Core::CardComponent.new({padding: :sm})) do %>
+                <%= render(Core::CardComponent.new({variant: :glass, glow: true})) do %>
                     <div class="flex flex-wrap items-center gap-4 mb-6">
                         <%= render(Core::BadgeComponent.new(ticket.status, options: {custom_style: {theme: ticket_status_theme(ticket.status), icon: "info", size: :md}})) %>
                         <%= render(Core::BadgeComponent.new("In Progress", options: {custom_style: {theme: :red, indicator: true, size: :md}})) %>
@@ -33,7 +33,7 @@
           <!-- Sidebar -->
             <div class="space-y-6">
                <!-- Actions Card -->
-              <%= render(Core::CardComponent.new({padding: :sm})) do %>
+              <%= render(Core::CardComponent.new({variant: :glass, glow: true})) do %>
                     <h3 class="text-lg font-semibold text-slate-800 mb-4">Actions</h3>
                     <div class="space-y-3">
                         <button class="w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">Edit</button>

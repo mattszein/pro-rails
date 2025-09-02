@@ -1,86 +1,84 @@
-# frozen_string_literal: true
-
 class Core::Form::ButtonComponent < ViewComponent::Form::ButtonComponent
   attr_accessor :theme, :size
 
   THEME_MAPPINGS = {
     primary: {
-      base: "bg-white dark:bg-white/[0.02] border-violet-500/20 text-violet-600 dark:text-violet-300",
-      hover_bg: "hover:bg-violet-500/[0.04] dark:hover:bg-violet-400/[0.12]",
-      hover_border: "hover:border-violet-400/60 dark:hover:border-violet-300/50",
-      focus: "focus:ring-violet-500/30 dark:focus:ring-violet-400/40",
+      base: "bg-highlight border-violet-500/30",
+      text_base: "text-violet-500 dark:text-violet-300",
+      text_hover: "hover:text-violet-700 dark:hover:text-violet-200",
+      hover_border: "hover:border-violet-500/60 dark:hover:border-violet-300/50",
+      focus: "focus:text-violet-700 dark:focus:text-violet-200 focus:border-violet-500/60 dark:focus:border-violet-300/50 focus:ring-violet-500/30 dark:focus:ring-violet-400/40",
       shimmer: "after:absolute after:inset-0 after:rounded-lg after:pointer-events-none " \
         "after:bg-gradient-to-r after:from-transparent " \
-        "after:via-violet-400/[0.15] dark:after:via-white/15 after:to-transparent " \
+        "after:via-violet-800/[0.15] dark:after:via-white/15 after:to-transparent " \
         "after:translate-x-[-100%] after:opacity-0 " \
         "hover:after:translate-x-[100%] hover:after:opacity-100 " \
-        "after:transition-all after:duration-500 after:ease-out",
-      text_glow: "hover:text-violet-500 dark:hover:text-violet-200"
+        "after:transition-all after:duration-300 after:ease-out"
     },
     secondary: {
-      base: "bg-white dark:bg-white/[0.02] border-pink-500/20 text-pink-600 dark:text-pink-300",
-      hover_bg: "hover:bg-pink-500/[0.04] dark:hover:bg-pink-400/[0.12]",
-      hover_border: "hover:border-pink-400/60 dark:hover:border-pink-300/50",
-      focus: "focus:ring-pink-500/30 dark:focus:ring-pink-400/40",
+      base: "bg-highlight border-pink-500/30",
+      text_base: "text-pink-500 dark:text-pink-300",
+      text_hover: "hover:text-pink-700 dark:hover:text-pink-200",
+      hover_border: "hover:border-pink-500/60 dark:hover:border-pink-300/50",
+      focus: "focus:text-pink-700 dark:focus:text-pink-200 focus:border-pink-500/60 dark:focus:border-pink-300/50 focus:ring-pink-500/30 dark:focus:ring-pink-400/40",
       shimmer: "after:absolute after:inset-0 after:rounded-lg after:pointer-events-none " \
         "after:bg-gradient-to-r after:from-transparent " \
-        "after:via-pink-400/[0.15] dark:after:via-white/15 after:to-transparent " \
+        "after:via-pink-800/[0.15] dark:after:via-white/15 after:to-transparent " \
         "after:translate-x-[-100%] after:opacity-0 " \
         "hover:after:translate-x-[100%] hover:after:opacity-100 " \
-        "after:transition-all after:duration-500 after:ease-out",
-      text_glow: "hover:text-pink-500 dark:hover:text-pink-200"
+        "after:transition-all after:duration-300 after:ease-out"
     },
     create: {
-      base: "bg-white/5 dark:bg-white/[0.02] border-emerald-500/20 text-emerald-600 dark:text-emerald-300",
-      hover_bg: "hover:bg-emerald-500/[0.04] dark:hover:bg-emerald-400/[0.12]",
-      hover_border: "hover:border-emerald-400/60 dark:hover:border-emerald-300/50",
-      focus: "focus:ring-emerald-500/30 dark:focus:ring-emerald-400/40",
+      base: "bg-highlight border-emerald-500/30",
+      text_base: "text-emerald-500 dark:text-emerald-300",
+      text_hover: "hover:text-emerald-700 dark:hover:text-emerald-200",
+      hover_border: "hover:border-emerald-500/60 dark:hover:border-emerald-300/50",
+      focus: "focus:text-emerald-700 dark:focus:text-emerald-200 focus:border-emerald-500/60 dark:focus:border-emerald-300/50 focus:ring-emerald-500/30 dark:focus:ring-emerald-400/40",
       shimmer: "after:absolute after:inset-0 after:rounded-lg after:pointer-events-none " \
         "after:bg-gradient-to-r after:from-transparent " \
-        "after:via-emerald-400/[0.15] dark:after:via-white/15 after:to-transparent " \
+        "after:via-emerald-800/[0.15] dark:after:via-white/15 after:to-transparent " \
         "after:translate-x-[-100%] after:opacity-0 " \
         "hover:after:translate-x-[100%] hover:after:opacity-100 " \
-        "after:transition-all after:duration-500 after:ease-out",
-      text_glow: "hover:text-emerald-500 dark:hover:text-emerald-200"
+        "after:transition-all after:duration-300 after:ease-out"
     },
     edit: {
-      base: "bg-white/5 dark:bg-white/[0.02] border-blue-500/20 text-blue-600 dark:text-blue-300",
-      hover_bg: "hover:bg-blue-500/[0.04] dark:hover:bg-blue-400/[0.12]",
-      hover_border: "hover:border-blue-400/60 dark:hover:border-blue-300/50",
-      focus: "focus:ring-blue-500/30 dark:focus:ring-blue-400/40",
+      base: "bg-highlight border-blue-500/30",
+      text_base: "text-blue-500 dark:text-blue-300",
+      text_hover: "hover:text-blue-700 dark:hover:text-blue-200",
+      hover_border: "hover:border-blue-500/60 dark:hover:border-blue-300/50",
+      focus: "focus:text-blue-700 dark:focus:text-blue-200 focus:border-blue-500/60 dark:focus:border-blue-300/50 focus:ring-blue-500/30 dark:focus:ring-blue-400/40",
       shimmer: "after:absolute after:inset-0 after:rounded-lg after:pointer-events-none " \
         "after:bg-gradient-to-r after:from-transparent " \
-        "after:via-blue-400/[0.15] dark:after:via-white/15 after:to-transparent " \
+        "after:via-blue-800/[0.15] dark:after:via-white/15 after:to-transparent " \
         "after:translate-x-[-100%] after:opacity-0 " \
         "hover:after:translate-x-[100%] hover:after:opacity-100 " \
-        "after:transition-all after:duration-500 after:ease-out",
-      text_glow: "hover:text-blue-500 dark:hover:text-blue-200"
+        "after:transition-all after:duration-300 after:ease-out"
     },
     delete: {
-      base: "bg-white/5 dark:bg-white/[0.02] border-red-500/20 text-red-600 dark:text-red-300",
-      hover_bg: "hover:bg-red-500/[0.04] dark:hover:bg-red-400/[0.12]",
-      hover_border: "hover:border-red-400/60 dark:hover:border-red-300/50",
-      focus: "focus:ring-red-500/30 dark:focus:ring-red-400/40",
+      base: "bg-highlight border-red-500/30",
+      text_base: "text-red-500 dark:text-red-300",
+      text_hover: "hover:text-red-700 dark:hover:text-red-200",
+      hover_border: "hover:border-red-500/60 dark:hover:border-red-300/50",
+      focus: "focus:text-red-700 dark:focus:text-red-200 focus:border-red-500/60 dark:focus:border-red-300/50 focus:ring-red-500/30 dark:focus:ring-red-400/40",
       shimmer: "after:absolute after:inset-0 after:rounded-lg after:pointer-events-none " \
         "after:bg-gradient-to-r after:from-transparent " \
-        "after:via-red-400/[0.15] dark:after:via-white/15 after:to-transparent " \
+        "after:via-red-800/[0.15] dark:after:via-white/15 after:to-transparent " \
         "after:translate-x-[-100%] after:opacity-0 " \
         "hover:after:translate-x-[100%] hover:after:opacity-100 " \
-        "after:transition-all after:duration-500 after:ease-out",
-      text_glow: "hover:text-red-500 dark:hover:text-red-200"
+        "after:transition-all after:duration-300 after:ease-out"
     },
     show: {
-      base: "bg-white/5 dark:bg-white/[0.02] border-indigo-500/20 text-indigo-600 dark:text-indigo-300",
-      hover_bg: "hover:bg-indigo-500/[0.04] dark:hover:bg-indigo-400/[0.12]",
-      hover_border: "hover:border-indigo-400/60 dark:hover:border-indigo-300/50",
-      focus: "focus:ring-indigo-500/30 dark:focus:ring-indigo-400/40",
+      base: "bg-highlight border-indigo-500/30",
+      text_base: "text-indigo-500 dark:text-indigo-300",
+      text_hover: "hover:text-indigo-700 dark:hover:text-indigo-200",
+      hover_border: "hover:border-indigo-500/60 dark:hover:border-indigo-300/50",
+      focus: "focus:text-indigo-700 dark:focus:text-indigo-200 focus:border-indigo-500/60 dark:focus:border-indigo-300/50 focus:ring-indigo-500/30 dark:focus:ring-indigo-400/40",
       shimmer: "after:absolute after:inset-0 after:rounded-lg after:pointer-events-none " \
         "after:bg-gradient-to-r after:from-transparent " \
-        "after:via-indigo-400/[0.15] dark:after:via-white/15 after:to-transparent " \
+        "after:via-indigo-800/[0.15] dark:after:via-white/15 after:to-transparent " \
         "after:translate-x-[-100%] after:opacity-0 " \
         "hover:after:translate-x-[100%] hover:after:opacity-100 " \
-        "after:transition-all after:duration-500 after:ease-out",
-      text_glow: "hover:text-indigo-500 dark:hover:text-indigo-200"
+        "after:transition-all after:duration-300 after:ease-out"
     }
   }
 
@@ -107,18 +105,18 @@ class Core::Form::ButtonComponent < ViewComponent::Form::ButtonComponent
   def html_class
     theme_config = THEME_MAPPINGS[@theme]
     class_names(
-      "relative overflow-hidden rounded-lg border backdrop-blur-sm isolate",
+      "relative overflow-hidden rounded-lg border isolate",
       "font-medium text-center font-semibold inline-block",
-      "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-transparent",
+      "focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-offset-transparent",
       "transform transition-all duration-300 ease-out",
       "hover:scale-[1.00] hover:shadow-md active:scale-[0.99]",
       "cursor-pointer select-none",
       theme_config[:base],
-      theme_config[:hover_bg],
+      theme_config[:text_base],
+      theme_config[:text_hover],
       theme_config[:hover_border],
       theme_config[:focus],
       theme_config[:shimmer],
-      theme_config[:text_glow],
       SIZE_MAPPINGS[@size],
       @fullw ? "w-full" : ""
     )
