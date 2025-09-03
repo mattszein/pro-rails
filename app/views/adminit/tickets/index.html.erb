@@ -1,9 +1,8 @@
 <div class="w-full">
   <div class="flex justify-between items-center pb-2">
     <h1 class="text-xl font-semibold">Tickets</h1>
-    <%= render(Core::LinkComponent.new(name: "Add ticket", url: new_adminit_ticket_path, options: {data: {turbo_frame: "modal"}, custom_style: {style: :as_button, theme: :create, size: :sm}})) %>
   </div>
-  <%= turbo_stream_from "tickets" %>
+  <%= turbo_stream_from "admin_tickets" %>
   <%= render(Core::CardComponent.new({padding: :sm})) do %>
   <table class="divide-y divide-gray-200 text-left">
     <thead>
@@ -17,7 +16,7 @@
         <th class="py-2 px-4 text-left text-xs text-gray-500 font-medium uppercase">Actions</th>
       </tr>
     </thead>
-    <tbody id="tickets" class="text-sm divide-y">
+    <tbody id="admin_tickets" class="text-sm divide-y">
       <%= render partial: "ticket_table", collection: @tickets, as: :ticket %>
     </tbody>
   </table>

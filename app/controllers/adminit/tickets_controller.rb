@@ -1,6 +1,5 @@
 class Adminit::TicketsController < Adminit::ApplicationController
   before_action :set_ticket, only: %i[show edit update destroy]
-  before_action :ensure_frame_response, only: %i[new edit]
 
   # GET /tickets or /tickets.json
   def index
@@ -11,30 +10,8 @@ class Adminit::TicketsController < Adminit::ApplicationController
   def show
   end
 
-  # GET /tickets/new
-  def new
-    @ticket = Ticket.new
-  end
-
   # GET /tickets/1/edit
   def edit
-  end
-
-  # POST /tickets or /tickets.json
-  def create
-    @ticket = Ticket.new(ticket_params)
-    respond_to do |format|
-      if @ticket.save
-        flash[:notice] = "Ticket was successfully created"
-        format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, adminit_ticket_url(@ticket)) }
-        format.html { redirect_to adminit_ticket_url(@ticket) }
-        format.json { render :show, status: :created, location: @ticket }
-      else
-        format.turbo_stream { render turbo_stream: turbo_stream.replace("modal", template: "adminit/tickets/new", locals: {ticket: @ticket}), status: :unprocessable_entity }
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @ticket.errors, status: :unprocessable_entity }
-      end
-    end
   end
 
   # PATCH/PUT /tickets/1 or /tickets/1.json

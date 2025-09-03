@@ -1,7 +1,5 @@
-<%= form_with url: rodauth.login_path, method: :post, data: {turbo: false}, class: "w-full max-w-sm" do |form| %>
-  <%= form.labeled :login, "Email"  do %>
-    <%= form.text_field :email, {required: true, autofocus: true, placeholder: " ", autocomplete: "email", value: params[rodauth.login_param], aria: ({invalid: true, describedby: "login_error_message"} if rodauth.field_error(rodauth.login_param))} %>
-  <% end %>
+<%= form_with url: rodauth.login_path, method: :post, data: {turbo: false}, class: form_classes do |form| %>
+  <%= form.text_field :email, {required: true, autofocus: true, placeholder: " ", autocomplete: "email", label: "Email", value: params[rodauth.login_param], aria: ({invalid: true, describedby: "login_error_message"} if rodauth.field_error(rodauth.login_param))} %>
   <%= error_tag(rodauth.field_error(rodauth.login_param), id: "login_error_message") if rodauth.field_error(rodauth.login_param) %>
   <% if params[rodauth.login_param] %>
     <%= form.labeled :password, "Password"  do %>

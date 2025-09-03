@@ -1,0 +1,22 @@
+<div class="w-full">
+  <div class="flex justify-between items-center pb-2">
+    <h1 class="text-xl font-semibold">Tickets</h1>
+    <%= render(Core::LinkComponent.new(name: "Add ticket", url: new_settings_ticket_path, options: {data: {turbo_frame: "modal"}, custom_style: {style: :as_button, theme: :create, size: :sm}})) %>
+  </div>
+  <%= turbo_stream_from "tickets" %>
+  <%= render(Core::CardComponent.new({variant: :primary, glow: true})) do %>
+  <table class="divide-y divide-gray-200 text-left">
+    <thead>
+      <tr class="border-b border-gray-200">
+        <th class="py-2 px-4 text-left text-xs text-gray-500 font-medium uppercase">Name</th>
+        <th class="py-2 px-4 text-left text-xs text-gray-500 font-medium uppercase">Description</th>
+        <th class="py-2 px-4 text-left text-xs text-gray-500 font-medium uppercase">status</th>
+        <th class="py-2 px-4 text-left text-xs text-gray-500 font-medium uppercase">Actions</th>
+      </tr>
+    </thead>
+    <tbody id="tickets" class="text-sm divide-y">
+      <%= render partial: "ticket_table", collection: @tickets, as: :ticket %>
+    </tbody>
+  </table>
+  <% end %>
+</div>

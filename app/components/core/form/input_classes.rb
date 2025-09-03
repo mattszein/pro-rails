@@ -21,6 +21,6 @@ module Core::Form::InputClasses
   end
 
   def html_class
-    class_names("block rounded-t-lg text-gray-900 border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:text-gray-200 focus:outline-none focus: focus:ring-0 peer bg-transparent px-0 group-[.is-filled]:bg-gray-50 dark:group-[.is-filled]:bg-gray-800 group-[.is-filled]:px-3.5 w-full", THEMES[theme], SIZES[size])
+    class_names("block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer group-[.is-filled]:bg-gray-50 dark:group-[.is-filled]:bg-gray-800 group-[.is-filled]:px-3.5 w-full", THEMES[theme])
   end
 end

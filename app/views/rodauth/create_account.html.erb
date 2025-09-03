@@ -1,18 +1,12 @@
 <%= render(Core::CardComponent.new) do %>
-  <%= form_with url: rodauth.create_account_path, method: :post, data: {turbo: false}, class: "w-full max-w-sm" do |form| %>
-    <%= form.labeled :login, "Email"  do %>
-      <%= form.text_field :email, {required: true, autofocus: true, placeholder: " ", value: params[rodauth.login_param], aria: ({invalid: true, describedby: "login_error_message"} if rodauth.field_error(rodauth.login_param))} %>
-    <% end %>
+  <%= form_with url: rodauth.create_account_path, method: :post, data: {turbo: false}, class: form_classes do |form| %>
+    <%= form.text_field :email, {label: "Email", required: true, autofocus: true, placeholder: " ", value: params[rodauth.login_param], aria: ({invalid: true, describedby: "login_error_message"} if rodauth.field_error(rodauth.login_param))} %>
     <%= error_tag(rodauth.field_error(rodauth.login_param), id: "login_error_message") if rodauth.field_error(rodauth.login_param) %>
-    <%= form.labeled :password, "Password"  do %>
-      <%= form.password_field :password, {required: true, placeholder: " "} %>
-    <% end %>
+    <%= form.password_field :password, {label: "Password", required: true, placeholder: " "} %>
     <%= error_tag(rodauth.field_error(rodauth.password_param), id: "password_error_message") if rodauth.field_error(rodauth.password_param) %>
-    <%= form.labeled :password, "Password confirm"  do %>
-      <%= form.password_field "password-confirm", {required: true, placeholder: " "} %>
-    <% end %>
+    <%= form.password_field "password-confirm", {label: "Password Confirm", required: true, placeholder: " "} %>
     <div class="mt-6">
-      <%= form.button "Login", {fullw: true} %>
+      <%= form.button "Register", {fullw: true} %>
     </div>
   <% end %>
 <% end %>

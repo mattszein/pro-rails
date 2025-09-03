@@ -1,7 +1,9 @@
 class Adminit::AccountsController < Adminit::ApplicationController
   before_action :set_account, only: %i[show edit destroy]
+  verify_authorized
 
   def index
+    authorize!
     @accounts = Account.all
   end
 
@@ -24,5 +26,6 @@ class Adminit::AccountsController < Adminit::ApplicationController
 
   def set_account
     @account = Account.find(params[:id])
+    authorize! @account
   end
 end

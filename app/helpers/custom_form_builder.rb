@@ -20,11 +20,11 @@ class CustomFormBuilder < ViewComponent::Form::Builder
   end
 
   def number_field(method, options = {})
-    render_component("form::NumberField", @object_name, method, objectify_options(options))
+    render_component("form::MaterialInput", @object_name, method, objectify_options(options.merge(input_type: :number)))
   end
 
   def password_field(method, options = {})
-    render_component("form::PasswordField", @object_name, method, objectify_options(options))
+    render_component("form::MaterialInput", @object_name, method, objectify_options(options.merge(input_type: :password)))
   end
 
   def text_area(method, options = {})
@@ -32,7 +32,7 @@ class CustomFormBuilder < ViewComponent::Form::Builder
   end
 
   def text_field(method, options = {})
-    render_component("form::TextField", @object_name, method, objectify_options(options))
+    render_component("form::MaterialInput", @object_name, method, objectify_options(options.merge(input_type: :text)))
   end
 
   def toggle(method, options = {}, checked_value = "1", unchecked_value = "0")
