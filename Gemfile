@@ -55,12 +55,13 @@ gem "action_policy"
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[mri windows], require: "debug/prelude"
-
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
   gem "brakeman", "~> 7.1.0", require: false
 
   gem "rspec-rails"
   gem "rubocop-rspec"
+  gem "factory_bot_rails"
+  gem "shoulda-matchers"
   gem "standard", ">= 1.35.1"
   gem "standard-rails"
   gem "erb_lint", require: false
@@ -77,7 +78,8 @@ end
 group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
-  gem "selenium-webdriver"
+  gem "cuprite", "= 0.16"
+  gem "test-prof"
 end
 
 gem "rodauth-rails", "~> 2.1"

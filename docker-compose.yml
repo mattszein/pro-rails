@@ -20,6 +20,7 @@ services:
       REDIS_URL: redis://redis:6379/1
       ANYCABLE_CABLE_URL: ws://localhost:8080/cable
       ANYCABLE_SECRET: anycable_key
+      CHROME_URL: ${CHROME_URL:-http://chrome:3333}
       # ----
       # Dev tools
       # ----
@@ -86,22 +87,34 @@ services:
 
   test_system:
     <<: *backend
-    command: bin/rails db:test:prepare test test:system
+    command: rspec spec/system
     ports:
       - "3001:3001"
       - "50051"
     environment:
       <<: *backend_environment
       RAILS_ENV: test
+      APP_HOST: ${APP_HOST:-anycable.test}
+      ANYCABLE_RPC_HOST: 0.0.0.0:50051
+      ANYCABLE_HTTP_BROADCAST_URL: http://ws.anycable.test:8090/_broadcast
+      ANYCABLE_WEBSOCKET_URL: ${ANYCABLE_WEBSOCKET_URL:-ws://ws.anycable.test:8081/cable}
     depends_on:
       <<: *backend_depends_on
+      chrome:
+        condition: service_started
+      ws_test:
+        condition: service_started
+    networks:
+      default:
+        aliases:
+          - anycable.test
 
-  ws:
+  ws: &ws
     image: anycable/anycable-go:1.6.3-alpine
     ports:
       - "8080:8080"
       - "8090:8090"
-    environment:
+    environment: &ws_environment
       ANYCABLE_HOST: "0.0.0.0"
       ANYCABLE_PORT: 8080
       ANYCABLE_REDIS_URL: redis://redis:6379/0
@@ -117,6 +130,22 @@ services:
       redis:
         condition: service_healthy
 
+  ws_test:
+    <<: *ws
+    ports:
+      - "8081:8081"
+    environment:
+      <<: *ws_environment
+      ANYCABLE_PORT: "8081"
+      # Disable broker to avoid race conditions when
+      # we load history since from previous examples
+      ANYCABLE_BROKER: ""
+      ANYCABLE_RPC_HOST: anycable.test:50051
+    networks:
+      default:
+        aliases:
+          - ws.anycable.test
+
   maildev:
     image: maildev/maildev
     restart: always
@@ -129,6 +158,25 @@ services:
     ports:
       - "1025:1025"
       - "8025:8025"
+
+  chrome:
+    # Currently, Apple M1 is only supported in unnumbered "latest" versions.
+    # See https://github.com/browserless/chrome/issues/1393
+    image: browserless/chrome:latest
+    ports:
+      - "3333:3333"
+    volumes:
+      - .:/rails-app
+    environment:
+      PORT: 3333
+      # Set connection timeout for debugging
+      # https://docs.browserless.io/docs/docker.html#connection-timeout
+      CONNECTION_TIMEOUT: 600000
+      # Add these for better stability
+      MAX_CONCURRENT_SESSIONS: 1
+      QUEUE_LENGTH: 2
+      PREBOOT_CHROME: "true"
+      KEEP_ALIVE: "true"
 
 volumes:
   pro-rails-postgres-db:
