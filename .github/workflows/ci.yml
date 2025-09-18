@@ -99,7 +99,8 @@ jobs:
           ANYCABLE_SECRET: anycable_key
         run: |
           export ANYCABLE_WEBSOCKET_URL="ws://$(hostname):8080/cable"
-          bin/rails db:test:prepare test test:system
+          bundle exec rails db:test:prepare
+          bundle exec rspec --tag ~type:system --force-color
 
       - name: Keep screenshots from failed system tests
         uses: actions/upload-artifact@v4
