@@ -8,4 +8,8 @@ class Permission < ApplicationRecord
   def self.default
     find_by(resource: Adminit::ApplicationPolicy.identifier)
   end
+
+  def is?(klass)
+    resource == klass.identifier.to_s
+  end
 end

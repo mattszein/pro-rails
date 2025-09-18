@@ -4,7 +4,7 @@ FactoryBot.define do
     sequence(:email) { |n| "user#{n}@#{TestConstants::TEST_EMAIL_DOMAIN}" }
     password { TestConstants::TEST_PASSWORD }
     status { "unverified" }
- 
+
     # Trait for verified accounts
     trait :verified do
       status { "verified" }
@@ -15,20 +15,12 @@ FactoryBot.define do
       status { "closed" }
     end
 
-    # Trait with specific email
-    trait :with_email do
-      transient do
-        email_address { "specific@example.com" }
-      end
-      
-      email { email_address }
+    trait :with_role do
+      association :role
     end
 
-    trait :role do
-      association :role, factory: :role
-    end
     trait :superadmin do
-      association :role, factory: :role, id: 1
+      association :role, factory: [:role, :superadmin]
     end
   end
 end

@@ -5,7 +5,6 @@ require "system_helper"
 describe "Accounts -> New" do
   include ActiveJob::TestHelper
   it "I can create a new Account successfully" do
-
     visit "create-account"
 
     fill_in "email", with: "user@#{TestConstants::TEST_EMAIL_DOMAIN}"

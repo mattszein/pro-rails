@@ -10,12 +10,16 @@ class Adminit::PermissionsController < Adminit::ApplicationController
 
   # /PUT /adminit/permissions/:id
   def update
-    authorize!
-    @permission.role_ids = permission_params[:role_ids]
-    if @permission.save
-      flash[:notice] = "Role was successfully updated."
-    else
-      flash[:alert] = "Role wasn't updated."
+    authorize! @permission, with: Adminit::PermissionPolicy, context: {role_ids: permission_params[:role_ids]}
+    begin
+      @permission.role_ids = permission_params[:role_ids]
+      if @permission.save
+        flash[:notice] = "Role was successfully updated."
+      else
+        flash[:alert] = "Role wasn't updated."
+      end
+    rescue ActiveRecord::RecordNotFound
+      flash[:alert] = "Role wasn't updated. Invalid role(s) selected."
     end
     redirect_to adminit_permissions_path
   end

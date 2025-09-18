@@ -1,5 +1,8 @@
 FactoryBot.define do
   factory :role do
-    name { "Super admin" }
+    sequence(:name) { |n| "role#{n}" }
+    trait :superadmin do
+      name { Role::SUPERADMIN }
+    end
   end
 end

@@ -4,8 +4,9 @@ RSpec.describe Permission, type: :model do
   subject {
     create(:permission)
   }
+
   describe "Associations" do
-    it { should have_and_belong_to_many(:roles) }
+    it { is_expected.to have_and_belong_to_many(:roles) }
   end
 
   describe "Validations" do

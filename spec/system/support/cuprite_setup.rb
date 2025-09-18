@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 # Cuprite is a modern Capybara driver which uses Chrome CDP API
 # instead of Selenium & co.
 # See https://github.com/rubycdp/cuprite
@@ -53,8 +54,8 @@ Capybara.register_driver(:better_cuprite) do |app|
         "disable-dev-shm-usage" => nil,
         "disable-web-security" => nil
       } : {},
-      inspector: ENV['INSPECTOR'] == 'true',
-      headless: !ENV['HEADFUL'], # Allow running in headful mode for debugging
+      inspector: ENV["INSPECTOR"] == "true",
+      headless: !ENV["HEADFUL"], # Allow running in headful mode for debugging
       timeout: 10,
       process_timeout: 10
     }.merge(remote_options)
@@ -68,13 +69,13 @@ module CupriteHelpers
   def pause
     page.driver.pause
   end
-  
+
   def debug(binding = nil)
     $stdout.puts "🔎 Open Chrome inspector at http://localhost:3333"
     return binding.break if binding
     page.driver.pause
   end
-  
+
   # Add this helper to restart browser on context loss
   def restart_browser
     Capybara.current_session.driver.quit
@@ -86,7 +87,7 @@ end
 
 RSpec.configure do |config|
   config.include CupriteHelpers, type: :system
-  
+
   # Add error handling for browser context loss
   config.around(:each, type: :system) do |example|
     retries = 2

@@ -30,14 +30,10 @@ class Adminit::RolesController < Adminit::ApplicationController
   def add_account
     authorize! @role
     account = Account.find_by(email: role_params[:email])
-    if account.role.nil?
-      if account.update(role: @role)
-        flash[:notice] = "account was successfully added to the role."
-      else
-        flash[:alert] = "account wasn't added to the role."
-      end
+    if account.update(role: @role)
+      flash[:notice] = "account was successfully added to the role."
     else
-      flash[:alert] = "account already has a role."
+      flash[:alert] = "account wasn't added to the role."
     end
     redirect_to adminit_role_path(@role)
   end

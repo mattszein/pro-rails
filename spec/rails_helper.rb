@@ -15,11 +15,10 @@ end
 require "rspec/rails"
 require "action_policy/rspec"
 
-Dir[Rails.root.join("spec", "support", "**", "*.rb")].each { |f| require f }
-require Rails.root.join("spec", "support", "constants_helper")
+Rails.root.glob("spec/support/**/*.rb").each { |f| require f }
+require Rails.root.join("spec/support/constants_helper")
 
 RSpec.configure do |config|
-
   config.use_transactional_fixtures = true
 
   config.infer_spec_type_from_file_location!
@@ -32,7 +31,6 @@ RSpec.configure do |config|
 
   config.after do
     # Make sure every example starts with the current time
-    travel_back
 
     # Clear ActiveJob jobs
     if defined?(ActiveJob) && ActiveJob::QueueAdapters::TestAdapter === ActiveJob::Base.queue_adapter
@@ -48,10 +46,10 @@ RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
 
   config.include LoginHelpers::Controller, type: :controller
-
-  # Include Rodauth controller test helpers for controller tests
   config.include Rodauth::Rails::Test::Controller, type: :controller
 
+  config.include Rodauth::Rails::Test::Request, type: :request
+  config.include LoginHelpers::Request, type: :request
 end
 
 Shoulda::Matchers.configure do |config|
