@@ -94,12 +94,18 @@ jobs:
       - name: Run tests
         env:
           RAILS_ENV: test
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+          DB_PORT: 5432
+          DB_HOST: localhost
+          RAILS_MAX_THREADS: 5
           REDIS_URL: redis://localhost:6379/0
           ANYCABLE_SECRET: anycable_key
+          FREEZOLITE_DISABLED: "true"
         run: |
-          export ANYCABLE_WEBSOCKET_URL="ws://$(hostname):8080/cable"
-          bin/rails db:test:prepare test test:system
+          export ANYCABLE_WEBSOCKET_URL="ws://localhost:8080/cable"
+          bundle exec rails db:test:prepare
+          bundle exec rspec --tag ~type:system --force-color
 
       - name: Keep screenshots from failed system tests
         uses: actions/upload-artifact@v4
