@@ -101,6 +101,7 @@ jobs:
           RAILS_MAX_THREADS: 5
           REDIS_URL: redis://localhost:6379/0
           ANYCABLE_SECRET: anycable_key
+          FREEZOLITE_DISABLED: "true"
         run: |
           export ANYCABLE_WEBSOCKET_URL="ws://localhost:8080/cable"
           bundle exec rails db:test:prepare
