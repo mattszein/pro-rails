@@ -18,6 +18,10 @@
           <dt class="text-gray-500 md:text-md dark:text-gray-400">Created by</dt>
           <dd class="text-md font-semibold"><%= ticket.created.email %></dd>
       </div>
+      <div>
+          <dt class="text-gray-500 md:text-md dark:text-gray-400">Assigned to</dt>
+          <dd class="text-md font-semibold"><%= ticket.assigned&.email || "Unassigned" %></dd>
+      </div>
 
   </dl>
   <% end %>

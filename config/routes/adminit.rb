@@ -2,7 +2,9 @@
 namespace :adminit do
   root to: "dashboard#index"
   resources :accounts
-  resources :tickets
+  resources :tickets do
+    post :take, on: :member
+  end
 
   resources :roles, only: [:index, :show] do
     get "account_select", on: :member

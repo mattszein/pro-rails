@@ -21,6 +21,13 @@
     <%= form.label :priority, class: "mr-2" %>
     <%= form.counter :priority, {value: ticket&.priority || 5, min: 1, max: 5} %>
     </div>
+    <% if ticket.persisted? && ticket.assigned_id == current_account.id %>
+      <div class="mt-6">
+        <%= form.labeled :status do %>
+          <%= form.select :status, Ticket.statuses.keys.map { |s| [s.humanize, s] }, {}, {class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"} %>
+        <% end %>
+      </div>
+    <% end %>
     <%= form.hidden_field :created_id, value: current_account.id %>
   <div class="mt-6">
     <%= form.button "Save", {theme: :create, fullw: true} %>
