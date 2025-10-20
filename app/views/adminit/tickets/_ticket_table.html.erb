@@ -8,8 +8,10 @@
     <td class="px-4 py-2 flex gap-2">
       <%= render(Core::LinkComponent.new(name: "Show", url: adminit_ticket_path(ticket), options: {custom_style: {style: :as_button, theme: :show, size: :xs}})) %>
       <%= render(Core::LinkComponent.new(name: "Edit", url: edit_adminit_ticket_path(ticket), options: {data: {turbo_frame: "modal"}, custom_style: {style: :as_button, theme: :edit, size: :xs}})) %>
-      <% if ticket.open? %>
-        <%= render(Core::LinkComponent.new(name: "Take", url: take_adminit_ticket_path(ticket), options: { data: { turbo_method: :post }, method: :post, custom_style: {style: :as_button, theme: :edit, size: :xs}})) %>
+      <% if ticket.assigned_id.nil? %>
+        <%= render(Core::LinkComponent.new(name: "Take", url: take_adminit_ticket_path(ticket), options: { data: { turbo_method: :post }, method: :post, custom_style: {style: :as_button, theme: :create, size: :xs}})) %>
+      <% elsif ticket.assigned_id == current_account.id %>
+        <%= render(Core::LinkComponent.new(name: "Leave", url: leave_adminit_ticket_path(ticket), options: { data: { turbo_method: :post }, method: :post, custom_style: {style: :as_button, theme: :delete, size: :xs}})) %>
       <% end %>
     </td>
   </tr>

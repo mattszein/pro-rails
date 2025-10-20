@@ -4,6 +4,7 @@ namespace :adminit do
   resources :accounts
   resources :tickets do
     post :take, on: :member
+    post :leave, on: :member
   end
 
   resources :roles, only: [:index, :show] do

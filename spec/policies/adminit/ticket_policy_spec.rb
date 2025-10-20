@@ -12,16 +12,25 @@ RSpec.describe Adminit::TicketPolicy, type: :policy do
   end
 
   describe "#take?" do
-    context "with an open ticket" do
-      let(:ticket) { create(:ticket, status: :open, created: creator_account) }
+    context "with an unassigned ticket" do
+      let(:ticket) { create(:ticket, status: :open, assigned: nil, created: creator_account) }
 
       it "allows admin to take the ticket" do
         expect(policy).to be_take
       end
     end
 
-    context "with a non-open ticket" do
-      let(:ticket) { create(:ticket, :in_progress, created: creator_account) }
+    context "with an unassigned closed ticket" do
+      let(:ticket) { create(:ticket, status: :closed, assigned: nil, created: creator_account) }
+
+      it "allows admin to take the ticket" do
+        expect(policy).to be_take
+      end
+    end
+
+    context "with an already assigned ticket" do
+      let(:other_admin) { create(:account, :verified, role: admin_role) }
+      let(:ticket) { create(:ticket, :in_progress, created: creator_account, assigned: other_admin) }
 
       it "denies admin from taking the ticket" do
         expect(policy).not_to be_take
@@ -30,11 +39,48 @@ RSpec.describe Adminit::TicketPolicy, type: :policy do
 
     context "when user has no role" do
       let(:regular_user) { create(:account, :verified) }
-      let(:ticket) { create(:ticket, status: :open, created: creator_account) }
+      let(:ticket) { create(:ticket, status: :open, assigned: nil, created: creator_account) }
       let(:policy) { described_class.new(ticket, user: regular_user) }
 
       it "denies user from taking the ticket" do
         expect(policy).not_to be_take
+      end
+    end
+  end
+
+  describe "#leave?" do
+    context "when admin is assigned to the ticket" do
+      let(:ticket) { create(:ticket, :in_progress, created: creator_account, assigned: admin_account) }
+
+      it "allows admin to leave the ticket" do
+        expect(policy).to be_leave
+      end
+    end
+
+    context "when admin is not assigned to the ticket" do
+      let(:other_admin) { create(:account, :verified, role: admin_role) }
+      let(:ticket) { create(:ticket, :in_progress, created: creator_account, assigned: other_admin) }
+
+      it "denies admin from leaving the ticket" do
+        expect(policy).not_to be_leave
+      end
+    end
+
+    context "when ticket is unassigned" do
+      let(:ticket) { create(:ticket, status: :open, assigned: nil, created: creator_account) }
+
+      it "denies admin from leaving the ticket" do
+        expect(policy).not_to be_leave
+      end
+    end
+
+    context "when user has no role" do
+      let(:regular_user) { create(:account, :verified) }
+      let(:ticket) { create(:ticket, :in_progress, created: creator_account, assigned: admin_account) }
+      let(:policy) { described_class.new(ticket, user: regular_user) }
+
+      it "denies user from leaving the ticket" do
+        expect(policy).not_to be_leave
       end
     end
   end

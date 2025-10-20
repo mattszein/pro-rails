@@ -1,5 +1,5 @@
 class Adminit::TicketsController < Adminit::ApplicationController
-  before_action :set_ticket, only: %i[show edit update destroy take]
+  before_action :set_ticket, only: %i[show edit update destroy take leave]
 
   # GET /tickets or /tickets.json
   def index
@@ -47,7 +47,7 @@ class Adminit::TicketsController < Adminit::ApplicationController
   def take
     authorize! @ticket, to: :take?
     respond_to do |format|
-      if @ticket.open? && @ticket.update(assigned: current_account, status: :in_progress)
+      if @ticket.assigned_id.nil? && @ticket.update(assigned: current_account, status: :in_progress)
         format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, adminit_tickets_path) }
         format.html { redirect_to adminit_tickets_url, notice: "Ticket was successfully assigned to you." }
         format.json { render :show, status: :ok, location: @ticket }
@@ -55,6 +55,22 @@ class Adminit::TicketsController < Adminit::ApplicationController
         format.turbo_stream { render turbo_stream: turbo_stream.replace(dom_id(@ticket, "admin"), partial: "adminit/tickets/ticket_table", locals: {ticket: @ticket}), status: :unprocessable_entity }
         format.html { redirect_to adminit_tickets_url, alert: "Unable to take this ticket." }
         format.json { render json: {error: "Unable to take this ticket"}, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  # POST /tickets/1/leave
+  def leave
+    authorize! @ticket, to: :leave?
+    respond_to do |format|
+      if @ticket.assigned_id == current_account.id && @ticket.update(assigned: nil, status: :open)
+        format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, adminit_tickets_path) }
+        format.html { redirect_to adminit_tickets_url, notice: "You have left the ticket." }
+        format.json { render :show, status: :ok, location: @ticket }
+      else
+        format.turbo_stream { render turbo_stream: turbo_stream.replace(dom_id(@ticket, "admin"), partial: "adminit/tickets/ticket_table", locals: {ticket: @ticket}), status: :unprocessable_entity }
+        format.html { redirect_to adminit_tickets_url, alert: "Unable to leave this ticket." }
+        format.json { render json: {error: "Unable to leave this ticket"}, status: :unprocessable_entity }
       end
     end
   end

@@ -22,12 +22,14 @@ Pro-Rails is a Rails 8.0 application using modern Rails stack with Hotwire (Turb
 ## Development Commands
 
 ### Setup
+
 ```bash
 bin/setup                    # Initial setup
 bin/dev                      # Start development server with all services
 ```
 
 ### Testing
+
 ```bash
 bundle exec rspec                                    # Run all tests
 bundle exec rspec spec/models/account_spec.rb        # Run single spec file
@@ -36,6 +38,7 @@ bundle exec rspec --tag ~type:system                 # Run all except system tes
 ```
 
 ### Database
+
 ```bash
 bin/rails db:prepare         # Setup database (create + migrate)
 bin/rails db:migrate         # Run migrations
@@ -44,6 +47,7 @@ bin/rails db:test:prepare    # Prepare test database
 ```
 
 ### Linting & Security
+
 ```bash
 bin/rubocop                  # Lint Ruby code (uses Standard)
 bin/rubocop -a               # Auto-fix linting issues
@@ -53,6 +57,7 @@ bin/importmap audit          # Check JS dependencies for vulnerabilities
 ```
 
 ### Component Development
+
 ```bash
 # Lookbook is available in development at /lookbook for component previews
 # Components are in app/components/core/
@@ -61,6 +66,7 @@ bin/importmap audit          # Check JS dependencies for vulnerabilities
 ## Architecture & Key Patterns
 
 ### Authentication (Rodauth)
+
 - Configured in `app/misc/rodauth_main.rb` and `app/misc/rodauth_app.rb`
 - Uses `Account` model with email-based authentication
 - Multi-phase login enabled
@@ -69,6 +75,7 @@ bin/importmap audit          # Check JS dependencies for vulnerabilities
 - Login helpers available in specs: see `spec/rails_helper.rb` for `LoginHelpers::Controller` and `LoginHelpers::Request`
 
 ### Authorization (ActionPolicy + RBAC)
+
 - Base policy: `app/policies/application_policy.rb`
 - Admin area uses specialized policies in `app/policies/adminit/` with resource-based permissions
 - Permission model controls access via `permissions_roles` join table
@@ -77,6 +84,7 @@ bin/importmap audit          # Check JS dependencies for vulnerabilities
 - "superadmin" role has special privileges
 
 ### Models & Database
+
 - **Account**: User model with Rodauth integration, belongs_to role
 - **Role**: has_many accounts, has_and_belongs_to_many permissions
 - **Permission**: has_and_belongs_to_many roles, resource-based authorization
@@ -84,6 +92,7 @@ bin/importmap audit          # Check JS dependencies for vulnerabilities
 - PostgreSQL extensions: citext (case-insensitive text), plpgsql
 
 ### ViewComponent Architecture
+
 - Custom form builder: `CustomFormBuilder` (extends `ViewComponent::Form::Builder`)
 - Form components namespace: `Core::Form::*` (MaterialInput, Button, Toggle, Counter, etc.)
 - Components in `app/components/core/` with corresponding CSS/JS in component directories
@@ -91,6 +100,7 @@ bin/importmap audit          # Check JS dependencies for vulnerabilities
 - Component previews available via Lookbook in development
 
 ### Adminit (Admin Area)
+
 - Namespace: `/adminit` routes (see `config/routes/adminit.rb`)
 - Base controller: `Adminit::ApplicationController` with authorization checks
 - Manages: accounts, tickets, roles (with account assignment), permissions
@@ -99,11 +109,13 @@ bin/importmap audit          # Check JS dependencies for vulnerabilities
 - Uses CustomFormBuilder for all forms
 
 ### Configuration
+
 - Config classes use Anyway Config pattern (see `config/configs/application_config.rb`)
 - AWS config available at `config/configs/aws_config.rb`
 - AnyCable configured via `anycable.toml`
 
 ### Testing Strategy
+
 - RSpec for all tests (no Minitest)
 - FactoryBot for test data
 - Shoulda-Matchers for model validation tests
@@ -113,7 +125,9 @@ bin/importmap audit          # Check JS dependencies for vulnerabilities
 - ActionPolicy RSpec matchers available
 
 ## File Generation Conventions
+
 Rails generators are configured to skip generating:
+
 - Asset files
 - Helper files
 - Stylesheets
@@ -123,13 +137,16 @@ Rails generators are configured to skip generating:
 Create components manually or use ViewComponent generators.
 
 ## CI/CD Pipeline
+
 GitHub Actions runs four jobs on PRs and main branch:
+
 1. **scan_ruby**: Brakeman security scan (`bin/brakeman --no-pager`)
 2. **scan_js**: JavaScript dependency audit (`bin/importmap audit`)
 3. **lint**: Ruby code linting (`bin/rubocop -f github`)
 4. **test**: RSpec test suite with PostgreSQL, Redis, and AnyCable services
 
 Required environment variables for tests:
+
 - DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT
 - REDIS_URL
 - ANYCABLE_SECRET, ANYCABLE_WEBSOCKET_URL
@@ -138,7 +155,9 @@ Required environment variables for tests:
 ## Important Patterns
 
 ### Custom Form Components
+
 When building forms, use the CustomFormBuilder methods which render ViewComponents:
+
 - `form.text_field`, `form.password_field`, `form.number_field` → MaterialInput component
 - `form.text_area` → TextArea component
 - `form.button` → Button component (supports theme, size, fullw options)
@@ -148,17 +167,20 @@ When building forms, use the CustomFormBuilder methods which render ViewComponen
 - `form.counter` → Counter component
 
 ### Rodauth Integration
+
 - Current user available as `rodauth.rails_account` or `current_account`
 - Test helpers: `rodauth.login(account)` in request/controller specs
 - Account status enum used throughout: `:unverified`, `:verified`, `:closed`
 
 ### ActionPolicy Authorization
+
 - Policies define rules using `def manage?`, `def index?`, etc.
 - Adminit policies check permissions via RBAC: `get_access(identifier)`
 - Use `authorize!` in controllers or `allowed_to?` in views
 - Test with ActionPolicy RSpec matchers
 
 ### AnyCable WebSockets
+
 - AnyCable replaces default Action Cable for better performance
 - Redis backend required
 - Configuration in `anycable.toml`
