@@ -1,0 +1,8 @@
+<% columns ||= ticket_columns %>
+<% broadcast_id ||= "admin" %>
+
+<%= render Core::TableRowComponent.with_collection(
+      @tickets,
+      columns: ticket_columns,
+      broadcast_id: "admin"
+) %>

@@ -32,6 +32,7 @@ describe Adminit::TicketsController, type: :controller do
 
   describe "POST #take" do
     let(:ticket) { create(:ticket, created: creator_account, assigned: nil, status: :open) }
+
     subject { post :take, params: {id: ticket.id} }
 
     include_context "adminit_auth"
@@ -102,6 +103,7 @@ describe Adminit::TicketsController, type: :controller do
 
   describe "POST #leave" do
     let(:ticket) { create(:ticket, :in_progress, created: creator_account, assigned: user) }
+
     subject { post :leave, params: {id: ticket.id} }
 
     include_context "adminit_auth"
@@ -156,6 +158,7 @@ describe Adminit::TicketsController, type: :controller do
   describe "PATCH #update" do
     let(:ticket) { create(:ticket, :in_progress, created: creator_account, assigned: user) }
     let(:params) { {id: ticket.id, ticket: {status: :closed}} }
+
     subject { patch :update, params: params }
 
     include_context "adminit_auth"

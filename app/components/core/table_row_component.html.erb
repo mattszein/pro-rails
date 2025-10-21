@@ -1,0 +1,7 @@
+<tr id="<%= @row.class.method_defined?(:id) ? dom_id(@row, @broadcast_id) : @index %>">
+  <% @columns.each do |col| %>
+    <td class="px-4 py-2">
+      <%= col[:renderer].call(@row) %>
+    </td>
+  <% end %>
+</tr>

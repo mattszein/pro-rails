@@ -5,7 +5,7 @@ class Ticket < ApplicationRecord
   validates :title, :description, :status, :created_id, presence: true
 
   broadcasts_to ->(ticket) { "admin_tickets" },
-    partial: "adminit/tickets/ticket_table",
+    partial: "adminit/tickets/ticket_row",
     target: "admin_tickets"
 
   after_update_commit do |ticket|
@@ -17,7 +17,7 @@ class Ticket < ApplicationRecord
     # For the admin list page
     broadcast_replace_later_to "admin_tickets",
       target: ActionView::RecordIdentifier.dom_id(ticket, "admin"),
-      partial: "adminit/tickets/ticket_table"
+      partial: "adminit/tickets/ticket_row"
   end
   default_scope { order(priority: :desc, created_at: :desc) }
 end
