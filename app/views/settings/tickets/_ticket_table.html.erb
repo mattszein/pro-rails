@@ -1,7 +1,18 @@
-  <tr id="<%= dom_id ticket %>">
-    <td class="px-4 py-2"><%= ticket.title %></td>
-    <td class="px-4 py-2"><%= ticket.description %></td>
-    <td class="px-4 py-2"><%= render(Core::BadgeComponent.new(ticket.status, options: {custom_style: {theme: ticket_status_theme(ticket.status)}})) %></td>
-    <td class="px-4 py-2"><%= render(Core::LinkComponent.new(name: "Show", url: settings_ticket_path(ticket), options: {custom_style: {style: :as_button, theme: :show, size: :xs}})) %>
-  <%= render(Core::LinkComponent.new(name: "Edit", url: edit_settings_ticket_path(ticket), options: {data: {turbo_frame: "modal"}, custom_style: {style: :as_button, theme: :edit, size: :xs}})) %></td>
-  </tr>
+<tr id="<%= ActionView::RecordIdentifier.dom_id(ticket) %>">
+  <%= render Core::TableCellComponent.new do %>
+    <%= ticket.title %>
+  <% end %>
+
+  <%= render Core::TableCellComponent.new do %>
+    <%= ticket.description %>
+  <% end %>
+
+  <%= render Core::TableCellComponent.new do %>
+    <%= render(Core::BadgeComponent.new(ticket.status, options: {custom_style: {theme: ticket_status_theme(ticket.status)}})) %>
+  <% end %>
+
+  <%= render Core::TableCellComponent.new do %>
+    <%= render(Core::LinkComponent.new(name: "Show", url: settings_ticket_path(ticket), options: {custom_style: {style: :as_button, theme: :show, size: :xs}})) %>
+    <%= render(Core::LinkComponent.new(name: "Edit", url: edit_settings_ticket_path(ticket), options: {data: {turbo_frame: "modal"}, custom_style: {style: :as_button, theme: :edit, size: :xs}})) %>
+  <% end %>
+</tr>

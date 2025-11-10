@@ -1,13 +1,21 @@
 class Core::TableComponent < ViewComponent::Base
-  def initialize(rows:, columns: nil, options: {ids: {tbody: nil, col_prefix: nil}})
+  attr_reader :rows, :columns, :options
+
+  def initialize(rows:, columns:, options: {})
     @rows = rows
-    @columns = columns || []       # use passed columns if any
-    @tbody_id = options[:ids][:tbody]
-    @broadcast_id = options[:ids][:col_prefix]
+    @columns = columns
+    @options = options
   end
 
-  # old DSL method: allows incremental refactoring
-  def column(label, &block)
-    @columns << {label: label, renderer: block}
+  def tbody_id
+    options.dig(:ids, :tbody)
+  end
+
+  def broadcast_id
+    options.dig(:ids, :col_prefix)
+  end
+
+  def custom_row_renderer?
+    content.present?
   end
 end

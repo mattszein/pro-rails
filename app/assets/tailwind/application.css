@@ -8,6 +8,7 @@
     --color-highlight: var(--color-gray-900);
   }
 }
+
 @theme {
   --color-default: var(--color-gray-50);
   --color-highlight: var(--color-white);
@@ -174,5 +175,5 @@
         transform: translateY(0); 
         opacity: 1; 
     }
-}
+  }
 }

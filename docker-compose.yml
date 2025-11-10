@@ -67,6 +67,7 @@ services:
       <<: *backend_environment
     ports:
       - 3000:3000
+    tty: true
     depends_on:
       <<: *backend_depends_on
       maildev:

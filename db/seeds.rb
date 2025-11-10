@@ -11,20 +11,42 @@
 role_superadmin = Role.create(name: "superadmin")
 role_support = Role.create(name: "support")
 
-Account.create(email: "matt@matt.com", role_id: role_superadmin.id, password_hash: RodauthApp.rodauth.allocate.password_hash("password"), status: "verified")
-Account.create(email: "matinger@gmail.com", role_id: role_support.id, password_hash: RodauthApp.rodauth.allocate.password_hash("password"), status: "verified")
-Account.create(email: "user@user.com", role_id: nil, password_hash: RodauthApp.rodauth.allocate.password_hash("password"), status: "verified")
+# Create accounts
+Account.find_or_create_by!(email: "matt@matt.com") do |account|
+  account.role = role_superadmin
+  account.password_hash = RodauthApp.rodauth.allocate.password_hash("password")
+  account.status = "verified"
+end
 
-app_permission = Permission.create(resource: Adminit::ApplicationPolicy.identifier)
-account_permission = Permission.create(resource: Adminit::AccountPolicy.identifier)
-ticket_permission = Permission.create(resource: Adminit::TicketPolicy.identifier)
+Account.find_or_create_by!(email: "matinger@gmail.com") do |account|
+  account.role = role_support
+  account.password_hash = RodauthApp.rodauth.allocate.password_hash("password")
+  account.status = "verified"
+end
 
-role_superadmin.permissions << app_permission
-role_superadmin.permissions << account_permission
-role_superadmin.permissions << Permission.create(resource: Adminit::RolePolicy.identifier)
-role_superadmin.permissions << Permission.create(resource: Adminit::PermissionPolicy.identifier)
-role_superadmin.permissions << ticket_permission
+Account.find_or_create_by!(email: "user@user.com") do |account|
+  account.role = nil
+  account.password_hash = RodauthApp.rodauth.allocate.password_hash("password")
+  account.status = "verified"
+end
 
-role_support.permissions << app_permission
-role_support.permissions << account_permission
-role_support.permissions << ticket_permission
+# Create permissions with roles assigned from the start
+Permission.find_or_create_by!(resource: Adminit::ApplicationPolicy.identifier) do |permission|
+  permission.roles = [role_superadmin, role_support]
+end
+
+Permission.find_or_create_by!(resource: Adminit::AccountPolicy.identifier) do |permission|
+  permission.roles = [role_superadmin, role_support]
+end
+
+Permission.find_or_create_by!(resource: Adminit::TicketPolicy.identifier) do |permission|
+  permission.roles = [role_superadmin, role_support]
+end
+
+Permission.find_or_create_by!(resource: Adminit::RolePolicy.identifier) do |permission|
+  permission.roles = [role_superadmin]
+end
+
+Permission.find_or_create_by!(resource: Adminit::PermissionPolicy.identifier) do |permission|
+  permission.roles = [role_superadmin]
+end

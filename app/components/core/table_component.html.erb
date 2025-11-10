@@ -2,11 +2,21 @@
   <thead>
     <tr class="border-b border-gray-200">
       <% @columns.each do |col| %>
-        <th class="py-2 px-4 text-left text-xs text-gray-500 font-medium uppercase whitespace-nowrap"><%= col[:label] %></th>
+        <th class="py-2 px-4 text-left text-xs text-gray-500 font-medium uppercase whitespace-nowrap">
+          <%= col[:label] %>
+        </th>
       <% end %>
     </tr>
   </thead>
-  <tbody id="<%= @tbody_id %>" class="text-sm divide-y">
-    <%= render Core::TableRowComponent.with_collection(@rows, columns: @columns, broadcast_id: @broadcast_id) %>
+  <tbody id="<%= tbody_id %>" class="text-sm divide-y">
+    <% if content.present? %>
+      <%= content %>
+    <% else %>
+      <%= render Core::TableRowComponent.with_collection(
+            @rows,
+            columns: @columns,
+            broadcast_id: broadcast_id
+          ) %>
+    <% end %>
   </tbody>
 </table>
