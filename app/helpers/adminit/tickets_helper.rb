@@ -7,9 +7,13 @@ module Adminit::TicketsHelper
         renderer: ->(ticket) { ticket.title }
       },
       {
+        label: "Category",
+        renderer: ->(ticket) { ticket.category.humanize }
+      },
+      {
         label: "Status",
         renderer: ->(ticket) do
-          render(Core::BadgeComponent.new(ticket.status,
+          render(Core::BadgeComponent.new(ticket.status.humanize,
             options: {custom_style: {theme: ticket_status_theme(ticket.status)}}))
         end
       },

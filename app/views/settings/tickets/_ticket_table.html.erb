@@ -4,6 +4,10 @@
   <% end %>
 
   <%= render Core::TableCellComponent.new do %>
+    <%= ticket.category.humanize %>
+  <% end %>
+
+  <%= render Core::TableCellComponent.new do %>
     <%= ticket.description %>
   <% end %>
 

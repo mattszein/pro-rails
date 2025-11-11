@@ -4,6 +4,7 @@ FactoryBot.define do
     description { "This is a test ticket description." }
     priority { 3 }
     status { :open }
+    category { :account_access }
     association :created, factory: :account
 
     trait :assigned do

@@ -1,32 +1,28 @@
-<div id="<%= dom_id ticket %>">
+<div id="<%= dom_id ticket %>" class="space-y-4">
   <!-- Header -->
-  <div class="mb-8 animate-fade-in">
-    <div class="flex items-center gap-3 mb-2">
-        <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
-          <%= icon "ticket", {classes: "w-5 h-5 text-white"} %>
-        </div>
-        <h1 class="text-3xl font-bold bg-gradient-to-r from-slate-700 to-slate-900 bg-clip-text text-transparent">Ticket #<%= ticket.id %></h1>
+  <%= render(Core::CardComponent.new({variant: :glass, glow: true, classes: "space-y-4"})) do %>
+    <div class="flex items-center gap-4">
+      <%= icon "support", {classes: "h-8"} %>
+      <h1>Ticket #<%= ticket.id %> - <%= ticket.title %></h1>
+      <%= render(Core::BadgeComponent.new(ticket.status.humanize, options: {custom_style: {theme: ticket_status_theme(ticket.status), icon: "info", size: :md}})) %>
     </div>
-    <p class="text-slate-600">Created on <%= ticket.created_at %></p>
-  </div>
+    <%= render Core::BoxComponent.new do %>
+      <%= render Core::DefinitionListComponent.new(variant: :info, gap: :sm) do |dl| %>
+        <% dl.with_item(term: "Category") do %>
+          <%= ticket.category.humanize %>
+        <% end %>
+        <% dl.with_item(term: "Assigned to") do %>
+          <%= ticket.assigned&.email || "-" %>
+        <% end %>
+        <% dl.with_item(term: "Created on") do %>
+          <%= ticket.created_at %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
     <div class="lg:col-span-2 space-y-6">
       <%= render(Core::CardComponent.new({variant: :glass, glow: true, classes: "space-y-4"})) do %>
-        <%= render Core::BoxComponent.new do %>
-              <div class="flex items-start gap-3">
-                  <div class="flex-1">
-                      <div class="flex items-center gap-2 mb-1">
-                          <span class="text-sm font-semibold text-blue-900">Assigned to Support</span>
-                      </div>
-                      <div class="text-sm text-blue-800 font-medium">Mike Chen</div>
-                  </div>
-              </div>
-        <% end %>
-          <div class="flex flex-wrap items-center gap-4 mb-6">
-              <%= render(Core::BadgeComponent.new(ticket.status, options: {custom_style: {theme: ticket_status_theme(ticket.status), icon: "info", size: :md}})) %>
-              <%= render(Core::BadgeComponent.new("In Progress", options: {custom_style: {theme: :red, indicator: true, size: :md}})) %>
-          </div>
-
           <h2 class="text-2xl font-bold text-slate-800 leading-tight">
             <%= ticket.title %>
           </h2>
@@ -35,12 +31,10 @@
           </p>
         </div>
       <% end %>
-      <div class="space-y-6">
-        <%= render(Core::CardComponent.new({variant: :glass, glow: true})) do %>
-          <h2 class="text-lg font-semibold text-slate-800 mb-4">Actions</h2>
+        <%= render(Core::CardComponent.new({variant: :glass, glow: true, classes: "space-y-4"})) do %>
+          <h3>Actions</h2>
           <%= render(Core::LinkComponent.new(name: "Edit", url: edit_settings_ticket_path(@ticket), options: {data: {turbo_frame: "modal"}, custom_style: {style: :as_button, theme: :edit, size: :md, fullw: true}})) %>
         <% end %>
-      </div>
     </div>
   </div>
 </div>

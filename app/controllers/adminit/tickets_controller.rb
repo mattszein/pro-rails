@@ -84,6 +84,6 @@ class Adminit::TicketsController < Adminit::ApplicationController
 
   # Only allow a list of trusted parameters through.
   def ticket_params
-    params.require(:ticket).permit(:title, :description, :priority, :status, :created_id, :assigned_id)
+    params.require(:ticket).permit(:title, :description, :priority, :status, :category, :created_id, :assigned_id)
   end
 end
