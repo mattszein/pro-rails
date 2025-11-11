@@ -1,29 +1,49 @@
-<div id="<%= dom_id ticket, "admin" %>">
-
-  <%= render(Core::CardComponent.new({padding: :sm})) do %>
-  <dl class="flex flex-col text-gray-900 dark:text-white dark:divide-gray-700 text-left gap-4 divide-y divide-gray-200">
-      <div>
-          <dt class="text-gray-500 md:text-md dark:text-gray-400">Subject</dt>
-          <dd class="text-md font-semibold"><%= ticket.title %></dd>
-      </div>
-      <div>
-          <dt class="text-gray-500 md:text-md dark:text-gray-400">Priority</dt>
-          <dd class="text-md font-semibold"><%= ticket.priority %></dd>
-      </div>
-      <div>
-          <dt class="text-gray-500 md:text-md dark:text-gray-400">Status</dt>
-          <dd class="text-md font-semibold"><%= render(Core::BadgeComponent.new(ticket.status, options: {custom_style: {theme: ticket_status_theme(ticket.status)}})) %></dd>
-      </div>
-      <div>
-          <dt class="text-gray-500 md:text-md dark:text-gray-400">Created by</dt>
-          <dd class="text-md font-semibold"><%= ticket.created.email %></dd>
-      </div>
-
-  </dl>
+<div id="<%= dom_id ticket, "admin" %>" class="space-y-4">
+  <!-- Header -->
+  <%= render(Core::CardComponent.new({variant: :glass, glow: true, classes: "space-y-4"})) do %>
+    <div class="flex items-center gap-4">
+      <%= icon "support", {classes: "h-8"} %>
+      <h1>Ticket #<%= ticket.id %> - <%= ticket.title %></h1>
+      <%= render(Core::BadgeComponent.new(ticket.status, options: {custom_style: {theme: ticket_status_theme(ticket.status), icon: "info", size: :md}})) %>
+    </div>
+    <%= render Core::BoxComponent.new do %>
+      <%= render Core::DefinitionListComponent.new(variant: :info, gap: :sm) do |dl| %>
+        <% dl.with_item(term: "Category") do %>
+          <%= ticket.category.humanize %>
+        <% end %>
+        <% dl.with_item(term: "Created by") do %>
+          <%= ticket.created.email %>
+        <% end %>
+        <% dl.with_item(term: "Assigned to") do %>
+          <%= ticket.assigned&.email || "-" %>
+        <% end %>
+        <% dl.with_item(term: "Priority") do %>
+          <%= ticket.priority %>
+        <% end %>
+        <% dl.with_item(term: "Created on") do %>
+          <%= ticket.created_at %>
+        <% end %>
+        <% dl.with_item(term: "Status") do %>
+          <%= render(Core::BadgeComponent.new(ticket.status, options: {custom_style: {theme: ticket_status_theme(ticket.status), icon: "info", size: :md}})) %>
+        <% end %>
+      <% end %>
+    <% end %>
   <% end %>
-
-  <%= render(Core::CardComponent.new({padding: :sm, class: "mt-4"})) do %>
-    <h2 class="text-lg font-semibold dark:text-white">Body</h2>
-    <p class="text-md dark:text-gray-400"><%= ticket.description %></p>
-  <% end %>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="lg:col-span-2 space-y-6">
+      <%= render(Core::CardComponent.new({variant: :glass, glow: true, classes: "space-y-4"})) do %>
+          <h2 class="text-2xl font-bold text-slate-800 leading-tight">
+            <%= ticket.title %>
+          </h2>
+          <p class="text-slate-700 leading-relaxed">
+            <%= ticket.description %>
+          </p>
+        </div>
+      <% end %>
+        <%= render(Core::CardComponent.new({variant: :glass, glow: true, classes: "space-y-4"})) do %>
+          <h3>Actions</h2>
+          <%= render(Core::LinkComponent.new(name: "Edit", url: edit_adminit_ticket_path(@ticket), options: {data: {turbo_frame: "modal"}, custom_style: {style: :as_button, theme: :edit, size: :md, fullw: true}})) %>
+        <% end %>
+    </div>
+  </div>
 </div>

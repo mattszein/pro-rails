@@ -1,22 +1,21 @@
 class Core::TableComponent < ViewComponent::Base
-  def initialize(rows:)
+  attr_reader :rows, :columns, :options
+
+  def initialize(rows:, columns:, options: {})
     @rows = rows
-    @columns = []
+    @columns = columns
+    @options = options
   end
 
-  def column(label, &block)
-    @columns << Column.new(label, &block)
+  def tbody_id
+    options.dig(:ids, :tbody)
   end
 
-  def before_render
-    content
+  def broadcast_id
+    options.dig(:ids, :col_prefix)
   end
 
-  class Column
-    attr_reader :label, :td_block
-    def initialize(label, &td_block)
-      @label = label
-      @td_block = td_block
-    end
+  def custom_row_renderer?
+    content.present?
   end
 end

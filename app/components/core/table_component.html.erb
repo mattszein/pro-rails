@@ -2,18 +2,21 @@
   <thead>
     <tr class="border-b border-gray-200">
       <% @columns.each do |col| %>
-        <th class="py-2 px-4 text-left text-xs text-gray-500 font-medium uppercase whitespace-nowrap"><%= col.label %></th>
+        <th class="py-2 px-4 text-left text-xs text-gray-500 font-medium uppercase whitespace-nowrap">
+          <%= col[:label] %>
+        </th>
       <% end %>
     </tr>
   </thead>
-  <tbody class="text-sm divide-y">
-    <% @rows.each.with_index(0) do |row, index| %>
-      <% puts row %>
-      <tr id="<%= row.class.method_defined?(:id) ? dom_id(row) : index %>">
-        <% @columns.each do |col| %>
-          <td class="px-4 py-2"><%= view_context.capture(row, &col.td_block) %></td>
-        <% end %>
-      </tr>
+  <tbody id="<%= tbody_id %>" class="text-sm divide-y">
+    <% if content.present? %>
+      <%= content %>
+    <% else %>
+      <%= render Core::TableRowComponent.with_collection(
+            @rows,
+            columns: @columns,
+            broadcast_id: broadcast_id
+          ) %>
     <% end %>
   </tbody>
 </table>

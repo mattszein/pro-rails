@@ -4,19 +4,23 @@
     <%= render(Core::LinkComponent.new(name: "Add ticket", url: new_settings_ticket_path, options: {data: {turbo_frame: "modal"}, custom_style: {style: :as_button, theme: :create, size: :sm}})) %>
   </div>
   <%= turbo_stream_from "tickets" %>
-  <%= render(Core::CardComponent.new({variant: :primary, glow: true})) do %>
-  <table class="divide-y divide-gray-200 text-left">
-    <thead>
-      <tr class="border-b border-gray-200">
-        <th class="py-2 px-4 text-left text-xs text-gray-500 font-medium uppercase">Name</th>
-        <th class="py-2 px-4 text-left text-xs text-gray-500 font-medium uppercase">Description</th>
-        <th class="py-2 px-4 text-left text-xs text-gray-500 font-medium uppercase">status</th>
-        <th class="py-2 px-4 text-left text-xs text-gray-500 font-medium uppercase">Actions</th>
-      </tr>
-    </thead>
-    <tbody id="tickets" class="text-sm divide-y">
-      <%= render partial: "ticket_table", collection: @tickets, as: :ticket %>
-    </tbody>
-  </table>
+  <%= render Core::CardComponent.new({padding: :none}) do %>
+    <div class="flex p-4 gap-4">
+      <%= render Core::TableComponent.new(
+            rows: @tickets,
+            columns: [
+              {label: "Title"},
+              {label: "Category"},
+              {label: "Description"},
+              {label: "Status"},
+              {label: "Actions"}
+            ],
+            options: {ids: {tbody: "tickets"}}
+          ) do %>
+        <% @tickets.each_with_index do |ticket, index| %>
+          <%= render "ticket_table", ticket: ticket, index: index %>
+        <% end %>
+      <% end %>
+    </div>
   <% end %>
 </div>

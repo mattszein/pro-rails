@@ -3,22 +3,9 @@
     <h1 class="text-xl font-semibold">Tickets</h1>
   </div>
   <%= turbo_stream_from "admin_tickets" %>
-  <%= render(Core::CardComponent.new({padding: :sm})) do %>
-  <table class="divide-y divide-gray-200 text-left">
-    <thead>
-      <tr class="border-b border-gray-200">
-        <th class="py-2 px-4 text-left text-xs text-gray-500 font-medium uppercase">Name</th>
-        <th class="py-2 px-4 text-left text-xs text-gray-500 font-medium uppercase">Description</th>
-        <th class="py-2 px-4 text-left text-xs text-gray-500 font-medium uppercase">status</th>
-        <th class="py-2 px-4 text-left text-xs text-gray-500 font-medium uppercase">priority</th>
-        <th class="py-2 px-4 text-left text-xs text-gray-500 font-medium uppercase">Created</th>
-        <th class="py-2 px-4 text-left text-xs text-gray-500 font-medium uppercase">Assigned</th>
-        <th class="py-2 px-4 text-left text-xs text-gray-500 font-medium uppercase">Actions</th>
-      </tr>
-    </thead>
-    <tbody id="admin_tickets" class="text-sm divide-y">
-      <%= render partial: "ticket_table", collection: @tickets, as: :ticket %>
-    </tbody>
-  </table>
+  <%= render Core::CardComponent.new({padding: :none}) do %>
+    <div class="flex p-4 gap-4">
+      <%= render Core::TableComponent.new(rows: @tickets, columns: ticket_columns, options: {ids: {tbody: "admin_tickets", col_prefix: "admin"}}) %>
+    </div>
   <% end %>
 </div>

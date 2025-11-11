@@ -2,11 +2,29 @@ class Ticket < ApplicationRecord
   belongs_to :created, class_name: "Account", optional: true
   belongs_to :assigned, class_name: "Account", optional: true
   enum :status, {open: 0, in_progress: 1, closed: 2}, default: :open, validate: {allow_nil: false}
-  validates :title, :description, :status, :created_id, presence: true
+  enum :category, {
+    account_access: 0,
+    technical_issue: 1,
+    billing: 2,
+    feature_request: 3,
+    other: 4
+  }, default: :account_access, validate: {allow_nil: false}
+  default_scope { order(priority: :desc, created_at: :desc) }
+  validates :title, :description, :status, :category, :created_id, presence: true
 
-  broadcasts_to ->(ticket) { "admin_tickets" },
-    partial: "adminit/tickets/ticket_table",
-    target: "admin_tickets"
+  broadcasts_to ->(ticket) { "tickets" },
+    partial: "settings/tickets/ticket_table"
+
+  after_create_commit do |ticket|
+    broadcast_append_later_to "admin_tickets",
+      target: "admin_tickets",
+      partial: "adminit/tickets/ticket_row"
+  end
+
+  after_destroy_commit do
+    broadcast_remove_later_to "admin_tickets",
+      target: dom_id(self, "admin")
+  end
 
   after_update_commit do |ticket|
     # For the individual show page
@@ -14,10 +32,8 @@ class Ticket < ApplicationRecord
       target: ActionView::RecordIdentifier.dom_id(ticket, "admin"),
       partial: "adminit/tickets/ticket"
 
-    # For the admin list page
     broadcast_replace_later_to "admin_tickets",
       target: ActionView::RecordIdentifier.dom_id(ticket, "admin"),
-      partial: "adminit/tickets/ticket_table"
+      partial: "adminit/tickets/ticket_row"
   end
-  default_scope { order(priority: :desc, created_at: :desc) }
 end

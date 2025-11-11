@@ -1,44 +1,40 @@
-<div id="<%= dom_id ticket %>">
-        <!-- Header -->
-        <div class="mb-8 animate-fade-in">
-            <div class="flex items-center gap-3 mb-2">
-                <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
-                  <%= icon "ticket", {classes: "w-5 h-5 text-white"} %>
-                </div>
-                <h1 class="text-3xl font-bold bg-gradient-to-r from-slate-700 to-slate-900 bg-clip-text text-transparent">Support Ticket #<%= ticket.id %></h1>
-            </div>
-            <p class="text-slate-600">Created on <%= ticket.created_at %></p>
-        </div>
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Main Ticket Details -->
-            <div class="lg:col-span-2 space-y-6">
-                <!-- Ticket Info Card -->
-                <%= render(Core::CardComponent.new({variant: :glass, glow: true})) do %>
-                    <div class="flex flex-wrap items-center gap-4 mb-6">
-                        <%= render(Core::BadgeComponent.new(ticket.status, options: {custom_style: {theme: ticket_status_theme(ticket.status), icon: "info", size: :md}})) %>
-                        <%= render(Core::BadgeComponent.new("In Progress", options: {custom_style: {theme: :red, indicator: true, size: :md}})) %>
-                        <span class="text-sm text-slate-500 ml-auto">Priority: High</span>
-                    </div>
-
-                    <h2 class="text-2xl font-bold text-slate-800 mb-4 leading-tight">
-                      <%= ticket.title %>
-                    </h2>
-                    <div class="prose prose-slate max-w-none">
-                        <p class="text-slate-700 leading-relaxed mb-4">
-                        <%= ticket.description %>
-                        </p>
-                    </div>
-                </div>
-          <% end %>
-          <!-- Sidebar -->
-            <div class="space-y-6">
-               <!-- Actions Card -->
-              <%= render(Core::CardComponent.new({variant: :glass, glow: true})) do %>
-                    <h3 class="text-lg font-semibold text-slate-800 mb-4">Actions</h3>
-                    <div class="space-y-3">
-                        <button class="w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">Edit</button>
-                    </div>
-                </div>
+<div id="<%= dom_id ticket %>" class="space-y-4">
+  <!-- Header -->
+  <%= render(Core::CardComponent.new({variant: :glass, glow: true, classes: "space-y-4"})) do %>
+    <div class="flex items-center gap-4">
+      <%= icon "support", {classes: "h-8"} %>
+      <h1>Ticket #<%= ticket.id %> - <%= ticket.title %></h1>
+      <%= render(Core::BadgeComponent.new(ticket.status.humanize, options: {custom_style: {theme: ticket_status_theme(ticket.status), icon: "info", size: :md}})) %>
+    </div>
+    <%= render Core::BoxComponent.new do %>
+      <%= render Core::DefinitionListComponent.new(variant: :info, gap: :sm) do |dl| %>
+        <% dl.with_item(term: "Category") do %>
+          <%= ticket.category.humanize %>
+        <% end %>
+        <% dl.with_item(term: "Assigned to") do %>
+          <%= ticket.assigned&.email || "-" %>
+        <% end %>
+        <% dl.with_item(term: "Created on") do %>
+          <%= ticket.created_at %>
+        <% end %>
+      <% end %>
     <% end %>
+  <% end %>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="lg:col-span-2 space-y-6">
+      <%= render(Core::CardComponent.new({variant: :glass, glow: true, classes: "space-y-4"})) do %>
+          <h2 class="text-2xl font-bold text-slate-800 leading-tight">
+            <%= ticket.title %>
+          </h2>
+          <p class="text-slate-700 leading-relaxed">
+            <%= ticket.description %>
+          </p>
+        </div>
+      <% end %>
+        <%= render(Core::CardComponent.new({variant: :glass, glow: true, classes: "space-y-4"})) do %>
+          <h3>Actions</h2>
+          <%= render(Core::LinkComponent.new(name: "Edit", url: edit_settings_ticket_path(@ticket), options: {data: {turbo_frame: "modal"}, custom_style: {style: :as_button, theme: :edit, size: :md, fullw: true}})) %>
+        <% end %>
+    </div>
   </div>
 </div>

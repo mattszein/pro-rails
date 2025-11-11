@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_18_141836) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_11_023645) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -86,6 +86,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_18_141836) do
     t.bigint "assigned_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "category", default: 0, null: false
     t.index ["assigned_id"], name: "index_tickets_on_assigned_id"
     t.index ["created_id"], name: "index_tickets_on_created_id"
   end
