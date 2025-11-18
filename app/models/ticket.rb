@@ -1,6 +1,7 @@
 class Ticket < ApplicationRecord
   belongs_to :created, class_name: "Account", optional: true
   belongs_to :assigned, class_name: "Account", optional: true
+  has_one :conversation, dependent: :destroy
   enum :status, {open: 0, in_progress: 1, closed: 2}, default: :open, validate: {allow_nil: false}
   enum :category, {
     account_access: 0,
@@ -11,6 +12,7 @@ class Ticket < ApplicationRecord
   }, default: :account_access, validate: {allow_nil: false}
   default_scope { order(priority: :desc, created_at: :desc) }
   validates :title, :description, :status, :category, :created_id, presence: true
+  after_create :create_conversation
 
   broadcasts_to ->(ticket) { "tickets" },
     partial: "settings/tickets/ticket_table"
@@ -35,5 +37,11 @@ class Ticket < ApplicationRecord
     broadcast_replace_later_to "admin_tickets",
       target: ActionView::RecordIdentifier.dom_id(ticket, "admin"),
       partial: "adminit/tickets/ticket_row"
+  end
+
+  private
+
+  def create_conversation
+    create_conversation! if conversation.blank?
   end
 end

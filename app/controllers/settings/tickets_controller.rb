@@ -9,6 +9,8 @@ class Settings::TicketsController < ApplicationController
 
   # GET /tickets/1 or /tickets/1.json
   def show
+    @conversation = @ticket.conversation
+    @messages = @conversation.messages.includes(:account).order(created_at: :asc)
   end
 
   # GET /tickets/new

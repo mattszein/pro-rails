@@ -19,6 +19,8 @@ class ApplicationController < ActionController::Base
   def current_account
     rodauth.rails_account
   end
+
+  alias_method :current_user, :current_account
   helper_method :current_account # skip if inheriting from ActionController::API
 
   def ensure_frame_response
