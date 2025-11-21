@@ -8,7 +8,7 @@
   </h3>
 </div>
 <!-- Messages Container -->
-<div class="space-y-6 max-h-96 overflow-y-auto" id="<%= dom_id(conversation) %>_messages">
+<div class="space-y-6 max-h-96 overflow-y-auto" id="<%= dom_id(conversation) %>_messages" data-controller="conversation--conversation-component" data-conversation--conversation-component-target="messages">
   <%= helpers.turbo_stream_from conversation %>
   <% if messages.any? %>
     <%= render(collection: messages, partial: "conversation/message") %>

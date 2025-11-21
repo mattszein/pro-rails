@@ -5,11 +5,7 @@
 
   <%= render Core::CardComponent.new({padding: :none}) do %>
     <div class="flex p-4 gap-4">
-      <%= render Core::TableComponent.new(rows: @roles) do |table| %>
-        <%= table.column("Name") { |role| role.name } %>
-        <%= table.column("Actions") { |role| link_to "Show", adminit_role_path(role), class: "text-indigo-500 font-bold" } %>
-      <% end %>
-
+      <%= render Core::TableComponent.new(rows: @roles, columns: roles_columns) %>
     </div>
   <% end %>
 </div>

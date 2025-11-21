@@ -1,7 +1,6 @@
 # app/controllers/messages_controller.rb
 class Settings::MessagesController < ApplicationController
   before_action :set_ticket
-  before_action :set_conversation
 
   def create
     @message = @conversation.messages.build(message_params)
@@ -11,7 +10,9 @@ class Settings::MessagesController < ApplicationController
 
     if @message.save
       respond_to do |format|
-        format.turbo_stream
+        format.turbo_stream {
+          render "messages/create"
+        }
         format.html { redirect_to @ticket, notice: "Message sent." }
       end
     else
@@ -19,7 +20,7 @@ class Settings::MessagesController < ApplicationController
         format.turbo_stream {
           render turbo_stream: turbo_stream.replace(
             "message_form",
-            partial: "messages/form",
+            partial: "messages/create",
             locals: {ticket: @ticket, message: @message}
           )
         }
@@ -59,10 +60,7 @@ class Settings::MessagesController < ApplicationController
   private
 
   def set_ticket
-    @ticket = Ticket.find(params[:ticket_id])
-  end
-
-  def set_conversation
+    @ticket = Ticket.includes(:conversation).find(params[:ticket_id])
     @conversation = @ticket.conversation
   end
 

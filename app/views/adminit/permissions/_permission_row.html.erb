@@ -1,0 +1,12 @@
+<tr id="<%= ActionView::RecordIdentifier.dom_id(permission) %>">
+  <%= render Core::TableCellComponent.new do %>
+    <%= permission.resource %>
+  <% end %>
+  <%= render Core::TableCellComponent.new do %>
+  <%= form_with(url: adminit_permission_path(id: permission.id), scope: "permission", data: {turbo: true}, method: :put) do |f|
+        render Core::LoaderComponent.new do
+          f.multi_select :role_ids, options_for_select(roles, permission.role_ids), {include_blank: false, include_hidden: false, required: true}, {class: "h-10 group-[.is-loading]:hidden", multiple: true, "data-controller": "core--form--select-component", "data-core--form--select-component-submit-value": "true", "data-core--form--select-component-allow-empty-value": "false", "data-action": "core--form--select-component:loaded->core--loader-component#loaded"}
+        end
+      end %>
+  <% end %>
+</tr>

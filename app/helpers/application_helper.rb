@@ -43,4 +43,34 @@ module ApplicationHelper
   def form_classes
     "w-full max-w-sm space-y-4"
   end
+
+  def accounts_columns
+    [
+      {
+        label: "Email",
+        renderer: ->(account) { account.email }
+      },
+      {
+        label: "Actions",
+        renderer: ->(account) {
+          render(Core::LinkComponent.new(name: "Show", url: adminit_account_path(account), options: {data: {turbo_prefetch: false}, custom_style: {style: :as_button, theme: :show, size: :xs}}))
+        }
+      }
+    ]
+  end
+
+  def roles_columns
+    [
+      {
+        label: "Name",
+        renderer: ->(role) { role.name }
+      },
+      {
+        label: "Actions",
+        renderer: ->(role) {
+          render(Core::LinkComponent.new(name: "Show", url: adminit_role_path(role), options: {data: {turbo_prefetch: false}, custom_style: {style: :as_button, theme: :show, size: :xs}}))
+        }
+      }
+    ]
+  end
 end

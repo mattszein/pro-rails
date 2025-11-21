@@ -50,7 +50,9 @@
             conversation: @conversation,
             messages: @messages
           ) do %>
-        <%= render "conversation/message_form", ticket: ticket %>
+        <turbo-show when="current-user-id" is="<%= @ticket.assigned_id.to_s %>">
+          <%= render "conversation/message_form", ticket: ticket %>
+        </turbo-show>
       <% end %>
     <% end %>
   </div>

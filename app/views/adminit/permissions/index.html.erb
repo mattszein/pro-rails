@@ -4,15 +4,10 @@
   </div>
   <%= render Core::CardComponent.new({padding: :none}) do %>
     <div class="flex p-4 gap-4">
-      <%= render Core::TableComponent.new(rows: @permissions) do |table| %>
-        <%= table.column("Policy name") { |permission| permission.resource } %>
-        <%= table.column("Roles") { |permission|
-              form_with(url: adminit_permission_path(id: permission.id), scope: "permission", data: {turbo: true}, method: :put) do |f|
-                render Core::LoaderComponent.new do
-                  f.select :role_ids, options_for_select(@roles, permission.role_ids), {include_blank: false, include_hidden: false, required: true}, {class: "h-10 group-[.is-loading]:hidden", multiple: true, "data-controller": "core--form--select-component", "data-core--form--select-component-submit-value": "true", "data-core--form--select-component-allow-empty-value": "false", "data-action": "core--form--select-component:loaded->core--loader-component#loaded"}
-                end
-              end
-            } %>
+      <%= render Core::TableComponent.new(rows: @permissions, columns: [{label: "Policy"}, {label: "Roles"}]) do |table| %>
+        <% @permissions.each_with_index do |permission, index| %>
+          <%= render "permission_row", permission: permission, roles: @roles, index: index %>
+        <% end %>
       <% end %>
     </div>
   <% end %>
