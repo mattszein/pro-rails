@@ -50,8 +50,8 @@ class Adminit::TicketsController < Adminit::ApplicationController
     authorize! @ticket, to: :take?
     respond_to do |format|
       if @ticket.assigned_id.nil? && @ticket.update(assigned: current_account, status: :in_progress)
-        format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, adminit_tickets_path) }
-        format.html { redirect_to adminit_tickets_url, notice: "Ticket was successfully assigned to you." }
+        format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, adminit_ticket_path(@ticket)) }
+        format.html { redirect_to adminit_ticket_path(@ticket), notice: "Ticket was successfully assigned to you." }
         format.json { render :show, status: :ok, location: @ticket }
       else
         format.turbo_stream { render turbo_stream: turbo_stream.replace(dom_id(@ticket, "admin"), partial: "adminit/tickets/ticket_table", locals: {ticket: @ticket}), status: :unprocessable_entity }

@@ -14,8 +14,12 @@ Rails.application.routes.draw do
   get "dashboard" => "dashboard#index", :as => :dashboard
 
   namespace :settings do
-    resources :tickets do
-      resources :messages, only: [:create, :update, :destroy]
+    resources :tickets
+  end
+
+  namespace :support do
+    resources :tickets, only: [] do
+      resources :messages, only: [:create]
     end
   end
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)

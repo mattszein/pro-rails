@@ -4,6 +4,9 @@ class ApplicationController < ActionController::Base
   default_form_builder CustomFormBuilder
 
   include ErrorResponseActions
+  include ActionPolicyHandler
+  include RecordNotFoundHandler
+
   before_action :set_sidebar_open
 
   def index
@@ -22,6 +25,10 @@ class ApplicationController < ActionController::Base
 
   alias_method :current_user, :current_account
   helper_method :current_account # skip if inheriting from ActionController::API
+
+  def require_account
+    rodauth.require_account
+  end
 
   def ensure_frame_response
     redirect_to root_path unless turbo_frame_request?
