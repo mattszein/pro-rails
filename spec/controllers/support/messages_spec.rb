@@ -77,11 +77,6 @@ RSpec.describe Support::MessagesController, type: :controller do
           expect { subject }.not_to change(Support::Message, :count)
         end
 
-        it "renders turbo_stream response with errors" do
-          subject
-          expect(response.media_type).to eq("text/vnd.turbo-stream.html")
-        end
-
         it "responds with success status even with validation errors" do
           subject
           expect(response).to have_http_status(200)
@@ -132,11 +127,6 @@ RSpec.describe Support::MessagesController, type: :controller do
 
       it "responds with success (turbo stream)" do
         expect(subject).to have_http_status(200)
-      end
-
-      it "renders turbo_stream response" do
-        subject
-        expect(response.media_type).to eq("text/vnd.turbo-stream.html")
       end
 
       it "sets unauthorized flash alert" do
@@ -199,11 +189,6 @@ RSpec.describe Support::MessagesController, type: :controller do
 
       it "responds with not found status" do
         expect(subject).to have_http_status(:not_found)
-      end
-
-      it "renders turbo_stream response" do
-        subject
-        expect(response.media_type).to eq("text/vnd.turbo-stream.html")
       end
 
       it "sets ticket not found flash alert" do

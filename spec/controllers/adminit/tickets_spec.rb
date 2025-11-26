@@ -157,7 +157,7 @@ describe Adminit::TicketsController, type: :controller do
 
   describe "PATCH #update" do
     let(:ticket) { create(:ticket, :in_progress, created: creator_account, assigned: user) }
-    let(:params) { {id: ticket.id, ticket: {status: :closed}} }
+    let(:params) { {id: ticket.id, support_ticket: {status: :closed}} }
 
     subject { patch :update, params: params }
 
