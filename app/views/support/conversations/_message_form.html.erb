@@ -1,0 +1,12 @@
+<%= form_with model: Support::Message.new, url: support_ticket_messages_path(ticket), id: "message_form", class: "flex gap-3", data: {controller: "message-form", action: "turbo:submit-start->message-form#beforeSubmit turbo:submit-end->message-form#afterSubmit"} do |form| %>
+  <%= form.text_area :content,
+        rows: 1,
+        placeholder: "Type your message...",
+        class: "flex-1 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none text-slate-900 dark:text-slate-100", data: {
+          message_form_target: "textarea",
+          action: "keydown->message-form#handleKeydown"
+        } %>
+  <%= form.submit "Send",
+        data: {message_form_target: "submit"},
+        class: "px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 cursor-pointer" %>
+<% end %>

@@ -13,5 +13,5 @@
   </div>
 
   <%= turbo_stream_from dom_id @ticket, "admin" %>
-  <%= render @ticket %>
+  <%= render "adminit/tickets/ticket", ticket: @ticket %>
 </div>

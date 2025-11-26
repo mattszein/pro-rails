@@ -22,7 +22,7 @@ describe Adminit::TicketsController, type: :controller do
         end
 
         it "is authorized" do
-          expect { subject }.to be_authorized_to(:manage?, Ticket).with(Adminit::TicketPolicy).with_context(user: user)
+          expect { subject }.to be_authorized_to(:manage?, Support::Ticket).with(Adminit::TicketPolicy).with_context(user: user)
         end
 
         it_behaves_like "respond to success"
@@ -56,8 +56,8 @@ describe Adminit::TicketsController, type: :controller do
           expect { subject }.to change { ticket.reload.status }.from("open").to("in_progress")
         end
 
-        it "redirects to tickets index" do
-          expect(subject).to redirect_to(adminit_tickets_path)
+        it "redirects to the ticket" do
+          expect(subject).to redirect_to(adminit_ticket_path(ticket))
         end
 
         it "flashes a success message" do
@@ -157,7 +157,7 @@ describe Adminit::TicketsController, type: :controller do
 
   describe "PATCH #update" do
     let(:ticket) { create(:ticket, :in_progress, created: creator_account, assigned: user) }
-    let(:params) { {id: ticket.id, ticket: {status: :closed}} }
+    let(:params) { {id: ticket.id, support_ticket: {status: :closed}} }
 
     subject { patch :update, params: params }
 

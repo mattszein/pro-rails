@@ -4,7 +4,7 @@
     <div class="flex items-center gap-4">
       <%= icon "support", {classes: "h-8"} %>
       <h1>Ticket #<%= ticket.id %> - <%= ticket.title %></h1>
-      <%= render(Core::BadgeComponent.new(ticket.status, options: {custom_style: {theme: ticket_status_theme(ticket.status), icon: "info", size: :md}})) %>
+      <%= render(Core::BadgeComponent.new(ticket.status.humanize, options: {custom_style: {theme: ticket_status_theme(ticket.status), icon: "info", size: :md}})) %>
     </div>
     <%= render Core::BoxComponent.new do %>
       <%= render Core::DefinitionListComponent.new(variant: :info, gap: :sm) do |dl| %>
@@ -45,5 +45,15 @@
           <%= render(Core::LinkComponent.new(name: "Edit", url: edit_adminit_ticket_path(@ticket), options: {data: {turbo_frame: "modal"}, custom_style: {style: :as_button, theme: :edit, size: :md, fullw: true}})) %>
         <% end %>
     </div>
+    <%= render(Core::CardComponent.new({variant: :glass, glow: true, classes: "space-y-4"})) do %>
+      <%= render Support::ConversationComponent.new(
+            conversation: @conversation,
+            messages: @messages
+          ) do %>
+        <turbo-show when="current-user-id" is="<%= @ticket.assigned_id.to_s %>">
+          <%= render "support/conversations/message_form", ticket: ticket %>
+        </turbo-show>
+      <% end %>
+    <% end %>
   </div>
 </div>

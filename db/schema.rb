@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_11_023645) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_12_185225) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -56,6 +56,24 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_11_023645) do
     t.check_constraint "email ~ '^[^,;@ \r\n]+@[^,@; \r\n]+.[^,@; \r\n]+$'::citext", name: "valid_email"
   end
 
+  create_table "conversations", force: :cascade do |t|
+    t.bigint "ticket_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ticket_id"], name: "index_conversations_on_ticket_id"
+  end
+
+  create_table "messages", force: :cascade do |t|
+    t.bigint "conversation_id", null: false
+    t.bigint "account_id", null: false
+    t.text "content", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_messages_on_account_id"
+    t.index ["conversation_id", "created_at"], name: "index_messages_on_conversation_id_and_created_at"
+    t.index ["conversation_id"], name: "index_messages_on_conversation_id"
+  end
+
   create_table "permissions", force: :cascade do |t|
     t.string "resource"
     t.datetime "created_at", null: false
@@ -97,6 +115,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_11_023645) do
   add_foreign_key "account_remember_keys", "accounts", column: "id"
   add_foreign_key "account_verification_keys", "accounts", column: "id"
   add_foreign_key "accounts", "roles"
+  add_foreign_key "conversations", "tickets"
+  add_foreign_key "messages", "accounts"
+  add_foreign_key "messages", "conversations"
   add_foreign_key "tickets", "accounts", column: "assigned_id"
   add_foreign_key "tickets", "accounts", column: "created_id"
 end

@@ -17,6 +17,9 @@
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= action_cable_with_jwt_meta_tag %>
     <%= javascript_importmap_tags %>
+    <% if current_account %>
+      <meta name="current-user-id" content="<%= current_account.id %>">
+    <% end %>
   </head>
   <body class="antialiased bg-default" data-controller="closer">
     <%= render partial: "partials/navbar" %>
@@ -24,7 +27,7 @@
       <%= turbo_frame_tag "modal", target: "_top" %>
       <%= yield %>
     </main>
-    <% if @current_account %>
+    <% if current_account %>
       <%= render(Core::SidebarComponent.new(open: @sidebar_open, navigation_items: sidebar_links)) %>
     <% end %>
     <div id="flashes_id">

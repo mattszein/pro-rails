@@ -1,8 +1,8 @@
 <div class="container mx-auto px-4 py-8 max-w-7xl">
   <div class="flex justify-between items-center pb-2">
-    <%= link_to "Back to Tickets", settings_tickets_path, class: "text-indigo-500" %>
+    <%= link_to "Back to Tickets", support_tickets_path, class: "text-indigo-500" %>
   </div>
 
   <%= turbo_stream_from dom_id @ticket %>
-  <%= render @ticket %>
+  <%= render "support/tickets/ticket", ticket: @ticket %>
 </div>
