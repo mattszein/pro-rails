@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory :ticket do
+  factory :ticket, class: "Support::Ticket" do
     sequence(:title) { |n| "Ticket ##{n}" }
     description { "This is a test ticket description." }
     priority { 3 }

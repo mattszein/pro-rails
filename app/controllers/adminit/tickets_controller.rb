@@ -3,25 +3,25 @@ class Adminit::TicketsController < Adminit::ApplicationController
 
   # GET /tickets or /tickets.json
   def index
-    authorize!
-    @tickets = Ticket.all
+    authorize! Support::Ticket, with: Adminit::TicketPolicy
+    @tickets = Support::Ticket.all
   end
 
   # GET /tickets/1 or /tickets/1.json
   def show
-    authorize! @ticket
+    authorize! @ticket, with: Adminit::TicketPolicy
     @conversation = @ticket.conversation
     @messages = @conversation.messages.includes(:account).order(created_at: :asc)
   end
 
   # GET /tickets/1/edit
   def edit
-    authorize! @ticket
+    authorize! @ticket, with: Adminit::TicketPolicy
   end
 
   # PATCH/PUT /tickets/1 or /tickets/1.json
   def update
-    authorize! @ticket
+    authorize! @ticket, with: Adminit::TicketPolicy
     respond_to do |format|
       if @ticket.update(ticket_params)
         format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, request.referer) }
@@ -36,7 +36,7 @@ class Adminit::TicketsController < Adminit::ApplicationController
 
   # DELETE /tickets/1 or /tickets/1.json
   def destroy
-    authorize! @ticket
+    authorize! @ticket, with: Adminit::TicketPolicy
     @ticket.destroy!
 
     respond_to do |format|
@@ -47,7 +47,7 @@ class Adminit::TicketsController < Adminit::ApplicationController
 
   # POST /tickets/1/take
   def take
-    authorize! @ticket, to: :take?
+    authorize! @ticket, to: :take?, with: Adminit::TicketPolicy
     respond_to do |format|
       if @ticket.assigned_id.nil? && @ticket.update(assigned: current_account, status: :in_progress)
         format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, adminit_ticket_path(@ticket)) }
@@ -63,7 +63,7 @@ class Adminit::TicketsController < Adminit::ApplicationController
 
   # POST /tickets/1/leave
   def leave
-    authorize! @ticket, to: :leave?
+    authorize! @ticket, to: :leave?, with: Adminit::TicketPolicy
     respond_to do |format|
       if @ticket.assigned_id == current_account.id && @ticket.update(assigned: nil, status: :open)
         format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, adminit_tickets_path) }
@@ -79,13 +79,11 @@ class Adminit::TicketsController < Adminit::ApplicationController
 
   private
 
-  # Use callbacks to share common setup or constraints between actions.
   def set_ticket
-    @ticket = Ticket.find(params[:id])
+    @ticket = Support::Ticket.find(params[:id])
   end
 
-  # Only allow a list of trusted parameters through.
   def ticket_params
-    params.require(:ticket).permit(:title, :description, :priority, :status, :category, :created_id, :assigned_id)
+    params.require(:support_ticket).permit(:title, :description, :priority, :status, :category, :created_id, :assigned_id)
   end
 end

@@ -33,16 +33,16 @@
       <% end %>
         <%= render(Core::CardComponent.new({variant: :glass, glow: true, classes: "space-y-4"})) do %>
           <h3>Actions</h2>
-          <%= render(Core::LinkComponent.new(name: "Edit", url: edit_settings_ticket_path(@ticket), options: {data: {turbo_frame: "modal"}, custom_style: {style: :as_button, theme: :edit, size: :md, fullw: true}})) %>
+          <%= render(Core::LinkComponent.new(name: "Edit", url: edit_support_ticket_path(@ticket), options: {data: {turbo_frame: "modal"}, custom_style: {style: :as_button, theme: :edit, size: :md, fullw: true}})) %>
         <% end %>
     </div>
 
     <%= render(Core::CardComponent.new({variant: :glass, glow: true, classes: "space-y-4"})) do %>
-      <%= render Conversation::ConversationComponent.new(
+      <%= render Support::ConversationComponent.new(
             conversation: @conversation,
             messages: @messages
           ) do %>
-          <%= render "conversation/message_form", ticket: ticket %>
+          <%= render "support/conversations/message_form", ticket: ticket %>
       <% end %>
     <% end %>
   </div>

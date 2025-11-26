@@ -46,12 +46,12 @@
         <% end %>
     </div>
     <%= render(Core::CardComponent.new({variant: :glass, glow: true, classes: "space-y-4"})) do %>
-      <%= render Conversation::ConversationComponent.new(
+      <%= render Support::ConversationComponent.new(
             conversation: @conversation,
             messages: @messages
           ) do %>
         <turbo-show when="current-user-id" is="<%= @ticket.assigned_id.to_s %>">
-          <%= render "conversation/message_form", ticket: ticket %>
+          <%= render "support/conversations/message_form", ticket: ticket %>
         </turbo-show>
       <% end %>
     <% end %>

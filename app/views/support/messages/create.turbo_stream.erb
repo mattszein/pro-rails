@@ -1,0 +1,3 @@
+<%= turbo_stream.replace "message_form" do %>
+  <%= render partial: "support/conversations/message_form", formats: [:html], locals: {ticket: @ticket} %>
+<% end %>

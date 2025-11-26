@@ -1,4 +1,4 @@
-<%= form_with model: [:support, ticket, Message.new], id: "message_form", class: "flex gap-3", data: {controller: "message-form", action: "turbo:submit-start->message-form#beforeSubmit turbo:submit-end->message-form#afterSubmit"} do |form| %>
+<%= form_with model: Support::Message.new, url: support_ticket_messages_path(ticket), id: "message_form", class: "flex gap-3", data: {controller: "message-form", action: "turbo:submit-start->message-form#beforeSubmit turbo:submit-end->message-form#afterSubmit"} do |form| %>
   <%= form.text_area :content,
         rows: 1,
         placeholder: "Type your message...",

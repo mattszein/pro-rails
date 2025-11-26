@@ -12,7 +12,7 @@ module Support
       if @message.save
         respond_to do |format|
           format.turbo_stream {
-            render "messages/create"
+            render "support/messages/create"
           }
           format.html { redirect_to request.referer || root_path, notice: "Message sent." }
         end
@@ -21,7 +21,7 @@ module Support
           format.turbo_stream {
             render turbo_stream: turbo_stream.replace(
               "message_form",
-              partial: "conversation/message_form",
+              partial: "support/conversations/message_form",
               locals: {ticket: @ticket, message: @message}
             )
           }
@@ -33,12 +33,12 @@ module Support
     private
 
     def set_ticket
-      @ticket = Ticket.includes(:conversation).find(params[:ticket_id])
+      @ticket = Support::Ticket.includes(:conversation).find(params[:ticket_id])
       @conversation = @ticket.conversation
     end
 
     def message_params
-      params.require(:message).permit(:content)
+      params.require(:support_message).permit(:content)
     end
   end
 end

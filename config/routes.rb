@@ -13,12 +13,8 @@ Rails.application.routes.draw do
 
   get "dashboard" => "dashboard#index", :as => :dashboard
 
-  namespace :settings do
-    resources :tickets
-  end
-
   namespace :support do
-    resources :tickets, only: [] do
+    resources :tickets do
       resources :messages, only: [:create]
     end
   end
