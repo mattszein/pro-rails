@@ -13,21 +13,21 @@ class Core::CardComponent < ViewComponent::Base
   VARIANT_STYLES = {
     default: {
       base: "bg-highlight",
-      border: "border border-violet-500/10 dark:border-violet-500/20",
-      shadow: "shadow-lg shadow-violet-500/5 dark:shadow-violet-500/10",
-      hover_shadow: "hover:shadow-xl hover:shadow-violet-500/10 dark:hover:shadow-violet-500/20 focus-within:shadow-xl focus-within:shadow-violet-500/10 dark:focus-within:shadow-violet-500/20"
+      border: "border border-primary-500/10 dark:border-primary-500/20",
+      shadow: "shadow-lg shadow-primary-500/5 dark:shadow-primary-500/10",
+      hover_shadow: "hover:shadow-xl hover:shadow-primary-500/10 dark:hover:shadow-primary-500/20 focus-within:shadow-xl focus-within:shadow-primary-500/10 dark:focus-within:shadow-primary-500/20"
     },
     primary: {
       base: "bg-highlight",
-      border: "border border-violet-500/15 dark:border-violet-400/25",
-      shadow: "shadow-lg shadow-violet-500/8 dark:shadow-violet-400/15",
-      hover_shadow: "hover:shadow-xl hover:shadow-violet-500/15 dark:hover:shadow-violet-400/25"
+      border: "border border-primary-500/15 dark:border-primary-400/25",
+      shadow: "shadow-lg shadow-primary-500/8 dark:shadow-primary-400/15",
+      hover_shadow: "hover:shadow-xl hover:shadow-primary-500/15 dark:hover:shadow-primary-400/25"
     },
     secondary: {
       base: "bg-highlight",
-      border: "border border-pink-500/15 dark:border-pink-400/25",
-      shadow: "shadow-lg shadow-pink-500/8 dark:shadow-pink-400/15",
-      hover_shadow: "hover:shadow-xl hover:shadow-pink-500/15 dark:hover:shadow-pink-400/25"
+      border: "border border-secondary-500/15 dark:border-secondary-400/25",
+      shadow: "shadow-lg shadow-secondary-500/8 dark:shadow-secondary-400/15",
+      hover_shadow: "hover:shadow-xl hover:shadow-secondary-500/15 dark:hover:shadow-secondary-400/25"
     },
     minimal: {
       base: "bg-highlight",
@@ -38,8 +38,8 @@ class Core::CardComponent < ViewComponent::Base
     glass: {
       base: "bg-highlight",
       border: "border border-white/20 dark:border-white/10",
-      shadow: "shadow-xl shadow-violet-500/5 dark:shadow-violet-400/10",
-      hover_shadow: "hover:shadow-2xl hover:shadow-violet-500/10 dark:hover:shadow-violet-400/20"
+      shadow: "shadow-xl shadow-primary-500/5 dark:shadow-primary-400/10",
+      hover_shadow: "hover:shadow-2xl hover:shadow-primary-500/10 dark:hover:shadow-primary-400/20"
     }
   }
 
@@ -65,7 +65,7 @@ class Core::CardComponent < ViewComponent::Base
       "rounded-2xl transition-all duration-300 ease-out",
       "hover:-translate-y-1 hover:brightness-[1.02] dark:hover:brightness-102",
       "focus-within:-translate-y-1 focus-within:brightness-[1.02] dark:focus-within:brightness-110",
-      "focus-within:ring-1 focus-within:ring-violet-500/30 focus-within:ring-offset-0.5 focus-within:ring-offset-transparent",
+      "focus-within:ring-1 focus-within:ring-primary-500/30 focus-within:ring-offset-0.5 focus-within:ring-offset-transparent",
       variant_config[:base],
       variant_config[:border],
       variant_config[:shadow],

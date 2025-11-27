@@ -3,27 +3,27 @@ class Core::Form::ButtonComponent < ViewComponent::Form::ButtonComponent
 
   THEME_MAPPINGS = {
     primary: {
-      base: "bg-highlight border-violet-500/30",
-      text_base: "text-violet-500 dark:text-violet-300",
-      text_hover: "hover:text-violet-700 dark:hover:text-violet-200",
-      hover_border: "hover:border-violet-500/60 dark:hover:border-violet-300/50",
-      focus: "focus:text-violet-700 dark:focus:text-violet-200 focus:border-violet-500/60 dark:focus:border-violet-300/50 focus:ring-violet-500/30 dark:focus:ring-violet-400/40",
+      base: "bg-highlight border-primary-500/30",
+      text_base: "text-primary-500 dark:text-primary-300",
+      text_hover: "hover:text-primary-700 dark:hover:text-primary-200",
+      hover_border: "hover:border-primary-500/60 dark:hover:border-primary-300/50",
+      focus: "focus:text-primary-700 dark:focus:text-primary-200 focus:border-primary-500/60 dark:focus:border-primary-300/50 focus:ring-primary-500/30 dark:focus:ring-primary-400/40",
       shimmer: "after:absolute after:inset-0 after:rounded-lg after:pointer-events-none " \
         "after:bg-gradient-to-r after:from-transparent " \
-        "after:via-violet-800/[0.15] dark:after:via-white/15 after:to-transparent " \
+        "after:via-primary-800/[0.15] dark:after:via-white/15 after:to-transparent " \
         "after:translate-x-[-100%] after:opacity-0 " \
         "hover:after:translate-x-[100%] hover:after:opacity-100 " \
         "after:transition-all after:duration-300 after:ease-out"
     },
     secondary: {
-      base: "bg-highlight border-pink-500/30",
-      text_base: "text-pink-500 dark:text-pink-300",
-      text_hover: "hover:text-pink-700 dark:hover:text-pink-200",
-      hover_border: "hover:border-pink-500/60 dark:hover:border-pink-300/50",
-      focus: "focus:text-pink-700 dark:focus:text-pink-200 focus:border-pink-500/60 dark:focus:border-pink-300/50 focus:ring-pink-500/30 dark:focus:ring-pink-400/40",
+      base: "bg-highlight border-secondary-500/30",
+      text_base: "text-secondary-500 dark:text-secondary-300",
+      text_hover: "hover:text-secondary-700 dark:hover:text-secondary-200",
+      hover_border: "hover:border-secondary-500/60 dark:hover:border-secondary-300/50",
+      focus: "focus:text-secondary-700 dark:focus:text-secondary-200 focus:border-secondary-500/60 dark:focus:border-secondary-300/50 focus:ring-secondary-500/30 dark:focus:ring-secondary-400/40",
       shimmer: "after:absolute after:inset-0 after:rounded-lg after:pointer-events-none " \
         "after:bg-gradient-to-r after:from-transparent " \
-        "after:via-pink-800/[0.15] dark:after:via-white/15 after:to-transparent " \
+        "after:via-secondary-800/[0.15] dark:after:via-white/15 after:to-transparent " \
         "after:translate-x-[-100%] after:opacity-0 " \
         "hover:after:translate-x-[100%] hover:after:opacity-100 " \
         "after:transition-all after:duration-300 after:ease-out"

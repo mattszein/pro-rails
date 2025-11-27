@@ -1,0 +1,31 @@
+@layer utilities {
+  .theme-oceanic {
+    /* PRIMARY: True Navy
+       Hue: 260 (Deep Blue) | Chroma: Moderate */
+    --color-primary-50:  oklch(96% 0.03 260);
+    --color-primary-100: oklch(91% 0.06 260);
+    --color-primary-200: oklch(84% 0.09 260);
+    --color-primary-300: oklch(74% 0.12 260);
+    --color-primary-400: oklch(62% 0.15 260);
+    --color-primary-500: oklch(50% 0.18 260); /* Darker standard point */
+    --color-primary-600: oklch(40% 0.18 260);
+    --color-primary-700: oklch(30% 0.15 260);
+    --color-primary-800: oklch(22% 0.12 260);
+    --color-primary-900: oklch(15% 0.08 260);
+    --color-primary-950: oklch(10% 0.05 260);
+
+    /* SECONDARY: Bright Sky
+       Hue: 220 (Light Blue) | Chroma: High */
+    --color-secondary-50:  oklch(97% 0.02 220);
+    --color-secondary-100: oklch(94% 0.05 220);
+    --color-secondary-200: oklch(89% 0.09 220);
+    --color-secondary-300: oklch(82% 0.13 220);
+    --color-secondary-400: oklch(74% 0.15 220);
+    --color-secondary-500: oklch(66% 0.16 220);
+    --color-secondary-600: oklch(56% 0.16 220);
+    --color-secondary-700: oklch(46% 0.14 220);
+    --color-secondary-800: oklch(36% 0.11 220);
+    --color-secondary-900: oklch(26% 0.08 220);
+    --color-secondary-950: oklch(18% 0.05 220);
+  }
+}
