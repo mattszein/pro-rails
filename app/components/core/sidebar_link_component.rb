@@ -10,15 +10,22 @@ class Core::SidebarLinkComponent < ViewComponent::Base
   end
 
   def link_classes
-    base_classes = "inline-flex p-3 hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg w-full transition duration-200 group"
-    active_classes = active? ? "bg-blue-100 dark:bg-blue-900" : ""
+    base_classes = "flex gap-2 items-center p-3 hover:cursor-pointer rounded-sm w-full group/link"
+    active_classes = active? ? "" : ""
 
     class_names(base_classes, active_classes)
   end
 
   def icon_classes
-    base_classes = "h-8 text-gray-500 dark:text-gray-100 group-hover:text-gray-900 dark:group-hover:text-blue-500 transition duration-200"
-    active_classes = active? ? "text-blue-600 dark:text-blue-400" : ""
+    base_classes = "h-8 text-gray-500 dark:text-gray-400 group-hover/link:text-secondary-500 dark:group-hover/link:text-secondary-500"
+    active_classes = active? ? "text-secondary-500 dark:text-secondary-500" : ""
+
+    class_names(base_classes, active_classes)
+  end
+
+  def span_classes
+    base_classes = "opacity-100 text-gray-600 dark:text-white ml-2 text-md group-hover/drawer:opacity-100 group-hover/drawer:transition-opacity group-hover/link:text-primary-500 dark:group-hover/link:text-primary-500"
+    active_classes = active? ? "text-primary-500 dark:text-primary-500 border-b-2 border-secondary-400" : ""
 
     class_names(base_classes, active_classes)
   end

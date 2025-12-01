@@ -32,10 +32,10 @@
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
     <div class="lg:col-span-2 space-y-6">
       <%= render(Core::CardComponent.new({variant: :glass, glow: true, classes: "space-y-4"})) do %>
-          <h2 class="text-2xl font-bold text-slate-800 leading-tight">
+          <h2 class="text-2xl font-bold leading-tight">
             <%= ticket.title %>
           </h2>
-          <p class="text-slate-700 leading-relaxed">
+          <p class="leading-relaxed">
             <%= ticket.description %>
           </p>
         </div>

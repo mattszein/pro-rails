@@ -1,6 +1,6 @@
 # Below are the routes for madmin
 namespace :adminit do
-  root to: "dashboard#index"
+  root to: "application#index"
   resources :accounts
   resources :tickets do
     post :take, on: :member

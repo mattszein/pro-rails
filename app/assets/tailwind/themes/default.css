@@ -2,6 +2,11 @@
   --color-default: theme(colors.gray.50);
   --color-highlight: theme(colors.white);
 
+  --color-text-heading-strong: theme(colors.gray.900); /* H1 */
+  --color-text-heading-soft:   theme(colors.gray.800); /* H2, H3 */
+  --color-text-body-strong:    theme(colors.gray.700); /* H4-H6 */
+  --color-text-body:           theme(colors.gray.600); /* p */
+
   /* Primary - Purple */
   --color-primary-50: theme(colors.purple.50);
   --color-primary-100: theme(colors.purple.100);

@@ -17,11 +17,18 @@
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= action_cable_with_jwt_meta_tag %>
     <%= javascript_importmap_tags %>
+    <% if current_account %>
+      <meta name="current-user-id" content="<%= current_account.id %>">
+    <% end %>
   </head>
   <body class="antialiased bg-default" data-controller="closer">
-    <%= render partial: "partials/navbar" %>
-    <main class="pt-20 px-8 h-full mx-auto flex justify-center dark:text-gray-200">
+    <%= render(Core::SidebarComponent.new(open: false, title: "RailsApp | Menu")) do %>
+      <%= render "partials/navigation" %>
+    <% end %>
+
+    <main class="pt-20 px-8 h-full mx-auto flex justify-center dark:text-gray-200" role="main">
       <%= turbo_frame_tag "modal", target: "_top" %>
+
       <%= yield %>
     </main>
     <div id="flashes_id">

@@ -1,5 +1,5 @@
 module Support
-  class TicketsController < ApplicationController
+  class TicketsController < DashboardController
     before_action :set_ticket, only: %i[show edit update destroy]
     before_action :ensure_frame_response, only: %i[new edit]
 
