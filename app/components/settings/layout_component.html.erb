@@ -1,0 +1,4 @@
+<div class="w-full flex flex-col space-y-4">
+  <%= render Core::SubmenuComponent.new(sections: MENU_ITEMS, current_section: @active_section) %>
+  <%= content %>
+</div>

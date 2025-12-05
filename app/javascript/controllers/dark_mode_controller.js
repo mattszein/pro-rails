@@ -16,23 +16,23 @@ export default class extends Controller {
     event.preventDefault()
     // this.lightIconTarget.classList.toggle('hidden');
     // this.darkIconTarget.classList.toggle('hidden');
-    if (localStorage.getItem('theme')) {
-      if (localStorage.getItem('theme') === 'light') {
+    if (localStorage.getItem('theme_mode')) {
+      if (localStorage.getItem('theme_mode') === 'light') {
         document.documentElement.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
+        localStorage.setItem('theme_mode', 'dark');
       } else {
         document.documentElement.classList.remove('dark');
-        localStorage.setItem('theme', 'light');
+        localStorage.setItem('theme_mode', 'light');
       }
 
       // if NOT set via local storage previously
     } else {
       if (document.documentElement.classList.contains('dark')) {
         document.documentElement.classList.remove('dark');
-        localStorage.setItem('theme', 'light');
+        localStorage.setItem('theme_mode', 'light');
       } else {
         document.documentElement.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
+        localStorage.setItem('theme_mode', 'dark');
       }
     }
   }

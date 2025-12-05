@@ -1,0 +1,41 @@
+/* Category: Vivid */
+@layer utilities {
+  .theme-flamingo {
+    /* PRIMARY (Hue: 350, Chroma: 0.22) */
+    --color-primary-50: oklch(0.98 0.08800000000000001 350);
+    --color-primary-100: oklch(0.95 0.08800000000000001 350);
+    --color-primary-200: oklch(0.9 0.22 350);
+    --color-primary-300: oklch(0.82 0.22 350);
+    --color-primary-400: oklch(0.72 0.22 350);
+    --color-primary-500: oklch(0.62 0.22 350);
+    --color-primary-600: oklch(0.52 0.22 350);
+    --color-primary-700: oklch(0.42 0.22 350);
+    --color-primary-800: oklch(0.32 0.22 350);
+    --color-primary-900: oklch(0.22 0.154 350);
+    --color-primary-950: oklch(0.12 0.11 350);
+    /* SECONDARY (Hue: 290, Chroma: 0.18) */
+    --color-secondary-50: oklch(0.98 0.072 290);
+    --color-secondary-100: oklch(0.95 0.072 290);
+    --color-secondary-200: oklch(0.9 0.18 290);
+    --color-secondary-300: oklch(0.82 0.18 290);
+    --color-secondary-400: oklch(0.72 0.18 290);
+    --color-secondary-500: oklch(0.62 0.18 290);
+    --color-secondary-600: oklch(0.52 0.18 290);
+    --color-secondary-700: oklch(0.42 0.18 290);
+    --color-secondary-800: oklch(0.32 0.18 290);
+    --color-secondary-900: oklch(0.22 0.126 290);
+    --color-secondary-950: oklch(0.12 0.09 290);
+
+    /* SEMANTIC TEXT MAPPING */
+    --color-text-heading-strong: var(--color-primary-900);
+    --color-text-heading-soft:   var(--color-primary-800);
+    --color-text-body-strong:    var(--color-primary-700);
+    --color-text-body:           theme(colors.slate.600);
+    &:where(.dark, .dark *) {
+      --color-text-heading-strong: var(--color-primary-50);
+      --color-text-heading-soft:   var(--color-primary-200);
+      --color-text-body-strong:    var(--color-primary-300);
+      --color-text-body:           theme(colors.slate.400);
+    }
+  }
+}

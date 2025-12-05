@@ -1,0 +1,5 @@
+<div class="flex" role="group">
+  <% @sections.each do |section| %>
+    <%= link_to section.name, section.path, class: link_classes(section) %>
+  <% end %>
+</div>

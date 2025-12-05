@@ -8,5 +8,4 @@ class Core::SidebarComponent < ViewComponent::Base
   end
 
   private
-
 end

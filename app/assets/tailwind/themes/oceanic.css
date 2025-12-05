@@ -1,31 +1,41 @@
+/* Category: Serene */
 @layer utilities {
   .theme-oceanic {
-    /* PRIMARY: True Navy
-       Hue: 260 (Deep Blue) | Chroma: Moderate */
-    --color-primary-50:  oklch(96% 0.03 260);
-    --color-primary-100: oklch(91% 0.06 260);
-    --color-primary-200: oklch(84% 0.09 260);
-    --color-primary-300: oklch(74% 0.12 260);
-    --color-primary-400: oklch(62% 0.15 260);
-    --color-primary-500: oklch(50% 0.18 260); /* Darker standard point */
-    --color-primary-600: oklch(40% 0.18 260);
-    --color-primary-700: oklch(30% 0.15 260);
-    --color-primary-800: oklch(22% 0.12 260);
-    --color-primary-900: oklch(15% 0.08 260);
-    --color-primary-950: oklch(10% 0.05 260);
+    /* PRIMARY (Hue: 215, Chroma: 0.18) */
+    --color-primary-50: oklch(0.98 0.072 215);
+    --color-primary-100: oklch(0.9199999999999999 0.072 215);
+    --color-primary-200: oklch(0.87 0.18 215);
+    --color-primary-300: oklch(0.7899999999999999 0.18 215);
+    --color-primary-400: oklch(0.69 0.18 215);
+    --color-primary-500: oklch(0.59 0.18 215);
+    --color-primary-600: oklch(0.49 0.18 215);
+    --color-primary-700: oklch(0.39 0.18 215);
+    --color-primary-800: oklch(0.29000000000000004 0.18 215);
+    --color-primary-900: oklch(0.19 0.126 215);
+    --color-primary-950: oklch(0.12 0.09 215);
+    /* SECONDARY (Hue: 190, Chroma: 0.12) */
+    --color-secondary-50: oklch(0.98 0.048 190);
+    --color-secondary-100: oklch(0.9199999999999999 0.048 190);
+    --color-secondary-200: oklch(0.87 0.12 190);
+    --color-secondary-300: oklch(0.7899999999999999 0.12 190);
+    --color-secondary-400: oklch(0.69 0.12 190);
+    --color-secondary-500: oklch(0.59 0.12 190);
+    --color-secondary-600: oklch(0.49 0.12 190);
+    --color-secondary-700: oklch(0.39 0.12 190);
+    --color-secondary-800: oklch(0.29000000000000004 0.12 190);
+    --color-secondary-900: oklch(0.19 0.08399999999999999 190);
+    --color-secondary-950: oklch(0.12 0.06 190);
 
-    /* SECONDARY: Bright Sky
-       Hue: 220 (Light Blue) | Chroma: High */
-    --color-secondary-50:  oklch(97% 0.02 220);
-    --color-secondary-100: oklch(94% 0.05 220);
-    --color-secondary-200: oklch(89% 0.09 220);
-    --color-secondary-300: oklch(82% 0.13 220);
-    --color-secondary-400: oklch(74% 0.15 220);
-    --color-secondary-500: oklch(66% 0.16 220);
-    --color-secondary-600: oklch(56% 0.16 220);
-    --color-secondary-700: oklch(46% 0.14 220);
-    --color-secondary-800: oklch(36% 0.11 220);
-    --color-secondary-900: oklch(26% 0.08 220);
-    --color-secondary-950: oklch(18% 0.05 220);
+    /* SEMANTIC TEXT MAPPING */
+    --color-text-heading-strong: var(--color-primary-900);
+    --color-text-heading-soft:   var(--color-primary-800);
+    --color-text-body-strong:    var(--color-primary-700);
+    --color-text-body:           theme(colors.slate.600);
+    &:where(.dark, .dark *) {
+      --color-text-heading-strong: var(--color-primary-50);
+      --color-text-heading-soft:   var(--color-primary-200);
+      --color-text-body-strong:    var(--color-primary-300);
+      --color-text-body:           theme(colors.slate.400);
+    }
   }
 }

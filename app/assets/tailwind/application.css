@@ -59,9 +59,52 @@
 }
 
 @import "./themes/default.css";
-@import "./themes/serene.css";
-@import "./themes/earthy.css";
-@import "./themes/royal.css";
-@import "./themes/luxury.css";
+/* Tech Edge */
+@import "./themes/hyper.css";
+@import "./themes/aurora.css";
+@import "./themes/eclipse.css";
+@import "./themes/galaxy.css";
+@import "./themes/synth.css";
+@import "./themes/thunder.css";
+@import "./themes/matrix.css";
+@import "./themes/cyber.css";
+
+/* Serene */
+@import "./themes/botanic.css";
+@import "./themes/reef.css";
 @import "./themes/oceanic.css";
-@import "./themes/horizon.css";
+@import "./themes/forest.css";
+@import "./themes/dune.css";
+@import "./themes/mauve.css";
+@import "./themes/glacier.css";
+@import "./themes/lavender.css";
+
+/* Cosmic */
+@import "./themes/nebula.css";
+@import "./themes/starlight.css";
+@import "./themes/void.css";
+@import "./themes/pulsar.css";
+@import "./themes/vapor.css";
+@import "./themes/prism.css";
+@import "./themes/comet.css";
+@import "./themes/solar.css";
+
+/* Vivid */
+@import "./themes/sunset.css";
+@import "./themes/berry.css";
+@import "./themes/flamingo.css";
+@import "./themes/royal.css";
+@import "./themes/coral.css";
+@import "./themes/neon.css";
+@import "./themes/phoenix.css";
+@import "./themes/bloom.css";
+
+/* Night Owl */
+@import "./themes/amber.css";
+@import "./themes/candle.css";
+@import "./themes/ember.css";
+@import "./themes/hearth.css";
+@import "./themes/vintage.css";
+@import "./themes/sepia.css";
+@import "./themes/autumn.css";
+@import "./themes/twilight.css";

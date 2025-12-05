@@ -1,4 +1,4 @@
-class DashboardController < ActionController::Base
+class DashboardController < ApplicationController
   allow_browser versions: :modern
   default_form_builder CustomFormBuilder
 
@@ -13,6 +13,7 @@ class DashboardController < ActionController::Base
   end
 
   private
+
   def set_sidebar_open
     value = cookies["sidebar"]
     @sidebar_open = !value.nil? && value == "1"

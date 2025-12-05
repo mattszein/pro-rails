@@ -15,8 +15,8 @@
     <%= render(Core::SidebarLinkComponent.new(label: "Tickets", path: adminit_tickets_path, active_paths: [adminit_tickets_path], icon_name: "adminit/tickets")) %>
   <% end %>
 
-  <hr class="my-4 border-gray-300 dark:border-gray-700" />
+  <hr class="my-4 border-gray-300 dark:border-gray-700">
 
-  <%= render(Core::SidebarLinkComponent.new(label: "Dark - Light", path: "#", icon_name: "theme", options: {data: {turbo: "false", controller:"dark-mode", dark_mode_target: "themeToggle", action: "click->dark-mode#toggleTheme"}})) %>
+  <%= render(Core::SidebarLinkComponent.new(label: "Dark - Light", path: "#", icon_name: "theme", options: {data: {turbo: "false", controller: "dark-mode", dark_mode_target: "themeToggle", action: "click->dark-mode#toggleTheme"}})) %>
   <%= render(Core::SidebarLinkComponent.new(label: "Back to App", path: dashboard_path, icon_name: "adminit/back")) %>
   <%= render(Core::SidebarLinkComponent.new(label: "Logout", path: rodauth.logout_path, icon_name: "logout", options: {data: {turbo_prefetch: "false", turbo_method: "post"}, method: :post})) %>

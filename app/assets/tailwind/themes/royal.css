@@ -1,31 +1,41 @@
+/* Category: Cosmic */
 @layer utilities {
   .theme-royal {
-    /* PRIMARY: Smooth Amethyst
-       Hue: 290 (Purple) | Chroma: High but controlled */
-    --color-primary-50:  oklch(97% 0.03 290);
-    --color-primary-100: oklch(93% 0.06 290);
-    --color-primary-200: oklch(88% 0.10 290);
-    --color-primary-300: oklch(80% 0.15 290);
-    --color-primary-400: oklch(70% 0.19 290);
-    --color-primary-500: oklch(60% 0.22 290);
-    --color-primary-600: oklch(50% 0.22 290);
-    --color-primary-700: oklch(40% 0.19 290);
-    --color-primary-800: oklch(30% 0.15 290);
-    --color-primary-900: oklch(20% 0.10 290);
-    --color-primary-950: oklch(12% 0.07 290);
+    /* PRIMARY (Hue: 275, Chroma: 0.18) */
+    --color-primary-50: oklch(0.98 0.072 275);
+    --color-primary-100: oklch(0.95 0.072 275);
+    --color-primary-200: oklch(0.9 0.18 275);
+    --color-primary-300: oklch(0.82 0.18 275);
+    --color-primary-400: oklch(0.72 0.18 275);
+    --color-primary-500: oklch(0.62 0.18 275);
+    --color-primary-600: oklch(0.52 0.18 275);
+    --color-primary-700: oklch(0.42 0.18 275);
+    --color-primary-800: oklch(0.32 0.18 275);
+    --color-primary-900: oklch(0.22 0.126 275);
+    --color-primary-950: oklch(0.12 0.09 275);
+    /* SECONDARY (Hue: 80, Chroma: 0.18) */
+    --color-secondary-50: oklch(0.98 0.072 80);
+    --color-secondary-100: oklch(1.0 0.072 80);
+    --color-secondary-200: oklch(0.9500000000000001 0.18 80);
+    --color-secondary-300: oklch(0.87 0.18 80);
+    --color-secondary-400: oklch(0.77 0.18 80);
+    --color-secondary-500: oklch(0.67 0.18 80);
+    --color-secondary-600: oklch(0.5700000000000001 0.18 80);
+    --color-secondary-700: oklch(0.47 0.18 80);
+    --color-secondary-800: oklch(0.37 0.18 80);
+    --color-secondary-900: oklch(0.27 0.126 80);
+    --color-secondary-950: oklch(0.12 0.09 80);
 
-    /* SECONDARY: Dusty Rose
-       Hue: 5 (Red-Pink) | Chroma: Medium */
-    --color-secondary-50:  oklch(97% 0.02 5);
-    --color-secondary-100: oklch(94% 0.04 5);
-    --color-secondary-200: oklch(88% 0.08 5);
-    --color-secondary-300: oklch(80% 0.11 5);
-    --color-secondary-400: oklch(72% 0.14 5);
-    --color-secondary-500: oklch(63% 0.16 5);
-    --color-secondary-600: oklch(53% 0.16 5);
-    --color-secondary-700: oklch(43% 0.13 5);
-    --color-secondary-800: oklch(33% 0.10 5);
-    --color-secondary-900: oklch(23% 0.07 5);
-    --color-secondary-950: oklch(15% 0.04 5);
+    /* SEMANTIC TEXT MAPPING */
+    --color-text-heading-strong: var(--color-primary-900);
+    --color-text-heading-soft:   var(--color-primary-800);
+    --color-text-body-strong:    var(--color-primary-700);
+    --color-text-body:           theme(colors.slate.600);
+    &:where(.dark, .dark *) {
+      --color-text-heading-strong: var(--color-primary-50);
+      --color-text-heading-soft:   var(--color-primary-200);
+      --color-text-body-strong:    var(--color-primary-300);
+      --color-text-body:           theme(colors.slate.400);
+    }
   }
 }
