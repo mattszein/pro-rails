@@ -1,0 +1,41 @@
+/* Category: Vivid */
+@layer utilities {
+  .theme-neon {
+    /* PRIMARY (Hue: 165, Chroma: 0.24) */
+    --color-primary-50: oklch(0.98 0.096 165);
+    --color-primary-100: oklch(0.95 0.096 165);
+    --color-primary-200: oklch(0.9 0.24 165);
+    --color-primary-300: oklch(0.82 0.24 165);
+    --color-primary-400: oklch(0.72 0.24 165);
+    --color-primary-500: oklch(0.62 0.24 165);
+    --color-primary-600: oklch(0.52 0.24 165);
+    --color-primary-700: oklch(0.42 0.24 165);
+    --color-primary-800: oklch(0.32 0.24 165);
+    --color-primary-900: oklch(0.22 0.16799999999999998 165);
+    --color-primary-950: oklch(0.12 0.12 165);
+    /* SECONDARY (Hue: 340, Chroma: 0.24) */
+    --color-secondary-50: oklch(0.98 0.096 340);
+    --color-secondary-100: oklch(0.95 0.096 340);
+    --color-secondary-200: oklch(0.9 0.24 340);
+    --color-secondary-300: oklch(0.82 0.24 340);
+    --color-secondary-400: oklch(0.72 0.24 340);
+    --color-secondary-500: oklch(0.62 0.24 340);
+    --color-secondary-600: oklch(0.52 0.24 340);
+    --color-secondary-700: oklch(0.42 0.24 340);
+    --color-secondary-800: oklch(0.32 0.24 340);
+    --color-secondary-900: oklch(0.22 0.16799999999999998 340);
+    --color-secondary-950: oklch(0.12 0.12 340);
+
+    /* SEMANTIC TEXT MAPPING */
+    --color-text-heading-strong: var(--color-primary-900);
+    --color-text-heading-soft:   var(--color-primary-800);
+    --color-text-body-strong:    var(--color-primary-700);
+    --color-text-body:           theme(colors.slate.600);
+    &:where(.dark, .dark *) {
+      --color-text-heading-strong: var(--color-primary-50);
+      --color-text-heading-soft:   var(--color-primary-200);
+      --color-text-body-strong:    var(--color-primary-300);
+      --color-text-body:           theme(colors.slate.400);
+    }
+  }
+}

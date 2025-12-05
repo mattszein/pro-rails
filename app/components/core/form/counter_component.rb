@@ -2,8 +2,8 @@ class Core::Form::CounterComponent < ViewComponent::Form::FieldComponent
   attr_accessor :theme
 
   THEMES = {
-    primary: "bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 hover:bg-gray-200",
-    secondary: "bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 hover:bg-gray-200"
+    primary: "bg-primary-100 dark:bg-primary-700 dark:hover:bg-primary-600 dark:border-primary-600 hover:bg-primary-200",
+    secondary: "bg-secondary-100 dark:bg-secondary-700 dark:hover:bg-secondary-600 dark:border-secondary-600 hover:bg-secondary-200"
   }.freeze
 
   DEFAULT = {theme: :primary}.freeze

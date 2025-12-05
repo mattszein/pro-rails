@@ -1,0 +1,6 @@
+<%= render(Core::CardComponent.new(classes: "text-center")) do %>
+  <h1 class="font-black">Adminit Rails App</h1>
+  <p class="py-3">
+    Hey, welcome back admin <%= current_account.email %>
+  </p>
+<% end %>

@@ -31,7 +31,7 @@
   </head>
   <body class="min-h-screen bg-indigo-50 dark:bg-black">
     <div class="md:flex w-full min-h-screen z-30">
-      <%= render(Core::DrawerComponent.new(title: "RailsApp | Menu")) do %>
+      <%= render(Core::SidebarComponent.new(open: false, title: "RailsApp | Menu")) do %>
         <%= render "navigation" %>
       <% end %>
       <main class="flex-grow pt-16 px-8 overflow-x-scroll" role="main">

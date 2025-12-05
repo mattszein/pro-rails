@@ -6,6 +6,9 @@ module Adminit
 
     before_action :authorize_adminit_access
 
+    def index
+    end
+
     private
 
     def current_account

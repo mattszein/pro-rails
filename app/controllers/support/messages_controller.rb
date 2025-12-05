@@ -1,5 +1,5 @@
 module Support
-  class MessagesController < ApplicationController
+  class MessagesController < DashboardController
     before_action :require_account
     before_action :set_ticket
 

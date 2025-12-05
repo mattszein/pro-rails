@@ -1,221 +1,110 @@
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
-
 @layer base {
   .dark {
     --color-default: var(--color-gray-900);
     --color-highlight: var(--color-gray-900);
+    --color-text-heading-strong: theme(colors.gray.50);  /* Almost White */
+    --color-text-heading-soft:   theme(colors.gray.100); /* Very Light Gray */
+    --color-text-body-strong:    theme(colors.gray.200); /* Light Gray */
+    --color-text-body:           theme(colors.gray.300); /* Medium Gray */
   }
 
   h1 {
-    font-size: 2.25rem; /* 36px */
+    font-size: 2.25rem;
     font-weight: 700;
-    color: theme(colors.gray.900);
+    color: var(--color-text-heading-strong); /* Dynamic */
   }
   
   h2 {
-    font-size: 1.875rem; /* 30px */
+    font-size: 1.875rem;
     font-weight: 700;
-    color: theme(colors.gray.800);
+    color: var(--color-text-heading-soft); /* Dynamic */
   }
   
   h3 {
-    font-size: 1.5rem; /* 24px */
+    font-size: 1.5rem;
     font-weight: 600;
-    color: theme(colors.gray.800);
+    color: var(--color-text-heading-soft); /* Dynamic */
   }
   
   h4 {
-    font-size: 1.25rem; /* 20px */
+    font-size: 1.25rem;
     font-weight: 600;
-    color: theme(colors.gray.700);
+    color: var(--color-text-body-strong); /* Dynamic */
   }
   
   h5 {
-    font-size: 1.125rem; /* 18px */
+    font-size: 1.125rem;
     font-weight: 500;
-    color: theme(colors.gray.700);
+    color: var(--color-text-body-strong); /* Dynamic */
   }
   
   h6 {
-    font-size: 1rem; /* 16px */
+    font-size: 1rem;
     font-weight: 500;
-    color: theme(colors.gray.700);
+    color: var(--color-text-body-strong); /* Dynamic */
   }
   
   p {
     font-size: 1rem;
-    color: theme(colors.gray.700);
     line-height: 1.625;
+    color: var(--color-text-body); /* Dynamic */
+  }
+
+  td {
+    color: var(--color-text-body); /* Dynamic */
   }
 }
 
-@theme {
-  --color-default: var(--color-gray-50);
-  --color-highlight: var(--color-white);
+@import "./themes/default.css";
+/* Tech Edge */
+@import "./themes/hyper.css";
+@import "./themes/aurora.css";
+@import "./themes/eclipse.css";
+@import "./themes/galaxy.css";
+@import "./themes/synth.css";
+@import "./themes/thunder.css";
+@import "./themes/matrix.css";
+@import "./themes/cyber.css";
 
-  /* Primary - Purple */
-  --color-primary-50: var(--color-purple-50);
-  --color-primary-100: var(--color-purple-100);
-  --color-primary-200: var(--color-purple-200);
-  --color-primary-300: var(--color-purple-300);
-  --color-primary-400: var(--color-purple-400);
-  --color-primary-500: var(--color-purple-500);
-  --color-primary-600: var(--color-purple-600);
-  --color-primary-700: var(--color-purple-700);
-  --color-primary-800: var(--color-purple-800);
-  --color-primary-900: var(--color-purple-900);
-  --color-primary-950: var(--color-purple-950);
+/* Serene */
+@import "./themes/botanic.css";
+@import "./themes/reef.css";
+@import "./themes/oceanic.css";
+@import "./themes/forest.css";
+@import "./themes/dune.css";
+@import "./themes/mauve.css";
+@import "./themes/glacier.css";
+@import "./themes/lavender.css";
 
-  /* Secondary - Pink */
-  --color-secondary-50: var(--color-pink-50);
-  --color-secondary-100: var(--color-pink-100);
-  --color-secondary-200: var(--color-pink-200);
-  --color-secondary-300: var(--color-pink-300);
-  --color-secondary-400: var(--color-pink-400);
-  --color-secondary-500: var(--color-pink-500);
-  --color-secondary-600: var(--color-pink-600);
-  --color-secondary-700: var(--color-pink-700);
-  --color-secondary-800: var(--color-pink-800);
-  --color-secondary-900: var(--color-pink-900);
-  --color-secondary-950: var(--color-pink-950);
+/* Cosmic */
+@import "./themes/nebula.css";
+@import "./themes/starlight.css";
+@import "./themes/void.css";
+@import "./themes/pulsar.css";
+@import "./themes/vapor.css";
+@import "./themes/prism.css";
+@import "./themes/comet.css";
+@import "./themes/solar.css";
 
-  /* Success - Green */
-  --color-success-50: var(--color-green-50);
-  --color-success-100: var(--color-green-100);
-  --color-success-200: var(--color-green-200);
-  --color-success-300: var(--color-green-300);
-  --color-success-400: var(--color-green-400);
-  --color-success-500: var(--color-green-500);
-  --color-success-600: var(--color-green-600);
-  --color-success-700: var(--color-green-700);
-  --color-success-800: var(--color-green-800);
-  --color-success-900: var(--color-green-900);
-  --color-success-950: var(--color-green-950);
+/* Vivid */
+@import "./themes/sunset.css";
+@import "./themes/berry.css";
+@import "./themes/flamingo.css";
+@import "./themes/royal.css";
+@import "./themes/coral.css";
+@import "./themes/neon.css";
+@import "./themes/phoenix.css";
+@import "./themes/bloom.css";
 
-  /* Danger - Red */
-  --color-danger-50: var(--color-red-50);
-  --color-danger-100: var(--color-red-100);
-  --color-danger-200: var(--color-red-200);
-  --color-danger-300: var(--color-red-300);
-  --color-danger-400: var(--color-red-400);
-  --color-danger-500: var(--color-red-500);
-  --color-danger-600: var(--color-red-600);
-  --color-danger-700: var(--color-red-700);
-  --color-danger-800: var(--color-red-800);
-  --color-danger-900: var(--color-red-900);
-  --color-danger-950: var(--color-red-950);
-
-  /* Warning - Yellow */
-  --color-warning-50: var(--color-yellow-50);
-  --color-warning-100: var(--color-yellow-100);
-  --color-warning-200: var(--color-yellow-200);
-  --color-warning-300: var(--color-yellow-300);
-  --color-warning-400: var(--color-yellow-400);
-  --color-warning-500: var(--color-yellow-500);
-  --color-warning-600: var(--color-yellow-600);
-  --color-warning-700: var(--color-yellow-700);
-  --color-warning-800: var(--color-yellow-800);
-  --color-warning-900: var(--color-yellow-900);
-  --color-warning-950: var(--color-yellow-950);
-
-  /* Info - Sky */
-  --color-info-50: var(--color-sky-50);
-  --color-info-100: var(--color-sky-100);
-  --color-info-200: var(--color-sky-200);
-  --color-info-300: var(--color-sky-300);
-  --color-info-400: var(--color-sky-400);
-  --color-info-500: var(--color-sky-500);
-  --color-info-600: var(--color-sky-600);
-  --color-info-700: var(--color-sky-700);
-  --color-info-800: var(--color-sky-800);
-  --color-info-900: var(--color-sky-900);
-  --color-info-950: var(--color-sky-950);
-
-  /* Create - Teal */
-  --color-create-50: var(--color-teal-50);
-  --color-create-100: var(--color-teal-100);
-  --color-create-200: var(--color-teal-200);
-  --color-create-300: var(--color-teal-300);
-  --color-create-400: var(--color-teal-400);
-  --color-create-500: var(--color-teal-500);
-  --color-create-600: var(--color-teal-600);
-  --color-create-700: var(--color-teal-700);
-  --color-create-800: var(--color-teal-800);
-  --color-create-900: var(--color-teal-900);
-  --color-create-950: var(--color-teal-950);
-
-  /* Show - Sky */
-  --color-show-50: var(--color-sky-50);
-  --color-show-100: var(--color-sky-100);
-  --color-show-200: var(--color-sky-200);
-  --color-show-300: var(--color-sky-300);
-  --color-show-400: var(--color-sky-400);
-  --color-show-500: var(--color-sky-500);
-  --color-show-600: var(--color-sky-600);
-  --color-show-700: var(--color-sky-700);
-  --color-show-800: var(--color-sky-800);
-  --color-show-900: var(--color-sky-900);
-  --color-show-950: var(--color-sky-950);
-
-  /* Edit - Lime */
-  --color-edit-50: var(--color-lime-50);
-  --color-edit-100: var(--color-lime-100);
-  --color-edit-200: var(--color-lime-200);
-  --color-edit-300: var(--color-lime-300);
-  --color-edit-400: var(--color-lime-400);
-  --color-edit-500: var(--color-lime-500);
-  --color-edit-600: var(--color-lime-600);
-  --color-edit-700: var(--color-lime-700);
-  --color-edit-800: var(--color-lime-800);
-  --color-edit-900: var(--color-lime-900);
-  --color-edit-950: var(--color-lime-950);
-
-  /* Update - Orange */
-  --color-update-50: var(--color-orange-50);
-  --color-update-100: var(--color-orange-100);
-  --color-update-200: var(--color-orange-200);
-  --color-update-300: var(--color-orange-300);
-  --color-update-400: var(--color-orange-400);
-  --color-update-500: var(--color-orange-500);
-  --color-update-600: var(--color-orange-600);
-  --color-update-700: var(--color-orange-700);
-  --color-update-800: var(--color-orange-800);
-  --color-update-900: var(--color-orange-900);
-  --color-update-950: var(--color-orange-950);
-
-  /* Delete - Red */
-  --color-delete-50: var(--color-red-50);
-  --color-delete-100: var(--color-red-100);
-  --color-delete-200: var(--color-red-200);
-  --color-delete-300: var(--color-red-300);
-  --color-delete-400: var(--color-red-400);
-  --color-delete-500: var(--color-red-500);
-  --color-delete-600: var(--color-red-600);
-  --color-delete-700: var(--color-red-700);
-  --color-delete-800: var(--color-red-800);
-  --color-delete-900: var(--color-red-900);
-  --color-delete-950: var(--color-red-950);
-
-  /* Custom animations */
-  --animate-fade-in: fadeIn 0.3s ease-in-out;
-  --animate-slide-up: slideUp 0.4s ease-out;
-  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-
-  @keyframes fadeIn {
-      0% { opacity: 0; }
-      100% { opacity: 1; }
-  }
-  
-  @keyframes slideUp {
-    0% { 
-        transform: translateY(10px); 
-        opacity: 0; 
-    }
-    100% { 
-        transform: translateY(0); 
-        opacity: 1; 
-    }
-  }
-}
+/* Night Owl */
+@import "./themes/amber.css";
+@import "./themes/candle.css";
+@import "./themes/ember.css";
+@import "./themes/hearth.css";
+@import "./themes/vintage.css";
+@import "./themes/sepia.css";
+@import "./themes/autumn.css";
+@import "./themes/twilight.css";

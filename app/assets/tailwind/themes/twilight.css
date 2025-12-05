@@ -1,0 +1,41 @@
+/* Category: Night Owl */
+@layer utilities {
+  .theme-twilight {
+    /* PRIMARY (Hue: 340, Chroma: 0.14) */
+    --color-primary-50: oklch(0.98 0.05600000000000001 340);
+    --color-primary-100: oklch(0.95 0.05600000000000001 340);
+    --color-primary-200: oklch(0.9 0.14 340);
+    --color-primary-300: oklch(0.82 0.14 340);
+    --color-primary-400: oklch(0.72 0.14 340);
+    --color-primary-500: oklch(0.62 0.14 340);
+    --color-primary-600: oklch(0.52 0.14 340);
+    --color-primary-700: oklch(0.42 0.14 340);
+    --color-primary-800: oklch(0.32 0.14 340);
+    --color-primary-900: oklch(0.22 0.098 340);
+    --color-primary-950: oklch(0.12 0.07 340);
+    /* SECONDARY (Hue: 40, Chroma: 0.14) */
+    --color-secondary-50: oklch(0.98 0.05600000000000001 40);
+    --color-secondary-100: oklch(0.95 0.05600000000000001 40);
+    --color-secondary-200: oklch(0.9 0.14 40);
+    --color-secondary-300: oklch(0.82 0.14 40);
+    --color-secondary-400: oklch(0.72 0.14 40);
+    --color-secondary-500: oklch(0.62 0.14 40);
+    --color-secondary-600: oklch(0.52 0.14 40);
+    --color-secondary-700: oklch(0.42 0.14 40);
+    --color-secondary-800: oklch(0.32 0.14 40);
+    --color-secondary-900: oklch(0.22 0.098 40);
+    --color-secondary-950: oklch(0.12 0.07 40);
+
+    /* SEMANTIC TEXT MAPPING */
+    --color-text-heading-strong: var(--color-primary-900);
+    --color-text-heading-soft:   var(--color-primary-800);
+    --color-text-body-strong:    var(--color-primary-700);
+    --color-text-body:           theme(colors.slate.600);
+    &:where(.dark, .dark *) {
+      --color-text-heading-strong: var(--color-primary-50);
+      --color-text-heading-soft:   var(--color-primary-200);
+      --color-text-body-strong:    var(--color-primary-300);
+      --color-text-body:           theme(colors.slate.400);
+    }
+  }
+}
