@@ -1,0 +1,19 @@
+<div class="relative group">
+  <% if image? %>
+    <%= link_to download_url, target: "_blank", class: "block", rel: "noopener" do %>
+      <%= image_tag attachment.variant(resize_to_limit: [300, 300]),
+            class: "w-full h-32 object-cover rounded-lg shadow-sm hover:shadow-md transition-shadow" %>
+    <% end %>
+  <% else %>
+    <%= link_to download_url, target: "_blank",
+          class: "flex items-center justify-center h-32 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors", rel: "noopener" do %>
+      <div class="text-center">
+        <%= icon "document", {classes: "h-8 mx-auto"} %>
+        <p class="text-xs mt-2 px-2 truncate"><%= filename %></p>
+      </div>
+    <% end %>
+  <% end %>
+  <div class="absolute top-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+    <%= file_size %>
+  </div>
+</div>

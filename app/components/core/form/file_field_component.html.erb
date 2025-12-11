@@ -1,0 +1,14 @@
+<div>
+  <% if display_label_text %>
+    <label class="flex text-sm font-medium text-slate-700 mb-2 space-x-2">
+      <%= icon_tag %>
+      <span><%= display_label_text %></span>
+    </label>
+  <% end %>
+  <div class="relative">
+    <%= input_tag %>
+  </div>
+  <% if helper_text %>
+    <p class="text-xs text-gray-500 mt-1"><%= helper_text %></p>
+  <% end %>
+</div>

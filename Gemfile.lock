@@ -136,6 +136,10 @@ GEM
     diff-lcs (1.6.2)
     dotenv (3.1.8)
     drb (2.2.3)
+    dry-initializer (3.2.0)
+    dry-initializer-rails (3.1.1)
+      dry-initializer (>= 2.4, < 4)
+      rails (> 3.0)
     ed25519 (1.4.0)
     erb (5.0.1)
     erb_lint (0.9.0)
@@ -208,6 +212,9 @@ GEM
     htmlentities (4.3.4)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
+    image_processing (1.14.0)
+      mini_magick (>= 4.9.5, < 6)
+      ruby-vips (>= 2.0.17, < 3)
     importmap-rails (2.1.0)
       actionpack (>= 6.0.0)
       activesupport (>= 6.0.0)
@@ -264,6 +271,8 @@ GEM
     marcel (1.0.4)
     matrix (0.4.2)
     method_source (1.1.0)
+    mini_magick (5.3.1)
+      logger
     mini_mime (1.1.5)
     minitest (5.25.5)
     msgpack (1.8.0)
@@ -430,6 +439,9 @@ GEM
       rubocop (~> 1.72, >= 1.72.1)
     ruby-next-core (1.1.2)
     ruby-progressbar (1.13.0)
+    ruby-vips (2.2.5)
+      ffi (~> 1.12)
+      logger
     securerandom (0.4.1)
     sequel (5.94.0)
       bigdecimal
@@ -549,10 +561,12 @@ DEPENDENCIES
   capybara
   cuprite (= 0.16)
   debug
+  dry-initializer-rails
   erb_lint
   factory_bot_rails
   freezolite
   htmlbeautifier
+  image_processing (~> 1.2)
   importmap-rails
   inline_svg
   jbuilder

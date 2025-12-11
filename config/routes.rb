@@ -15,6 +15,9 @@ Rails.application.routes.draw do
 
   namespace :support do
     resources :tickets do
+      member do
+        post :attach_files
+      end
       resources :messages, only: [:create]
     end
   end

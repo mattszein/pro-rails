@@ -16,5 +16,10 @@ module Adminit
     def update?
       manage? && (record.assigned_id == user.id || user.role&.name == "superadmin")
     end
+
+    # Admins cannot attach files - only ticket creators can
+    def attach_files?
+      false
+    end
   end
 end

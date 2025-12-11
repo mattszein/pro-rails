@@ -1,6 +1,6 @@
 module Support
   class TicketsController < DashboardController
-    before_action :set_ticket, only: %i[show edit update destroy]
+    before_action :set_ticket, only: %i[show edit update destroy attach_files]
     before_action :ensure_frame_response, only: %i[new edit]
 
     # GET /support/tickets or /support/tickets.json
@@ -65,6 +65,22 @@ module Support
       end
     end
 
+    # POST /support/tickets/1/attach_files
+    def attach_files
+      authorize! @ticket, to: :attach_files?, with: Support::TicketPolicy
+      if params[:support_ticket] && params[:support_ticket][:attachments]
+        @ticket.attachments.attach(params[:support_ticket][:attachments])
+        if @ticket.save
+          flash[:notice] = "Files were successfully attached"
+        else
+          flash[:alert] = @ticket.errors.full_messages.join(", ")
+        end
+      else
+        flash[:alert] = "No files selected"
+      end
+      redirect_to support_ticket_path(@ticket)
+    end
+
     private
 
     def set_ticket
@@ -72,7 +88,7 @@ module Support
     end
 
     def ticket_params
-      params.require(:support_ticket).permit(:title, :description, :category)
+      params.require(:support_ticket).permit(:title, :description, :category, attachments: [])
     end
   end
 end

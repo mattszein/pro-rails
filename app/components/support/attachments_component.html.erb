@@ -1,0 +1,23 @@
+<div class="flex justify-between items-center">
+  <h3>Attachments</h3>
+</div>
+<% if has_attachments? %>
+  <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+    <% attachments.each do |attachment| %>
+      <%= render Support::AttachmentItemComponent.new(attachment: attachment) %>
+    <% end %>
+  </div>
+<% else %>
+  <p class="text-gray-500 text-sm">
+    <% if show_upload_form %>
+      No attachments yet. Click "Add Files" to upload.
+    <% else %>
+      No attachments.
+    <% end %>
+  </p>
+<% end %>
+<% if show_upload_form %>
+  <%= render Support::AttachmentUploadFormComponent.new(
+      ticket: ticket
+    ) %>
+<% end %>

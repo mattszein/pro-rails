@@ -131,6 +131,33 @@ RSpec.describe Adminit::TicketPolicy, type: :policy do
     end
   end
 
+  describe "#attach_files?" do
+    context "when admin is assigned to the ticket" do
+      let(:ticket) { create(:ticket, :in_progress, created: creator_account, assigned: admin_account) }
+
+      it "denies admin from attaching files (only creators can upload)" do
+        expect(policy).not_to be_attach_files
+      end
+    end
+
+    context "when superadmin" do
+      let(:superadmin_role) { create(:role, :superadmin) }
+      let(:superadmin_account) { create(:account, :verified, role: superadmin_role) }
+      let(:other_admin) { create(:account, :verified, role: admin_role) }
+      let(:ticket) { create(:ticket, :in_progress, created: creator_account, assigned: other_admin) }
+      let(:policy) { described_class.new(ticket, user: superadmin_account) }
+
+      before do
+        # Add superadmin role to existing permission
+        permission.roles << superadmin_role unless permission.roles.include?(superadmin_role)
+      end
+
+      it "denies superadmin from attaching files (only creators can upload)" do
+        expect(policy).not_to be_attach_files
+      end
+    end
+  end
+
   describe "#manage?" do
     context "when admin has permission" do
       let(:ticket) { create(:ticket, created: creator_account) }

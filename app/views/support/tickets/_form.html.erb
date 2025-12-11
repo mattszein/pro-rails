@@ -1,4 +1,4 @@
-<%= form_with(model: ticket, url: ticket.persisted? ? support_ticket_path(ticket) : support_tickets_path, data: {turbo: true}) do |form| %>
+<%= form_with(model: ticket, url: ticket.persisted? ? support_ticket_path(ticket) : support_tickets_path, builder: CustomFormBuilder, multipart: true, data: {turbo: true}) do |form| %>
   <% if ticket.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
       <h2><%= pluralize(ticket.errors.count, "error") %> prohibited this ticket from being saved:</h2>
@@ -24,6 +24,16 @@
     <%= form.label :description, class: "sr-only" %>
     <%= form.text_area :description, rows: 4, placeholder: "Write your ticket description here", class: "w-full mt-4" %>
     </div>
+    <% unless ticket.persisted? %>
+      <div class="mt-6">
+        <%= form.file_field :attachments,
+              multiple: true,
+              accept: FileUploadConfig.allowed_content_types_list.join(","),
+              label: "Attach files (images, PDF - max 2MB each)",
+              helper_text: "You can upload up to #{FileUploadConfig.max_files_per_ticket} files",
+              icon: "plus" %>
+      </div>
+    <% end %>
   <div class="mt-6">
     <%= form.button "Save", {theme: :create, fullw: true} %>
   </div>

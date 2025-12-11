@@ -1,0 +1,13 @@
+<div class="mt-4 pt-4 border-t border-gray-200">
+  <%= form_with(model: ticket, url: attach_files_support_ticket_path(@ticket), method: :post, builder: CustomFormBuilder, multipart: true, class: "space-y-4") do |form| %>
+    <%= form.file_field :attachments,
+          multiple: true,
+          accept: allowed_types,
+          label: "Select files to upload",
+          helper_text: "Max 2MB per file. Up to #{max_files} files total.",
+          icon: "plus" %>
+    <div class="flex gap-2">
+      <%= form.button "Upload Files", {theme: :create, size: :sm} %>
+    </div>
+  <% end %>
+</div>

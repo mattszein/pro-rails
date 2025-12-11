@@ -54,4 +54,8 @@ class CustomFormBuilder < ViewComponent::Form::Builder
   def counter(method, options = {})
     render_component("form::Counter", @object_name, method, objectify_options(options))
   end
+
+  def file_field(method, options = {})
+    render_component("form::FileField", @object_name, method, objectify_options(options))
+  end
 end
