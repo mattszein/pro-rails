@@ -52,7 +52,7 @@ class RodauthMain < Rodauth::Rails::Auth
     # password_confirm_param "confirm_password"
 
     # Redirect back to originally requested location after authentication.
-    # login_return_to_requested_location? true
+    login_return_to_requested_location? true
     # two_factor_auth_return_to_requested_location? true # if using MFA
 
     # Autologin the user after they have reset their password.
@@ -140,8 +140,9 @@ class RodauthMain < Rodauth::Rails::Auth
     # Redirect to wherever login redirects to after account verification.
     verify_account_redirect { login_redirect }
 
-    # Redirect to login page after password reset.
     reset_password_redirect { login_path }
+    change_password_redirect { rails_routes.dashboard_path }
+    login_redirect { rails_routes.dashboard_path }
 
     # ==> Deadlines
     # Change default deadlines for some actions.

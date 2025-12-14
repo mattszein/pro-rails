@@ -1,4 +1,4 @@
-class RodauthController < ApplicationController
+class RodauthController < DashboardController
   # Used by Rodauth for rendering views, CSRF protection, running any
   # registered action callbacks and rescue handlers, instrumentation etc.
 
@@ -8,13 +8,13 @@ class RodauthController < ApplicationController
 
   # Layout can be changed for all Rodauth pages or only certain pages.
   # layout "authentication"
-  # layout -> do
-  #   case rodauth.current_route
-  #   when :login, :create_account, :verify_account, :verify_account_resend,
-  #        :reset_password, :reset_password_request
-  #     "authentication"
-  #   else
-  #     "application"
-  #   end
-  # end
+  layout -> do
+    case rodauth.current_route
+    when :login, :create_account, :verify_account, :verify_account_resend,
+         :reset_password, :reset_password_request
+      "application"
+    else
+      "dashboard"
+    end
+  end
 end
