@@ -76,7 +76,7 @@ describe "Authentication Routes", type: :request do
 
       it "logs in successfully" do
         subject
-        expect(response).to redirect_to("/")
+        expect(response).to redirect_to(dashboard_path)
       end
     end
 
