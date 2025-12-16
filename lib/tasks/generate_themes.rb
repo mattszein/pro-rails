@@ -60,10 +60,10 @@ def create_theme_file(theme_name, primary_hue, primary_chroma, secondary_hue, se
         --color-text-body-strong:    var(--color-primary-700);
         --color-text-body:           theme(colors.slate.600);
         &:where(.dark, .dark *) {
-          --color-text-heading-strong: var(--color-primary-50);
-          --color-text-heading-soft:   var(--color-primary-200);
-          --color-text-body-strong:    var(--color-primary-300);
-          --color-text-body:           theme(colors.slate.400);
+          --color-text-heading-strong: var(--color-primary-200);
+          --color-text-heading-soft:   var(--color-primary-100);
+          --color-text-body-strong:    var(--color-primary-100);
+          --color-text-body:           theme(colors.slate.100);
         }
       }
     }

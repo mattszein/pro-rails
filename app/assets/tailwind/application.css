@@ -2,53 +2,60 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 @layer base {
+  .font-inter, .font-default { font-family: 'Inter', system-ui, sans-serif; }
+  .font-plus-jakarta { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+  .font-space-grotesk { font-family: 'Space Grotesk', monospace, sans-serif; }
+  .font-outfit { font-family: 'Outfit', system-ui, sans-serif; }
+  .font-bricolage { font-family: 'Bricolage Grotesque', system-ui, sans-serif; }
+  .font-google-sans-code { font-family: 'Google Sans Code', monospace, sans-serif; }
+  .font-orbitron { font-family: 'Orbitron', system-ui, sans-serif; }
+  .font-manrope { font-family: 'Manrope', system-ui, sans-serif; }
+
   .dark {
-    --color-default: var(--color-gray-900);
-    --color-highlight: var(--color-gray-900);
-    --color-text-heading-strong: theme(colors.gray.50);  /* Almost White */
-    --color-text-heading-soft:   theme(colors.gray.100); /* Very Light Gray */
-    --color-text-body-strong:    theme(colors.gray.200); /* Light Gray */
-    --color-text-body:           theme(colors.gray.300); /* Medium Gray */
+    --color-default: var(--color-zinc-950);
+    --color-highlight: var(--color-zinc-900);
   }
 
   h1 {
-    font-size: 2.25rem;
+    font-size: 2.5rem;
     font-weight: 700;
     color: var(--color-text-heading-strong); /* Dynamic */
   }
   
   h2 {
-    font-size: 1.875rem;
+    font-size: 2.25rem;
     font-weight: 700;
     color: var(--color-text-heading-soft); /* Dynamic */
   }
   
   h3 {
-    font-size: 1.5rem;
+    font-size: 1.875rem;
     font-weight: 600;
     color: var(--color-text-heading-soft); /* Dynamic */
   }
   
   h4 {
-    font-size: 1.25rem;
+
+    font-size: 1.5rem;
     font-weight: 600;
     color: var(--color-text-body-strong); /* Dynamic */
   }
   
   h5 {
-    font-size: 1.125rem;
+
+    font-size: 1.25rem;
     font-weight: 500;
     color: var(--color-text-body-strong); /* Dynamic */
   }
   
   h6 {
-    font-size: 1rem;
+    font-size: 1.125rem;
     font-weight: 500;
     color: var(--color-text-body-strong); /* Dynamic */
   }
   
   p {
-    font-size: 1rem;
+    font-size: 1.125rem;
     line-height: 1.625;
     color: var(--color-text-body); /* Dynamic */
   }

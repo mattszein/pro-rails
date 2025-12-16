@@ -1,8 +1,6 @@
-class Settings::ThemeItemComponent < ViewComponent::Base
-  def initialize(theme:, selected: false)
-    @theme = theme
-    @selected = selected
-  end
+class Settings::ThemeItemComponent < ApplicationViewComponent
+  option :theme
+  option :selected, default: false
 
   def theme_id
     @theme.id
