@@ -16,6 +16,11 @@ if (sessionStorage.getItem('lookbook') != 'true') {
   if (savedTheme) {
     document.documentElement.classList.add(`theme-${savedTheme}`)
   }
+
+  const savedFont = localStorage.getItem('font')
+  if (savedFont) {
+    document.documentElement.classList.add(`font-${savedFont}`)
+  }
 }
 
 Turbo.StreamActions.redirect = function () {

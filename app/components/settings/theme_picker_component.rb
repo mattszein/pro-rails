@@ -1,6 +1,6 @@
-class Settings::ThemePickerComponent < ViewComponent::Base
+class Settings::ThemePickerComponent < ApplicationViewComponent
   Theme = Data.define(:id, :name)
-  attr_reader :current_theme
+  option :current_theme, default: -> { "hyper" }
 
   THEMES_TECH_EDGE = [
     Theme.new(id: "hyper", name: "Hyper"),
@@ -56,8 +56,4 @@ class Settings::ThemePickerComponent < ViewComponent::Base
     Theme.new(id: "autumn", name: "Autumn"),
     Theme.new(id: "twilight", name: "Twilight")
   ]
-
-  def initialize(current_theme:)
-    @current_theme = current_theme || "hyper"
-  end
 end

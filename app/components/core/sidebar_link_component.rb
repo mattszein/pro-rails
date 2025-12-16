@@ -21,7 +21,7 @@ class Core::SidebarLinkComponent < ViewComponent::Base
   end
 
   def span_classes
-    base_classes = "opacity-100 ml-2 text-md group-hover/drawer:opacity-100 group-hover/drawer:transition-opacity group-hover/link:text-primary-500 dark:group-hover/link:text-primary-500"
+    base_classes = "opacity-100 ml-2 text-lg group-hover/drawer:opacity-100 group-hover/drawer:transition-opacity group-hover/link:text-primary-500 dark:group-hover/link:text-primary-500"
     active_classes = active? ? "text-primary-500 dark:text-primary-400 border-b-2 border-secondary-400" : "text-gray-600 dark:text-white"
 
     class_names(base_classes, active_classes)

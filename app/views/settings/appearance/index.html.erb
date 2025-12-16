@@ -1,9 +1,10 @@
 <%= render Settings::LayoutComponent.new(active_section: :appearance) do %>
   <%= render Core::CardComponent.new do %>
-    <div class="text-center mb-12">
-      <h1>Select Your Palette</h1>
-      <p>Elegant themes for your experience</p>
+    <div class="text-center mb-6">
+      <h1>Font & Theme Selector</h1>
+      <p>Elegant customization for your experience</p>
     </div>
+    <%= render Settings::FontComponent.new(current_font: "default") %>
     <%= render Settings::ThemePickerComponent.new(current_theme: "default") %>
   <% end %>
 <% end %>

@@ -1,10 +1,10 @@
-<div class="flex flex-col items-center gap-4">
+<div class="flex flex-col items-center gap-4 group has-[.selected]:selected">
   <!-- Circular Color Preview -->
   <button
     data-theme-target="button"
     data-theme-id="<%= theme_id %>"
     data-action="click->theme#selectTheme"
-    class="relative group transition-all duration-300 hover:scale-105 selected:scale-110 <%= "selected" if selected? %> theme-<%= theme_id %>">
+    class="relative group peer transition-all duration-300 hover:scale-105 selected:scale-110 <%= "selected" if selected? %> theme-<%= theme_id %>">
     <!-- Outer Ring -->
     <div class="h-32 w-32 rounded-full p-1 transition-all duration-300 bg-slate-700/50 shadow-lg group-hover:bg-slate-600/50 group-[.selected]:bg-white group-[.selected]:shadow-2xl">
       <!-- Inner Circle with Split Gradient -->
@@ -17,7 +17,6 @@
         <div
           class="absolute inset-0 bg-gradient-to-bl from-secondary-900 via-secondary-500 to-secondary-50"
           style="clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);"></div>
-        <!-- Center Divider Line -->
         <div class="absolute inset-y-0 left-1/2 w-px bg-white/20"></div>
         <!-- Selected Indicator -->
         <div class="absolute inset-0 items-center justify-center hidden group-[.selected]:flex">
@@ -31,9 +30,7 @@
     </div>
   </button>
   <!-- Theme Name -->
-  <div class="text-center">
-    <p class="text-sm font-medium transition-all duration-300 text-slate-400 selected:font-semibold">
-      <%= theme_name %>
-    </p>
-  </div>
+  <p class="transition-all duration-300 peer-[.selected]:font-bold text-slate-600 dark:text-slate-300 peer-[.selected]:text-slate-900 dark:peer-[.selected]:text-slate-200">
+    <%= theme_name %>
+  </p>
 </div>

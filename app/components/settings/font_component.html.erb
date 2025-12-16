@@ -1,0 +1,10 @@
+<!-- FONT SELECTOR -->
+<div data-controller="font" class="text-center flex flex-col space-y-6 mb-16">
+  <h2 class="font-semibold">Choose Your Typeface</h2>
+  <!-- Font Grid - Compact & Elegant -->
+  <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
+    <% FONTS.each do |font| %>
+      <%= render Settings::FontItemComponent.new(font: font, selected: false) %>
+    <% end %>
+  </div>
+</div>
