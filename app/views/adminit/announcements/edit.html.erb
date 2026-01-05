@@ -1,0 +1,5 @@
+<%= render(Core::ModalComponent.new(title: "Editing Announcement")) do %>
+  <%= turbo_frame_tag "announcement_form" do %>
+    <%= render "form", announcement: @announcement %>
+  <% end %>
+<% end %>

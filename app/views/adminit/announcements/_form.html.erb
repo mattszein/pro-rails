@@ -1,0 +1,31 @@
+<%= form_with(model: announcement, url: announcement.persisted? ? adminit_announcement_path(announcement) : adminit_announcements_path,
+    data: {turbo: true}) do |form| %>
+  <% if announcement.errors.any? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+      <h2><%= pluralize(announcement.errors.count, "error") %> prohibited this announcement from being saved:</h2>
+      <ul>
+        <% announcement.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= form.labeled :title do %>
+    <%= form.text_field :title, {autofocus: true, required: true, placeholder: " ", class: "w-full"} %>
+  <% end %>
+
+  <div class="mt-6">
+    <%= form.label :body, class: "block text-sm font-medium mb-2" %>
+    <%= form.text_area :body, rows: 8, placeholder: "Write your announcement here...",
+        class: "w-full mt-2 rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500",
+        required: true %>
+  </div>
+  <%= form.date_time :scheduled_at, disabled: !announcement.can_change_scheduled_at? %>
+  <% if !announcement.can_change_scheduled_at? %>
+    <p class="text-sm text-gray-500 mt-1">Scheduled time cannot be changed once the announcement is scheduled or published.</p>
+  <% end %>
+  <div class="mt-6">
+    <%= form.button "Save Draft", {theme: :create, fullw: true} %>
+  </div>
+<% end %>

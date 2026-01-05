@@ -2,6 +2,10 @@
   <% if allowed_to? :manage?, with: Adminit::AccountPolicy %>
     <%= render(Core::SidebarLinkComponent.new(label: "Accounts", path: adminit_accounts_path, active_paths: [adminit_accounts_path], icon_name: "adminit/accounts")) %>
   <% end %>
+  
+  <% if allowed_to? :manage?, with: Adminit::AnnouncementPolicy %>
+    <%= render(Core::SidebarLinkComponent.new(label: "Announcements", path: adminit_announcements_path, active_paths: [adminit_announcements_path], icon_name: "adminit/announcement")) %>
+  <% end %>
 
   <% if allowed_to? :manage?, with: Adminit::PermissionPolicy %>
     <%= render(Core::SidebarLinkComponent.new(label: "Permissions", path: adminit_permissions_path, active_paths: [adminit_permissions_path], icon_name: "adminit/permissions")) %>

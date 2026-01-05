@@ -58,4 +58,8 @@ class CustomFormBuilder < ViewComponent::Form::Builder
   def file_field(method, options = {})
     render_component("form::FileField", @object_name, method, objectify_options(options))
   end
+
+  def date_time(method, options = {})
+    render_component("form::DateTime", @object_name, method, objectify_options(options))
+  end
 end

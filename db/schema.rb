@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_05_193220) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_26_222659) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -84,6 +84,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_05_193220) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "announcements", force: :cascade do |t|
+    t.string "title", null: false
+    t.text "body", null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "scheduled_at"
+    t.datetime "published_at"
+    t.bigint "author_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["author_id"], name: "index_announcements_on_author_id"
+    t.index ["status", "scheduled_at"], name: "index_announcements_on_status_and_scheduled_at"
+    t.index ["status"], name: "index_announcements_on_status"
+  end
+
   create_table "conversations", force: :cascade do |t|
     t.bigint "ticket_id", null: false
     t.datetime "created_at", null: false
@@ -145,6 +159,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_05_193220) do
   add_foreign_key "accounts", "roles"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "announcements", "accounts", column: "author_id"
   add_foreign_key "conversations", "tickets"
   add_foreign_key "messages", "accounts"
   add_foreign_key "messages", "conversations"

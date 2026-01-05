@@ -15,4 +15,8 @@ pin "@anycable/core", to: "@anycable--core.js" # @1.1.2
 pin "@hotwired/turbo", to: "@hotwired--turbo.js" # @8.0.13
 pin "nanoevents" # @9.1.0
 
+pin "air-datepicker", to: "https://esm.sh/air-datepicker@3.6.0"
+pin "air-datepicker/locale/en", to: "https://esm.sh/air-datepicker@3.6.0/locale/en"
+pin "@floating-ui/dom", to: "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.7.3/+esm"
+
 pin "cable", to: "cable.js", preload: true

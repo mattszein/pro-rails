@@ -1,0 +1,44 @@
+<div id="<%= dom_id announcement, "admin" %>" class="space-y-4">
+  <%= render(Core::CardComponent.new({variant: :glass, glow: true, classes: "space-y-4"})) do %>
+    <div class="flex items-center gap-4">
+      <%= icon "adminit/announcement", {classes: "h-8"} %>
+      <h1><%= announcement.title %></h1>
+      <%= render(Core::BadgeComponent.new(announcement.status.humanize,
+          options: {custom_style: {theme: announcement_status_theme(announcement.status), icon: "info", size: :md}})) %>
+    </div>
+
+    <%= render Core::BoxComponent.new do %>
+      <%= render Core::DefinitionListComponent.new(variant: :info, gap: :sm) do |dl| %>
+        <% dl.with_item(term: "Author") do %>
+          <%= announcement.author.email %>
+        <% end %>
+        <% dl.with_item(term: "Status") do %>
+          <%= announcement.status.humanize %>
+        <% end %>
+        <% if announcement.scheduled_at.present? %>
+          <% dl.with_item(term: "Scheduled for") do %>
+            <%= announcement.scheduled_at.strftime("%B %d, %Y at %I:%M %p") %>
+          <% end %>
+        <% end %>
+        <% if announcement.published_at.present? %>
+          <% dl.with_item(term: "Published on") do %>
+            <%= announcement.published_at.strftime("%B %d, %Y at %I:%M %p") %>
+          <% end %>
+        <% end %>
+        <% dl.with_item(term: "Created on") do %>
+          <%= announcement.created_at.strftime("%B %d, %Y at %I:%M %p") %>
+        <% end %>
+
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <%= render(Core::CardComponent.new({variant: :glass, glow: true, classes: "space-y-4"})) do %>
+    <h2 class="text-2xl font-bold leading-tight">
+      <%= announcement.title %>
+    </h2>
+    <div class="prose dark:prose-invert max-w-none">
+      <%= simple_format(announcement.body) %>
+    </div>
+  <% end %>
+</div>

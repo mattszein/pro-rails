@@ -6,11 +6,14 @@ namespace :adminit do
     post :take, on: :member
     post :leave, on: :member
   end
+  resources :announcements do
+    post :publish, on: :member
+    post :draft, on: :member
+  end
 
   resources :roles, only: [:index, :show] do
     get "account_select", on: :member
     delete "account", to: "roles#remove_account", on: :member
-
     post "account", to: "roles#add_account", on: :member
   end
   resources :permissions, only: [:index] do

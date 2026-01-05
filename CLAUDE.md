@@ -23,6 +23,9 @@ Pro-Rails is a Rails 8.0 application using modern Rails stack with Hotwire (Turb
 
 ### Setup
 
+DOCKER: We use docker and docker-compose for local development. Execute any
+command using docker compose! rails backend service is called rails.
+
 ```bash
 bin/setup                    # Initial setup
 bin/dev                      # Start development server with all services
@@ -76,19 +79,35 @@ bin/importmap audit          # Check JS dependencies for vulnerabilities
 
 ### Authorization (ActionPolicy + RBAC)
 
+**Three-Layer Authorization:**
+
+1. **Account-level gate**: `Account#adminit_access?` checks if role is present
+2. **Controller-level gate**: `Adminit::ApplicationController#authorize_adminit_access` before_action
+3. **Policy-level checks**: `verify_authorized` and `authorize!` per action/resource
+
+**Policy Pattern:**
+
 - Base policy: `app/policies/application_policy.rb`
-- Admin area uses specialized policies in `app/policies/adminit/` with resource-based permissions
-- Permission model controls access via `permissions_roles` join table
-- Access check: `user.role.permissions.exists?(resource: key)`
-- Accounts need a role to access adminit area (checked by `Account#adminit_access?`)
-- "superadmin" role has special privileges
+- Admin policies in `app/policies/adminit/` inherit from `Adminit::ApplicationPolicy`
+- Each policy defines `self.identifier` as a symbol (e.g., `:"Adminit::AccountPolicy"`)
+- Permission model stores these identifiers in `resource` column
+- Access check: `user.role.permissions.exists?(resource: policy_identifier)`
+
+**Key Details:**
+
+- HABTM association via `permissions_roles` join table (not has_many :through)
+- `Role.superadmin` returns role with identifier "superadmin" (special privileges)
+- Policies use `get_access(identifier)` helper to check RBAC permissions
+- `ActionPolicyHandler` concern provides Turbo Stream support for authorization errors
 
 ### Models & Database
 
-- **Account**: User model with Rodauth integration, belongs_to role
+- **Account**: User model with Rodauth integration, belongs_to role (optional)
 - **Role**: has_many accounts, has_and_belongs_to_many permissions
-- **Permission**: has_and_belongs_to_many roles, resource-based authorization
-- **Ticket**: Example domain model with creator/assignee relationships to accounts
+- **Permission**: has_and_belongs_to_many roles, stores policy identifiers in `resource` column
+- **Support::Ticket**: Namespaced domain model with creator/assignee relationships to accounts, broadcasts to Turbo Streams
+- **Support::Conversation**: One-to-one with Ticket
+- **Support::Message**: Many messages per conversation
 - PostgreSQL extensions: citext (case-insensitive text), plpgsql
 
 ### ViewComponent Architecture
@@ -158,13 +177,32 @@ Required environment variables for tests:
 
 When building forms, use the CustomFormBuilder methods which render ViewComponents:
 
-- `form.text_field`, `form.password_field`, `form.number_field` → MaterialInput component
+**Input Components:**
+
+- `form.text_field`, `form.password_field`, `form.number_field`, etc. → MaterialInput component
+  - Variants: `:filled`, `:outlined`, `:standard` (default: outlined)
+  - Themes: `:primary`, `:secondary`, `:success`, `:danger`
+  - Floating label pattern with Material Design inspiration
 - `form.text_area` → TextArea component
-- `form.button` → Button component (supports theme, size, fullw options)
+- `form.code(length: 6)` → Code input component for verification codes
+- `form.counter` → Counter component with increment/decrement buttons
+
+**State Components:**
+
 - `form.toggle`, `form.check_box` → Toggle/CheckBox components
-- `form.labeled` → Labeled wrapper component
-- `form.code` → Code input component
-- `form.counter` → Counter component
+- `form.select`, `form.multi_select` → Enhanced select with TailwindCSS styling
+
+**Action Components:**
+
+- `form.button(theme: :primary, size: :md, fullw: false)` → Button component
+  - Themes: `:primary`, `:secondary`, `:create`, `:edit`, `:delete`, `:show`
+  - Sizes: `:xs`, `:sm`, `:md`, `:lg`, `:xlg`, `:giant`
+  - Shimmer effect on hover with scale transform
+
+**Layout Components:**
+
+- `form.labeled(label_text)` → Labeled wrapper component
+- `form.file_field` → File upload component
 
 ### Rodauth Integration
 
@@ -182,14 +220,40 @@ When building forms, use the CustomFormBuilder methods which render ViewComponen
 ### AnyCable WebSockets
 
 - AnyCable replaces default Action Cable for better performance
-- Redis backend required
+- Redis backend required (memory-based broker in development)
 - Configuration in `anycable.toml`
 - WebSocket server runs separately in development and CI
+
+### Turbo Streams & Real-time Updates
+
+**Broadcasting Pattern:**
+
+- Models use `broadcasts_to` for automatic real-time updates
+- Example: `Support::Ticket` broadcasts to `"tickets"` and `"admin_tickets"` channels
+- Hooks: `after_create_commit`, `after_update_commit`, `after_destroy_commit`
+- Actions: append, replace, remove on Turbo Stream targets
+
+**Usage in Models:**
+
+```ruby
+broadcasts_to ->(ticket) { "tickets" }
+broadcasts_to "admin_tickets" via: :append  # or :replace, :remove
+```
+
+**Signed Stream Verification:**
+
+- Turbo Stream verifier key from AnyCable secret
+- Prevents unauthorized channel subscription
 
 ## Common Gotchas
 
 - Freezolite adds `frozen_string_literal: true` to all files automatically (disabled in test env)
 - Components must be in `app/components/` and are autoloaded
-- Adminit area requires accounts to have a role assigned
-- Permission resources are identified by policy class identifiers (e.g., `:"Adminit::ApplicationPolicy"`)
+- Adminit area requires accounts to have a role assigned (three-layer authorization)
+- Permission resources are identified by policy class identifiers as symbols (e.g., `:"Adminit::AccountPolicy"`)
+- Policies must define `self.identifier` to work with Permission model
 - HABTM associations used for roles/permissions (not has_many :through)
+- Support models are namespaced under `Support::` (Ticket, Conversation, Message)
+- Account model has two ticket associations: as creator (`:created_id`) and assignee (`:assigned_id`)
+- CustomFormBuilder is set as `default_form_builder` in `ApplicationController`
+- Turbo broadcasts use AnyCable secret for signed stream verification

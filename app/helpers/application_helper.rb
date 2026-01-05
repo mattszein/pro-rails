@@ -73,4 +73,40 @@ module ApplicationHelper
       }
     ]
   end
+
+  ANNOUNCEMENT_STATUS_THEME = {draft: :yellow, scheduled: :orange, published: :green}
+  def announcement_status_theme(status)
+    ANNOUNCEMENT_STATUS_THEME[status.to_sym]
+  end
+
+  def announcement_columns
+    [
+      {
+        label: "Title",
+        renderer: ->(announcement) { announcement.title }
+      },
+      {
+        label: "Status",
+        renderer: ->(announcement) do
+          render(Core::BadgeComponent.new(announcement.status.humanize,
+            options: {custom_style: {theme: announcement_status_theme(announcement.status)}}))
+        end
+      },
+      {
+        label: "Author",
+        renderer: ->(announcement) { announcement.author.email }
+      },
+      {
+        label: "Scheduled At",
+        renderer: ->(announcement) { announcement.scheduled_at&.strftime("%Y-%m-%d %H:%M") || "-" }
+      },
+      {
+        label: "Actions",
+        renderer: ->(announcement) {
+          render(Core::LinkComponent.new(name: "Show", url: adminit_announcement_path(announcement),
+            options: {data: {turbo_prefetch: false}, custom_style: {style: :as_button, theme: :show, size: :xs}}))
+        }
+      }
+    ]
+  end
 end
