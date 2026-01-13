@@ -7,8 +7,8 @@ namespace :adminit do
     post :leave, on: :member
   end
   resources :announcements do
-    post :publish, on: :member
-    post :draft, on: :member
+    post :schedule, on: :member
+    post :unschedule, on: :member
   end
 
   resources :roles, only: [:index, :show] do

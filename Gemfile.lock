@@ -222,6 +222,8 @@ GEM
     inline_svg (1.10.0)
       activesupport (>= 3.0)
       nokogiri (>= 1.6)
+    interactor (3.2.0)
+      ostruct
     io-console (0.8.0)
     irb (1.15.2)
       pp (>= 0.6.0)
@@ -275,6 +277,16 @@ GEM
       logger
     mini_mime (1.1.5)
     minitest (5.25.5)
+    mission_control-jobs (1.1.0)
+      actioncable (>= 7.1)
+      actionpack (>= 7.1)
+      activejob (>= 7.1)
+      activerecord (>= 7.1)
+      importmap-rails (>= 1.2.1)
+      irb (~> 1.13)
+      railties (>= 7.1)
+      stimulus-rails
+      turbo-rails
     msgpack (1.8.0)
     net-imap (0.5.8)
       date
@@ -569,10 +581,12 @@ DEPENDENCIES
   image_processing (~> 1.2)
   importmap-rails
   inline_svg
+  interactor (~> 3.0)
   jbuilder
   kamal
   listen
   lookbook (>= 2.3.11)
+  mission_control-jobs
   pg (~> 1.5)
   propshaft
   puma (>= 5.0)

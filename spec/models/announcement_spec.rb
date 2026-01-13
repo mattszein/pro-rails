@@ -10,24 +10,9 @@ RSpec.describe Announcement, type: :model do
     it { is_expected.to validate_presence_of(:body) }
 
     context "when status is scheduled" do
-      let(:announcement) { build(:announcement, :scheduled) }
+      subject { build(:announcement, :scheduled) }
 
-      it "requires scheduled_at" do
-        announcement.scheduled_at = nil
-        expect(announcement).not_to be_valid
-        expect(announcement.errors[:scheduled_at]).to include("can't be blank")
-      end
-
-      it "validates scheduled_at is not in the past" do
-        announcement.scheduled_at = 1.day.ago
-        expect(announcement).not_to be_valid
-        expect(announcement.errors[:scheduled_at]).to include("cannot be in the past")
-      end
-
-      it "allows scheduled_at in the future" do
-        announcement.scheduled_at = 1.day.from_now
-        expect(announcement).to be_valid
-      end
+      it { is_expected.to validate_presence_of(:scheduled_at) }
     end
 
     context "when status is not scheduled" do
@@ -59,19 +44,76 @@ RSpec.describe Announcement, type: :model do
         expect(Announcement.ready_to_publish).to contain_exactly(scheduled_past)
       end
     end
-  end
 
-  describe "default scope" do
-    let!(:old_announcement) { create(:announcement, created_at: 3.days.ago) }
-    let!(:new_announcement) { create(:announcement, created_at: 1.day.ago) }
-    let!(:middle_announcement) { create(:announcement, created_at: 2.days.ago) }
+    describe ".overdue" do
+      let!(:overdue_announcement) do
+        announcement = create(:announcement, status: :scheduled, scheduled_at: 1.hour.from_now)
+        announcement.update_column(:scheduled_at, 10.minutes.ago)
+        announcement
+      end
+      let!(:recent_scheduled) do
+        announcement = create(:announcement, status: :scheduled, scheduled_at: 1.hour.from_now)
+        announcement.update_column(:scheduled_at, 2.minutes.ago)
+        announcement
+      end
+      let!(:draft) { create(:announcement, :draft) }
 
-    it "orders by created_at desc" do
-      expect(Announcement.all).to eq([new_announcement, middle_announcement, old_announcement])
+      it "returns scheduled announcements more than 5 minutes past scheduled_at" do
+        expect(Announcement.overdue).to contain_exactly(overdue_announcement)
+      end
+    end
+
+    describe ".ordered" do
+      let!(:old_announcement) { create(:announcement, created_at: 3.days.ago) }
+      let!(:new_announcement) { create(:announcement, created_at: 1.day.ago) }
+      let!(:middle_announcement) { create(:announcement, created_at: 2.days.ago) }
+
+      it "orders by created_at desc" do
+        expect(Announcement.ordered).to eq([new_announcement, middle_announcement, old_announcement])
+      end
     end
   end
 
-  describe "business rule methods" do
+  describe "state query methods" do
+    describe "#schedulable?" do
+      it "returns true for draft announcements with scheduled_at" do
+        announcement = build(:announcement, :draft, scheduled_at: 1.day.from_now)
+        expect(announcement.schedulable?).to be true
+      end
+
+      it "returns false for draft announcements without scheduled_at" do
+        announcement = build(:announcement, :draft, scheduled_at: nil)
+        expect(announcement.schedulable?).to be false
+      end
+
+      it "returns false for scheduled announcements" do
+        announcement = build(:announcement, :scheduled)
+        expect(announcement.schedulable?).to be false
+      end
+
+      it "returns false for published announcements" do
+        announcement = build(:announcement, :published)
+        expect(announcement.schedulable?).to be false
+      end
+    end
+
+    describe "#scheduled_at_editable?" do
+      it "returns true for draft announcements" do
+        announcement = build(:announcement, :draft)
+        expect(announcement.scheduled_at_editable?).to be true
+      end
+
+      it "returns false for scheduled announcements" do
+        announcement = build(:announcement, :scheduled)
+        expect(announcement.scheduled_at_editable?).to be false
+      end
+
+      it "returns false for published announcements" do
+        announcement = build(:announcement, :published)
+        expect(announcement.scheduled_at_editable?).to be false
+      end
+    end
+
     describe "#destroyable?" do
       it "returns true for draft announcements" do
         announcement = build(:announcement, :draft)
@@ -105,38 +147,115 @@ RSpec.describe Announcement, type: :model do
         expect(announcement.editable?).to be false
       end
     end
+  end
 
-    describe "#can_change_scheduled_at?" do
-      it "returns true for draft announcements" do
-        announcement = build(:announcement, :draft)
-        expect(announcement.can_change_scheduled_at?).to be true
+  describe "state transition methods" do
+    describe "#schedule!" do
+      context "when announcement is draft with valid scheduled_at" do
+        let(:announcement) { create(:announcement, :draft, scheduled_at: 1.day.from_now) }
+
+        it "transitions to scheduled status" do
+          expect { announcement.schedule! }.to change { announcement.status }.from("draft").to("scheduled")
+        end
       end
 
-      it "returns false for scheduled announcements" do
-        announcement = build(:announcement, :scheduled)
-        expect(announcement.can_change_scheduled_at?).to be false
+      context "when announcement is already published" do
+        let(:announcement) { create(:announcement, :published) }
+
+        it "raises InvalidTransition" do
+          expect { announcement.schedule! }.to raise_error(Announcement::InvalidTransition, "Cannot schedule a published announcement")
+        end
       end
 
-      it "returns false for published announcements" do
-        announcement = build(:announcement, :published)
-        expect(announcement.can_change_scheduled_at?).to be false
+      context "when announcement is already scheduled" do
+        let(:announcement) { create(:announcement, :scheduled) }
+
+        it "raises InvalidTransition" do
+          expect { announcement.schedule! }.to raise_error(Announcement::InvalidTransition, "Already scheduled")
+        end
+      end
+
+      context "when scheduled_at is nil" do
+        let(:announcement) { create(:announcement, :draft, scheduled_at: nil) }
+
+        it "raises InvalidTransition" do
+          expect { announcement.schedule! }.to raise_error(Announcement::InvalidTransition, "Scheduled time is required")
+        end
+      end
+
+      context "when scheduled_at is in the past beyond tolerance" do
+        let(:announcement) { create(:announcement, :draft, scheduled_at: 1.day.from_now) }
+
+        before do
+          announcement.update_column(:scheduled_at, 10.minutes.ago)
+        end
+
+        it "raises InvalidTransition" do
+          expect { announcement.schedule! }.to raise_error(Announcement::InvalidTransition, "Scheduled time must be in the future")
+        end
+      end
+
+      context "when scheduled_at is within tolerance window" do
+        let(:announcement) { create(:announcement, :draft, scheduled_at: 1.day.from_now) }
+
+        before do
+          announcement.update_column(:scheduled_at, 1.minute.ago)
+        end
+
+        it "allows scheduling" do
+          expect { announcement.schedule! }.to change { announcement.status }.from("draft").to("scheduled")
+        end
       end
     end
 
-    describe "#can_transition_to_draft?" do
-      it "returns true for draft announcements" do
-        announcement = build(:announcement, :draft)
-        expect(announcement.can_transition_to_draft?).to be true
+    describe "#unschedule!" do
+      context "when announcement is scheduled" do
+        let(:announcement) { create(:announcement, :scheduled) }
+
+        it "transitions to draft status" do
+          expect { announcement.unschedule! }.to change { announcement.status }.from("scheduled").to("draft")
+        end
       end
 
-      it "returns true for scheduled announcements" do
-        announcement = build(:announcement, :scheduled)
-        expect(announcement.can_transition_to_draft?).to be true
+      context "when announcement is not scheduled" do
+        let(:announcement) { create(:announcement, :draft) }
+
+        it "raises InvalidTransition" do
+          expect { announcement.unschedule! }.to raise_error(Announcement::InvalidTransition, "Can only unschedule scheduled announcements")
+        end
+      end
+    end
+
+    describe "#publish!" do
+      context "when announcement is scheduled" do
+        let(:announcement) { create(:announcement, :scheduled) }
+
+        it "transitions to published status" do
+          expect { announcement.publish! }.to change { announcement.status }.from("scheduled").to("published")
+        end
+
+        it "sets published_at" do
+          freeze_time do
+            announcement.publish!
+            expect(announcement.published_at).to eq(Time.current)
+          end
+        end
       end
 
-      it "returns false for published announcements" do
-        announcement = build(:announcement, :published)
-        expect(announcement.can_transition_to_draft?).to be false
+      context "when announcement is already published" do
+        let(:announcement) { create(:announcement, :published) }
+
+        it "raises InvalidTransition" do
+          expect { announcement.publish! }.to raise_error(Announcement::InvalidTransition, "Already published")
+        end
+      end
+
+      context "when announcement is draft" do
+        let(:announcement) { create(:announcement, :draft) }
+
+        it "raises InvalidTransition" do
+          expect { announcement.publish! }.to raise_error(Announcement::InvalidTransition, "Must be scheduled first")
+        end
       end
     end
   end
@@ -149,7 +268,7 @@ RSpec.describe Announcement, type: :model do
         new_time = 2.days.from_now
         announcement.scheduled_at = new_time
         expect(announcement).not_to be_valid
-        expect(announcement.errors[:scheduled_at]).to include("cannot be changed for scheduled announcements")
+        expect(announcement.errors[:scheduled_at]).to include("cannot be changed when scheduled. Unschedule first.")
       end
 
       it "allows updating other attributes" do
@@ -164,13 +283,7 @@ RSpec.describe Announcement, type: :model do
       it "prevents updating any attributes" do
         announcement.title = "Updated Title"
         expect(announcement).not_to be_valid
-        expect(announcement.errors[:base]).to include("cannot be updated once published")
-      end
-
-      it "prevents any updates including status changes" do
-        announcement.status = :draft
-        expect(announcement).not_to be_valid
-        expect(announcement.errors[:base]).to include("cannot be updated once published")
+        expect(announcement.errors[:base]).to include("Cannot update a published announcement")
       end
     end
 
@@ -192,14 +305,16 @@ RSpec.describe Announcement, type: :model do
       expect { announcement.destroy }.to change(Announcement, :count).by(-1)
     end
 
-    it "does not prevent destroying scheduled announcements at model level" do
+    it "prevents destroying scheduled announcements" do
       announcement = create(:announcement, :scheduled)
-      expect { announcement.destroy }.to change(Announcement, :count).by(-1)
+      expect { announcement.destroy }.not_to change(Announcement, :count)
+      expect(announcement.errors[:base]).to include("Only draft announcements can be deleted")
     end
 
-    it "does not prevent destroying published announcements at model level" do
+    it "prevents destroying published announcements" do
       announcement = create(:announcement, :published)
-      expect { announcement.destroy }.to change(Announcement, :count).by(-1)
+      expect { announcement.destroy }.not_to change(Announcement, :count)
+      expect(announcement.errors[:base]).to include("Only draft announcements can be deleted")
     end
   end
 

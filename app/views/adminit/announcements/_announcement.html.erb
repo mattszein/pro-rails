@@ -4,7 +4,7 @@
       <%= icon "adminit/announcement", {classes: "h-8"} %>
       <h1><%= announcement.title %></h1>
       <%= render(Core::BadgeComponent.new(announcement.status.humanize,
-          options: {custom_style: {theme: announcement_status_theme(announcement.status), icon: "info", size: :md}})) %>
+            options: {custom_style: {theme: announcement_status_theme(announcement.status), icon: "info", size: :md}})) %>
     </div>
 
     <%= render Core::BoxComponent.new do %>

@@ -1,5 +1,5 @@
 class Adminit::AnnouncementsController < Adminit::ApplicationController
-  before_action :set_announcement, only: %i[show edit update destroy publish draft]
+  before_action :set_announcement, only: %i[show edit update destroy schedule unschedule]
   verify_authorized
 
   def index
@@ -16,74 +16,58 @@ class Adminit::AnnouncementsController < Adminit::ApplicationController
   end
 
   def edit
+    unless @announcement.editable?
+      respond_error("Cannot edit a published announcement.")
+    end
   end
 
   def create
     authorize!
     @announcement = Announcement.new(announcement_params)
     @announcement.author = current_account
-
-    respond_to do |format|
-      if @announcement.save
-        format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, adminit_announcements_path) }
-        format.html { redirect_to adminit_announcement_path(@announcement), notice: "Announcement was successfully created." }
-        format.json { render :show, status: :created, location: @announcement }
-      else
-        format.turbo_stream {
-          render turbo_stream: turbo_stream.replace("announcement_form",
-            partial: "adminit/announcements/form",
-            locals: {announcement: @announcement}),
-            status: :unprocessable_entity
-        }
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @announcement.errors, status: :unprocessable_entity }
-      end
+    if @announcement.save
+      respond_success("Announcement was successfully created.", adminit_announcement_path(@announcement))
+    else
+      respond_form_error(:new)
     end
   end
 
   def update
-    respond_to do |format|
-      if @announcement.update(announcement_params)
-        flash[:notice] = "Announcement was successfully updated."
-        format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, adminit_announcement_path(@announcement)) }
-        format.html { redirect_to adminit_announcement_path(@announcement)}
-        format.json { render :show, status: :ok, location: @announcement }
-      else
-        format.turbo_stream {
-          render turbo_stream: turbo_stream.replace("announcement_form",
-            partial: "adminit/announcements/form",
-            locals: {announcement: @announcement}),
-            status: :unprocessable_entity
-        }
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @announcement.errors, status: :unprocessable_entity }
-      end
+    authorize! @announcement
+
+    if @announcement.update(announcement_params)
+      respond_success("Announcement was successfully updated.", adminit_announcement_path(@announcement))
+    else
+      respond_form_error(:edit)
     end
   end
 
-  def publish
-    authorize! @announcement, to: :publish?
-    if @announcement.update(status: :scheduled)
-      redirect_to adminit_announcement_path(@announcement), notice: "Announcement was successfully scheduled for publishing."
+  def schedule
+    result = Announcements::Schedule.call(announcement: @announcement)
+    if result.success?
+      respond_success(
+        "Announcement scheduled for #{@announcement.scheduled_at.strftime("%B %d, %Y at %I:%M %p")}.",
+        adminit_announcement_path(@announcement)
+      )
     else
-      redirect_to adminit_announcement_path(@announcement), alert: "Failed to schedule announcement: #{@announcement.errors.full_messages.join(", ")}"
+      respond_error(result.error)
     end
   end
 
-  def draft
-    authorize! @announcement, to: :draft?
-    if @announcement.update(status: :draft)
-      redirect_to adminit_announcement_path(@announcement), notice: "Announcement was successfully updated as draft."
+  def unschedule
+    result = Announcements::Unschedule.call(announcement: @announcement)
+    if result.success?
+      respond_success("Announcement was unscheduled.", adminit_announcement_path(@announcement))
     else
-      redirect_to adminit_announcement_path(@announcement), alert: "Failed to draft announcement: #{@announcement.errors.full_messages.join(", ")}"
+      respond_error(result.error)
     end
   end
 
   def destroy
-    @announcement.destroy!
-    respond_to do |format|
-      format.html { redirect_to adminit_announcements_path, notice: "Announcement was successfully destroyed." }
-      format.json { head :no_content }
+    if @announcement.destroy
+      respond_success("Announcement was successfully deleted.", adminit_announcements_path)
+    else
+      respond_error(@announcement.errors.full_messages.to_sentence)
     end
   end
 
@@ -96,5 +80,34 @@ class Adminit::AnnouncementsController < Adminit::ApplicationController
 
   def announcement_params
     params.require(:announcement).permit(:title, :body, :scheduled_at)
+  end
+
+  def respond_success(message, path)
+    respond_to do |format|
+      format.html { redirect_to path, notice: message }
+      format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, path) }
+      format.json { render :show, status: :ok, location: @announcement }
+    end
+  end
+
+  def respond_error(message)
+    respond_to do |format|
+      format.html { redirect_back fallback_location: adminit_announcements_path, alert: message }
+      format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, request.referer || adminit_announcements_path) }
+      format.json { render json: @announcement.errors, status: :unprocessable_entity }
+    end
+  end
+
+  def respond_form_error(action)
+    respond_to do |format|
+      format.html { render action, status: :unprocessable_entity }
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.replace(
+          "announcement_form",
+          partial: "adminit/announcements/form",
+          locals: {announcement: @announcement}
+        ), status: :unprocessable_entity
+      end
+    end
   end
 end

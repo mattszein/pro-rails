@@ -60,6 +60,16 @@ services:
       test: pg_isready -U postgres -h 127.0.0.1
       interval: 5s
 
+  jobs:
+    <<: *backend
+    command: /bin/bash -c "bin/jobs start"
+    environment:
+      <<: *backend_environment
+      RAILS_LOG_TO_STDOUT: "true"
+    tty: true
+    depends_on:
+      <<: *backend_depends_on
+
   rails:
     <<: *backend
     command: /bin/bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
@@ -71,6 +81,8 @@ services:
     depends_on:
       <<: *backend_depends_on
       maildev:
+        condition: service_started
+      jobs:
         condition: service_started
 
   redis:
