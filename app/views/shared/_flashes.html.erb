@@ -1,3 +1,16 @@
-<% flash.each do |type, msg| %>
-  <%= render(Core::AlertComponent.new(type: type.to_sym, title: (type == "notice") ? "Info" : "Error", message: msg)) %>
-<% end %>
+<div id="flashes_id" class="fixed top-8 right-4 z-50 space-y-3 max-w-md w-full pointer-events-none" data-controller="notifications" data-notifications-target="container">
+  <% flash.each do |type, msg| %>
+    <%= render(Core::ToastComponent.new(
+      title: (type == "notice") ? "Info" : "Error",
+      message: msg,
+      theme: (type == "notice") ? :primary : :error
+    )) %>
+  <% end %>
+  <template data-notifications-target="template">
+    <%= render(Core::ToastComponent.new(
+      title: "",
+      message: "",
+      theme: :primary
+    )) %>
+  </template>
+</div>

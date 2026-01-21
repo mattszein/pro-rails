@@ -315,6 +315,8 @@ GEM
       racc (~> 1.4)
     nokogiri (1.18.8-x86_64-linux-musl)
       racc (~> 1.4)
+    noticed (3.0.0)
+      rails (>= 6.1.0)
     ostruct (0.6.1)
     parallel (1.27.0)
     parser (3.3.8.0)
@@ -587,6 +589,7 @@ DEPENDENCIES
   listen
   lookbook (>= 2.3.11)
   mission_control-jobs
+  noticed (~> 3.0)
   pg (~> 1.5)
   propshaft
   puma (>= 5.0)

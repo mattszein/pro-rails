@@ -18,7 +18,8 @@ module Announcements
     def deliver_notifications
       # TODO: Implement notification delivery with Noticed gem
       # AnnouncementNotifier.with(record: announcement).deliver(Account.verified)
-      Rails.logger.info "Announcement ##{announcement.id} published. Notifications pending implementation."
+      Rails.logger.info "Announcement ##{announcement.id} published."
+      AnnouncementNotifier.with(record: announcement, message: announcement.title).deliver(Account.all)
     end
   end
 end
