@@ -13,6 +13,17 @@ Rails.application.routes.draw do
   end
 
   get "dashboard" => "dashboard#index", :as => :dashboard
+  resources :notifications, only: [:index, :show] do
+    collection do
+      post :mark_all_read
+      get :user
+    end
+    member do 
+      post :mark_as_read
+    end
+  end
+
+  resources :announcements, only: [:show]
 
   namespace :support do
     resources :tickets do

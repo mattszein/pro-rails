@@ -12,6 +12,11 @@ class DashboardController < ApplicationController
     @current_account = current_account
   end
 
+  def user_notifications
+    @notifications = current_account.notifications.order(created_at: :desc).limit(10)
+    @unread_count = @notifications.unread.count
+  end
+
   private
 
   def set_sidebar_open

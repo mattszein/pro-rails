@@ -29,7 +29,7 @@ class Core::ToastComponent < ApplicationViewComponent
     success: "toast/check",
     error: "toast/error",
     warning: "toast/warning",
-    info: "info"
+    info: "toast/info"
   }.freeze
 
   def icon_name

@@ -6,10 +6,14 @@ class AnnouncementNotifier < ApplicationNotifier
     config.method = "new_announcement"
   end
 
-  deliver_by :action_cable do |config|
-    config.channel = "Noticed::NotificationChannel"
-    config.stream = ->{ recipient }
-    config.message = ->{ params.merge( user_id: recipient.id) }
+  # deliver_by :action_cable do |config|
+  #   config.channel = "Noticed::NotificationChannel"
+  #   config.stream = ->{ recipient }
+  #   config.message = ->{ params.merge( user_id: recipient.id) }
+  # end
+  
+  deliver_by :custom do |config|
+    config.class = "DeliveryMethods::TurboStream"
   end
 
   # bulk_deliver_by :slack do |config|
@@ -29,4 +33,17 @@ class AnnouncementNotifier < ApplicationNotifier
   # recipients do
   #   params[:record].thread.all_authors
   # end
+  notification_methods do
+    def title
+      t(".title")
+    end
+    
+    def subtitle
+      record.title
+    end
+
+    def notification_type
+      "announcement"
+    end
+  end
 end

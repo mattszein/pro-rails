@@ -1,0 +1,30 @@
+<%= link_to polymorphic_path(notification.event.record) || "#",
+    data: { 
+      notifications__main_notifications_target: "item",
+      turbo_frame: "_top",
+      controller: "notifications--item-component",
+      action: "click->notifications--item-component#markAsRead",
+      notification_id: @notification.id
+    },
+    class: "block px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 group #{read_class} [.unread&]:bg-primary-50/60 [.unread&]:dark:bg-primary-600" do %>
+  <div class="flex gap-3">
+    <div class="shrink-0">
+      <div class="<%= icon_class %> w-10 h-10 rounded-full flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+          <%= icon_svg.html_safe %>
+        </svg>
+      </div>
+    </div>
+    <div class="flex-1 min-w-0">
+      <p class="text-md mb-0.5" data-role="title">
+        <%= @notification.title %>
+      </p>
+      <p class="text-sm line-clamp-2" data-role="subtitle">
+        <%= @notification.subtitle %>
+      </p>
+      <p class="text-sm mt-1.5">
+        <%= time_ago %>
+      </p>
+    </div>
+  </div>
+<% end %>

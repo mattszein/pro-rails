@@ -39,14 +39,12 @@
       <%= render(Core::SidebarComponent.new(open: false, title: "RailsApp | Menu")) do %>
         <%= render "navigation" %>
       <% end %>
-      <main class="flex-grow pt-16 px-8 overflow-x-scroll" role="main">
+      <main class="grow pt-16 px-8 overflow-x-scroll" role="main">
         <%= turbo_frame_tag "modal", target: "_top" %>
         <%= yield %>
       </main>
-
-      <div id="flashes_id">
-        <%= render "shared/flashes" %>
-      </div>
+      <div id="notifications-permanent" data-controller="notifications" data-turbo-permanent></div>
+      <%= render "shared/flashes" %>
     </div>
   </body>
 </html>

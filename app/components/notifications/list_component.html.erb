@@ -1,0 +1,5 @@
+<div class="divide-y divide-gray-100 dark:divide-gray-800">
+  <% notifications.each do |notification| %>
+    <%= render Notifications::ItemComponent.new(notification: notification) %>
+  <% end %>
+</div>

@@ -71,7 +71,6 @@ class Core::CardComponent < ViewComponent::Base
       variant_config[:hover_shadow],
       glow_effect,
       PADDING[@padding],
-      "animate-slide-up",
       @classes
     ].reject(&:empty?).join(" ")
   end
