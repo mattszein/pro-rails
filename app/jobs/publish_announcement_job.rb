@@ -10,7 +10,7 @@ class PublishAnnouncementJob < ApplicationJob
     return if announcement.scheduled_at.to_i != expected_scheduled_at
     return unless announcement.scheduled?
 
-    Announcements::Publish.call(announcement: announcement)
+    result = Announcements::Publish.call(announcement: announcement)
     if result.failure?
       Rails.logger.error("PublishJob Failed for Announcement #{announcement_id}: #{result.error}")
     else

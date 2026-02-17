@@ -21,6 +21,31 @@ RSpec.describe Announcements::Publish do
           expect(announcement.reload.published_at).to eq(Time.current)
         end
       end
+
+      it "creates a notification for each account" do
+        announcement # force creation
+        create_list(:account, 2, :verified)
+        expected_count = Account.count
+
+        expect { described_class.call(announcement: announcement) }
+          .to change(Noticed::Notification, :count).by(expected_count)
+      end
+
+      it "creates notifications linked to the announcement" do
+        recipient = create(:account, :verified)
+
+        described_class.call(announcement: announcement)
+
+        notification = recipient.notifications.last
+        expect(notification.event.record).to eq(announcement)
+      end
+
+      it "enqueues announcement emails for each recipient" do
+        create_list(:account, 2, :verified)
+
+        expect { described_class.call(announcement: announcement) }
+          .to have_enqueued_job.on_queue("default").at_least(:once)
+      end
     end
 
     context "when announcement is already published" do
