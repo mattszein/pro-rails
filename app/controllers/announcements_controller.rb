@@ -9,5 +9,4 @@ class AnnouncementsController < DashboardController
   def set_announcement
     @announcement = Announcement.find(params[:id])
   end
-
 end

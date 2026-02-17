@@ -1,6 +1,6 @@
 class Core::ToastComponent < ApplicationViewComponent
   option :title
-  option :message, default: -> { nil }
+  option :message, default: -> {}
   option :theme, default: -> { :info }
   option :icon, optional: true
   option :auto_dismiss, default: -> { true }
@@ -33,7 +33,7 @@ class Core::ToastComponent < ApplicationViewComponent
   }.freeze
 
   def icon_name
-    self.icon || DEFAULT_ICONS[theme]
+    icon || DEFAULT_ICONS[theme]
   end
 
   def html_class

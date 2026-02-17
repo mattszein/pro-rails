@@ -19,5 +19,4 @@ class NotificationsController < DashboardController
     notification.mark_as_read!
     head :ok
   end
-
 end

@@ -11,7 +11,7 @@ class AnnouncementNotifier < ApplicationNotifier
   #   config.stream = ->{ recipient }
   #   config.message = ->{ params.merge( user_id: recipient.id) }
   # end
-  
+
   deliver_by :custom do |config|
     config.class = "DeliveryMethods::TurboStream"
   end
@@ -37,7 +37,7 @@ class AnnouncementNotifier < ApplicationNotifier
     def title
       t(".title")
     end
-    
+
     def subtitle
       record.title
     end

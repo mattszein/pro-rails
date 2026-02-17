@@ -5,10 +5,8 @@ export default class extends Controller {
 
   connect() {
 
-    console.log("MainNotificationsController connected")
     this.boundClickOutside = this.handleClickOutside.bind(this)
     this.boundStreamEvent = this.handleStream.bind(this)
-
     document.addEventListener("click", this.boundClickOutside)
     document.addEventListener("turbo:before-stream-render", this.boundStreamEvent)
     this.element.addEventListener('notifications--item-component:read', this.handleRead.bind(this))
@@ -23,8 +21,6 @@ export default class extends Controller {
     const stream = event.target
     if (stream.getAttribute("target") !== "notifications_list") return
     if (stream.getAttribute("action") !== "prepend") return
-
-    console.log("Notification stream received!")
 
     // Increment badge
     const count = parseInt(this.badgeTarget.textContent || "0") + 1
@@ -71,19 +67,4 @@ export default class extends Controller {
     if (count === 0) this.badgeWrapperTarget.classList.add("hidden")
   }
 
-  // markAsRead(event) {
-  //   const item = event.currentTarget
-  //   const notificationId = item.dataset.notificationId
-  //   if (!notificationId) return
-  //
-  //   // Remove unread styling
-  //   item.classList.remove("unread")
-  //
-  //   // Decrement badge
-  //   const count = Math.max(0, parseInt(this.badgeTarget.textContent || "0") - 1)
-  //   this.badgeTarget.textContent = count
-  //   if (count === 0) this.badgeWrapperTarget.classList.add("hidden")
-  //
-  //   new FetchRequest("post", `/notifications/${notificationId}/mark_as_read`).perform()
-  // }
 }

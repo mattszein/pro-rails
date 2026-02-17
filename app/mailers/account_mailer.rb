@@ -1,6 +1,5 @@
 class AccountMailer < ApplicationMailer
-
-   def new_announcement
+  def new_announcement
     @user = params[:recipient]
     @title = params[:message]
     @announcement = params[:record]

@@ -6,39 +6,35 @@
       <span class="relative inline-flex items-center justify-center h-6 w-6 rounded-full bg-primary-800 text-white" data-notifications--main-notifications-target="badge"><%= unread_count %></span>
     </span>
   </button>
-
   <!-- Dropdown Panel -->
-  <div 
+  <div
     data-notifications--main-notifications-target="panel"
-    class="hidden absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50"
-  >
+    class="hidden absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50">
     <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
       <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">
         Notifications
       </h3>
-        <%= button_to mark_all_read_notifications_path, 
+      <%= button_to mark_all_read_notifications_path,
             method: :post,
             class: "text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors",
-            form: { data: { turbo_stream: true } } do %>
-          Mark all as read
-        <% end %>
+            form: {data: {turbo_stream: true}} do %>
+        Mark all as read
+      <% end %>
     </div>
-    <div 
-      id="notifications_list" 
+    <div
+      id="notifications_list"
       class="max-h-96 overflow-y-auto"
-      data-notifications--main-notifications-target="list"
-    >
+      data-notifications--main-notifications-target="list">
       <%= helpers.turbo_stream_from "notifications_#{helpers.current_account.id}" %>
       <%= render Notifications::ListComponent.new(notifications: @notifications) %>
     </div>
-
     <!-- Footer -->
     <div class="px-4 py-2.5 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-      <%= link_to notifications_path, 
-          data: {
-            turbo_frame: "_top"
-          },
-          class: "text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 font-medium transition-colors block text-center" do %>
+      <%= link_to notifications_path,
+            data: {
+              turbo_frame: "_top"
+            },
+            class: "text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 font-medium transition-colors block text-center" do %>
         View all notifications →
       <% end %>
     </div>

@@ -18,7 +18,7 @@ Rails.application.routes.draw do
       post :mark_all_read
       get :user
     end
-    member do 
+    member do
       post :mark_as_read
     end
   end

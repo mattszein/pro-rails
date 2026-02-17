@@ -7,7 +7,6 @@ export default class extends Controller {
     const notificationId = item.dataset.notificationId
     if (!notificationId) return
     new FetchRequest("post", `/notifications/${notificationId}/mark_as_read`).perform()
-    // Remove unread styling
 
     item.classList.remove("unread")
     this.dispatch('read', {

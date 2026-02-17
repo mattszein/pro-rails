@@ -1,16 +1,16 @@
 <div id="toasts_container" class="fixed top-8 right-4 z-50 space-y-3 max-w-md w-full pointer-events-none" data-controller="toasts" data-toasts-target="container" data-action="toast@document->toasts#show">
   <% flash.each do |type, msg| %>
     <%= render(Core::ToastComponent.new(
-      title: (type == "notice") ? "Info" : "Error",
-      message: msg,
-      theme: (type == "notice") ? :primary : :error
-    )) %>
+          title: (type == "notice") ? "Info" : "Error",
+          message: msg,
+          theme: (type == "notice") ? :primary : :error
+        )) %>
   <% end %>
   <template data-toasts-target="template">
     <%= render(Core::ToastComponent.new(
-      title: "",
-      message: "",
-      theme: :primary
-    )) %>
+          title: "",
+          message: "",
+          theme: :primary
+        )) %>
   </template>
 </div>

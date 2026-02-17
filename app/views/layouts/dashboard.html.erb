@@ -29,13 +29,13 @@
       <%= render "partials/navigation" %>
     <% end %>
     <div class="flex pt-4 pr-4 justify-end">
-      <%= turbo_frame_tag :main_notifications, src: user_notifications_path, loading: :lazy, data: { turbo_permanent: true } do %>
+      <%= turbo_frame_tag :main_notifications, src: user_notifications_path, loading: :lazy, data: {turbo_permanent: true} do %>
       <div class="relative p-2.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-200 hover:outline-none hover:ring-2 hover:ring-primary-200 text-primary-400" aria-label="Notifications" aria-expanded="false">
-      <%= icon("bell", classes: "w-7 h-7 animate-pulse") %>
-      <span class="absolute top-0 right-0 flex h-6 w-6">
-        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-50"></span>
-      </span>
-  </div>
+        <%= icon("bell", classes: "w-7 h-7 animate-pulse") %>
+        <span class="absolute top-0 right-0 flex h-6 w-6">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-50"></span>
+        </span>
+      </div>
       <% end %>
     </div>
     <main class="grow pt-16 px-8 overflow-x-scroll" role="main">
@@ -43,5 +43,5 @@
       <%= yield %>
     </main>
     <%= render "shared/flashes" %>
-   </body>
+  </body>
 </html>

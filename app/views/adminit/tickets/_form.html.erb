@@ -10,9 +10,7 @@
       </ul>
     </div>
   <% end %>
-    <%= form.labeled :title do %>
-      <%= form.text_field :title, {autofocus: true, required: true, placeholder: " ", class: "w-full"} %>
-    <% end %>
+    <%= form.text_field :title, {autofocus: true, required: true, placeholder: " ", autocomplete: "title", label: "Title", class: "w-full"} %>
     <div class="mt-6">
     <%= form.label :description, class: "sr-only" %>
     <%= form.text_area :description, rows: 4, placeholder: "Write your ticket description here", class: "w-full mt-4" %>

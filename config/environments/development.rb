@@ -105,13 +105,11 @@ Rails.application.configure do
     config.logger = ActiveSupport::TaggedLogging.new(logger)
   end
 
-# After other configs
-config.after_initialize do
-  if defined?(AnyCable)
-    AnyCable.logger = Rails.logger
-    AnyCable.logger.level = Logger::DEBUG
+  # After other configs
+  config.after_initialize do
+    if defined?(AnyCable)
+      AnyCable.logger = Rails.logger
+      AnyCable.logger.level = Logger::DEBUG
+    end
   end
 end
-end
-
-
