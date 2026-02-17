@@ -44,7 +44,7 @@ gem "freezolite" # Freezolite add frozen_string_literals to true to every file i
 gem "view_component"
 gem "view_component-form"
 
-gem "tailwindcss-rails", "~> 4.2"
+gem "tailwindcss-rails", "~> 4.4"
 gem "inline_svg"
 
 gem "redis", "~> 5.4", ">= 5.4.1"
