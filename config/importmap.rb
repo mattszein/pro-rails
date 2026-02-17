@@ -12,7 +12,7 @@ pin "tom-select", to: "https://ga.jspm.io/npm:tom-select@2.4.3/dist/js/tom-selec
 pin "@anycable/turbo-stream", to: "@anycable--turbo-stream.js" # @0.8.1
 pin "@anycable/web", to: "@anycable--web.js" # @1.1.0
 pin "@anycable/core", to: "@anycable--core.js" # @1.1.4
-pin "@hotwired/turbo", to: "@hotwired--turbo.js" # @8.0.21
+pin "@hotwired/turbo", to: "@hotwired--turbo.js" # @8.0.23
 pin "nanoevents" # @9.1.0
 
 pin "air-datepicker", to: "https://esm.sh/air-datepicker@3.6.0"
