@@ -11,7 +11,7 @@ export default class extends Controller {
     item.classList.remove("unread")
     this.dispatch('read', {
       detail: { notificationId: this.element.dataset.notificationId },
-      bubbles: true  // importante para que suba en el DOM
+      bubbles: true
     })
     item.remove()
   }

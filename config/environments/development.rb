@@ -98,7 +98,6 @@ Rails.application.configure do
   config.importmap.cache_sweepers << Rails.root.join("app/components")
   config.turbo.signed_stream_verifier_key = ENV.fetch("ANYCABLE_SECRET", "anycable_key")
 
-  # Agrega esto para que Docker pueda ver los logs
   if ENV["RAILS_LOG_TO_STDOUT"].present?
     logger = ActiveSupport::Logger.new($stdout)
     logger.formatter = config.log_formatter

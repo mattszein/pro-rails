@@ -1,4 +1,4 @@
-<%= link_to polymorphic_path(notification.event.record) || "#",
+<%= link_to (notification.event.record ? polymorphic_path(notification.event.record) : "#") rescue "#",
       data: {
         notifications__main_notifications_target: "item",
         turbo_frame: "_top",

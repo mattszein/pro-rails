@@ -22,7 +22,7 @@ default: &default # Turn on/off access logs ("Started..." and "Finished...")
 
 development:
   <<: *default
-  embedded: true
+  embedded: false
   secret: <%= ENV.fetch("ANYCABLE_SECRET") %>
 
 test:

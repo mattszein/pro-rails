@@ -76,8 +76,8 @@ services:
     environment:
       <<: *backend_environment
       ANYCABLE_RPC_HOST: 0.0.0.0:50051
-      ANYCABLE_DEBUG: "1" # Add this
-      ANYCABLE_LOG_LEVEL: "debug" # Add this
+      ANYCABLE_DEBUG: "1"
+      ANYCABLE_LOG_LEVEL: "debug"
     ports:
       - 3000:3000
       - 50051:50051

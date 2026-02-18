@@ -15,6 +15,7 @@ export default class extends Controller {
   disconnect() {
     document.removeEventListener("click", this.boundClickOutside)
     document.removeEventListener("turbo:before-stream-render", this.boundStreamEvent)
+    this.element.removeEventListener('notifications--item-component:read', this.boundHandleRead)
   }
 
   handleStream(event) {
