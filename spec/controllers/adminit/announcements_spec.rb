@@ -104,7 +104,7 @@ describe Adminit::AnnouncementsController, type: :controller do
         end
 
         it "returns unprocessable entity" do
-          expect(subject).to have_http_status(:unprocessable_entity)
+          expect(subject).to have_http_status(:unprocessable_content)
         end
       end
     end
@@ -155,7 +155,7 @@ describe Adminit::AnnouncementsController, type: :controller do
           end
 
           it "returns unprocessable entity" do
-            expect(subject).to have_http_status(:unprocessable_entity)
+            expect(subject).to have_http_status(:unprocessable_content)
           end
         end
       end
@@ -170,7 +170,7 @@ describe Adminit::AnnouncementsController, type: :controller do
         end
 
         it "returns unprocessable entity" do
-          expect(subject).to have_http_status(:unprocessable_entity)
+          expect(subject).to have_http_status(:unprocessable_content)
         end
       end
     end

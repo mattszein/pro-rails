@@ -30,8 +30,8 @@ module Support
     end
 
     after_destroy_commit do
-      broadcast_remove_later_to "admin_tickets",
-        target: dom_id(self, "admin")
+      broadcast_remove_to "admin_tickets",
+        target: ActionView::RecordIdentifier.dom_id(self, "admin")
     end
 
     after_update_commit do |ticket|

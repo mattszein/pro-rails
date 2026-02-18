@@ -94,19 +94,19 @@ class Adminit::AnnouncementsController < Adminit::ApplicationController
     respond_to do |format|
       format.html { redirect_back fallback_location: adminit_announcements_path, alert: message }
       format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, request.referer || adminit_announcements_path) }
-      format.json { render json: @announcement.errors, status: :unprocessable_entity }
+      format.json { render json: @announcement.errors, status: :unprocessable_content }
     end
   end
 
   def respond_form_error(action)
     respond_to do |format|
-      format.html { render action, status: :unprocessable_entity }
+      format.html { render action, status: :unprocessable_content }
       format.turbo_stream do
         render turbo_stream: turbo_stream.replace(
           "announcement_form",
           partial: "adminit/announcements/form",
           locals: {announcement: @announcement}
-        ), status: :unprocessable_entity
+        ), status: :unprocessable_content
       end
     end
   end
