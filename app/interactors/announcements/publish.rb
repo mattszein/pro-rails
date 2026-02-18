@@ -16,7 +16,9 @@ module Announcements
     private
 
     def deliver_notifications
-      AnnouncementNotifier.with(record: announcement, message: announcement.title).deliver(Account.all)
+      Account.verified.find_each do |account|
+        AnnouncementNotifier.with(record: announcement, message: announcement.title).deliver(account)
+      end
     end
   end
 end

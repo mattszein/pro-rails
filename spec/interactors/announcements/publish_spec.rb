@@ -22,10 +22,11 @@ RSpec.describe Announcements::Publish do
         end
       end
 
-      it "creates a notification for each account" do
+      it "creates a notification for each verified account" do
         announcement # force creation
         create_list(:account, 2, :verified)
-        expected_count = Account.count
+        create_list(:account, 1, :unverified)
+        expected_count = Account.verified.count
 
         expect { described_class.call(announcement: announcement) }
           .to change(Noticed::Notification, :count).by(expected_count)
