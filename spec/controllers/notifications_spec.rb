@@ -8,8 +8,13 @@ RSpec.describe NotificationsController, type: :controller do
     subject { get :index }
 
     context "when not logged in" do
-      it "raises NoMethodError because /notifications is not protected by Rodauth" do
-        expect { subject }.to raise_error(NoMethodError)
+      it "redirects to login" do
+        expect(subject).to redirect_to(rodauth.login_path)
+      end
+
+      it "sets a flash alert" do
+        subject
+        expect(flash[:alert]).to eq("Please login to continue")
       end
     end
 
@@ -17,6 +22,10 @@ RSpec.describe NotificationsController, type: :controller do
       before { login_user(account) }
 
       it_behaves_like "respond to success"
+
+      it "is authorized" do
+        expect { subject }.to be_authorized_to(:index?, :notification).with(NotificationPolicy).with_context(user: account)
+      end
     end
   end
 
@@ -24,8 +33,13 @@ RSpec.describe NotificationsController, type: :controller do
     subject { get :user }
 
     context "when not logged in" do
-      it "raises NoMethodError because /notifications/user is not protected by Rodauth" do
-        expect { subject }.to raise_error(NoMethodError)
+      it "redirects to login" do
+        expect(subject).to redirect_to(rodauth.login_path)
+      end
+
+      it "sets a flash alert" do
+        subject
+        expect(flash[:alert]).to eq("Please login to continue")
       end
     end
 
@@ -33,6 +47,10 @@ RSpec.describe NotificationsController, type: :controller do
       before { login_user(account) }
 
       it_behaves_like "respond to success"
+
+      it "is authorized" do
+        expect { subject }.to be_authorized_to(:user?, :notification).with(NotificationPolicy).with_context(user: account)
+      end
     end
   end
 
@@ -40,13 +58,22 @@ RSpec.describe NotificationsController, type: :controller do
     subject { post :mark_all_read }
 
     context "when not logged in" do
-      it "raises NoMethodError because /notifications/mark_all_read is not protected by Rodauth" do
-        expect { subject }.to raise_error(NoMethodError)
+      it "redirects to login" do
+        expect(subject).to redirect_to(rodauth.login_path)
+      end
+
+      it "sets a flash alert" do
+        subject
+        expect(flash[:alert]).to eq("Please login to continue")
       end
     end
 
     context "when logged in" do
       before { login_user(account) }
+
+      it "is authorized" do
+        expect { subject }.to be_authorized_to(:mark_all_read?, :notification).with(NotificationPolicy).with_context(user: account)
+      end
 
       it "marks all unread notifications as read" do
         create(:noticed_notification, recipient: account)
@@ -82,14 +109,25 @@ RSpec.describe NotificationsController, type: :controller do
 
   describe "POST #mark_as_read" do
     context "when not logged in" do
-      it "raises NoMethodError because /notifications/:id/mark_as_read is not protected by Rodauth" do
+      it "redirects to login" do
         notification = create(:noticed_notification, recipient: account)
-        expect { post :mark_as_read, params: {id: notification.id} }.to raise_error(NoMethodError)
+        expect(post(:mark_as_read, params: {id: notification.id})).to redirect_to(rodauth.login_path)
+      end
+
+      it "sets a flash alert" do
+        notification = create(:noticed_notification, recipient: account)
+        post :mark_as_read, params: {id: notification.id}
+        expect(flash[:alert]).to eq("Please login to continue")
       end
     end
 
     context "when logged in" do
       before { login_user(account) }
+
+      it "is authorized" do
+        notification = create(:noticed_notification, recipient: account)
+        expect { post :mark_as_read, params: {id: notification.id} }.to be_authorized_to(:mark_as_read?, a_kind_of(Noticed::Notification)).with(NotificationPolicy).with_context(user: account)
+      end
 
       it "marks the notification as read" do
         notification = create(:noticed_notification, recipient: account)
@@ -106,7 +144,7 @@ RSpec.describe NotificationsController, type: :controller do
         expect(response).to have_http_status(:ok)
       end
 
-      it "redirects when notification belongs to another user" do
+      it "denies access when notification belongs to another user" do
         other_account = create(:account, :verified)
         other_notification = create(:noticed_notification, recipient: other_account)
 
