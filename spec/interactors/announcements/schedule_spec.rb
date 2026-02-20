@@ -89,16 +89,5 @@ RSpec.describe Announcements::Schedule do
         expect(result.error).to eq("Scheduled time must be in the future")
       end
     end
-
-    describe "transaction behavior" do
-      let(:announcement) { create(:announcement, :draft, scheduled_at: 1.day.from_now) }
-
-      it "wraps schedule and job enqueue in a transaction" do
-        allow(PublishAnnouncementJob).to receive(:set).and_raise(StandardError, "Job enqueue failed")
-
-        expect { described_class.call(announcement: announcement) }.to raise_error(StandardError)
-        expect(announcement.reload.status).to eq("draft")
-      end
-    end
   end
 end

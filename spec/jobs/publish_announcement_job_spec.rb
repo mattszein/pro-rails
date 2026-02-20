@@ -40,8 +40,9 @@ RSpec.describe PublishAnnouncementJob, type: :job do
     context "when announcement is no longer scheduled" do
       let(:announcement) { create(:announcement, :draft, scheduled_at: 1.day.from_now) }
 
-      it "returns without publishing" do
-        expect(Announcements::Publish).not_to receive(:call)
+      it "calls Publish and logs failure (model rejects the transition)" do
+        expect(Announcements::Publish).to receive(:call).and_call_original
+        expect(Rails.logger).to receive(:error).with(/PublishJob Failed for Announcement #{announcement.id}/)
 
         described_class.new.perform(announcement.id, announcement.scheduled_at.to_i)
       end
@@ -50,8 +51,9 @@ RSpec.describe PublishAnnouncementJob, type: :job do
     context "when announcement is already published" do
       let(:announcement) { create(:announcement, :published) }
 
-      it "returns without publishing" do
-        expect(Announcements::Publish).not_to receive(:call)
+      it "calls Publish and logs failure (model rejects the transition)" do
+        expect(Announcements::Publish).to receive(:call).and_call_original
+        expect(Rails.logger).to receive(:error).with(/PublishJob Failed for Announcement #{announcement.id}/)
 
         described_class.new.perform(announcement.id, announcement.scheduled_at.to_i)
       end

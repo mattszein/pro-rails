@@ -3,7 +3,7 @@ module Support
     before_action :require_account
     verify_authorized
 
-    before_action :set_ticket, only: %i[show edit update destroy attach_files]
+    before_action :set_ticket, only: %i[show edit update attach_files]
     before_action :ensure_frame_response, only: %i[new edit]
 
     # GET /support/tickets or /support/tickets.json
@@ -61,17 +61,6 @@ module Support
           format.turbo_stream { render turbo_stream: turbo_stream.replace("ticket_form", partial: "support/tickets/form", locals: {ticket: @ticket}), status: :unprocessable_content }
           format.json { render json: @ticket.errors, status: :unprocessable_content }
         end
-      end
-    end
-
-    # DELETE /support/tickets/1 or /support/tickets/1.json
-    def destroy
-      authorize! @ticket
-      @ticket.destroy!
-
-      respond_to do |format|
-        format.html { redirect_to support_tickets_url, notice: "Ticket was successfully destroyed." }
-        format.json { head :no_content }
       end
     end
 

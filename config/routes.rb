@@ -26,7 +26,7 @@ Rails.application.routes.draw do
   resources :announcements, only: [:show]
 
   namespace :support do
-    resources :tickets do
+    resources :tickets, except: [:destroy] do
       member do
         post :attach_files
       end

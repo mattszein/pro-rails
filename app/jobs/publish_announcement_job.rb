@@ -8,7 +8,6 @@ class PublishAnnouncementJob < ApplicationJob
 
     # Job is stale (announcement was rescheduled or in other state)
     return if announcement.scheduled_at.to_i != expected_scheduled_at
-    return unless announcement.scheduled?
 
     result = Announcements::Publish.call(announcement: announcement)
     if result.failure?

@@ -88,8 +88,8 @@ The controller calls the interactor, which handles the workflow:
 
 ```ruby
 def schedule
-  result = Announcement::Schedule.call(announcement: @announcement)
-  
+  result = Announcements::Schedule.call(announcement: @announcement)
+
   if result.success?
     redirect_to @announcement, notice: "Scheduled"
   else
@@ -358,17 +358,15 @@ We use the [interactor](https://github.com/collectiveidea/interactor) gem for wo
 ### Basic Structure
 
 ```ruby
-module Announcement
+module Announcements
   class Schedule
     include Interactor
 
     delegate :announcement, to: :context
 
     def call
-      ActiveRecord::Base.transaction do
-        announcement.schedule!
-        enqueue_publish_job
-      end
+      announcement.schedule!
+      enqueue_publish_job
     rescue Announcement::InvalidTransition, ActiveRecord::RecordInvalid => e
       context.fail!(error: e.message)
     end
@@ -399,18 +397,18 @@ end
 
 ### Transactions
 
-Wrap multiple database operations in a transaction:
+Wrap multiple database writes in a transaction only when they target the **same database**:
 
 ```ruby
 def call
   ActiveRecord::Base.transaction do
-    record.transition!
-    enqueue_job
+    record_a.update!(...)
+    record_b.update!(...)
   end
 end
 ```
 
-**Note:** Because we use Solid Queue (database-backed), the job enqueue is part of the same transaction. Both succeed or both rollback atomically.
+**Important:** Solid Queue uses a **separate database**, so job enqueues are NOT part of the application's ActiveRecord transaction. Do not wrap model updates + `perform_later` calls in a transaction expecting atomic rollback — it won't work. If the job enqueue fails after a model update, the model change will still be committed.
 
 ### When to Use Organizer
 
@@ -442,43 +440,50 @@ class PublishAnnouncementJob < ApplicationJob
     # Idempotency guards
     return unless announcement
     return if announcement.scheduled_at.to_i != expected_scheduled_at
-    return if announcement.published?
 
-    result = Announcement::Publish.call(announcement: announcement)
+    result = Announcements::Publish.call(announcement: announcement)
 
-    raise "Failed to publish: #{result.error}" if result.failure?
+    if result.failure?
+      Rails.logger.error("PublishJob Failed for Announcement #{announcement_id}: #{result.error}")
+    else
+      Rails.logger.info("Published Announcement #{announcement_id} successfully")
+    end
   end
 end
 ```
 
 ### Idempotency Guards
 
-Jobs should be safe to run multiple times:
+Jobs should be safe to run multiple times. The guards go in the job; state validity is enforced by the model:
 
 | Guard | Purpose |
 |-------|---------|
 | Record exists | Handle deleted records |
 | Timestamp matches | Detect stale jobs after reschedule |
-| Already completed | Skip if already done |
+
+**Note:** Do not add redundant state guards in the job (e.g. `return if announcement.published?`). If the record is in an invalid state, the model's transition method raises `InvalidTransition`, the interactor returns a failure, and the job logs the error. The model is the single source of truth for state rules.
 
 ### Safety Net Pattern
 
 For critical jobs, add a recurring safety net that catches any records that failed to process. The primary job handles the happy path at the exact scheduled time. The safety net runs periodically to catch anything that slipped through due to failures, server restarts, or edge cases.
 
-### Transaction Safety with Solid Queue
+### Solid Queue on a Separate Database
 
-Because Solid Queue stores jobs in PostgreSQL, wrapping model updates and job enqueues in a transaction creates atomic operations. Both the model update and the job insert happen in the same database transaction, so both succeed or both rollback together.
+Solid Queue runs on a **separate PostgreSQL database** from the application. This means:
 
-**Note:** If migrating to Redis-based queues (Sidekiq), use `after_transaction_commit` to avoid race conditions where the job runs before the transaction commits.
+- Job enqueues (`perform_later`) are **not** part of the application's ActiveRecord transaction
+- Wrapping a model update + `perform_later` in `ActiveRecord::Base.transaction` will NOT roll back the job insert if the model update fails, and vice versa
+- Accept this as a trade-off: if a job fails to enqueue after a state change, log and monitor it; rely on safety-net recurring jobs to catch anything that slips through
 
 ### Recurring Jobs
 
 Configure recurring jobs in `config/recurring.yml`:
 
 ```yaml
-publish_overdue_announcements:
-  class: PublishOverdueAnnouncementsJob
-  schedule: "every 5 minutes"
+production:
+  clear_solid_queue_finished_jobs:
+    command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
+    schedule: every hour at minute 12
 ```
 
 ---
@@ -681,22 +686,80 @@ We use [noticed](https://github.com/excid3/noticed) gem for notifications.
 
 ### Notifier Structure
 
+Notifiers live in `app/notifiers/` and inherit from `ApplicationNotifier`. Each delivery method is configured with a block:
+
 ```ruby
 class AnnouncementNotifier < ApplicationNotifier
-  deliver_by :action_cable, channel: "NotificationsChannel", if: :web_enabled?
-  deliver_by :email, mailer: "AnnouncementMailer", if: :email_enabled?
+  deliver_by :email do |config|
+    config.mailer = "AccountMailer"
+    config.method = "new_announcement"
+  end
+
+  deliver_by :custom do |config|
+    config.class = "DeliveryMethods::TurboStream"
+  end
+
+  required_param :message
 
   notification_methods do
-    def message
-      "New announcement: #{record.title}"
+    def title
+      t(".title")
+    end
+
+    def subtitle
+      record.title
+    end
+
+    def notification_type
+      "announcement"
     end
   end
 end
 ```
 
-### Delivery from Interactor
+### Delivery via Background Job
 
-Notifications are triggered from interactors, never from models. This keeps models focused on data integrity and makes notification logic explicit and testable.
+Notifications are triggered from interactors, never from models. When notifying many recipients, the interactor enqueues a background job instead of delivering inline — this keeps the request fast and avoids timeouts.
+
+```ruby
+# Interactor: transitions state, enqueues bulk delivery
+module Announcements
+  class Publish
+    include Interactor
+
+    delegate :announcement, to: :context
+
+    def call
+      announcement.publish!
+      BulkAnnouncementNotificationJob.perform_later(announcement.id)
+    rescue Announcement::InvalidTransition, ActiveRecord::RecordInvalid => e
+      context.fail!(error: e.message)
+    end
+  end
+end
+
+# Job: delivers to all unnotified verified accounts (idempotent)
+class BulkAnnouncementNotificationJob < ApplicationJob
+  queue_as :notifications
+
+  def perform(announcement_id)
+    announcement = Announcement.find_by(id: announcement_id)
+    return unless announcement
+
+    already_notified_ids = Noticed::Notification
+                           .where(recipient_type: "Account")
+                           .joins(:event)
+                           .where(noticed_events: { record: announcement })
+                           .select(:recipient_id)
+
+    Account.verified.where.not(id: already_notified_ids).find_each do |account|
+      AnnouncementNotifier.with(record: announcement, message: announcement.title).deliver(account)
+    end
+  end
+end
+```
+
+The job is idempotent: it queries already-notified recipients before delivering, so re-runs are safe.
 
 ---
 
@@ -743,7 +806,7 @@ end
 Test interactors in isolation:
 
 ```ruby
-RSpec.describe Announcement::Schedule, type: :interactor do
+RSpec.describe Announcements::Schedule, type: :interactor do
   let(:announcement) { create(:announcement, :draft, scheduled_at: 1.hour.from_now) }
 
   describe ".call" do

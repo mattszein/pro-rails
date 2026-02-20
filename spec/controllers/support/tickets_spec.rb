@@ -262,58 +262,6 @@ RSpec.describe Support::TicketsController, type: :controller do
     end
   end
 
-  describe "DELETE #destroy" do
-    subject { delete :destroy, params: {id: ticket.id} }
-
-    context "when not logged in" do
-      it "redirects to login" do
-        expect(subject).to redirect_to(rodauth.login_path)
-      end
-
-      it "does not destroy the ticket" do
-        ticket # create it
-        expect { subject }.not_to change(Support::Ticket, :count)
-      end
-    end
-
-    context "when logged in as ticket creator" do
-      before { login_user(creator_account) }
-
-      it "is authorized" do
-        expect { subject }.to be_authorized_to(:destroy?, ticket).with(Support::TicketPolicy).with_context(user: creator_account)
-      end
-
-      it "destroys the ticket" do
-        ticket # create it
-        expect { subject }.to change(Support::Ticket, :count).by(-1)
-      end
-
-      it "redirects to tickets index" do
-        expect(subject).to redirect_to(support_tickets_url)
-      end
-
-      it "sets a flash notice" do
-        subject
-        expect(flash[:notice]).to eq("Ticket was successfully destroyed.")
-      end
-    end
-
-    context "when logged in as other user" do
-      before { login_user(other_account) }
-
-      it "denies access" do
-        subject
-        expect(response).to have_http_status(:redirect)
-        expect(flash[:alert]).to eq(I18n.t("adminit.authorization.unauthorized"))
-      end
-
-      it "does not destroy the ticket" do
-        ticket # create it
-        expect { subject }.not_to change(Support::Ticket, :count)
-      end
-    end
-  end
-
   describe "POST #attach_files" do
     let(:file) { fixture_file_upload("test_file.txt", "image/png") }
 

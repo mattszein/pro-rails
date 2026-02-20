@@ -22,30 +22,11 @@ RSpec.describe Announcements::Publish do
         end
       end
 
-      it "creates a notification for each verified account" do
-        announcement # force creation
-        create_list(:account, 2, :verified)
-        create_list(:account, 1, :unverified)
-        expected_count = Account.verified.count
-
+      it "enqueues BulkAnnouncementNotificationJob" do
         expect { described_class.call(announcement: announcement) }
-          .to change(Noticed::Notification, :count).by(expected_count)
-      end
-
-      it "creates notifications linked to the announcement" do
-        recipient = create(:account, :verified)
-
-        described_class.call(announcement: announcement)
-
-        notification = recipient.notifications.last
-        expect(notification.event.record).to eq(announcement)
-      end
-
-      it "enqueues announcement emails for each recipient" do
-        create_list(:account, 2, :verified)
-
-        expect { described_class.call(announcement: announcement) }
-          .to have_enqueued_job.on_queue("default").at_least(:once)
+          .to have_enqueued_job(BulkAnnouncementNotificationJob)
+          .with(announcement.id)
+          .on_queue("notifications")
       end
     end
 

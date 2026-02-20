@@ -4,12 +4,12 @@ export default class extends Controller {
   static targets = ["button", "panel", "list", "badge", "badgeWrapper"]
 
   connect() {
-
     this.boundClickOutside = this.handleClickOutside.bind(this)
     this.boundStreamEvent = this.handleStream.bind(this)
+    this.boundHandleRead = this.handleRead.bind(this)
     document.addEventListener("click", this.boundClickOutside)
     document.addEventListener("turbo:before-stream-render", this.boundStreamEvent)
-    this.element.addEventListener('notifications--item-component:read', this.handleRead.bind(this))
+    this.element.addEventListener('notifications--item-component:read', this.boundHandleRead)
   }
 
   disconnect() {
@@ -62,8 +62,7 @@ export default class extends Controller {
   }
 
   handleRead(event) {
-    console.log("handleRead is executed, going to update badge")
-    const count = Math.max(0, parseInt(this.badgeTarget.textContent || "0") - 1)
+    const count = parseInt(this.badgeTarget.textContent || "0") - 1
     this.badgeTarget.textContent = count
     if (count === 0) this.badgeWrapperTarget.classList.add("hidden")
   }

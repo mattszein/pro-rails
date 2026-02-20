@@ -5,10 +5,8 @@ module Announcements
     delegate :announcement, to: :context
 
     def call
-      ActiveRecord::Base.transaction do
-        announcement.schedule!
-        enqueue_publish_job
-      end
+      announcement.schedule!
+      enqueue_publish_job
     rescue Announcement::InvalidTransition, ActiveRecord::RecordInvalid => e
       context.fail!(error: e.message)
     end
