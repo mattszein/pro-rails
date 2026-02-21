@@ -28,8 +28,8 @@ class Adminit::TicketsController < Adminit::ApplicationController
         format.html { redirect_to adminit_ticket_url(@ticket), notice: "Ticket was successfully updated." }
         format.json { render :show, status: :ok, location: @ticket }
       else
-        format.turbo_stream { render turbo_stream: turbo_stream.replace("ticket_form", partial: "adminit/tickets/form", locals: {ticket: @ticket}), status: :unprocessable_entity }
-        format.json { render json: @ticket.errors, status: :unprocessable_entity }
+        format.turbo_stream { render turbo_stream: turbo_stream.replace("ticket_form", partial: "adminit/tickets/form", locals: {ticket: @ticket}), status: :unprocessable_content }
+        format.json { render json: @ticket.errors, status: :unprocessable_content }
       end
     end
   end
@@ -54,9 +54,9 @@ class Adminit::TicketsController < Adminit::ApplicationController
         format.html { redirect_to adminit_ticket_path(@ticket), notice: "Ticket was successfully assigned to you." }
         format.json { render :show, status: :ok, location: @ticket }
       else
-        format.turbo_stream { render turbo_stream: turbo_stream.replace(dom_id(@ticket, "admin"), partial: "adminit/tickets/ticket_table", locals: {ticket: @ticket}), status: :unprocessable_entity }
+        format.turbo_stream { render turbo_stream: turbo_stream.replace(dom_id(@ticket, "admin"), partial: "adminit/tickets/ticket_table", locals: {ticket: @ticket}), status: :unprocessable_content }
         format.html { redirect_to adminit_tickets_url, alert: "Unable to take this ticket." }
-        format.json { render json: {error: "Unable to take this ticket"}, status: :unprocessable_entity }
+        format.json { render json: {error: "Unable to take this ticket"}, status: :unprocessable_content }
       end
     end
   end
@@ -70,9 +70,9 @@ class Adminit::TicketsController < Adminit::ApplicationController
         format.html { redirect_to adminit_tickets_url, notice: "You have left the ticket." }
         format.json { render :show, status: :ok, location: @ticket }
       else
-        format.turbo_stream { render turbo_stream: turbo_stream.replace(dom_id(@ticket, "admin"), partial: "adminit/tickets/ticket_table", locals: {ticket: @ticket}), status: :unprocessable_entity }
+        format.turbo_stream { render turbo_stream: turbo_stream.replace(dom_id(@ticket, "admin"), partial: "adminit/tickets/ticket_table", locals: {ticket: @ticket}), status: :unprocessable_content }
         format.html { redirect_to adminit_tickets_url, alert: "Unable to leave this ticket." }
-        format.json { render json: {error: "Unable to leave this ticket"}, status: :unprocessable_entity }
+        format.json { render json: {error: "Unable to leave this ticket"}, status: :unprocessable_content }
       end
     end
   end

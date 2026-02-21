@@ -5,6 +5,27 @@ RSpec.describe Support::TicketPolicy, type: :policy do
   let(:other_account) { create(:account, :verified) }
   let(:ticket) { create(:ticket, created: creator_account) }
 
+  describe "#index?" do
+    it "allows when user is present" do
+      policy = described_class.new(:ticket, user: creator_account)
+      expect(policy).to be_index
+    end
+  end
+
+  describe "#new?" do
+    it "allows when user is present" do
+      policy = described_class.new(:ticket, user: creator_account)
+      expect(policy).to be_new
+    end
+  end
+
+  describe "#create?" do
+    it "allows when user is present" do
+      policy = described_class.new(:ticket, user: creator_account)
+      expect(policy).to be_create
+    end
+  end
+
   describe "#show?" do
     context "when user is the creator" do
       let(:policy) { described_class.new(ticket, user: creator_account) }

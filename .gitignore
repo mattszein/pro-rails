@@ -40,3 +40,9 @@
 /config/credentials/local.*
 
 /vendor/javascript/*
+
+# Ignore temporary Docker files
+Dockerfile.backup
+Dockerfile.simple
+Dockerfile.test
+docker-compose.override.yml

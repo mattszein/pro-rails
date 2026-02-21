@@ -29,11 +29,6 @@ module Support
         partial: "adminit/tickets/ticket_row"
     end
 
-    after_destroy_commit do
-      broadcast_remove_later_to "admin_tickets",
-        target: dom_id(self, "admin")
-    end
-
     after_update_commit do |ticket|
       # For the individual show page
       broadcast_replace_later_to ActionView::RecordIdentifier.dom_id(ticket, "admin"),

@@ -1,4 +1,5 @@
-// app/javascript/cable.js
 import { createCable } from "@anycable/web";
 
-export default createCable();
+export default createCable({
+  protocol: 'actioncable-v1-ext-json',
+});

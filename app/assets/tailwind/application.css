@@ -63,6 +63,10 @@
   td {
     color: var(--color-text-body); /* Dynamic */
   }
+
+  label {
+    color: var(--color-text-body); /* Dynamic */
+  }
 }
 
 @import "./themes/default.css";

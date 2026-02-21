@@ -1,0 +1,7 @@
+<%= turbo_frame_tag "main_notifications" do %>
+  <%= render Notifications::MainNotificationComponent.new(
+        notifications: @notifications,
+        unread_count: @unread_count,
+        current_account_id: current_account.id
+      ) %>
+<% end %>

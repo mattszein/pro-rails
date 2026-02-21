@@ -2,6 +2,18 @@
 
 module Support
   class TicketPolicy < ApplicationPolicy
+    def index?
+      user.present?
+    end
+
+    def new?
+      user.present?
+    end
+
+    def create?
+      user.present?
+    end
+
     # Users can only view their own tickets
     def show?
       record.created_id == user.id
