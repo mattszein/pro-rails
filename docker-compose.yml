@@ -139,7 +139,7 @@ services:
       ANYCABLE_TURBO_STREAMS: true
       ANYCABLE_SECRET: anycable_key
       ANYCABLE_JWT_ID_KEY: anycable_key
-      ANYCABLE_BROADCAST_ADAPTER: "redis"
+      ANYCABLE_BROADCAST_ADAPTER: "redisx"
       ANYCABLE_BROKER: "memory"
       ANYCABLE_REDIS_CHANNEL: __anycable__
     depends_on:

@@ -7,15 +7,19 @@ export default class extends Controller {
     this.boundClickOutside = this.handleClickOutside.bind(this)
     this.boundStreamEvent = this.handleStream.bind(this)
     this.boundHandleRead = this.handleRead.bind(this)
+    this.boundChannelMessage = this.handleChannelMessage.bind(this)
     document.addEventListener("click", this.boundClickOutside)
     document.addEventListener("turbo:before-stream-render", this.boundStreamEvent)
     this.element.addEventListener('notifications--item-component:read', this.boundHandleRead)
+    this.channel = new BroadcastChannel("notifications")
+    this.channel.onmessage = this.boundChannelMessage
   }
 
   disconnect() {
     document.removeEventListener("click", this.boundClickOutside)
     document.removeEventListener("turbo:before-stream-render", this.boundStreamEvent)
     this.element.removeEventListener('notifications--item-component:read', this.boundHandleRead)
+    this.channel.close()
   }
 
   handleStream(event) {
@@ -62,6 +66,18 @@ export default class extends Controller {
   }
 
   handleRead(event) {
+    this.decrementBadge()
+    this.channel.postMessage({ type: "read", notificationId: event.detail.notificationId })
+  }
+
+  handleChannelMessage(event) {
+    if (event.data.type !== "read") return
+    this.decrementBadge()
+    const item = this.listTarget.querySelector(`[data-notification-id="${event.data.notificationId}"]`)
+    item?.remove()
+  }
+
+  decrementBadge() {
     const count = parseInt(this.badgeTarget.textContent || "0") - 1
     this.badgeTarget.textContent = count
     if (count === 0) this.badgeWrapperTarget.classList.add("hidden")
