@@ -1,493 +1,141 @@
-# Pro-Rails
+# Pro Rails
 
-A modern Rails 8.0 application showcasing best practices with Hotwire, ViewComponent architecture, and a comprehensive role-based access control (RBAC) admin system.
+> ⚠️ Pre-1.0 — actively evolving. Expect breaking changes until the first stable release.
 
-## Table of Contents
+A production-ready Rails 8 starter template built for real-world web products. Not a toy app, not a hello-world scaffold — this is the foundation I use to launch applications that need authentication, role-based access control, real-time features, background jobs, and clean architecture from day one.
 
-- [Tech Stack](#tech-stack)
-- [Development Workflow](#development-workflow)
-- [Architecture Patterns](#architecture-patterns)
-- [Getting Started](#getting-started)
-- [Testing](#testing)
-- [Code Quality](#code-quality)
-- [Deployment](#deployment)
+The goal: skip the weeks of boilerplate setup on every new project and start building what actually matters. Every pattern and feature in this template is a deliberate choice, showing how authentication, authorization, real-time, background jobs, and UI components fit together in a clean, maintainable way. Designed for products with global users in mind, with the architecture decisions already made and working as a reference for how a well-structured Rails app fits together.
 
-## Tech Stack
+---
 
-### Core Framework
+## What's included
 
-**Rails 8.0.2** with PostgreSQL 17 - Ruby 3.4.4
+### Authentication — [Rodauth](https://rodauth.jeremyevans.net/)
 
-### Frontend Stack
+Full auth flow out of the box: multi-phase login, email verification, password reset, magic links, and remember me. Rodauth runs as Rack middleware, entirely separate from Rails, no monkey-patching, no engine magic. This makes it significantly easier to customize: auth logic lives in one explicit configuration file rather than scattered across initializers and overridden controllers.
 
-**Hotwire (Turbo + Stimulus)**
+### Authorization — [ActionPolicy](https://actionpolicy.evilmartians.io/)
 
-- Server-rendered HTML with Turbo Drive, Frames, and Streams
-- Stimulus controllers for interactive components
-- No heavy JavaScript framework needed
+Policy-based authorization and a custom RBAC system for the admin area ("Adminit"). Three-layer protection: account-level gate → controller-level gate → per-action policy. Roles and permissions are stored in the database and fully manageable at runtime.
 
-**TailwindCSS 4.2**
+### Admin Panel — Adminit
 
-- Utility-first CSS framework
-- Custom configuration for component styling
+A built-in admin area with role and permission management, announcement broadcasting, ticket queue management, and account administration. No admin gem, no DSL to learn, no fighting a framework to get the UI you need... it's just Rails! Every feature is plain controllers, views, and policies that you can read, change, and extend like any other part of the app. Add the resources your product actually needs without working around opinionated constraints.
 
-**ViewComponent Architecture**
+### Real-time — [AnyCable](https://anycable.io/) + Hotwire
 
-- Component-based UI development
-- Custom form builder with specialized components
-- Lookbook for component previews (available at `/lookbook` in development)
-- Components organized in `app/components/core/`
+AnyCable replaces Action Cable with a standalone WebSocket server written in Go, backed by Redis pub/sub. It handles far more concurrent connections at far lower memory usage than the Rails-native alternative. Crucially, there is no RPC call back into the Rails process for every message — the Go server handles broadcasting independently, which is what makes it genuinely scalable. JWT authentication is configured for secure stream verification without round-tripping Rails. Turbo Streams and Stimulus handle the frontend reactivity without a JS framework.
 
-**Propshaft**
+### Background Jobs — [Solid Queue](https://github.com/rails/solid-queue)
 
-- Modern asset pipeline replacement for Sprockets
-- Faster and simpler asset handling
+Database-backed job queue powered by PostgreSQL. No Redis needed for jobs, no extra infrastructure to manage. Jobs are visible, inspectable, and transactional.
 
-### Authentication
+### Business Logic — [Interactor](https://github.com/collectiveidea/interactor)
 
-**Rodauth**
+Workflow orchestration lives in interactors, not controllers or models. Each interactor does one thing: coordinates a sequence of steps, triggers side effects (jobs, notifications, external APIs), and returns a success/failure context. Models stay clean, controllers stay thin.
 
-- Flexible authentication framework configured in `app/misc/rodauth_main.rb` and `app/misc/rodauth_app.rb`
-- Email-based authentication with multi-phase login
-- Features: account creation, verification, login/logout, remember me, password reset, password change, login change, account closure, email auth
-- Account statuses: unverified (1), verified (2), closed (3)
-- Current user available as `rodauth.rails_account` or `current_account`
+### UI Components — [ViewComponent](https://viewcomponent.org/)
 
-### Authorization
+A fully custom component library built in-house — no third-party component gem. Core UI components cover the common building blocks: cards, badges, avatars, alerts, modals, and more. A separate set of core form components (inputs, textareas, selects, multi-selects, toggles, checkboxes, code inputs, buttons) is exposed through a custom `FormBuilder` set as the application default, so you get consistent, component-backed forms everywhere without passing any extra options. All components are previewed in development via Lookbook at `/lookbook`.
 
-**ActionPolicy**
+### Notifications — [Noticed](https://github.com/excid3/noticed)
 
-- Policy-based authorization with granular permission control
-- Custom RBAC (Role-Based Access Control) system
-- Resource-based permissions via `Permission` model
-- Adminit admin area with specialized policies in `app/policies/adminit/`
-- Permission checks: `user.role.permissions.exists?(resource: key)`
-- "superadmin" role with elevated privileges
+Multi-channel notification delivery (email + real-time Turbo Stream, and more).
 
-### Configuration Management
+### Frontend — Hotwire + TailwindCSS 4 + Propshaft
 
-**Anyway Config**
+No webpack, no Node build step for the asset pipeline. Propshaft keeps assets simple. TailwindCSS 4 with a clean component-driven structure. Turbo handles page transitions and frame/stream updates. Stimulus for the small JS behaviors that remain.
 
-- Type-safe configuration classes
-- Environment-based settings
-- Configuration files in `config/configs/`
+### Internationalization
 
-### WebSockets
+I18n support wired up from the start, with locale files organized by domain.
+Coming soon.
 
-**AnyCable**
+### Configuration — [Anyway Config](https://github.com/palkan/anyway_config)
 
-- High-performance Action Cable replacement
-- Redis-backed for horizontal scaling
-- Separate WebSocket server for better performance
-- Turbo Streams support enabled
+Typed configuration classes instead of scattered `ENV[]` calls. Loads from environment variables, Rails credentials, or YAML.
 
-### Testing
+### Testing — RSpec + FactoryBot + Capybara/Cuprite
 
-**RSpec** with comprehensive tooling:
+Full test suite with model specs (Shoulda-Matchers), request specs, policy specs, interactor specs, and system tests running against a real Chromium browser via Cuprite. Docker-based CI runs the full suite on every PR.
 
-- FactoryBot for test data generation
-- Shoulda-Matchers for model validation tests
-- Capybara + Cuprite (Chrome headless) for system tests
-- TestProf for test performance analysis
-- ActionPolicy RSpec matchers
-- Custom login helpers for authentication testing
+### Support Tickets
 
-### Code Quality
+A full ticket support system built into the app: users can open tickets, and admins handle them from the admin side. Each ticket has a real-time conversation thread powered by AnyCable and Turbo Streams, so both sides see messages appear instantly without a page reload. Designed as a reference implementation of real-time chat you can adapt or extend.
 
-**Standard Ruby**
+### Appearance & Theming
 
-- Ruby linter based on RuboCop
-- Consistent code style enforcement
+Users can personalize the look of the application to their preference. The app ships with 40 themes and 8 font choices, each with predefined primary and secondary color palettes. The goal is comfort and accessibility giving users meaningful control over their visual experience.
 
-**Brakeman**
+### Code Quality — [RuboCop](https://rubocop.org/) + [Standard](https://github.com/standardrb/standard)
 
-- Security vulnerability scanner
-- Integrated into CI pipeline
+RuboCop with Standard extended. Brakeman scans for security vulnerabilities. ERB templates are kept clean via a `./erb_linter.sh` script that runs both `htmlbeautifier` (to normalize formatting) and `erb_lint` (to catch issues) in one pass. Freezolite auto-adds `frozen_string_literal: true` across the codebase.
 
-## Development Workflow
+---
 
-### Docker-Based Development
+## Architecture
 
-This project uses Docker as the primary development workflow, providing a consistent environment across all development machines.
+This template follows a clear three-layer architecture for business logic:
 
-**Architecture:**
+- **Models** — data integrity, validations, and state transitions only. No side effects.
+- **Interactors** — workflow orchestration and side effects (jobs, notifications, APIs).
+- **Controllers** — HTTP handling and authorization. Thin by design.
 
-- `rails` service: Main Rails application server (port 3000)
-- `db` service: PostgreSQL 17.5 database with health checks
-- `redis` service: Redis 8.2.0 for caching and job queues
-- `ws` service: AnyCable-Go WebSocket server (ports 8080, 8090)
-- `maildev` service: Development mail server with web UI (ports 1025, 8025)
-- `chrome` service: Browserless Chrome for system tests
-- `test_system` service: Dedicated service for running system tests
+See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed patterns, conventions, and decision frameworks.
 
-**Key Features:**
+---
 
-- Persistent volumes for database, gems, cache, and command history
-- Health checks ensuring services start in correct order
-- Hot reloading with volume mounts for live code updates
-- Shared command history across container restarts (bash, irb, psql)
-- Isolated test environment with separate AnyCable instance
+## Roadmap to 1.0
 
-**Volume Persistence:**
+### Setup & documentation
 
-- Database data persists across container restarts
-- Bundler gems cached for faster rebuilds
-- Asset builds and cache preserved
-- Shell history maintained for better developer experience
+- [x] README
+- [ ] Credentials: define defaults and document how to use Rails credentials across environments
+- [ ] Lookbook: update previews to cover all core components and recently added features
+- [ ] Upgrade all gems to latest versions
 
-### Quick Start with Docker
+### Internationalization
 
-```bash
-# Build and start all services
-docker-compose up
+- [ ] Add a second locale (non-English) to validate the i18n setup end-to-end
+- [ ] Replace hardcoded strings across views and mailers with i18n keys
 
-# Run commands in the Rails container
-docker-compose exec rails bash
-docker-compose exec rails bundle exec rails c
-docker-compose exec rails bundle exec rspec
+### Announcements
 
-# View logs
-docker-compose logs -f rails
-docker-compose logs -f ws
+- [ ] Email template for announcement notifications
+- [ ] Rich text support via ActionText
+- [ ] Fix factory traits: `published` trait should not trigger the notification event automatically
+- [ ] RSpec factory for Noticed events: allow customizing the announcement but keep a sensible default
 
-# Stop all services
-docker-compose down
+### Support tickets
 
-# Reset everything (including volumes)
-docker-compose down -v
-```
+- [ ] Expand ticket states beyond `open / in_progress / closed` — add `initial`, `reopened`, and others as needed
 
-## Architecture Patterns
+### Architecture & refactoring
 
-### ViewComponent with Custom Form Builder
+- [ ] Base controller shared between Adminit and Dashboard to reduce duplication
+- [ ] Adminit menu: replace `allowed_to?` iteration in the view with a helper that resolves permitted items for the current user
+- [ ] Permissions: replace string-based controller references with integer enums
+- [ ] Generator: scaffold a new Adminit resource (controller, views, policy, and specs) in one command
+- [ ] Adminit dashboard: analytics, stats, and quick actions — with role-specific views per role
 
-Pro-Rails uses a component-based architecture for all UI elements. The `CustomFormBuilder` extends `ViewComponent::Form::Builder` to provide a consistent, reusable component library.
+## Roadmap to 2.0
 
-**Available Form Components:**
+-### Payments & subscriptions
 
-- `form.text_field`, `form.password_field`, `form.number_field` → MaterialInput component
-- `form.text_area` → TextArea component
-- `form.button` → Button component (supports theme, size, fullw options)
-- `form.toggle`, `form.check_box` → Toggle/CheckBox components
-- `form.labeled` → Labeled wrapper component
-- `form.code` → Code input component
-- `form.counter` → Counter component
+- [ ] Plans model and subscription management
+- [ ] Stripe integration (charges, webhooks, billing portal)
 
-**Example:**
-
-```erb
-<%= form_with model: @user, builder: CustomFormBuilder do |form| %>
-  <%= form.text_field :email, label: "Email Address" %>
-  <%= form.password_field :password, label: "Password" %>
-  <%= form.button "Sign In", theme: :primary %>
-<% end %>
-```
-
-Components are organized in `app/components/core/` with corresponding CSS and JavaScript in component directories. All components are autoloaded and can be previewed in Lookbook during development.
-
-### RBAC Admin System (Adminit)
-
-Adminit is a custom admin area with fine-grained role-based access control.
-
-**Structure:**
-
-- Routes: `/adminit` (see `config/routes/adminit.rb`)
-- Base controller: `Adminit::ApplicationController` with authorization checks
-- Manages: accounts, tickets, roles, permissions
-
-**Authorization Flow:**
-
-1. Account must have a role assigned to access Adminit (`Account#adminit_access?`)
-2. Role has many permissions via `permissions_roles` join table
-3. Permission resources identified by policy class (e.g., `:"Adminit::ApplicationPolicy"`)
-4. Controllers use `authorize!` to check permissions
-5. Views use `allowed_to?` for conditional rendering
-
-**Models:**
-
-- `Account`: User model with Rodauth integration, belongs_to role
-- `Role`: has_many accounts, has_and_belongs_to_many permissions
-- `Permission`: has_and_belongs_to_many roles, resource-based authorization
-
-### Hotwire Integration
-
-**Stimulus Controllers:** Progressive JavaScript enhancement
-
-- Controllers in `app/javascript/controllers/`
-- Automatically connected via Stimulus
-- Used for interactive components
-
-### AnyCable WebSockets
-
-AnyCable replaces default Action Cable for better performance and scalability.
-
-**Key Benefits:**
-
-- Language-agnostic WebSocket server (written in Go)
-- Better performance under high concurrent connections
-- Horizontal scaling with Redis backend
-- Compatible with Action Cable API
-
-**Configuration:**
-
-- Rails integration: `config/cable.yml`
-- Redis channel: `__anycable__`
-- Turbo Streams enabled by default
-
-### Configuration with Anyway Config
-
-Type-safe configuration management using the Anyway Config pattern.
-
-**Example:**
-
-```ruby
-class ApplicationConfig < Anyway::Config
-  attr_config :feature_flag, :max_uploads
-
-  required :feature_flag
-end
-
-# Usage
-ApplicationConfig.new.feature_flag
-```
-
-Configuration classes in `config/configs/` provide environment-based settings with validation and defaults.
-
-## Getting Started
-
-### Prerequisites
-
-**With Docker (Recommended):**
-
-- Docker Desktop or Docker Engine + Docker Compose
-- No Ruby, PostgreSQL, or Redis installation needed
-
-**Without Docker:**
-
-- Ruby 3.4.4
-- PostgreSQL 17+
-- Redis 8.2+
-
-### Installation
-
-**Docker Setup:**
-
-```bash
-# Clone the repository
-git clone <repository-url>
-cd pro-rails
-
-# Build and start services
-docker-compose up -d
-
-# Setup database
-docker-compose exec rails bin/rails db:prepare
-docker-compose exec rails bin/rails db:seed
-
-# Application available at http://localhost:3000
-# Maildev UI at http://localhost:8025
-```
-
-**Local Setup:**
-
-```bash
-# Clone the repository
-git clone <repository-url>
-cd pro-rails
-
-# Install dependencies and setup database
-bin/setup
-
-# Start development server
-bin/dev
-
-# Application available at http://localhost:3000
-```
-
-### Environment Variables
-
-Required environment variables (automatically set in Docker):
-
-- `DB_USERNAME`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`
-- `REDIS_URL`
-- `ANYCABLE_SECRET`, `ANYCABLE_WEBSOCKET_URL`
-- `MAILER_ADDRESS`, `MAILER_PORT` (for email in development)
-
-## Testing
-
-### Running Tests
-
-**In Docker:**
-
-```bash
-# All tests
-docker-compose exec rails bundle exec rspec
-
-# Specific file
-docker-compose exec rails bundle exec rspec spec/models/account_spec.rb
-
-# Specific test
-docker-compose exec rails bundle exec rspec spec/models/account_spec.rb:10
-
-# Exclude system tests
-docker-compose exec rails bundle exec rspec --tag ~type:system
-
-# System tests (uses dedicated service)
-docker-compose run test_system
-```
-
-**Locally:**
-
-```bash
-# All tests
-bundle exec rspec
-
-# Specific file
-bundle exec rspec spec/models/account_spec.rb
-
-# Specific test
-bundle exec rspec spec/models/account_spec.rb:10
-
-# Exclude system tests (faster, used in CI)
-bundle exec rspec --tag ~type:system
-```
-
-### Test Database
-
-**Docker:**
-
-```bash
-docker-compose exec rails bin/rails db:test:prepare
-```
-
-**Local:**
-
-```bash
-bin/rails db:test:prepare
-```
-
-### Test Helpers
-
-**Authentication Helpers:**
-
-```ruby
-# In request specs
-RSpec.describe "Conversations", type: :request do
-  include LoginHelpers::Request
-
-  let(:account) { create(:account, :verified) }
-
-  before { rodauth_login(account) }
-
-  it "allows access" do
-    get conversations_path
-    expect(response).to have_http_status(:success)
-  end
-end
-
-# In controller specs
-RSpec.describe ConversationsController, type: :controller do
-  include LoginHelpers::Controller
-
-  let(:account) { create(:account, :verified) }
-
-  before { rodauth_login(account) }
-
-  it "loads conversations" do
-    get :index
-    expect(response).to have_http_status(:success)
-  end
-end
-```
-
-## Code Quality
-
-### Linting
-
-**Docker:**
-
-```bash
-# Run linter
-docker-compose exec rails bin/rubocop
-
-# Auto-fix issues
-docker-compose exec rails bin/rubocop -a
-
-# Lint ERB templates
-docker-compose exec rails ./erb_linter.sh
-```
-
-**Local:**
-
-```bash
-bin/rubocop
-bin/rubocop -a
-./erb_linter.sh
-```
-
-### Security Scanning
-
-**Docker:**
-
-```bash
-# Brakeman security scan
-docker-compose exec rails bin/brakeman
-
-# JavaScript dependency audit
-docker-compose exec rails bin/importmap audit
-```
-
-**Local:**
-
-```bash
-bin/brakeman
-bin/importmap audit
-```
-
-## Deployment
-
-### CI/CD Pipeline
-
-GitHub Actions runs four jobs on pull requests and main branch:
-
-1. **scan_ruby**: Brakeman security scan
-2. **scan_js**: JavaScript dependency audit
-3. **lint**: Ruby code linting with Standard
-4. **test**: Full RSpec test suite
-
-**CI Services:**
-
-- PostgreSQL 17
-- Redis 8.2
-- AnyCable-Go for WebSocket tests
-
-### Production Considerations
-
-- Ensure `SECRET_KEY_BASE` is set securely
-- Configure production database credentials
-- Set up Redis for caching and job processing
-- Deploy AnyCable-Go WebSocket server separately
-- Configure SSL/TLS for secure WebSocket connections
-- Set appropriate `RAILS_ENV=production`
-- Precompile assets: `bin/rails assets:precompile`
-- Run migrations: `bin/rails db:migrate`
-
-### Docker Production Build
-
-The Dockerfile uses multi-stage builds optimized for production:
-
-- Base image: Ruby 3.4.4 on Debian Bookworm
-- PostgreSQL 17 client libraries
-- Jemalloc for better memory management
-- libvips for image processing
+--
 
 ## Contributing
 
-1. Follow the existing code patterns and architecture
+1. Follow the existing code patterns and architecture (see [ARCHITECTURE.md](ARCHITECTURE.md))
 2. Write tests for new features
-3. Run linter and fix any issues before committing
-4. Ensure all tests pass
+3. Run the linter and fix any issues before committing (`bin/rubocop -a`)
+4. Ensure all tests pass (`bundle exec rspec`)
 5. Update documentation for significant changes
+
+---
 
 ## License
 
