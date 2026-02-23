@@ -4,8 +4,9 @@ class NotificationsController < DashboardController
 
   def index
     authorize! :notification
-    @notifications = current_account.notifications_feed
+    @pagy, @notifications = pagy_countless(current_account.notifications_feed, limit: 4)
     @unread_count = current_account.unread_notifications_count
+    render partial: "notifications/page", formats: [:html], layout: false if turbo_frame_request?
   end
 
   def user

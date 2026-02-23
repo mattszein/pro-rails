@@ -1,5 +1,5 @@
-<%= render(Core::CardComponent.new) do %>
-  <div class="divide-y divide-gray-100 dark:divide-gray-800">
+<%= turbo_frame_tag "notifications_page_#{@pagy.page}" do %>
+  <div class="divide-y divide-gray-100 dark:divide-gray-800 border-t border-gray-100 dark:border-gray-800">
     <% @notifications.each do |notification| %>
       <%= render Notifications::ItemComponent.new(notification: notification) %>
     <% end %>

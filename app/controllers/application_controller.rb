@@ -3,6 +3,7 @@ class ApplicationController < ActionController::Base
   allow_browser versions: :modern
   default_form_builder CustomFormBuilder
 
+  include Pagy::Backend
   include ErrorResponseActions
   include ActionPolicyHandler
   include RecordNotFoundHandler
