@@ -111,4 +111,6 @@ Rails.application.configure do
       AnyCable.logger.level = Logger::DEBUG
     end
   end
+  MissionControl::Jobs.http_basic_auth_user = "dev"
+  MissionControl::Jobs.http_basic_auth_password = "secret"
 end

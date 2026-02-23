@@ -17,7 +17,7 @@ class Adminit::AnnouncementsController < Adminit::ApplicationController
 
   def edit
     unless @announcement.editable?
-      respond_error("Cannot edit a published announcement.")
+      respond_error("Cannot edit this announcement.")
     end
   end
 
@@ -26,7 +26,7 @@ class Adminit::AnnouncementsController < Adminit::ApplicationController
     @announcement = Announcement.new(announcement_params)
     @announcement.author = current_account
     if @announcement.save
-      respond_success("Announcement was successfully created.", adminit_announcement_path(@announcement))
+      respond_success(resource_message(:created, @announcement), adminit_announcement_path(@announcement))
     else
       respond_form_error(:new)
     end
@@ -36,7 +36,7 @@ class Adminit::AnnouncementsController < Adminit::ApplicationController
     authorize! @announcement
 
     if @announcement.update(announcement_params)
-      respond_success("Announcement was successfully updated.", adminit_announcement_path(@announcement))
+      respond_success(resource_message(:updated, @announcement), adminit_announcement_path(@announcement))
     else
       respond_form_error(:edit)
     end
@@ -65,7 +65,7 @@ class Adminit::AnnouncementsController < Adminit::ApplicationController
 
   def destroy
     if @announcement.destroy
-      respond_success("Announcement was successfully deleted.", adminit_announcements_path)
+      respond_success(resource_message(:deleted, @announcement), adminit_announcements_path)
     else
       respond_error(@announcement.errors.full_messages.to_sentence)
     end
@@ -85,7 +85,10 @@ class Adminit::AnnouncementsController < Adminit::ApplicationController
   def respond_success(message, path)
     respond_to do |format|
       format.html { redirect_to path, notice: message }
-      format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, path) }
+      format.turbo_stream do
+        flash[:notice] = message
+        render turbo_stream: turbo_stream.action(:redirect, path)
+      end
       format.json { render :show, status: :ok, location: @announcement }
     end
   end
@@ -93,7 +96,10 @@ class Adminit::AnnouncementsController < Adminit::ApplicationController
   def respond_error(message)
     respond_to do |format|
       format.html { redirect_back fallback_location: adminit_announcements_path, alert: message }
-      format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, request.referer || adminit_announcements_path) }
+      format.turbo_stream do
+        flash[:alert] = message
+        render turbo_stream: turbo_stream.action(:redirect, request.referer || adminit_announcements_path)
+      end
       format.json { render json: @announcement.errors, status: :unprocessable_content }
     end
   end
