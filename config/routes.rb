@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", :as => :rails_health_check
+  mount MissionControl::Jobs::Engine, at: "/jobs"
 
   root "application#index"
   draw :adminit
@@ -12,9 +13,20 @@ Rails.application.routes.draw do
   end
 
   get "dashboard" => "dashboard#index", :as => :dashboard
+  resources :notifications, only: [:index, :show] do
+    collection do
+      post :mark_all_read
+      get :user
+    end
+    member do
+      post :mark_as_read
+    end
+  end
+
+  resources :announcements, only: [:show]
 
   namespace :support do
-    resources :tickets do
+    resources :tickets, except: [:destroy] do
       member do
         post :attach_files
       end

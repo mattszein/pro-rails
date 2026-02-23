@@ -1,0 +1,22 @@
+<div
+  class="<%= html_class %> hidden pointer-events-auto"
+  data-controller="core--toast-component"
+  data-core--toast-component-target="toast"
+  data-duration="4000"
+  data-role="toast">
+  <div class="<%= icon_container_class %>">
+    <%= helpers.icon(icon_name, classes: "w-6 h-6") %>
+  </div>
+  <div class="flex-1 min-w-0">
+    <p class="text-sm font-semibold text-slate-900 dark:text-white" data-role="title"><%= title %></p>
+    <p class="text-sm text-slate-600 dark:text-slate-400 mt-0.5" data-role="subtitle"><%= message %></p>
+  </div>
+  <button
+    type="button"
+    data-action="click->core--toast-component#dismiss"
+    class="text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
+    aria-label="Close">
+    <span class="sr-only">Close</span>
+    <%= helpers.icon("x", classes: "w-5 h-5") %>
+  </button>
+</div>

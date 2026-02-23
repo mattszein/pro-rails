@@ -1,0 +1,6 @@
+<%= render(Core::CardComponent.new) do %>
+  <h1 class=""><%= @announcement.title %></h1>
+  <p class="py-3">
+    <%= @announcement.body %>
+  </p>
+<% end %>

@@ -47,6 +47,10 @@ Permission.find_or_create_by!(resource: Adminit::RolePolicy.identifier) do |perm
   permission.roles = [role_superadmin]
 end
 
+Permission.find_or_create_by!(resource: Adminit::AnnouncementPolicy.identifier) do |permission|
+  permission.roles = [role_superadmin]
+end
+
 Permission.find_or_create_by!(resource: Adminit::PermissionPolicy.identifier) do |permission|
   permission.roles = [role_superadmin]
 end

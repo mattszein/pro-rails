@@ -1,7 +1,7 @@
 module Adminit
   class ApplicationController < ActionController::Base
     default_form_builder CustomFormBuilder
-
+    include LocaleMessages
     include ActionPolicyHandler
 
     before_action :authorize_adminit_access

@@ -9,7 +9,6 @@ export default class extends Controller {
   // hide modal on successful form submission
   submitEnd(element) {
     if (element.detail.success) {
-      console.log("success")
       this.closeModal()
     }
   }

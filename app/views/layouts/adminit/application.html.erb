@@ -22,7 +22,8 @@
     <link rel="apple-touch-icon" href="/icon.png">
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
-    <%= action_cable_with_jwt_meta_tag %>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/air-datepicker@3.6.0/air-datepicker.min.css">
+    <%= action_cable_with_jwt_meta_tag(current_user: current_account) if current_account %>
     <%= javascript_importmap_tags %>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -34,18 +35,26 @@
 
   </head>
   <body class="min-h-screen bg-indigo-50 dark:bg-black">
+
+    <div class="flex pt-4 pr-4 justify-end">
+    <%= turbo_frame_tag :main_notifications, src: user_notifications_path, loading: :lazy, data: {turbo_permanent: true} do %>
+      <div class="relative p-2.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-200 hover:outline-none hover:ring-2 hover:ring-primary-200 text-primary-400" aria-label="Notifications" aria-expanded="false">
+          <%= icon("bell", classes: "w-7 h-7 animate-pulse") %>
+          <span class="absolute top-0 right-0 flex h-6 w-6">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-50"></span>
+          </span>
+        </div>
+      <% end %>
+      </div>
     <div class="md:flex w-full min-h-screen z-30">
       <%= render(Core::SidebarComponent.new(open: false, title: "RailsApp | Menu")) do %>
         <%= render "navigation" %>
       <% end %>
-      <main class="flex-grow pt-16 px-8 overflow-x-scroll" role="main">
+      <main class="grow pt-16 px-8 overflow-x-scroll" role="main">
         <%= turbo_frame_tag "modal", target: "_top" %>
         <%= yield %>
       </main>
-
-      <div id="flashes_id">
-        <%= render "shared/flashes" %>
-      </div>
+      <%= render "shared/flashes" %>
     </div>
   </body>
 </html>

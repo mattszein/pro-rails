@@ -63,6 +63,9 @@ Rails.application.configure do
   # Highlight code that enqueued background job in logs.
   config.active_job.verbose_enqueue_logs = true
 
+  config.active_job.queue_adapter = :solid_queue
+  config.solid_queue.connects_to = {database: {writing: :queue}}
+
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true
 
@@ -94,4 +97,20 @@ Rails.application.configure do
 
   config.importmap.cache_sweepers << Rails.root.join("app/components")
   config.turbo.signed_stream_verifier_key = ENV.fetch("ANYCABLE_SECRET", "anycable_key")
+
+  if ENV["RAILS_LOG_TO_STDOUT"].present?
+    logger = ActiveSupport::Logger.new($stdout)
+    logger.formatter = config.log_formatter
+    config.logger = ActiveSupport::TaggedLogging.new(logger)
+  end
+
+  # After other configs
+  config.after_initialize do
+    if defined?(AnyCable)
+      AnyCable.logger = Rails.logger
+      AnyCable.logger.level = Logger::DEBUG
+    end
+  end
+  MissionControl::Jobs.http_basic_auth_user = "dev"
+  MissionControl::Jobs.http_basic_auth_password = "secret"
 end

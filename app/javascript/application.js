@@ -6,4 +6,4 @@ import "@hotwired/turbo";
 import { start } from "@anycable/turbo-stream";
 import cable from "cable";
 
-start(cable);
+start(cable, { requestSocketIDHeader: true })

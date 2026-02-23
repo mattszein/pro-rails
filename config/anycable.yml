@@ -14,15 +14,16 @@ default: &default # Turn on/off access logs ("Started..." and "Finished...")
   # Whether to enable gRPC level logging or not
   log_grpc: true
   # Use HTTP broadcaster
-  broadcast_adapter: redis
+  broadcast_adapter: redisx
   redis_channel: __anycable__
-
   # http_broadcast_url: "http://localhost:8090/_broadcast"
   # Must be the same as in your AnyCable server config
   websocket_url: <%= ENV.fetch("ANYCABLE_WEBSOCKET_URL", "ws://localhost:8080/cable") %>
 
 development:
   <<: *default
+  embedded: false
+  secret: <%= ENV.fetch("ANYCABLE_SECRET") %>
 
 test:
   <<: *default

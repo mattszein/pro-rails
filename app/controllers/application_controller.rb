@@ -6,6 +6,7 @@ class ApplicationController < ActionController::Base
   include ErrorResponseActions
   include ActionPolicyHandler
   include RecordNotFoundHandler
+  include LocaleMessages
 
   def index
   end
