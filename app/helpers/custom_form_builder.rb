@@ -25,15 +25,11 @@ class CustomFormBuilder < ActionView::Helpers::FormBuilder
   end
 
   def select(method, choices = nil, options = {}, html_options = {}, &block)
-    default_classes = "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-    html_options[:class] = [default_classes, html_options[:class]].compact.join(" ")
-    super
+    render_component("form::Select", @object_name, method, choices, options, html_options)
   end
 
   def multi_select(method, choices = nil, options = {}, html_options = {}, &block)
-    html_options[:multiple] = true
-    original_select = ActionView::Helpers::FormBuilder.instance_method(:select)
-    original_select.bind_call(self, method, choices, options, html_options, &block)
+    render_component("form::Select", @object_name, method, choices, options, html_options.merge(multiple: true))
   end
 
   def text_area(method, options = {})
