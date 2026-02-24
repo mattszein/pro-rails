@@ -6,8 +6,6 @@ A production-ready Rails 8 starter template built for real-world web products. N
 
 The goal: skip the weeks of boilerplate setup on every new project and start building what actually matters. Every pattern and feature in this template is a deliberate choice, showing how authentication, authorization, real-time, background jobs, and UI components fit together in a clean, maintainable way. Designed for products with global users in mind, with the architecture decisions already made and working as a reference for how a well-structured Rails app fits together.
 
----
-
 ## What's included
 
 ### Authentication — [Rodauth](https://rodauth.jeremyevans.net/)
@@ -28,9 +26,9 @@ AnyCable replaces Action Cable with a standalone WebSocket server written in Go,
 
 ### Background Jobs — [Solid Queue](https://github.com/rails/solid-queue)
 
-Database-backed job queue powered by PostgreSQL. No Redis needed for jobs, no extra infrastructure to manage. Jobs are visible, inspectable, and transactional.
+Database-backed job queue powered by PostgreSQL. No Redis needed for jobs. Jobs are visible, inspectable, and transactional. Mission Control provides a web UI to monitor, retry, and manage jobs.
 
-### Business Logic — [Interactor](https://github.com/collectiveidea/interactor)
+### Workflow Logic — [Interactor](https://github.com/collectiveidea/interactor)
 
 Workflow orchestration lives in interactors, not controllers or models. Each interactor does one thing: coordinates a sequence of steps, triggers side effects (jobs, notifications, external APIs), and returns a success/failure context. Models stay clean, controllers stay thin.
 
@@ -57,7 +55,7 @@ Typed configuration classes instead of scattered `ENV[]` calls. Loads from envir
 
 ### Testing — RSpec + FactoryBot + Capybara/Cuprite
 
-Full test suite with model specs (Shoulda-Matchers), request specs, policy specs, interactor specs, and system tests running against a real Chromium browser via Cuprite. Docker-based CI runs the full suite on every PR.
+Full test suite with model specs (Shoulda-Matchers), request specs, policy specs, interactor specs, and system tests running against a real Chromium browser via Cuprite.
 
 ### Support Tickets
 
@@ -74,12 +72,6 @@ RuboCop with Standard extended. Brakeman scans for security vulnerabilities. ERB
 ---
 
 ## Architecture
-
-This template follows a clear three-layer architecture for business logic:
-
-- **Models** — data integrity, validations, and state transitions only. No side effects.
-- **Interactors** — workflow orchestration and side effects (jobs, notifications, APIs).
-- **Controllers** — HTTP handling and authorization. Thin by design.
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed patterns, conventions, and decision frameworks.
 
@@ -103,8 +95,8 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed patterns, conventions, and d
 
 - [ ] Email template for announcement notifications
 - [ ] Rich text support via ActionText
-- [ ] Fix factory traits: `published` trait should not trigger the notification event automatically
-- [ ] RSpec factory for Noticed events: allow customizing the announcement but keep a sensible default
+- [ ] `published` trait in the factory (spec) should have the associated Noticed event attached, reflecting real production state
+- [ ] Noticed event factory should support other notifier types beyond AnnouncementNotifier
 
 ### Support tickets
 
@@ -116,7 +108,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed patterns, conventions, and d
 - [ ] Adminit menu: replace `allowed_to?` iteration in the view with a helper that resolves permitted items for the current user
 - [ ] Permissions: replace string-based controller references with integer enums
 - [ ] Generator: scaffold a new Adminit resource (controller, views, policy, and specs) in one command
-- [ ] Adminit dashboard: analytics, stats, and quick actions — with role-specific views per role
+- [ ] Adminit dashboard: analytics, stats, and quick actions, with role-specific views per role
 
 ## Roadmap to 2.0
 
