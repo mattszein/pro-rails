@@ -2,7 +2,7 @@
 
 > ⚠️ Pre-1.0 — actively evolving. Expect breaking changes until the first stable release.
 
-A production-ready Rails 8 starter template built for real-world web products. Not a toy app, not a hello-world scaffold — this is the foundation I use to launch applications that need authentication, role-based access control, real-time features, background jobs, and clean architecture from day one.
+A production-ready Rails 8 starter template built for real-world web products. This is the foundation I use to launch applications that need authentication, role-based access control, real-time features, background jobs, and clean architecture from day one.
 
 The goal: skip the weeks of boilerplate setup on every new project and start building what actually matters. Every pattern and feature in this template is a deliberate choice, showing how authentication, authorization, real-time, background jobs, and UI components fit together in a clean, maintainable way. Designed for products with global users in mind, with the architecture decisions already made and working as a reference for how a well-structured Rails app fits together.
 
@@ -10,7 +10,7 @@ The goal: skip the weeks of boilerplate setup on every new project and start bui
 
 ### Authentication — [Rodauth](https://rodauth.jeremyevans.net/)
 
-Full auth flow out of the box: multi-phase login, email verification, password reset, magic links, and remember me. Rodauth runs as Rack middleware, entirely separate from Rails, no monkey-patching, no engine magic. This makes it significantly easier to customize: auth logic lives in one explicit configuration file rather than scattered across initializers and overridden controllers.
+Full auth flow out of the box: multi-phase login, email verification, password reset, magic links, and remember me. Rodauth runs as Rack middleware, entirely separate from Rails, no monkey-patching, no engine magic.
 
 ### Authorization — [ActionPolicy](https://actionpolicy.evilmartians.io/)
 
@@ -22,7 +22,7 @@ A built-in admin area with role and permission management, announcement broadcas
 
 ### Real-time — [AnyCable](https://anycable.io/) + Hotwire
 
-AnyCable replaces Action Cable with a standalone WebSocket server written in Go, backed by Redis pub/sub. It handles far more concurrent connections at far lower memory usage than the Rails-native alternative. Crucially, there is no RPC call back into the Rails process for every message — the Go server handles broadcasting independently, which is what makes it genuinely scalable. JWT authentication is configured for secure stream verification without round-tripping Rails. Turbo Streams and Stimulus handle the frontend reactivity without a JS framework.
+AnyCable replaces Action Cable with a standalone WebSocket server written in Go, backed by Redis pub/sub. It handles far more concurrent connections at far lower memory usage than the Rails-native alternative. JWT authentication is configured for secure stream verification without round-tripping Rails. Turbo Streams and Stimulus handle the frontend reactivity without a JS framework.
 
 ### Background Jobs — [Solid Queue](https://github.com/rails/solid-queue)
 
@@ -112,7 +112,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed patterns, conventions, and d
 
 ## Roadmap to 2.0
 
--### Payments & subscriptions
+- Payments & subscriptions
 
 - [ ] Plans model and subscription management
 - [ ] Stripe integration (charges, webhooks, billing portal)
