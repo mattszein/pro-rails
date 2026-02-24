@@ -1,8 +1,5 @@
 # app/helpers/custom_form_builder.rb
-class CustomFormBuilder < ViewComponent::Form::Builder
-  # Set the namespace you want to use for your own components
-  namespace "Core"
-
+class CustomFormBuilder < ActionView::Helpers::FormBuilder
   def button(value = "", style = {theme: :primary, size: :md, fullw: false}, options = {}, &block)
     render_component("form::Button", value, style, options, &block)
   end
@@ -61,5 +58,12 @@ class CustomFormBuilder < ViewComponent::Form::Builder
 
   def date_time(method, options = {})
     render_component("form::DateTime", @object_name, method, objectify_options(options))
+  end
+
+  private
+
+  def render_component(component_path, *args, &block)
+    klass = "Core::#{component_path.to_s.camelize}Component".constantize
+    @template.render(klass.new(self, *args), &block)
   end
 end

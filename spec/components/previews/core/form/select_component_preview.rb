@@ -1,19 +1,25 @@
 class Core::Form::SelectComponentPreview < ViewComponent::Preview
   # @label Default
   def default
-    render ViewComponent::Form::SelectComponent.new(form_builder, "input", "name", options)
+    form = form_builder("input")
+    html = form.select("name", options)
+    html.html_safe
   end
 
   # @!group Multiselect
 
   # @label Default
   def multiselect
-    render ViewComponent::Form::SelectComponent.new(form_builder, "input", "name", options, {}, {class: "h-10", multiple: true, "data-controller": "core--form--select-component"})
+    form = form_builder("input")
+    html = form.multi_select("name", options, {}, {class: "h-10", "data-controller": "core--form--select-component"})
+    html.html_safe
   end
 
   # @label No Empty
   def noempty
-    render ViewComponent::Form::SelectComponent.new(form_builder, "input", "name", options, {selected: [options[0][1]]}, {class: "h-10", multiple: true, "data-controller": "core--form--select-component", "data-core--form--select-component-submit-value": "true", "data-core--form--select-component-allow-empty-value": "false"})
+    form = form_builder("input")
+    html = form.multi_select("name", options, {selected: [options[0][1]]}, {class: "h-10", "data-controller": "core--form--select-component", "data-core--form--select-component-submit-value": "true", "data-core--form--select-component-allow-empty-value": "false"})
+    html.html_safe
   end
 
   # @!endgroup

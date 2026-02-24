@@ -1,5 +1,5 @@
 # app/components/core/form/file_field_component.rb
-class Core::Form::FileFieldComponent < ViewComponent::Form::FieldComponent
+class Core::Form::FileFieldComponent < Core::Form::FieldComponent
   CUSTOM_OPTIONS_DEFAULTS = {
     label: nil,
     helper_text: nil,
@@ -37,6 +37,6 @@ class Core::Form::FileFieldComponent < ViewComponent::Form::FieldComponent
 
   def icon_tag
     return nil unless icon_name
-    @view_context.helpers.icon(icon_name, classes: "w-5 h-5 text-indigo-500")
+    helpers.icon(icon_name, classes: "w-5 h-5 text-indigo-500")
   end
 end

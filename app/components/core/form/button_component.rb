@@ -1,4 +1,4 @@
-class Core::Form::ButtonComponent < ViewComponent::Form::ButtonComponent
+class Core::Form::ButtonComponent < ApplicationViewComponent
   attr_accessor :theme, :size
 
   THEME_MAPPINGS = {
@@ -93,13 +93,19 @@ class Core::Form::ButtonComponent < ViewComponent::Form::ButtonComponent
   }.freeze
 
   def initialize(form, value, style = {}, options = {})
+    @form = form
     default = {theme: :primary, size: :md, fullw: false}
     style_merged = default.merge(style)
     @value = value
     @theme = style_merged[:theme]
     @fullw = style_merged[:fullw]
     @size = style_merged[:size]
-    super(form, value, options)
+    @options = options
+    super()
+  end
+
+  def call
+    helpers.button_tag(@value, @options.merge(class: html_class))
   end
 
   def html_class

@@ -82,10 +82,10 @@ Rails.application.configure do
   # config.generators.apply_rubocop_autocorrect_after_generate!
 
   # View Component configuration
-  config.view_component.preview_paths << "#{root}/spec/components/previews"
-  config.view_component.default_preview_layout = "preview"
-  config.view_component.preview_controller = "PreviewController"
-  config.view_component.show_previews = true
+  config.view_component.previews.paths = ["#{root}/spec/components/previews"]
+  config.view_component.previews.default_layout = "preview"
+  config.view_component.previews.controller = "PreviewController"
+  config.view_component.previews.enabled = true
   config.view_component.generate.stimulus_controller = true
 
   config.lookbook.project_name = "Pro Rails App Template"

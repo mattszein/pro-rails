@@ -1,5 +1,5 @@
 # app/components/core/form/material_input_component.rb
-class Core::Form::MaterialInputComponent < ViewComponent::Form::FieldComponent
+class Core::Form::MaterialInputComponent < Core::Form::FieldComponent
   attr_reader :variant, :theme, :input_type, :placeholder_text, :background_color
 
   VARIANTS = {
