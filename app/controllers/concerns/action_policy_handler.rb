@@ -18,7 +18,7 @@ module ActionPolicyHandler
         end
 
         format.html do
-          redirect_back fallback_location: root_path, alert: msg
+          redirect_back_or_to(root_path, alert: msg)
         end
       end
     end

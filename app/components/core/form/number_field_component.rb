@@ -1,5 +1,7 @@
-# app/components/custom/form/text_field_component.rb
-
-class Core::Form::NumberFieldComponent < ViewComponent::Form::NumberFieldComponent
+class Core::Form::NumberFieldComponent < Core::Form::FieldComponent
   include Core::Form::InputClasses
+
+  def call
+    ActionView::Helpers::Tags::NumberField.new(object_name, method_name, @view_context, options).render
+  end
 end

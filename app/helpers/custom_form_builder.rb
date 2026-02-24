@@ -1,8 +1,5 @@
 # app/helpers/custom_form_builder.rb
-class CustomFormBuilder < ViewComponent::Form::Builder
-  # Set the namespace you want to use for your own components
-  namespace "Core"
-
+class CustomFormBuilder < ActionView::Helpers::FormBuilder
   def button(value = "", style = {theme: :primary, size: :md, fullw: false}, options = {}, &block)
     render_component("form::Button", value, style, options, &block)
   end
@@ -28,15 +25,11 @@ class CustomFormBuilder < ViewComponent::Form::Builder
   end
 
   def select(method, choices = nil, options = {}, html_options = {}, &block)
-    default_classes = "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-    html_options[:class] = [default_classes, html_options[:class]].compact.join(" ")
-    super
+    render_component("form::Select", @object_name, method, choices, options, html_options)
   end
 
   def multi_select(method, choices = nil, options = {}, html_options = {}, &block)
-    html_options[:multiple] = true
-    original_select = ActionView::Helpers::FormBuilder.instance_method(:select)
-    original_select.bind_call(self, method, choices, options, html_options, &block)
+    render_component("form::Select", @object_name, method, choices, options, html_options.merge(multiple: true))
   end
 
   def text_area(method, options = {})
@@ -61,5 +54,12 @@ class CustomFormBuilder < ViewComponent::Form::Builder
 
   def date_time(method, options = {})
     render_component("form::DateTime", @object_name, method, objectify_options(options))
+  end
+
+  private
+
+  def render_component(component_path, *args, &block)
+    klass = "Core::#{component_path.to_s.camelize}Component".constantize
+    @template.render(klass.new(self, *args), &block)
   end
 end

@@ -1,4 +1,4 @@
-class Core::Form::CounterComponent < ViewComponent::Form::FieldComponent
+class Core::Form::CounterComponent < Core::Form::FieldComponent
   attr_accessor :theme
 
   THEMES = {

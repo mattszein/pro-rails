@@ -1,5 +1,6 @@
-class Core::Form::ToggleComponent < ViewComponent::Form::CheckBoxComponent
+class Core::Form::ToggleComponent < Core::Form::FieldComponent
   attr_accessor :theme, :size
+  attr_reader :checked_value, :unchecked_value
 
   THEMES = {
     primary: "peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 peer-checked:bg-primary-600",
@@ -15,11 +16,13 @@ class Core::Form::ToggleComponent < ViewComponent::Form::CheckBoxComponent
   DEFAULT = {theme: :primary, size: :md}.freeze
 
   def initialize(form, object_name, method_name, checked_value, unchecked_value, options = {}) # rubocop:disable Metrics/ParameterLists
+    @checked_value = checked_value
+    @unchecked_value = unchecked_value
     custom_style = options&.delete(:custom_style) || {}
     options_merged = DEFAULT.merge(custom_style)
     @theme = options_merged[:theme]
     @size = options_merged[:size]
-    super
+    super(form, object_name, method_name, options)
   end
 
   def html_class

@@ -2,9 +2,7 @@
   <%= form.text_field :email, {required: true, autofocus: true, placeholder: " ", autocomplete: "email", label: "Email", value: params[rodauth.login_param], aria: ({invalid: true, describedby: "login_error_message"} if rodauth.field_error(rodauth.login_param)), onchange: 'document.getElementById("email") && (document.getElementById("email").value = this.value);'} %>
   <%= error_tag(rodauth.field_error(rodauth.login_param), id: "login_error_message") if rodauth.field_error(rodauth.login_param) %>
   <% if params[rodauth.login_param] %>
-    <%= form.labeled :password, "Password"  do %>
-      <%= form.password_field :password, {required: true, placeholder: " ", value: "", id: "password", autocomplete: rodauth.password_field_autocomplete_value, aria: ({invalid: true, describedby: "password_error_message"} if rodauth.field_error(rodauth.password_param))} %>
-    <% end %>
+    <%= form.password_field :password, {required: true, placeholder: " ", value: "", id: "password", autocomplete: rodauth.password_field_autocomplete_value, aria: ({invalid: true, describedby: "password_error_message"} if rodauth.field_error(rodauth.password_param))} %>
   <% end %>
   <div class="mt-6">
     <%= form.button "Login", {fullw: true} %>

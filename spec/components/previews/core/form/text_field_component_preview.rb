@@ -1,6 +1,4 @@
 class Core::Form::TextFieldComponentPreview < ViewComponent::Preview
-  require "view_component/form/test_helpers"
-
   # Form components are used the same way than basic rails forms.
   #
   # ```erb

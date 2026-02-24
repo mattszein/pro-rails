@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 8.0.2"
+gem "rails", "~> 8.1.2"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
 gem "pg", "~> 1.5"
@@ -23,9 +23,9 @@ gem "jbuilder"
 gem "tzinfo-data", platforms: %i[windows jruby]
 
 # Use the database-backed adapters for Rails.cache, Active Job, and Action Cable
-gem "solid_cache"
+# gem "solid_cache" # Using Redis for caching
 gem "solid_queue"
-gem "solid_cable"
+# gem "solid_cable" # Using AnyCable + Redis
 
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
@@ -41,8 +41,7 @@ gem "image_processing", "~> 1.2"
 
 gem "freezolite" # Freezolite add frozen_string_literals to true to every file in your project
 
-gem "view_component"
-gem "view_component-form"
+gem "view_component", "~> 4.4"
 
 gem "tailwindcss-rails", "~> 4.2"
 gem "inline_svg"

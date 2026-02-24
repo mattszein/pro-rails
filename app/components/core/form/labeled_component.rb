@@ -1,5 +1,6 @@
-class Core::Form::LabeledComponent < ViewComponent::Form::LabelComponent
+class Core::Form::LabeledComponent < Core::Form::FieldComponent
   attr_accessor :theme, :style
+  attr_reader :attribute_content
 
   THEMES = {
     primary: "peer-focus:text-primary-700 peer-focus:dark:text-primary-600",
@@ -14,11 +15,17 @@ class Core::Form::LabeledComponent < ViewComponent::Form::LabelComponent
   DEFAULT = {theme: :primary, style: :default}.freeze
 
   def initialize(form, object_name, method_name, content_or_options = nil, options = nil)
+    if content_or_options.is_a?(Hash)
+      options = content_or_options
+      @attribute_content = nil
+    else
+      @attribute_content = content_or_options
+    end
     custom_style = options&.delete(:custom_style) || {}
     options_merged = DEFAULT.merge(custom_style)
     @theme = options_merged[:theme]
     @style = options_merged[:style]
-    super
+    super(form, object_name, method_name, options || {})
   end
 
   def html_class
