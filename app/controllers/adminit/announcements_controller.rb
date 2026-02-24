@@ -95,7 +95,7 @@ class Adminit::AnnouncementsController < Adminit::ApplicationController
 
   def respond_error(message)
     respond_to do |format|
-      format.html { redirect_back fallback_location: adminit_announcements_path, alert: message }
+      format.html { redirect_back_or_to(adminit_announcements_path, alert: message) }
       format.turbo_stream do
         flash[:alert] = message
         render turbo_stream: turbo_stream.action(:redirect, request.referer || adminit_announcements_path)

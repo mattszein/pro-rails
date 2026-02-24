@@ -1,5 +1,6 @@
 class Core::LinkComponent < ViewComponent::Base
   include ActionView::Helpers::UrlHelper
+
   attr_accessor :style, :theme, :size, :name, :url, :options
 
   STYLE = {default: :default,
