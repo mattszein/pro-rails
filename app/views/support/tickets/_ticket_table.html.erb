@@ -12,11 +12,11 @@
   <% end %>
 
   <%= render Core::TableCellComponent.new do %>
-    <%= render(Core::BadgeComponent.new(ticket.status, options: {custom_style: {theme: ticket_status_theme(ticket.status)}})) %>
+    <%= render(Core::BadgeComponent.new(label: ticket.status, theme: ticket_status_theme(ticket.status))) %>
   <% end %>
 
   <%= render Core::TableCellComponent.new do %>
-    <%= render(Core::LinkComponent.new(name: "Show", url: support_ticket_path(ticket), options: {custom_style: {style: :as_button, theme: :show, size: :xs}})) %>
-    <%= render(Core::LinkComponent.new(name: "Edit", url: edit_support_ticket_path(ticket), options: {data: {turbo_frame: "modal"}, custom_style: {style: :as_button, theme: :edit, size: :xs}})) %>
+    <%= render(Core::LinkComponent.new(name: "Show", url: support_ticket_path(ticket), style: :as_button, theme: :show, size: :xs)) %>
+    <%= render(Core::LinkComponent.new(name: "Edit", url: edit_support_ticket_path(ticket), style: :as_button, theme: :edit, size: :xs, html_options: {data: {turbo_frame: "modal"}})) %>
   <% end %>
 </tr>

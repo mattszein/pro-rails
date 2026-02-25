@@ -13,8 +13,8 @@ module Adminit::TicketsHelper
       {
         label: "Status",
         renderer: ->(ticket) do
-          render(Core::BadgeComponent.new(ticket.status.humanize,
-            options: {custom_style: {theme: ticket_status_theme(ticket.status)}}))
+          render(Core::BadgeComponent.new(label: ticket.status.humanize,
+            theme: ticket_status_theme(ticket.status)))
         end
       },
       {
@@ -32,7 +32,7 @@ module Adminit::TicketsHelper
       {
         label: "Actions",
         renderer: ->(ticket) {
-          render(Core::LinkComponent.new(name: "Show", url: adminit_ticket_path(ticket), options: {data: {turbo_prefetch: false}, custom_style: {style: :as_button, theme: :show, size: :xs}}))
+          render(Core::LinkComponent.new(name: "Show", url: adminit_ticket_path(ticket), style: :as_button, theme: :show, size: :xs, html_options: {data: {turbo_prefetch: false}}))
         }
       }
     ]

@@ -1,7 +1,7 @@
 <span class="<%= html_class %>">
   <%= icon && helpers.icon(icon, {classes: "w-4 h-4 mr-2"}) %>
   <% if indicator %>
-    <div class="<%= class_names("w-2 h-2 rounded-full mr-2", INDICATOR_COLOR[theme]) %>"></div>
+    <div class="<%= indicator_class %>"></div>
   <% end %>
   <%= @label %>
 </span>

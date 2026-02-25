@@ -14,8 +14,8 @@
     <div class="mt-6">
       <%= form.label :category, class: "block text-sm font-medium text-gray-700 mb-2" %>
       <%= form.select :category,
-            Support::Ticket.categories.keys.map { |cat| [cat.humanize, cat] },
-            {},
+            options_for_select(Support::Ticket.categories.keys.map { |cat| [cat.humanize, cat] }, ticket.persisted? ? ticket.category : nil),
+            {include_blank: "Select a category"},
             {required: true, class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"} %>
     </div>
     <div class="mt-6">

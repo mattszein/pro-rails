@@ -2,12 +2,12 @@
   <div class="flex justify-between items-center pb-2">
     <%= link_to "Back to Tickets", adminit_tickets_path, class: "text-indigo-500" %>
 <div class="flex gap-2 items-center px-4">
-    <%= render(Core::LinkComponent.new(name: "Edit", url: edit_adminit_ticket_path(@ticket), options: {data: {turbo_frame: "modal"}, custom_style: {style: :as_button, theme: :edit, size: :sm}})) %>
-    <%= render(Core::LinkComponent.new(name: "Delete", url: adminit_ticket_path(@ticket), options: {custom_style: {style: :as_button, theme: :delete, size: :sm}, method: :delete, data: {turbo: true, turbo_method: :delete, turbo_confirm: "Are you sure?"}})) %>
+    <%= render(Core::LinkComponent.new(name: "Edit", url: edit_adminit_ticket_path(@ticket), style: :as_button, theme: :edit, size: :sm, html_options: {data: {turbo_frame: "modal"}})) %>
+    <%= render(Core::LinkComponent.new(name: "Delete", url: adminit_ticket_path(@ticket), style: :as_button, theme: :delete, size: :sm, html_options: {method: :delete, data: {turbo: true, turbo_method: :delete, turbo_confirm: "Are you sure?"}})) %>
     <% if @ticket.assigned_id.nil? %>
-      <%= render(Core::LinkComponent.new(name: "Take", url: take_adminit_ticket_path(@ticket), options: {data: {turbo_method: :post}, method: :post, custom_style: {style: :as_button, theme: :create, size: :sm}})) %>
+      <%= render(Core::LinkComponent.new(name: "Take", url: take_adminit_ticket_path(@ticket), style: :as_button, theme: :create, size: :sm, html_options: {data: {turbo_method: :post}, method: :post})) %>
     <% elsif @ticket.assigned_id == current_account.id %>
-      <%= render(Core::LinkComponent.new(name: "Leave", url: leave_adminit_ticket_path(@ticket), options: {data: {turbo_method: :post}, method: :post, custom_style: {style: :as_button, theme: :delete, size: :sm}})) %>
+      <%= render(Core::LinkComponent.new(name: "Leave", url: leave_adminit_ticket_path(@ticket), style: :as_button, theme: :delete, size: :sm, html_options: {data: {turbo_method: :post}, method: :post})) %>
       <% end %>
   </div>
   </div>

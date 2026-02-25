@@ -1,11 +1,7 @@
 module Support
-  class ConversationComponent < ViewComponent::Base
-    attr_reader :conversation, :messages
-
-    def initialize(conversation:, messages:)
-      @conversation = conversation
-      @messages = messages
-    end
+  class ConversationComponent < ApplicationViewComponent
+    option :conversation
+    option :messages
 
     def title
       "Conversation"

@@ -1,11 +1,9 @@
-class Core::RowRendererComponent < ViewComponent::Base
-  def initialize(row:, index:, block:)
-    @row = row
-    @index = index
-    @block = block
-  end
+class Core::RowRendererComponent < ApplicationViewComponent
+  option :row
+  option :index
+  option :block
 
   def call
-    @block.call(@row, @index)
+    block.call(row, index)
   end
 end

@@ -21,7 +21,7 @@
         <%= @notification.subtitle %>
       </p>
       <p class="text-sm mt-1.5">
-        <%= time_ago %>
+        <%= helpers.local_time_ago(@notification.created_at) %>
       </p>
     </div>
   </div>

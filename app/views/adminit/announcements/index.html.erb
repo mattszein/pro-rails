@@ -1,9 +1,9 @@
 <div class="w-full">
   <div class="flex justify-between items-center pb-2">
     <h1 class="text-xl font-semibold">Announcements</h1>
-      <%= render(Core::LinkComponent.new(name: "New Announcement", url: new_adminit_announcement_path, options: {data: {turbo_frame: "modal"}, custom_style: {style: :as_button, theme: :create, size: :sm}})) %>
+      <%= render(Core::LinkComponent.new(name: "New Announcement", url: new_adminit_announcement_path, style: :as_button, theme: :create, size: :sm, html_options: {data: {turbo_frame: "modal"}})) %>
   </div>
-  <%= render Core::CardComponent.new({padding: :none}) do %>
+  <%= render Core::CardComponent.new(padding: :none) do %>
     <div class="flex p-4 gap-4">
       <%= render Core::TableComponent.new(rows: @announcements, columns: announcement_columns,
             options: {ids: {tbody: "admin_announcements", col_prefix: "admin"}}) %>

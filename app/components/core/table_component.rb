@@ -1,11 +1,7 @@
-class Core::TableComponent < ViewComponent::Base
-  attr_reader :rows, :columns, :options
-
-  def initialize(rows:, columns:, options: {})
-    @rows = rows
-    @columns = columns
-    @options = options
-  end
+class Core::TableComponent < ApplicationViewComponent
+  option :rows
+  option :columns
+  option :options, default: -> { {} }
 
   def tbody_id
     options.dig(:ids, :tbody)

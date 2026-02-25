@@ -5,7 +5,7 @@ class Core::ToastComponent < ApplicationViewComponent
   option :icon, optional: true
   option :auto_dismiss, default: -> { true }
 
-  THEMES = {
+  THEME_STYLES = {
     primary: "border-l-primary-500",
     secondary: "border-l-secondary-500",
     success: "border-l-emerald-500",
@@ -14,7 +14,7 @@ class Core::ToastComponent < ApplicationViewComponent
     info: "border-l-blue-500"
   }.freeze
 
-  ICON_THEMES = {
+  ICON_STYLES = {
     primary: "bg-primary-100 dark:bg-primary-500/20 text-primary-600 dark:text-primary-400",
     secondary: "bg-secondary-100 dark:bg-secondary-500/20 text-secondary-600 dark:text-secondary-400",
     success: "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400",
@@ -37,17 +37,10 @@ class Core::ToastComponent < ApplicationViewComponent
   end
 
   def html_class
-    class_names(
-      "bg-white dark:bg-slate-800 dark:border dark:border-slate-700",
-      "rounded-xl shadow-lg p-4 flex items-start gap-3 max-w-md border-l-4",
-      THEMES[theme]
-    )
+    class_names("bg-white dark:bg-slate-800 dark:border dark:border-slate-700 rounded-xl shadow-lg p-4 flex items-start gap-3 max-w-md border-l-4", THEME_STYLES[theme])
   end
 
   def icon_container_class
-    class_names(
-      "flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center",
-      ICON_THEMES[theme]
-    )
+    class_names("flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center", ICON_STYLES[theme])
   end
 end

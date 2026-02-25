@@ -55,7 +55,7 @@ module ApplicationHelper
       {
         label: "Actions",
         renderer: ->(account) {
-          render(Core::LinkComponent.new(name: "Show", url: adminit_account_path(account), options: {data: {turbo_prefetch: false}, custom_style: {style: :as_button, theme: :show, size: :xs}}))
+          render(Core::LinkComponent.new(name: "Show", url: adminit_account_path(account), style: :as_button, theme: :show, size: :xs, html_options: {data: {turbo_prefetch: false}}))
         }
       }
     ]
@@ -70,7 +70,7 @@ module ApplicationHelper
       {
         label: "Actions",
         renderer: ->(role) {
-          render(Core::LinkComponent.new(name: "Show", url: adminit_role_path(role), options: {data: {turbo_prefetch: false}, custom_style: {style: :as_button, theme: :show, size: :xs}}))
+          render(Core::LinkComponent.new(name: "Show", url: adminit_role_path(role), style: :as_button, theme: :show, size: :xs, html_options: {data: {turbo_prefetch: false}}))
         }
       }
     ]
@@ -90,8 +90,8 @@ module ApplicationHelper
       {
         label: "Status",
         renderer: ->(announcement) do
-          render(Core::BadgeComponent.new(announcement.status.humanize,
-            options: {custom_style: {theme: announcement_status_theme(announcement.status)}}))
+          render(Core::BadgeComponent.new(label: announcement.status.humanize,
+            theme: announcement_status_theme(announcement.status)))
         end
       },
       {
@@ -106,7 +106,7 @@ module ApplicationHelper
         label: "Actions",
         renderer: ->(announcement) {
           render(Core::LinkComponent.new(name: "Show", url: adminit_announcement_path(announcement),
-            options: {data: {turbo_prefetch: false}, custom_style: {style: :as_button, theme: :show, size: :xs}}))
+            style: :as_button, theme: :show, size: :xs, html_options: {data: {turbo_prefetch: false}}))
         }
       }
     ]

@@ -253,6 +253,7 @@ GEM
       logger
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
+    local_time (3.0.3)
     logger (1.7.0)
     loofah (2.25.0)
       crass (~> 1.0.2)
@@ -585,6 +586,7 @@ DEPENDENCIES
   jbuilder
   kamal
   listen
+  local_time
   lookbook (>= 2.3.11)
   mission_control-jobs
   noticed (~> 3.0)
