@@ -86,6 +86,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed patterns, conventions, and d
 - [ ] Lookbook: update previews to cover all core components and recently added features
 - [x] Upgrade all gems to latest versions
 - [x] Remove view components form gem
+- [ ] Add basic setup instructions to start the app locally (database setup, credentials, etc), create script for db setup and seeding.
 
 ### Internationalization
 
@@ -109,9 +110,10 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed patterns, conventions, and d
 - [ ] Permissions: replace string-based controller references with integer enums
 - [ ] Generator: scaffold a new Adminit resource (controller, views, policy, and specs) in one command
 - [ ] Adminit dashboard: analytics, stats, and quick actions, with role-specific views per role
-- [ ] Refactoring view components to use dry::initializer
-- [ ] Table component should support sorting, filtering, and pagination (client
-vs server ?)
+- [x] Refactoring view components to use same patterns
+- [ ] Table component should support sorting, filtering, and pagination (client vs server ?)
+- [ ] Fix old adminit components (Roles views, account views)
+- [ ] Components should be refactored to use primary / secondary colors? messages in conversation, box component, notifications
 
 ## Roadmap to 2.0
 
