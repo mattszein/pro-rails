@@ -14,11 +14,11 @@ Full auth flow out of the box: multi-phase login, email verification, password r
 
 ### Authorization — [ActionPolicy](https://actionpolicy.evilmartians.io/)
 
-Policy-based authorization and a custom RBAC system for the admin area ("Adminit"). Three-layer protection: account-level gate → controller-level gate → per-action policy. Roles and permissions are stored in the database and fully manageable at runtime.
+Policy-based authorization and a custom RBAC system for the admin area ("Adminit"), with roles and permissions stored in the database and fully manageable at runtime.
 
 ### Admin Panel — Adminit
 
-A built-in admin area with role and permission management, announcement broadcasting, ticket queue management, and account administration. No admin gem, no DSL to learn, no fighting a framework to get the UI you need... it's just Rails! Every feature is plain controllers, views, and policies that you can read, change, and extend like any other part of the app. Add the resources your product actually needs without working around opinionated constraints.
+A built-in admin area with role and permission management, announcement broadcasting, ticket management, and account administration. No admin gem, no DSL to learn, no fighting a framework to get the UI you need... it's just Rails! Every feature is plain controllers, views, and policies that you can read, change, and extend like any other part of the app. Add the resources your product actually needs without working around opinionated constraints.
 
 ### Real-time — [AnyCable](https://anycable.io/) + Hotwire
 
@@ -84,7 +84,8 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed patterns, conventions, and d
 - [x] README
 - [ ] Credentials: define defaults and document how to use Rails credentials across environments
 - [ ] Lookbook: update previews to cover all core components and recently added features
-- [ ] Upgrade all gems to latest versions
+- [x] Upgrade all gems to latest versions
+- [x] Remove view components form gem
 
 ### Internationalization
 
@@ -94,8 +95,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed patterns, conventions, and d
 ### Announcements
 
 - [ ] Email template for announcement notifications
-- [ ] Rich text support via ActionText
-- [ ] `published` trait in the factory (spec) should have the associated Noticed event attached, reflecting real production state
+- [ ] Rich text support via ActionText. Test Lexxy
 - [ ] Noticed event factory should support other notifier types beyond AnnouncementNotifier
 
 ### Support tickets
@@ -109,13 +109,22 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed patterns, conventions, and d
 - [ ] Permissions: replace string-based controller references with integer enums
 - [ ] Generator: scaffold a new Adminit resource (controller, views, policy, and specs) in one command
 - [ ] Adminit dashboard: analytics, stats, and quick actions, with role-specific views per role
+- [ ] Refactoring view components to use dry::initializer
+- [ ] Table component should support sorting, filtering, and pagination (client
+vs server ?)
 
 ## Roadmap to 2.0
 
-- Payments & subscriptions
+### Payments & subscriptions
 
 - [ ] Plans model and subscription management
-- [ ] Stripe integration (charges, webhooks, billing portal)
+- [ ] Stripe and others payments integration (charges, webhooks, billing portal)
+
+### Ticket support
+
+- [ ] Conversation chat is managed by AI at beginning. Admnins can take over the
+conversation at any time, and the AI will step back until the next ticket is
+opened.
 
 --
 
