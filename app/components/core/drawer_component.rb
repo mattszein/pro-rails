@@ -1,7 +1,3 @@
-class Core::DrawerComponent < ViewComponent::Base
-  attr_reader :title
-
-  def initialize(title: nil, options: {})
-    @title = title
-  end
+class Core::DrawerComponent < ApplicationViewComponent
+  option :title, default: -> {}
 end

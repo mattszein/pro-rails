@@ -1,7 +1,7 @@
-<tr id="<%= dom_id(@row, @broadcast_id) %>">
-  <% @columns.each do |col| %>
+<tr id="<%= dom_id(table_row, broadcast_id) %>">
+  <% columns.each do |col| %>
     <td class="px-4 py-2">
-      <%= col[:renderer].call(@row) %>
+      <%= col[:renderer].call(table_row) %>
     </td>
   <% end %>
 </tr>

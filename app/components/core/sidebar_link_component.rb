@@ -1,40 +1,36 @@
-class Core::SidebarLinkComponent < ViewComponent::Base
-  attr_reader :label, :path, :icon_name, :active_paths, :options
+class Core::SidebarLinkComponent < ApplicationViewComponent
   include Rails.application.routes.url_helpers
 
-  def initialize(label:, path:, icon_name:, active_paths: [], options: {})
-    @label = label
-    @path = path
-    @icon_name = icon_name
-    @active_paths = active_paths
-    @options = options
-  end
+  option :label
+  option :path
+  option :icon_name
+  option :active_paths, default: -> { [] }
+  option :html_options, default: -> { {} }
+
+  ICON_STYLES = {
+    true => "text-secondary-500 dark:text-secondary-500",
+    false => ""
+  }.freeze
+
+  SPAN_STYLES = {
+    true => "text-primary-500 dark:text-primary-400 border-b-2 border-secondary-400",
+    false => "text-gray-600 dark:text-white"
+  }.freeze
 
   def link_classes
     "flex gap-2 items-center p-3 hover:cursor-pointer rounded-sm w-full group/link"
   end
 
   def icon_classes
-    base_classes = "h-8 text-gray-500 dark:text-gray-400 group-hover/link:text-secondary-500 dark:group-hover/link:text-secondary-500"
-    active_classes = active? ? "text-secondary-500 dark:text-secondary-500" : ""
-
-    class_names(base_classes, active_classes)
+    class_names("h-8 text-gray-500 dark:text-gray-400 group-hover/link:text-secondary-500 dark:group-hover/link:text-secondary-500", ICON_STYLES[active?])
   end
 
   def span_classes
-    base_classes = "opacity-100 ml-2 text-lg group-hover/drawer:opacity-100 group-hover/drawer:transition-opacity group-hover/link:text-primary-500 dark:group-hover/link:text-primary-500"
-    active_classes = active? ? "text-primary-500 dark:text-primary-400 border-b-2 border-secondary-400" : "text-gray-600 dark:text-white"
-
-    class_names(base_classes, active_classes)
+    class_names("opacity-100 ml-2 text-lg group-hover/drawer:opacity-100 group-hover/drawer:transition-opacity group-hover/link:text-primary-500 dark:group-hover/link:text-primary-500", SPAN_STYLES[active?])
   end
 
-  def link_options
-    default_options = {
-      class: link_classes,
-      custom_style: {style: :no_style}
-    }
-
-    default_options.deep_merge(options)
+  def link_html_options
+    {class: link_classes}.deep_merge(html_options)
   end
 
   private

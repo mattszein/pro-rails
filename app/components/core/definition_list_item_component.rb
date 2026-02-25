@@ -1,15 +1,17 @@
 # app/components/core/definition_list_item_component.rb
-class Core::DefinitionListItemComponent < ViewComponent::Base
-  attr_reader :term, :size, :term_gap
+class Core::DefinitionListItemComponent < ApplicationViewComponent
+  option :term
+  option :size, default: -> { :sm }
+  option :term_gap, default: -> { :sm }
 
-  SIZES = {
-    xs: {term: "text-xs", detail: "text-xs"},
-    sm: {term: "text-sm", detail: "text-sm"},
-    base: {term: "text-base", detail: "text-base"},
-    lg: {term: "text-lg", detail: "text-lg"}
+  SIZE_STYLES = {
+    xs: "text-xs",
+    sm: "text-sm",
+    base: "text-base",
+    lg: "text-lg"
   }.freeze
 
-  TERM_GAP = {
+  TERM_GAP_STYLES = {
     none: "pr-0",
     xs: "pr-2",
     sm: "pr-3",
@@ -17,29 +19,11 @@ class Core::DefinitionListItemComponent < ViewComponent::Base
     lg: "pr-6"
   }.freeze
 
-  DEFAULT = {
-    size: :sm,
-    term_gap: :sm
-  }.freeze
-
-  def initialize(term:, **options)
-    @term = term
-    @size = options.fetch(:size, DEFAULT[:size])
-    @term_gap = options.fetch(:term_gap, DEFAULT[:term_gap])
-  end
-
   def term_classes
-    [
-      SIZES[@size][:term],
-      TERM_GAP[@term_gap],
-      "font-semibold"
-    ].join(" ")
+    class_names("font-semibold", SIZE_STYLES[size], TERM_GAP_STYLES[term_gap])
   end
 
   def detail_classes
-    [
-      SIZES[@size][:detail],
-      "font-medium"
-    ].join(" ")
+    class_names("font-medium", SIZE_STYLES[size])
   end
 end

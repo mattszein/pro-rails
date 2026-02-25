@@ -3,7 +3,7 @@
     <h1 class="text-xl font-semibold">Tickets</h1>
   </div>
   <%= turbo_stream_from "admin_tickets" %>
-  <%= render Core::CardComponent.new({padding: :none}) do %>
+  <%= render Core::CardComponent.new(padding: :none) do %>
     <div class="flex p-4 gap-4">
       <%= render Core::TableComponent.new(rows: @tickets, columns: ticket_columns, options: {ids: {tbody: "admin_tickets", col_prefix: "admin"}}) %>
     </div>

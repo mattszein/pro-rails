@@ -2,7 +2,7 @@
   <div class="flex justify-between items-center pb-2">
     <h1 class="text-xl font-semibold">Accounts</h1>
   </div>
-  <%= render Core::CardComponent.new({padding: :none}) do %>
+  <%= render Core::CardComponent.new(padding: :none) do %>
     <div class="flex p-4 gap-4">
       <%= render Core::TableComponent.new(rows: @accounts, columns: accounts_columns) %>
     </div>

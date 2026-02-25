@@ -1,7 +1,7 @@
 <%= render(Core::CardComponent.new(classes: "space-y-4")) do %>
   <p class="text-lg">Sign up for members-only access</p>
   <div class="flex items-center space-x-3 justify-center">
-    <%= render(Core::LinkComponent.new(name: "Sign In", url: rodauth.login_path, options: {custom_style: {style: :as_button, theme: :primary, size: :sm}})) %>
-    <%= render(Core::LinkComponent.new(name: "Register", url: rodauth.create_account_path, options: {custom_style: {style: :as_button, theme: :secondary, size: :sm}})) %>
+    <%= render(Core::LinkComponent.new(name: "Sign In", url: rodauth.login_path, style: :as_button, theme: :primary, size: :sm)) %>
+    <%= render(Core::LinkComponent.new(name: "Register", url: rodauth.create_account_path, style: :as_button, theme: :secondary, size: :sm)) %>
   </div>
 <% end %>

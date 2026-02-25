@@ -1,2 +1,2 @@
-class Core::LoaderComponent < ViewComponent::Base
+class Core::LoaderComponent < ApplicationViewComponent
 end

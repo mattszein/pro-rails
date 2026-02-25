@@ -1,9 +1,5 @@
-class Core::ModalComponent < ViewComponent::Base
+class Core::ModalComponent < ApplicationViewComponent
   include Turbo::FramesHelper
 
-  attr_reader :title
-
-  def initialize(title: nil)
-    @title = title
-  end
+  option :title, default: -> {}
 end

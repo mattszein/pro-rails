@@ -3,5 +3,5 @@
 <%= render(Core::SidebarLinkComponent.new(label: "Admin", path: adminit_root_path, active_paths: [adminit_root_path], icon_name: "admin")) %>
 <%= render(Core::SidebarLinkComponent.new(label: "Settings", path: settings_appearance_index_path, active_paths: [settings_appearance_index_path], icon_name: "settings")) %>
 <%= render(Core::SidebarLinkComponent.new(label: "Support", path: support_tickets_path, active_paths: [support_tickets_path], icon_name: "support")) %>
-<%= render(Core::SidebarLinkComponent.new(label: "Dark - Light", path: "#", icon_name: "theme", options: {data: {turbo: "false", controller: "dark-mode", dark_mode_target: "themeToggle", action: "click->dark-mode#toggleTheme"}})) %>
-<%= render(Core::SidebarLinkComponent.new(label: "Logout", path: rodauth.logout_path, icon_name: "logout", options: {data: {turbo_prefetch: "false", turbo_method: "post"}, method: :post})) %>
+<%= render(Core::SidebarLinkComponent.new(label: "Dark - Light", path: "#", icon_name: "theme", html_options: {data: {turbo: "false", controller: "dark-mode", dark_mode_target: "themeToggle", action: "click->dark-mode#toggleTheme"}})) %>
+<%= render(Core::SidebarLinkComponent.new(label: "Logout", path: rodauth.logout_path, icon_name: "logout", html_options: {data: {turbo_prefetch: "false", turbo_method: "post"}, method: :post})) %>

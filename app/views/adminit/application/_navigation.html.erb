@@ -21,6 +21,6 @@
 
   <hr class="my-4 border-gray-300 dark:border-gray-700">
 
-  <%= render(Core::SidebarLinkComponent.new(label: "Dark - Light", path: "#", icon_name: "theme", options: {data: {turbo: "false", controller: "dark-mode", dark_mode_target: "themeToggle", action: "click->dark-mode#toggleTheme"}})) %>
+  <%= render(Core::SidebarLinkComponent.new(label: "Dark - Light", path: "#", icon_name: "theme", html_options: {data: {turbo: "false", controller: "dark-mode", dark_mode_target: "themeToggle", action: "click->dark-mode#toggleTheme"}})) %>
   <%= render(Core::SidebarLinkComponent.new(label: "Back to App", path: dashboard_path, icon_name: "adminit/back")) %>
-  <%= render(Core::SidebarLinkComponent.new(label: "Logout", path: rodauth.logout_path, icon_name: "logout", options: {data: {turbo_prefetch: "false", turbo_method: "post"}, method: :post})) %>
+  <%= render(Core::SidebarLinkComponent.new(label: "Logout", path: rodauth.logout_path, icon_name: "logout", html_options: {data: {turbo_prefetch: "false", turbo_method: "post"}, method: :post})) %>

@@ -1,10 +1,10 @@
 <div id="<%= dom_id ticket, "admin" %>" class="space-y-4">
   <!-- Header -->
-  <%= render(Core::CardComponent.new({variant: :glass, glow: true, classes: "space-y-4"})) do %>
+  <%= render(Core::CardComponent.new(variant: :glass, glow: true, classes: "space-y-4")) do %>
     <div class="flex items-center gap-4">
       <%= icon "support", {classes: "h-8"} %>
       <h1>Ticket #<%= ticket.id %> - <%= ticket.title %></h1>
-      <%= render(Core::BadgeComponent.new(ticket.status.humanize, options: {custom_style: {theme: ticket_status_theme(ticket.status), icon: "info", size: :md}})) %>
+      <%= render(Core::BadgeComponent.new(label: ticket.status.humanize, theme: ticket_status_theme(ticket.status), icon: "info", size: :md)) %>
     </div>
     <%= render Core::BoxComponent.new do %>
       <%= render Core::DefinitionListComponent.new(variant: :info, gap: :sm) do |dl| %>
@@ -24,14 +24,14 @@
           <%= ticket.created_at %>
         <% end %>
         <% dl.with_item(term: "Status") do %>
-          <%= render(Core::BadgeComponent.new(ticket.status, options: {custom_style: {theme: ticket_status_theme(ticket.status), icon: "info", size: :md}})) %>
+          <%= render(Core::BadgeComponent.new(label: ticket.status, theme: ticket_status_theme(ticket.status), icon: "info", size: :md)) %>
         <% end %>
       <% end %>
     <% end %>
   <% end %>
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
     <div class="lg:col-span-2 space-y-6">
-      <%= render(Core::CardComponent.new({variant: :glass, glow: true, classes: "space-y-4"})) do %>
+      <%= render(Core::CardComponent.new(variant: :glass, glow: true, classes: "space-y-4")) do %>
           <h2 class="text-2xl font-bold leading-tight">
             <%= ticket.title %>
           </h2>
@@ -40,11 +40,11 @@
           </p>
         </div>
       <% end %>
-      <%= render(Core::CardComponent.new({variant: :glass, glow: true, classes: "space-y-4"})) do %>
+      <%= render(Core::CardComponent.new(variant: :glass, glow: true, classes: "space-y-4")) do %>
         <%= render Support::AttachmentsComponent.new(ticket: ticket, show_upload_form: false) %>
       <% end %>
     </div>
-    <%= render(Core::CardComponent.new({variant: :glass, glow: true, classes: "space-y-4"})) do %>
+    <%= render(Core::CardComponent.new(variant: :glass, glow: true, classes: "space-y-4")) do %>
       <%= render Support::ConversationComponent.new(
             conversation: @conversation,
             messages: @messages

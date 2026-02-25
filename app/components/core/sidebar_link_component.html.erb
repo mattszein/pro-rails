@@ -1,4 +1,4 @@
-<%= render(Core::LinkComponent.new(url: path.is_a?(Symbol) ? send(path) : path, options: link_options)) do %>
+<%= render(Core::LinkComponent.new(url: path.is_a?(Symbol) ? send(path) : path, style: :no_style, html_options: link_html_options)) do %>
   <%= helpers.icon icon_name, {classes: icon_classes} %>
   <span class="<%= span_classes %>"><%= label %></span>
 <% end %>

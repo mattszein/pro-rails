@@ -1,10 +1,13 @@
 # app/components/core/definition_list_component.rb
-class Core::DefinitionListComponent < ViewComponent::Base
+class Core::DefinitionListComponent < ApplicationViewComponent
   renders_many :items, Core::DefinitionListItemComponent
 
-  attr_reader :variant, :gap, :layout, :classes
+  option :variant, default: -> { :default }
+  option :gap, default: -> { :md }
+  option :layout, default: -> { :stacked }
+  option :classes, default: -> { "" }
 
-  VARIANTS = {
+  VARIANT_STYLES = {
     default: "text-gray-900 dark:text-gray-100",
     info: "text-blue-900 dark:text-blue-100",
     success: "text-emerald-900 dark:text-emerald-100",
@@ -12,7 +15,7 @@ class Core::DefinitionListComponent < ViewComponent::Base
     error: "text-red-900 dark:text-red-100"
   }.freeze
 
-  GAP = {
+  GAP_STYLES = {
     none: "gap-0",
     xs: "gap-1",
     sm: "gap-2",
@@ -21,34 +24,13 @@ class Core::DefinitionListComponent < ViewComponent::Base
     xl: "gap-6"
   }.freeze
 
-  LAYOUT = {
+  LAYOUT_STYLES = {
     stacked: "grid",
     inline: "grid grid-cols-1 sm:grid-cols-2",
     compact: "grid"
   }.freeze
 
-  DEFAULT = {
-    variant: :default,
-    gap: :md,
-    layout: :stacked,
-    classes: ""
-  }.freeze
-
-  def initialize(options = {})
-    options_merged = DEFAULT.merge(options)
-    @variant = options_merged[:variant]
-    @gap = options_merged[:gap]
-    @layout = options_merged[:layout]
-    @classes = options_merged[:classes]
-  end
-
   def html_classes
-    [
-      LAYOUT[@layout],
-      GAP[@gap],
-      "grid-cols-[auto_1fr]", # This creates two columns: auto-width for dt, remaining space for dd
-      VARIANTS[@variant],
-      @classes
-    ].compact.join(" ")
+    class_names(LAYOUT_STYLES[layout], GAP_STYLES[gap], "grid-cols-[auto_1fr]", VARIANT_STYLES[variant], classes)
   end
 end

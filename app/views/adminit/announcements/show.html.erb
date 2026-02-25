@@ -4,18 +4,18 @@
     <div class="flex gap-2 items-center px-4">
       <% if @announcement.draft? %>
         <%= render(Core::LinkComponent.new(name: "Publish", url: schedule_adminit_announcement_path(@announcement),
-              options: {method: :post, data: {turbo: true, turbo_method: :post}, custom_style: {style: :as_button, theme: :edit, size: :sm}})) %>
+              style: :as_button, theme: :edit, size: :sm, html_options: {method: :post, data: {turbo: true, turbo_method: :post}})) %>
         <%= render(Core::LinkComponent.new(name: "Delete", url: adminit_announcement_path(@announcement),
-              options: {custom_style: {style: :as_button, theme: :delete, size: :sm}, method: :delete,
-                        data: {turbo: true, turbo_method: :delete, turbo_confirm: "Are you sure?"}})) %>
+              style: :as_button, theme: :delete, size: :sm, html_options: {method: :delete,
+                                                                           data: {turbo: true, turbo_method: :delete, turbo_confirm: "Are you sure?"}})) %>
       <% end %>
       <% if @announcement.scheduled? %>
         <%= render(Core::LinkComponent.new(name: "Stop Publish", url: unschedule_adminit_announcement_path(@announcement),
-              options: {method: :post, data: {turbo: true, turbo_method: :post}, custom_style: {style: :as_button, theme: :delete, size: :sm}})) %>
+              style: :as_button, theme: :delete, size: :sm, html_options: {method: :post, data: {turbo: true, turbo_method: :post}})) %>
       <% end %>
       <% unless @announcement.published? %>
         <%= render(Core::LinkComponent.new(name: "Edit", url: edit_adminit_announcement_path(@announcement),
-              options: {data: {turbo_frame: "modal"}, custom_style: {style: :as_button, theme: :edit, size: :sm}})) %>
+              style: :as_button, theme: :edit, size: :sm, html_options: {data: {turbo_frame: "modal"}})) %>
       <% end %>
     </div>
   </div>

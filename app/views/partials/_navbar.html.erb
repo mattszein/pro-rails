@@ -18,9 +18,9 @@
         </svg>
         <span class="sr-only">Theme</span>
       </button>
-      <%= render(Core::LinkComponent.new(name: "Sign In", url: rodauth.login_path, options: {class: "order-5", custom_style: {style: :default}})) %>
+      <%= render(Core::LinkComponent.new(name: "Sign In", url: rodauth.login_path, style: :default, html_options: {class: "order-5"})) %>
       <div class="inline-flex items-center order-6"><span class="dark:text-gray-100 px-2"> - </span></div>
-      <%= render(Core::LinkComponent.new(name: "Register", url: rodauth.create_account_path, options: {class: "order-7", custom_style: {style: :default}})) %>
+      <%= render(Core::LinkComponent.new(name: "Register", url: rodauth.create_account_path, style: :default, html_options: {class: "order-7"})) %>
     </div>
   </div>
 </nav>

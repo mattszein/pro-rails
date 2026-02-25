@@ -1,5 +1,5 @@
-class Settings::LayoutComponent < ViewComponent::Base
-  attr_reader :active_section
+class Settings::LayoutComponent < ApplicationViewComponent
+  option :active_section
 
   def sections
     [
@@ -8,9 +8,5 @@ class Settings::LayoutComponent < ViewComponent::Base
       Core::SubmenuComponent::Section.new(key: :password, name: "Password", path: helpers.rodauth.change_password_path),
       Core::SubmenuComponent::Section.new(key: :remember, name: "Remember", path: helpers.rodauth.remember_path)
     ].freeze
-  end
-
-  def initialize(active_section:)
-    @active_section = active_section
   end
 end

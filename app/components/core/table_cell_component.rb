@@ -1,8 +1,5 @@
-class Core::TableCellComponent < ViewComponent::Base
-  def initialize(options: {})
-    @options = options
-    @custom_classes = options.fetch(:classes, "")
-  end
+class Core::TableCellComponent < ApplicationViewComponent
+  option :classes, default: -> { "" }
 
   def call
     content_tag :td, content, class: cell_classes
@@ -11,7 +8,6 @@ class Core::TableCellComponent < ViewComponent::Base
   private
 
   def cell_classes
-    base_classes = "px-4 py-2"
-    [base_classes, @custom_classes].compact.join(" ")
+    class_names("px-4 py-2", classes)
   end
 end
