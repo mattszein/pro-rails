@@ -57,7 +57,7 @@ gem "interactor", "~> 3.0"
 gem "mission_control-jobs"
 gem "local_time"
 gem "noticed", "~> 3.0"
-gem "pagy", "~> 9.0"
+gem "pagy", "~> 43.3"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
