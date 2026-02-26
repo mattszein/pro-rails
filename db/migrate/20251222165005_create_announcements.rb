@@ -1,8 +1,9 @@
 class CreateAnnouncements < ActiveRecord::Migration[8.0]
   def change
     create_table :announcements do |t|
-      t.string :title, null: false
-      t.text :body, null: false
+      t.string :reference, null: false
+      t.string :title
+      t.text :body
       t.integer :status, default: 0, null: false
       t.datetime :scheduled_at
       t.datetime :published_at

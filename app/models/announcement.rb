@@ -2,6 +2,7 @@ class Announcement < ApplicationRecord
   class InvalidTransition < StandardError; end
   SCHEDULE_TOLERANCE = 3.minutes
   belongs_to :author, class_name: "Account"
+  has_rich_text :rich_body
 
   enum :status, {
     draft: 0,
@@ -9,13 +10,15 @@ class Announcement < ApplicationRecord
     published: 2
   }, default: :draft, validate: {allow_nil: false}
 
-  validates :title, presence: true
-  validates :body, presence: true
+  validates :reference, presence: true
   validates :scheduled_at, presence: true, if: :scheduled?
+
+  validate :content_complete_for_scheduling
 
   validate :scheduled_at_immutable_when_scheduled, on: :update
   validate :cannot_update_when_published, on: :update
 
+  before_validation :sync_body_from_rich_body
   before_destroy :ensure_destroyable
 
   scope :ready_to_publish, -> { where(status: :scheduled).where("scheduled_at <= ?", Time.current) }
@@ -45,6 +48,7 @@ class Announcement < ApplicationRecord
     raise InvalidTransition, "Already scheduled" if scheduled?
     raise InvalidTransition, "Scheduled time is required" if scheduled_at.blank?
     raise InvalidTransition, "Scheduled time must be in the future" if scheduled_at < SCHEDULE_TOLERANCE.ago
+    raise InvalidTransition, "Title and content are required to schedule" if title.blank? || rich_body.blank?
 
     update!(status: :scheduled)
   end
@@ -72,6 +76,21 @@ class Announcement < ApplicationRecord
   end
 
   private
+
+  def content_complete_for_scheduling
+    return unless scheduled? || status_changed_to_scheduled?
+
+    errors.add(:title, :blank) if title.blank?
+    errors.add(:rich_body, :blank) if rich_body.blank?
+  end
+
+  def status_changed_to_scheduled?
+    status_changed? && scheduled?
+  end
+
+  def sync_body_from_rich_body
+    self.body = rich_body.to_plain_text if rich_body.present?
+  end
 
   def scheduled_at_immutable_when_scheduled
     if scheduled? && scheduled_at_changed?

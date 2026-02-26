@@ -22,3 +22,5 @@ pin "@floating-ui/dom", to: "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.7.3
 
 pin "cable", to: "cable.js", preload: true
 pin "@rails/request.js", to: "@rails--request.js.js" # @0.0.13
+pin "lexxy", to: "lexxy.js"
+pin "@rails/activestorage", to: "activestorage.esm.js"

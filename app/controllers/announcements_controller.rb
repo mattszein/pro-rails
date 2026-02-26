@@ -7,6 +7,6 @@ class AnnouncementsController < DashboardController
   private
 
   def set_announcement
-    @announcement = Announcement.find(params[:id])
+    @announcement = Announcement.published.find(params[:id])
   end
 end

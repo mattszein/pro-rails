@@ -6,8 +6,7 @@ RSpec.describe Announcement, type: :model do
   end
 
   describe "validations" do
-    it { is_expected.to validate_presence_of(:title) }
-    it { is_expected.to validate_presence_of(:body) }
+    it { is_expected.to validate_presence_of(:reference) }
 
     context "when status is scheduled" do
       subject { build(:announcement, :scheduled) }
@@ -21,6 +20,53 @@ RSpec.describe Announcement, type: :model do
       it "does not require scheduled_at" do
         announcement.scheduled_at = nil
         expect(announcement).to be_valid
+      end
+    end
+
+    describe "content_complete_for_scheduling" do
+      context "when transitioning to scheduled" do
+        it "requires title" do
+          announcement = build(:announcement, :draft, title: nil, rich_body: "<p>Content</p>", scheduled_at: 1.day.from_now)
+          announcement.status = :scheduled
+          expect(announcement).not_to be_valid
+          expect(announcement.errors[:title]).to include("can't be blank")
+        end
+
+        it "requires rich_body" do
+          announcement = build(:announcement, :draft, title: "Title", rich_body: nil, scheduled_at: 1.day.from_now)
+          announcement.status = :scheduled
+          expect(announcement).not_to be_valid
+          expect(announcement.errors[:rich_body]).to include("can't be blank")
+        end
+
+        it "is valid with both title and rich_body" do
+          announcement = build(:announcement, :draft, title: "Title", rich_body: "<p>Content</p>", scheduled_at: 1.day.from_now)
+          announcement.status = :scheduled
+          expect(announcement).to be_valid
+        end
+      end
+
+      context "when already scheduled" do
+        it "is invalid if title is blanked out" do
+          announcement = create(:announcement, :scheduled)
+          announcement.title = nil
+          expect(announcement).not_to be_valid
+          expect(announcement.errors[:title]).to include("can't be blank")
+        end
+
+        it "is invalid if rich_body is blanked out" do
+          announcement = create(:announcement, :scheduled)
+          announcement.rich_body = nil
+          expect(announcement).not_to be_valid
+          expect(announcement.errors[:rich_body]).to include("can't be blank")
+        end
+      end
+
+      context "when draft" do
+        it "does not require title" do
+          announcement = build(:announcement, :draft, title: nil, rich_body: nil)
+          expect(announcement).to be_valid
+        end
       end
     end
   end
@@ -71,6 +117,20 @@ RSpec.describe Announcement, type: :model do
       it "orders by created_at desc" do
         expect(Announcement.ordered).to eq([new_announcement, middle_announcement, old_announcement])
       end
+    end
+  end
+
+  describe "#sync_body_from_rich_body" do
+    it "populates body from rich_body plain text on validation" do
+      announcement = build(:announcement, rich_body: "<p>Hello <strong>world</strong></p>", body: nil)
+      announcement.valid?
+      expect(announcement.body).to eq("Hello world")
+    end
+
+    it "does not overwrite body when rich_body is blank" do
+      announcement = build(:announcement, rich_body: nil, body: "existing")
+      announcement.valid?
+      expect(announcement.body).to eq("existing")
     end
   end
 
@@ -195,6 +255,31 @@ RSpec.describe Announcement, type: :model do
         end
       end
 
+      context "when title is blank" do
+        let(:announcement) { create(:announcement, :draft, scheduled_at: 1.day.from_now) }
+
+        before do
+          announcement.update_column(:title, nil)
+        end
+
+        it "raises InvalidTransition" do
+          expect { announcement.schedule! }.to raise_error(Announcement::InvalidTransition, "Title and content are required to schedule")
+        end
+      end
+
+      context "when rich_body is blank" do
+        let(:announcement) { create(:announcement, :draft, scheduled_at: 1.day.from_now) }
+
+        before do
+          announcement.rich_body = nil
+          announcement.save!(validate: false)
+        end
+
+        it "raises InvalidTransition" do
+          expect { announcement.schedule! }.to raise_error(Announcement::InvalidTransition, "Title and content are required to schedule")
+        end
+      end
+
       context "when scheduled_at is within tolerance window" do
         let(:announcement) { create(:announcement, :draft, scheduled_at: 1.day.from_now) }
 
@@ -291,8 +376,9 @@ RSpec.describe Announcement, type: :model do
       let(:announcement) { create(:announcement, :draft) }
 
       it "allows updating all attributes" do
+        announcement.reference = "Updated Ref"
         announcement.title = "Updated Title"
-        announcement.body = "Updated Body"
+        announcement.rich_body = "<p>Updated Body</p>"
         announcement.scheduled_at = 1.day.from_now
         expect(announcement).to be_valid
       end

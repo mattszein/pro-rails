@@ -94,14 +94,14 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed patterns, conventions, and d
 ### Announcements
 
 - [ ] Email template for announcement notifications
-- [ ] Rich text support via ActionText. Test Lexxy
+- [x] Rich text support via ActionText. Test Lexxy. Add reference.
 
 ### Support tickets
 
 - [ ] Expand ticket states beyond `open / in_progress / closed` — add `initial`, `reopened`, and others as needed.
 - [ ] User that opened a ticket only can send messages in the conversation when is in_progress.
-- [ ] Add notes (only admins can create them, visualize and delete them, normal users cant see them) to a ticket. 
-- [ ] Add tickets references. You can link ticket to others that has the same root problem and solution! 
+- [ ] Add notes (only admins can create them, visualize and delete them, normal users cant see them) to a ticket.
+- [ ] Add tickets references. You can link ticket to others that has the same root problem and solution!
 
 ### Architecture & refactoring
 
@@ -118,6 +118,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed patterns, conventions, and d
 - [ ] Lookbook: update previews to cover all core components and recently added features
 
 ### Accounts
+
 - [ ] Add profile with avatar upload
 - [ ] Add AI(rubyllm) to make an example for an image generation for the account avatar
 

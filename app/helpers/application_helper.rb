@@ -84,8 +84,8 @@ module ApplicationHelper
   def announcement_columns
     [
       {
-        label: "Title",
-        renderer: ->(announcement) { announcement.title }
+        label: "Reference",
+        renderer: ->(announcement) { announcement.reference }
       },
       {
         label: "Status",

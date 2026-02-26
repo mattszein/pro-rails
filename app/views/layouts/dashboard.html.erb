@@ -17,6 +17,7 @@
     <link rel="apple-touch-icon" href="/icon.png">
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "lexxy" %>
     <%= javascript_importmap_tags %>
     <%= action_cable_with_jwt_meta_tag(current_user: current_account) if current_account %>
     <link rel="preconnect" href="https://fonts.googleapis.com">
