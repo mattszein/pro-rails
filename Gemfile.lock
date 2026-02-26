@@ -128,9 +128,9 @@ GEM
     crass (1.0.6)
     css_parser (2.0.0)
       addressable
-    cuprite (0.16)
+    cuprite (0.17)
       capybara (~> 3.0)
-      ferrum (~> 0.16.0)
+      ferrum (~> 0.17.0)
     date (3.5.1)
     debug (1.11.1)
       irb (~> 1.10)
@@ -159,7 +159,7 @@ GEM
     factory_bot_rails (6.5.1)
       factory_bot (~> 6.5)
       railties (>= 6.1.0)
-    ferrum (0.16)
+    ferrum (0.17.1)
       addressable (~> 2.5)
       base64 (~> 0.2)
       concurrent-ruby (~> 1.1)
@@ -574,7 +574,7 @@ DEPENDENCIES
   bootsnap
   brakeman (~> 8.0)
   capybara
-  cuprite (= 0.16)
+  cuprite (= 0.17)
   debug
   dry-initializer-rails
   erb_lint
