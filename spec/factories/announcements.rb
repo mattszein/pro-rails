@@ -1,5 +1,6 @@
 FactoryBot.define do
   factory :announcement do
+    sequence(:reference) { |n| "REF-#{n}" }
     sequence(:title) { |n| "Announcement ##{n}" }
     body { "This is an important announcement about our platform updates." }
     rich_body { "<p>This is an <strong>important</strong> announcement about our platform updates.</p>" }

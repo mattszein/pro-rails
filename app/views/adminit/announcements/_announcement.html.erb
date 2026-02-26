@@ -2,13 +2,16 @@
   <%= render(Core::CardComponent.new(variant: :glass, glow: true, classes: "space-y-4")) do %>
     <div class="flex items-center gap-4">
       <%= icon "adminit/announcement", {classes: "h-8"} %>
-      <h1><%= announcement.title %></h1>
+      <h1><%= announcement.reference %></h1>
       <%= render(Core::BadgeComponent.new(label: announcement.status.humanize,
             theme: announcement_status_theme(announcement.status), icon: "info", size: :md)) %>
     </div>
 
     <%= render Core::BoxComponent.new do %>
       <%= render Core::DefinitionListComponent.new(variant: :info, gap: :sm) do |dl| %>
+        <% dl.with_item(term: "Reference") do %>
+          <%= announcement.reference %>
+        <% end %>
         <% dl.with_item(term: "Author") do %>
           <%= announcement.author.email %>
         <% end %>

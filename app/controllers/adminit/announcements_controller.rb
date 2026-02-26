@@ -79,7 +79,7 @@ class Adminit::AnnouncementsController < Adminit::ApplicationController
   end
 
   def announcement_params
-    params.require(:announcement).permit(:title, :body, :rich_body, :scheduled_at)
+    params.require(:announcement).permit(:reference, :title, :body, :rich_body, :scheduled_at)
   end
 
   def respond_success(message, path)

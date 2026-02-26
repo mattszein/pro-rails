@@ -66,8 +66,8 @@ describe Adminit::AnnouncementsController, type: :controller do
   end
 
   describe "POST #create" do
-    let(:valid_params) { {announcement: attributes_for(:announcement).merge(rich_body: "<p>Test</p>")} }
-    let(:invalid_params) { {announcement: {title: nil, rich_body: nil}} }
+    let(:valid_params) { {announcement: attributes_for(:announcement).slice(:reference)} }
+    let(:invalid_params) { {announcement: {reference: nil}} }
 
     subject { post :create, params: valid_params }
 

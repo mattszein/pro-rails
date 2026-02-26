@@ -10,7 +10,8 @@
       </ul>
     </div>
   <% end %>
-  <%= form.text_field :title, {autofocus: true, required: true, placeholder: " ", autocomplete: "title", class: "w-full"} %>
+  <%= form.text_field :reference, {autofocus: true, required: true, placeholder: " ", autocomplete: "off", class: "w-full"} %>
+  <%= form.text_field :title, {placeholder: " ", autocomplete: "title", class: "w-full"} %>
   <div>
     <%= form.label :rich_body, "Content", class: "block text-sm font-medium mb-2" %>
     <%= form.rich_text_area :rich_body %>
