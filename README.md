@@ -6,6 +6,31 @@ A production-ready Rails 8 starter template built for real-world web products. T
 
 The goal: skip the weeks of boilerplate setup on every new project and start building what actually matters. Every pattern and feature in this template is a deliberate choice, showing how authentication, authorization, real-time, background jobs, and UI components fit together in a clean, maintainable way. Designed for products with global users in mind, with the architecture decisions already made and working as a reference for how a well-structured Rails app fits together.
 
+## 🛠 Getting Started
+
+`Tip: Dockerize your life`
+Why spend three hours fighting with local Ruby versions and native extensions when you can let Docker do the heavy lifting? To get the entire stack breathing, just execute:
+
+```
+chmod +x init.sh
+./init.sh
+```
+
+The init.sh Quick Breakdown.
+
+- Check: Verifies gawk and docker are installed.
+- Build: Prepares the Docker images and environment.
+- Bundle: Runs bundle install inside a volume.
+- Database: Boots the PostgreSQL service in the background.
+- Wait: Pauses 5 seconds for the DB to initialize.
+- Setup: Runs db:setup and db:seed to prep your data.
+
+If you want to up your server just execute:
+
+```
+docker compose up rails
+```
+
 ## What's included
 
 ### Authentication — [Rodauth](https://rodauth.jeremyevans.net/)
