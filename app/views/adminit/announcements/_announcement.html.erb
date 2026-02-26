@@ -38,7 +38,7 @@
       <%= announcement.title %>
     </h2>
     <div class="prose dark:prose-invert max-w-none">
-      <%= simple_format(announcement.body) %>
+      <%= announcement.rich_body %>
     </div>
   <% end %>
 </div>

@@ -12,10 +12,8 @@
   <% end %>
   <%= form.text_field :title, {autofocus: true, required: true, placeholder: " ", autocomplete: "title", class: "w-full"} %>
   <div>
-    <%= form.label :body, class: "block text-sm font-medium mb-2" %>
-    <%= form.text_area :body, rows: 8, placeholder: "Write your announcement here...",
-          class: "w-full mt-2 rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500",
-          required: true %>
+    <%= form.label :rich_body, "Content", class: "block text-sm font-medium mb-2" %>
+    <%= form.rich_text_area :rich_body %>
   </div>
   <%= form.date_time :scheduled_at, disabled: !announcement.scheduled_at_editable? %>
   <% if !announcement.scheduled_at_editable? %>

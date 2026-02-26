@@ -10,71 +10,81 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_23_154832) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_26_030336) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
 
   create_table "account_email_auth_keys", force: :cascade do |t|
-    t.string "key", null: false
+    t.datetime "create_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.datetime "deadline", null: false
     t.datetime "email_last_sent", default: -> { "CURRENT_TIMESTAMP" }, null: false
-    t.datetime "create_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.string "key", null: false
   end
 
   create_table "account_login_change_keys", force: :cascade do |t|
+    t.datetime "deadline", null: false
     t.string "key", null: false
     t.string "login", null: false
-    t.datetime "deadline", null: false
   end
 
   create_table "account_password_reset_keys", force: :cascade do |t|
-    t.string "key", null: false
     t.datetime "deadline", null: false
     t.datetime "email_last_sent", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.string "key", null: false
   end
 
   create_table "account_remember_keys", force: :cascade do |t|
-    t.string "key", null: false
     t.datetime "deadline", null: false
+    t.string "key", null: false
   end
 
   create_table "account_verification_keys", force: :cascade do |t|
+    t.datetime "email_last_sent", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.string "key", null: false
     t.datetime "requested_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
-    t.datetime "email_last_sent", default: -> { "CURRENT_TIMESTAMP" }, null: false
   end
 
   create_table "accounts", force: :cascade do |t|
-    t.integer "status", default: 1, null: false
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.citext "email", null: false
     t.string "password_hash"
-    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.bigint "role_id"
+    t.integer "status", default: 1, null: false
     t.index ["email"], name: "index_accounts_on_email", unique: true, where: "(status = ANY (ARRAY[1, 2]))"
     t.index ["role_id"], name: "index_accounts_on_role_id"
     t.check_constraint "email ~ '^[^,;@ \r\n]+@[^,@; \r\n]+.[^,@; \r\n]+$'::citext", name: "valid_email"
   end
 
-  create_table "active_storage_attachments", force: :cascade do |t|
+  create_table "action_text_rich_texts", force: :cascade do |t|
+    t.text "body"
+    t.datetime "created_at", null: false
     t.string "name", null: false
-    t.string "record_type", null: false
     t.bigint "record_id", null: false
+    t.string "record_type", null: false
+    t.datetime "updated_at", null: false
+    t.index ["record_type", "record_id", "name"], name: "index_action_text_rich_texts_uniqueness", unique: true
+  end
+
+  create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.bigint "record_id", null: false
+    t.string "record_type", null: false
     t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
     t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
   end
 
   create_table "active_storage_blobs", force: :cascade do |t|
-    t.string "key", null: false
-    t.string "filename", null: false
-    t.string "content_type"
-    t.text "metadata"
-    t.string "service_name", null: false
     t.bigint "byte_size", null: false
     t.string "checksum"
+    t.string "content_type"
     t.datetime "created_at", null: false
+    t.string "filename", null: false
+    t.string "key", null: false
+    t.text "metadata"
+    t.string "service_name", null: false
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
 
@@ -85,13 +95,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_23_154832) do
   end
 
   create_table "announcements", force: :cascade do |t|
-    t.string "title", null: false
-    t.text "body", null: false
-    t.integer "status", default: 0, null: false
-    t.datetime "scheduled_at"
-    t.datetime "published_at"
     t.bigint "author_id", null: false
+    t.text "body", null: false
     t.datetime "created_at", null: false
+    t.datetime "published_at"
+    t.datetime "scheduled_at"
+    t.integer "status", default: 0, null: false
+    t.string "title", null: false
     t.datetime "updated_at", null: false
     t.index ["author_id"], name: "index_announcements_on_author_id"
     t.index ["status", "scheduled_at"], name: "index_announcements_on_status_and_scheduled_at"
@@ -99,16 +109,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_23_154832) do
   end
 
   create_table "conversations", force: :cascade do |t|
-    t.bigint "ticket_id", null: false
     t.datetime "created_at", null: false
+    t.bigint "ticket_id", null: false
     t.datetime "updated_at", null: false
     t.index ["ticket_id"], name: "index_conversations_on_ticket_id"
   end
 
   create_table "messages", force: :cascade do |t|
-    t.bigint "conversation_id", null: false
     t.bigint "account_id", null: false
     t.text "content", null: false
+    t.bigint "conversation_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_messages_on_account_id"
@@ -117,24 +127,24 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_23_154832) do
   end
 
   create_table "noticed_events", force: :cascade do |t|
-    t.string "type"
-    t.string "record_type"
-    t.bigint "record_id"
-    t.jsonb "params"
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.integer "notifications_count"
+    t.jsonb "params"
+    t.bigint "record_id"
+    t.string "record_type"
+    t.string "type"
+    t.datetime "updated_at", null: false
     t.index ["record_type", "record_id"], name: "index_noticed_events_on_record"
   end
 
   create_table "noticed_notifications", force: :cascade do |t|
-    t.string "type"
-    t.bigint "event_id", null: false
-    t.string "recipient_type", null: false
-    t.bigint "recipient_id", null: false
-    t.datetime "read_at", precision: nil
-    t.datetime "seen_at", precision: nil
     t.datetime "created_at", null: false
+    t.bigint "event_id", null: false
+    t.datetime "read_at", precision: nil
+    t.bigint "recipient_id", null: false
+    t.string "recipient_type", null: false
+    t.datetime "seen_at", precision: nil
+    t.string "type"
     t.datetime "updated_at", null: false
     t.index ["event_id"], name: "index_noticed_notifications_on_event_id"
     t.index ["recipient_type", "recipient_id", "read_at"], name: "index_noticed_notifications_on_recipient_and_read_at"
@@ -142,8 +152,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_23_154832) do
   end
 
   create_table "permissions", force: :cascade do |t|
-    t.string "resource"
     t.datetime "created_at", null: false
+    t.string "resource"
     t.datetime "updated_at", null: false
     t.index ["resource"], name: "index_permissions_on_resource", unique: true
   end
@@ -157,21 +167,21 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_23_154832) do
   end
 
   create_table "roles", force: :cascade do |t|
-    t.string "name"
     t.datetime "created_at", null: false
+    t.string "name"
     t.datetime "updated_at", null: false
   end
 
   create_table "tickets", force: :cascade do |t|
-    t.string "title"
+    t.bigint "assigned_id"
+    t.integer "category", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.bigint "created_id"
     t.text "description"
     t.integer "priority"
     t.integer "status", default: 0
-    t.bigint "created_id"
-    t.bigint "assigned_id"
-    t.datetime "created_at", null: false
+    t.string "title"
     t.datetime "updated_at", null: false
-    t.integer "category", default: 0, null: false
     t.index ["assigned_id"], name: "index_tickets_on_assigned_id"
     t.index ["created_id"], name: "index_tickets_on_created_id"
   end

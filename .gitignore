@@ -39,7 +39,6 @@
 /config/*.local.yml
 /config/credentials/local.*
 
-/vendor/javascript/*
 
 # Ignore temporary Docker files
 Dockerfile.backup

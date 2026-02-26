@@ -7,7 +7,7 @@ RSpec.describe Announcement, type: :model do
 
   describe "validations" do
     it { is_expected.to validate_presence_of(:title) }
-    it { is_expected.to validate_presence_of(:body) }
+    it { is_expected.to validate_presence_of(:rich_body) }
 
     context "when status is scheduled" do
       subject { build(:announcement, :scheduled) }
@@ -71,6 +71,20 @@ RSpec.describe Announcement, type: :model do
       it "orders by created_at desc" do
         expect(Announcement.ordered).to eq([new_announcement, middle_announcement, old_announcement])
       end
+    end
+  end
+
+  describe "#sync_body_from_rich_body" do
+    it "populates body from rich_body plain text on validation" do
+      announcement = build(:announcement, rich_body: "<p>Hello <strong>world</strong></p>", body: nil)
+      announcement.valid?
+      expect(announcement.body).to eq("Hello world")
+    end
+
+    it "does not overwrite body when rich_body is blank" do
+      announcement = build(:announcement, rich_body: nil, body: "existing")
+      announcement.valid?
+      expect(announcement.body).to eq("existing")
     end
   end
 
@@ -292,7 +306,7 @@ RSpec.describe Announcement, type: :model do
 
       it "allows updating all attributes" do
         announcement.title = "Updated Title"
-        announcement.body = "Updated Body"
+        announcement.rich_body = "<p>Updated Body</p>"
         announcement.scheduled_at = 1.day.from_now
         expect(announcement).to be_valid
       end

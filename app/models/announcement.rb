@@ -2,6 +2,7 @@ class Announcement < ApplicationRecord
   class InvalidTransition < StandardError; end
   SCHEDULE_TOLERANCE = 3.minutes
   belongs_to :author, class_name: "Account"
+  has_rich_text :rich_body
 
   enum :status, {
     draft: 0,
@@ -10,12 +11,13 @@ class Announcement < ApplicationRecord
   }, default: :draft, validate: {allow_nil: false}
 
   validates :title, presence: true
-  validates :body, presence: true
+  validates :rich_body, presence: true
   validates :scheduled_at, presence: true, if: :scheduled?
 
   validate :scheduled_at_immutable_when_scheduled, on: :update
   validate :cannot_update_when_published, on: :update
 
+  before_validation :sync_body_from_rich_body
   before_destroy :ensure_destroyable
 
   scope :ready_to_publish, -> { where(status: :scheduled).where("scheduled_at <= ?", Time.current) }
@@ -72,6 +74,10 @@ class Announcement < ApplicationRecord
   end
 
   private
+
+  def sync_body_from_rich_body
+    self.body = rich_body.to_plain_text if rich_body.present?
+  end
 
   def scheduled_at_immutable_when_scheduled
     if scheduled? && scheduled_at_changed?
