@@ -83,8 +83,6 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed patterns, conventions, and d
 
 - [x] README
 - [ ] Credentials: define defaults and document how to use Rails credentials across environments
-- [ ] Lookbook: update previews to cover all core components and recently added features
-- [x] Upgrade all gems to latest versions
 - [x] Remove view components form gem
 - [ ] Add basic setup instructions to start the app locally (database setup, credentials, etc), create script for db setup and seeding.
 
@@ -97,14 +95,17 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed patterns, conventions, and d
 
 - [ ] Email template for announcement notifications
 - [ ] Rich text support via ActionText. Test Lexxy
-- [ ] Noticed event factory should support other notifier types beyond AnnouncementNotifier
 
 ### Support tickets
 
-- [ ] Expand ticket states beyond `open / in_progress / closed` — add `initial`, `reopened`, and others as needed
+- [ ] Expand ticket states beyond `open / in_progress / closed` — add `initial`, `reopened`, and others as needed.
+- [ ] User that opened a ticket only can send messages in the conversation when is in_progress.
+- [ ] Add notes (only admins can create them, visualize and delete them, normal users cant see them) to a ticket. 
+- [ ] Add tickets references. You can link ticket to others that has the same root problem and solution! 
 
 ### Architecture & refactoring
 
+- [x] Upgrade all gems to latest versions
 - [ ] Base controller shared between Adminit and Dashboard to reduce duplication
 - [ ] Adminit menu: replace `allowed_to?` iteration in the view with a helper that resolves permitted items for the current user
 - [ ] Permissions: replace string-based controller references with integer enums
@@ -114,6 +115,11 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed patterns, conventions, and d
 - [ ] Table component should support sorting, filtering, and pagination (client vs server ?)
 - [ ] Fix old adminit components (Roles views, account views)
 - [ ] Components should be refactored to use primary / secondary colors? messages in conversation, box component, notifications
+- [ ] Lookbook: update previews to cover all core components and recently added features
+
+### Accounts
+- [ ] Add profile with avatar upload
+- [ ] Add AI(rubyllm) to make an example for an image generation for the account avatar
 
 ## Roadmap to 2.0
 
