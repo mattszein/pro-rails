@@ -172,15 +172,16 @@ We use ActionPolicy for authorization, and we have a custom RBAC system for the 
 ```ruby
 module Adminit
   class AnnouncementPolicy < ApplicationPolicy
+    POLICY_RESOURCE = :announcement
     self.identifier = :"Adminit::AnnouncementPolicy"
-    
+
     # All actions use default manage? rule
     # Define specific methods only if different logic needed
   end
 end
 ```
 
-The `identifier` is stored in the Permission model's `resource` column. Policies check if the user's role has a permission with that identifier.
+Each policy defines a `POLICY_RESOURCE` constant that maps to an integer enum on the `Permission` model. The enum registry (`Permission::RESOURCE_REGISTRY`) assigns stable integers to each resource key, so renaming a policy class never breaks existing permissions. The base `get_access` method uses `self.class::POLICY_RESOURCE` to look up whether the user's role has the matching permission.
 
 ### Controller Usage
 
