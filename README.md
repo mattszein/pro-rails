@@ -109,7 +109,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed patterns, conventions, and d
 - [x] README
 - [ ] Credentials: define defaults and document how to use Rails credentials across environments
 - [x] Remove view components form gem
-- [ ] Add basic setup instructions to start the app locally (database setup, credentials, etc), create script for db setup and seeding.
+- [x] Add basic setup instructions to start the app locally (database setup, credentials, etc), create script for db setup and seeding.
 
 ### Internationalization
 
@@ -123,9 +123,9 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed patterns, conventions, and d
 
 ### Support tickets
 
-- [ ] Expand ticket states beyond `open / in_progress / closed` — add `initial`, `reopened`, and others as needed.
-- [ ] User that opened a ticket only can send messages in the conversation when is in_progress.
-- [ ] Add notes (only admins can create them, visualize and delete them, normal users cant see them) to a ticket.
+- [x] Expand ticket states beyond `open / in_progress / closed` — add `initial`, `reopened`, and others as needed.
+- [x] User that opened a ticket only can send messages in the conversation when is in_progress.
+- [x] Add notes (only admins can create them, visualize and delete them, normal users cant see them) to a ticket.
 - [ ] Add tickets references. You can link ticket to others that has the same root problem and solution!
 
 ### Architecture & refactoring
@@ -133,7 +133,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed patterns, conventions, and d
 - [x] Upgrade all gems to latest versions
 - [ ] Base controller shared between Adminit and Dashboard to reduce duplication
 - [ ] Adminit menu: replace `allowed_to?` iteration in the view with a helper that resolves permitted items for the current user
-- [ ] Permissions: replace string-based controller references with integer enums
+- [x] Permissions: replace string-based controller references with integer enums
 - [ ] Generator: scaffold a new Adminit resource (controller, views, policy, and specs) in one command
 - [ ] Adminit dashboard: analytics, stats, and quick actions, with role-specific views per role
 - [x] Refactoring view components to use same patterns
