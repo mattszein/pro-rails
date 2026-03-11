@@ -1,5 +1,6 @@
 module Adminit
   class TicketPolicy < ApplicationPolicy
+    POLICY_RESOURCE = :ticket
     self.identifier = :"Adminit::TicketPolicy"
 
     # Allow admins to take unassigned tickets regardless of status

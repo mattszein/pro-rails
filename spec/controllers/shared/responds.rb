@@ -79,9 +79,9 @@ RSpec.shared_context "user and permissions adminit" do
   let(:user_without_permissions) { create(:account, :with_role, :verified) }
 
   let(:app_permission) { create(:permission, roles: [user.role, user_superadmin.role]) }
-  let(:permissions_permission) { create(:permission, resource: Adminit::PermissionPolicy.identifier, roles: [user_superadmin.role, user.role]) }
-  let(:account_permission) { create(:permission, resource: Adminit::AccountPolicy.identifier, roles: [user_superadmin.role, user.role]) }
-  let(:role_permission) { create(:permission, resource: Adminit::RolePolicy.identifier, roles: [user_superadmin.role, user.role]) }
+  let(:permissions_permission) { create(:permission, resource: :permission, roles: [user_superadmin.role, user.role]) }
+  let(:account_permission) { create(:permission, resource: :account, roles: [user_superadmin.role, user.role]) }
+  let(:role_permission) { create(:permission, resource: :role, roles: [user_superadmin.role, user.role]) }
 end
 
 RSpec.shared_context "adminit_auth" do

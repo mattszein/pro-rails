@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe Adminit::TicketPolicy, type: :policy do
   let(:admin_role) { create(:role, name: "admin") }
-  let(:permission) { create(:permission, resource: Adminit::TicketPolicy.identifier, roles: [admin_role]) }
+  let(:permission) { create(:permission, resource: :ticket, roles: [admin_role]) }
   let(:admin_account) { create(:account, :verified, role: admin_role) }
   let(:creator_account) { create(:account, :verified) }
   let(:policy) { described_class.new(ticket, user: admin_account) }

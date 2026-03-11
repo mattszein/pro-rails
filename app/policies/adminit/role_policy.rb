@@ -1,5 +1,6 @@
 module Adminit
   class RolePolicy < ApplicationPolicy
+    POLICY_RESOURCE = :role
     self.identifier = :"Adminit::RolePolicy"
     def remove_account?
       return false unless manage?

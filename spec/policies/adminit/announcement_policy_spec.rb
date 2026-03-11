@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe Adminit::AnnouncementPolicy, type: :policy do
   let(:admin_role) { create(:role, name: "admin") }
-  let(:permission) { create(:permission, resource: Adminit::AnnouncementPolicy.identifier, roles: [admin_role]) }
+  let(:permission) { create(:permission, resource: :announcement, roles: [admin_role]) }
   let(:admin_account) { create(:account, :verified, role: admin_role) }
   let(:announcement) { create(:announcement) }
 
@@ -42,7 +42,7 @@ RSpec.describe Adminit::AnnouncementPolicy, type: :policy do
       let(:policy) { described_class.new(announcement, user: superadmin_account) }
 
       before do
-        create(:permission, resource: Adminit::AnnouncementPolicy.identifier, roles: [superadmin_role])
+        create(:permission, resource: :announcement, roles: [superadmin_role])
       end
 
       it "allows access" do
