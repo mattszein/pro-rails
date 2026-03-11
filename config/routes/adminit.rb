@@ -3,8 +3,16 @@ namespace :adminit do
   root to: "application#index"
   resources :accounts
   resources :tickets do
-    post :take, on: :member
-    post :leave, on: :member
+    member do
+      post :take
+      post :leave
+      post :finish
+      post :reopen
+      post :accept_reopen
+      get :reject_reopen
+      post :reject_reopen
+    end
+    resources :notes, only: [:create], controller: "tickets/notes"
   end
   resources :announcements do
     post :schedule, on: :member

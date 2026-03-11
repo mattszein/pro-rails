@@ -1,0 +1,6 @@
+<%= form_with model: Support::Note.new, url: adminit_ticket_notes_path(ticket), class: "space-y-3" do |form| %>
+  <%= form.text_area :body, rows: 2, placeholder: "Add an internal note...", required: true %>
+  <div class="flex justify-end">
+    <%= form.button "Add Note", {theme: :primary, size: :sm} %>
+  </div>
+<% end %>

@@ -1,5 +1,7 @@
 class Adminit::TicketsController < Adminit::ApplicationController
-  before_action :set_ticket, only: %i[show edit update destroy take leave]
+  before_action :set_ticket, only: %i[show edit update destroy take leave finish reopen accept_reopen reject_reopen]
+  before_action :ensure_frame_response, only: %i[edit]
+  before_action :ensure_frame_response, only: %i[reject_reopen], if: -> { request.get? }
 
   # GET /tickets or /tickets.json
   def index
@@ -12,6 +14,7 @@ class Adminit::TicketsController < Adminit::ApplicationController
     authorize! @ticket, with: Adminit::TicketPolicy
     @conversation = @ticket.conversation
     @messages = @conversation.messages.includes(:account).order(created_at: :asc)
+    @notes = @ticket.notes.includes(:account).order(created_at: :desc)
   end
 
   # GET /tickets/1/edit
@@ -48,15 +51,17 @@ class Adminit::TicketsController < Adminit::ApplicationController
   # POST /tickets/1/take
   def take
     authorize! @ticket, to: :take?, with: Adminit::TicketPolicy
+    result = Adminit::Tickets::Take.call(ticket: @ticket, account: current_account)
+    
     respond_to do |format|
-      if @ticket.assigned_id.nil? && @ticket.update(assigned: current_account, status: :in_progress)
+      if result.success?
         format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, adminit_ticket_path(@ticket)) }
         format.html { redirect_to adminit_ticket_path(@ticket), notice: "Ticket was successfully assigned to you." }
         format.json { render :show, status: :ok, location: @ticket }
       else
-        format.turbo_stream { render turbo_stream: turbo_stream.replace(dom_id(@ticket, "admin"), partial: "adminit/tickets/ticket_table", locals: {ticket: @ticket}), status: :unprocessable_content }
-        format.html { redirect_to adminit_tickets_url, alert: "Unable to take this ticket." }
-        format.json { render json: {error: "Unable to take this ticket"}, status: :unprocessable_content }
+        format.turbo_stream { render turbo_stream: turbo_stream.replace(ActionView::RecordIdentifier.dom_id(@ticket, "admin"), partial: "adminit/tickets/ticket_row", locals: {ticket: @ticket}), status: :unprocessable_content }
+        format.html { redirect_to adminit_tickets_url, alert: result.error }
+        format.json { render json: {error: result.error}, status: :unprocessable_content }
       end
     end
   end
@@ -64,15 +69,81 @@ class Adminit::TicketsController < Adminit::ApplicationController
   # POST /tickets/1/leave
   def leave
     authorize! @ticket, to: :leave?, with: Adminit::TicketPolicy
+    result = Adminit::Tickets::Leave.call(ticket: @ticket, account: current_account)
+
     respond_to do |format|
-      if @ticket.assigned_id == current_account.id && @ticket.update(assigned: nil, status: :open)
+      if result.success?
         format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, adminit_tickets_path) }
         format.html { redirect_to adminit_tickets_url, notice: "You have left the ticket." }
         format.json { render :show, status: :ok, location: @ticket }
       else
-        format.turbo_stream { render turbo_stream: turbo_stream.replace(dom_id(@ticket, "admin"), partial: "adminit/tickets/ticket_table", locals: {ticket: @ticket}), status: :unprocessable_content }
-        format.html { redirect_to adminit_tickets_url, alert: "Unable to leave this ticket." }
-        format.json { render json: {error: "Unable to leave this ticket"}, status: :unprocessable_content }
+        format.turbo_stream { render turbo_stream: turbo_stream.replace(ActionView::RecordIdentifier.dom_id(@ticket, "admin"), partial: "adminit/tickets/ticket_row", locals: {ticket: @ticket}), status: :unprocessable_content }
+        format.html { redirect_to adminit_tickets_url, alert: result.error }
+        format.json { render json: {error: result.error}, status: :unprocessable_content }
+      end
+    end
+  end
+
+  # POST /tickets/1/finish
+  def finish
+    authorize! @ticket, with: Adminit::TicketPolicy
+    result = Adminit::Tickets::Finish.call(ticket: @ticket, account: current_account)
+
+    respond_to do |format|
+      if result.success?
+        format.html { redirect_to adminit_ticket_path(@ticket), notice: "Ticket marked as finished." }
+      else
+        format.html { redirect_to adminit_ticket_path(@ticket), alert: result.error }
+      end
+    end
+  end
+
+  # POST /tickets/1/reopen
+  def reopen
+    authorize! @ticket, with: Adminit::TicketPolicy
+    result = Adminit::Tickets::Reopen.call(ticket: @ticket, account: current_account)
+
+    respond_to do |format|
+      if result.success?
+        format.html { redirect_to adminit_ticket_path(@ticket), notice: "Ticket reopened." }
+      else
+        format.html { redirect_to adminit_ticket_path(@ticket), alert: result.error }
+      end
+    end
+  end
+
+  # POST /tickets/1/accept_reopen
+  def accept_reopen
+    authorize! @ticket, with: Adminit::TicketPolicy
+    result = Adminit::Tickets::AcceptReopen.call(ticket: @ticket, account: current_account)
+
+    respond_to do |format|
+      if result.success?
+        format.html { redirect_to adminit_ticket_path(@ticket), notice: "Reopen request accepted." }
+      else
+        format.html { redirect_to adminit_ticket_path(@ticket), alert: result.error }
+      end
+    end
+  end
+
+  # GET /tickets/1/reject_reopen - render form in modal
+  # POST /tickets/1/reject_reopen - process rejection
+  def reject_reopen
+    authorize! @ticket, with: Adminit::TicketPolicy
+
+    if request.get?
+      render :reject_reopen
+    else
+      result = Adminit::Tickets::RejectReopen.call(ticket: @ticket, account: current_account, body: params[:reason])
+
+      respond_to do |format|
+        if result.success?
+          format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, adminit_ticket_path(@ticket)) }
+          format.html { redirect_to adminit_ticket_path(@ticket), notice: "Reopen request rejected." }
+        else
+          format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, adminit_ticket_path(@ticket)) }
+          format.html { redirect_to adminit_ticket_path(@ticket), alert: result.error }
+        end
       end
     end
   end

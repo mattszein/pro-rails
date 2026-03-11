@@ -1,0 +1,9 @@
+<div class="p-3 rounded-lg <%= note_classes %>">
+  <div class="flex justify-between items-start mb-1">
+    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">
+      <%= note.kind.humanize %> <%= "• #{note.account.email}" if note.account %>
+    </span>
+    <span class="text-xs text-slate-400 text-nowrap ml-2"><%= time_ago_in_words(note.created_at) %> ago</span>
+  </div>
+  <p class="text-sm text-slate-700 dark:text-slate-300"><%= note.body %></p>
+</div>

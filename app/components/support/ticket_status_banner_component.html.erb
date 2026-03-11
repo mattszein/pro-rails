@@ -1,0 +1,5 @@
+<% config = banner_config %>
+<div class="p-4 rounded-xl border flex items-center gap-3 <%= config[:wrapper] %>">
+  <%= helpers.icon config[:icon], classes: "h-5 w-5" %>
+  <p class="font-medium"><%= config[:message] %></p>
+</div>

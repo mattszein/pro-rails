@@ -3,7 +3,7 @@ module Support
     before_action :require_account
     verify_authorized
 
-    before_action :set_ticket, only: %i[show edit update attach_files]
+    before_action :set_ticket, only: %i[show edit update attach_files request_reopen]
     before_action :ensure_frame_response, only: %i[new edit]
 
     # GET /support/tickets or /support/tickets.json
@@ -78,6 +78,22 @@ module Support
         flash[:alert] = "No files selected"
       end
       redirect_to support_ticket_path(@ticket)
+    end
+
+    # POST /support/tickets/1/request_reopen
+    def request_reopen
+      authorize! @ticket
+      result = Support::Tickets::RequestReopen.call(
+        ticket: @ticket,
+        account: current_account,
+        body: params[:reason]
+      )
+
+      if result.success?
+        redirect_to support_ticket_path(@ticket), notice: "Reopen request sent."
+      else
+        redirect_to support_ticket_path(@ticket), alert: result.error
+      end
     end
 
     private

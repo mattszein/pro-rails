@@ -1,0 +1,15 @@
+<div class="flex flex-col h-full min-h-0">
+  <div class="mb-4 shrink-0">
+    <%= render Support::NoteFormComponent.new(ticket: ticket) %>
+  </div>
+  
+  <div class="flex-1 overflow-y-auto pr-2 space-y-3 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700 min-h-0">
+    <% if notes.any? %>
+      <% notes.each do |note| %>
+        <%= render Support::NoteComponent.new(note: note) %>
+      <% end %>
+    <% else %>
+      <p class="text-sm text-slate-500 italic text-center py-4">No notes yet.</p>
+    <% end %>
+  </div>
+</div>

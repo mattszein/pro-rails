@@ -5,7 +5,14 @@ module Support
       return false unless record.conversation&.ticket
 
       ticket = record.conversation.ticket
-      user.id == ticket.created_id || user.id == ticket.assigned_id
+
+      # If the user is the creator, they can only message when ticket is messageable
+      if user.id == ticket.created_id
+        return ticket.messageable?
+      end
+
+      # Assignee or Adminit access can always message
+      user.id == ticket.assigned_id || user.adminit_access?
     end
 
     # Only the message author can update their own messages

@@ -30,6 +30,8 @@ Pro-Rails is a Rails 8.0 application using modern Rails stack with Hotwire (Turb
 
 DOCKER: We use docker and docker-compose for local development. Execute any
 command using docker compose! rails backend service is called rails.
+Always pass `RAILS_ENV=test` when running rspec, e.g.:
+`docker compose exec -e RAILS_ENV=test rails bundle exec rspec`
 
 ```bash
 bin/setup                    # Initial setup

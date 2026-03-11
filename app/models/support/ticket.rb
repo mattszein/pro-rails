@@ -1,13 +1,23 @@
 module Support
   class Ticket < ApplicationRecord
+    class InvalidTransition < StandardError; end
+
     self.table_name = "tickets"
 
     belongs_to :created, class_name: "Account", optional: true
     belongs_to :assigned, class_name: "Account", optional: true
     has_one :conversation, class_name: "Support::Conversation", dependent: :destroy
+    has_many :notes, class_name: "Support::Note", dependent: :destroy
     has_many_attached :attachments
 
-    enum :status, {open: 0, in_progress: 1, closed: 2}, default: :open, validate: {allow_nil: false}
+    enum :status, {
+      open: 0,
+      in_progress: 1,
+      finished: 2,
+      reopen_requested: 3,
+      reopened: 4,
+      closed: 5
+    }, default: :open, validate: {allow_nil: false}
     enum :category, {
       account_access: 0,
       technical_issue: 1,
@@ -38,6 +48,35 @@ module Support
       broadcast_replace_later_to "admin_tickets",
         target: ActionView::RecordIdentifier.dom_id(ticket, "admin"),
         partial: "adminit/tickets/ticket_row"
+    end
+
+    def messageable?
+      in_progress? || reopened?
+    end
+
+    def finish!
+      raise InvalidTransition, "Can only finish in-progress or reopened tickets" unless in_progress? || reopened?
+      update!(status: :finished)
+    end
+
+    def reopen!
+      raise InvalidTransition, "Can only reopen finished tickets" unless finished?
+      update!(status: :reopened)
+    end
+
+    def request_reopen!
+      raise InvalidTransition, "Can only request reopen on finished tickets" unless finished?
+      update!(status: :reopen_requested)
+    end
+
+    def accept_reopen!
+      raise InvalidTransition, "Can only accept reopen on reopen-requested tickets" unless reopen_requested?
+      update!(status: :reopened)
+    end
+
+    def reject_reopen!
+      raise InvalidTransition, "Can only reject reopen on reopen-requested tickets" unless reopen_requested?
+      update!(status: :closed)
     end
 
     private

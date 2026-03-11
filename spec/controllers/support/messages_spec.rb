@@ -7,7 +7,7 @@ RSpec.describe Support::MessagesController, type: :controller do
   let(:creator_account) { create(:account, :verified) }
   let(:assignee_account) { create(:account, :with_role, :verified) }
   let(:other_account) { create(:account, :verified) }
-  let(:ticket) { create(:ticket, created_id: creator_account.id, assigned_id: assignee_account.id) }
+  let(:ticket) { create(:ticket, created_id: creator_account.id, assigned_id: assignee_account.id, status: :in_progress) }
   let(:conversation) { ticket.conversation }
 
   describe "POST #create" do
@@ -139,20 +139,16 @@ RSpec.describe Support::MessagesController, type: :controller do
       end
     end
 
-    context "when ticket has no assignee" do
-      let(:ticket) { create(:ticket, created_id: creator_account.id, assigned_id: nil) }
+    context "when ticket has no assignee (open status)" do
+      let(:ticket) { create(:ticket, created_id: creator_account.id, assigned_id: nil, status: :open) }
 
       before { login_user(creator_account) }
 
-      context "creator can still send messages" do
+      context "creator cannot send messages on open tickets" do
         let(:params) { valid_params }
 
-        it "is authorized" do
-          expect { subject }.to be_authorized_to(:create?, an_instance_of(Support::Message)).with(Support::MessagePolicy).with_context(user: creator_account)
-        end
-
-        it "creates a new message" do
-          expect { subject }.to change(Support::Message, :count).by(1)
+        it "does not create a message" do
+          expect { subject }.not_to change(Support::Message, :count)
         end
       end
     end
@@ -160,7 +156,7 @@ RSpec.describe Support::MessagesController, type: :controller do
     context "when assignee is different from creator" do
       let(:different_creator) { create(:account, :verified) }
       let(:different_assignee) { create(:account, :with_role, :verified) }
-      let(:ticket) { create(:ticket, created_id: different_creator.id, assigned_id: different_assignee.id) }
+      let(:ticket) { create(:ticket, created_id: different_creator.id, assigned_id: different_assignee.id, status: :in_progress) }
 
       before { login_user(different_assignee) }
 
