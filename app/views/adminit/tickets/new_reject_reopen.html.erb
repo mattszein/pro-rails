@@ -1,0 +1,8 @@
+<%= render(Core::ModalComponent.new(title: "Reject Reopen Request")) do %>
+  <%= form_with url: reject_reopen_adminit_ticket_path(@ticket), class: "space-y-4" do |form| %>
+    <%= form.text_area :reason, rows: 3, placeholder: "Explain why this request is being rejected...", required: true %>
+    <div class="flex justify-end gap-3">
+      <%= form.button "Reject Request", {theme: :delete} %>
+    </div>
+  <% end %>
+<% end %>

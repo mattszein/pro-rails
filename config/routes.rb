@@ -29,6 +29,7 @@ Rails.application.routes.draw do
     resources :tickets, except: [:destroy] do
       member do
         post :attach_files
+        post :request_reopen
       end
       resources :messages, only: [:create]
     end

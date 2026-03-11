@@ -1,0 +1,12 @@
+<div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-200 dark:border-blue-800 space-y-3">
+  <p class="text-blue-800 dark:text-blue-300 font-medium">This ticket is marked as finished.</p>
+  <p class="text-sm text-slate-600 dark:text-slate-400">If your issue is not resolved, you can request to reopen it by providing a reason below.</p>
+  <%= form_with url: helpers.request_reopen_support_ticket_path(ticket), builder: CustomFormBuilder, class: "flex gap-3" do |form| %>
+    <%= form.text_area :reason,
+          rows: 1,
+          placeholder: "Reason for reopening...",
+          required: true,
+          class: "flex-1 px-4 py-3 rounded-xl resize-none" %>
+    <%= form.button "Request Reopen" %>
+  <% end %>
+</div>

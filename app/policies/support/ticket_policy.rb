@@ -33,5 +33,9 @@ module Support
     def attach_files?
       record.created_id == user.id
     end
+
+    def request_reopen?
+      record.created_id == user.id && record.finished?
+    end
   end
 end

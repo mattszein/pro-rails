@@ -1,57 +1,41 @@
 <div id="<%= dom_id ticket, "admin" %>" class="space-y-4">
-  <!-- Header -->
-  <%= render(Core::CardComponent.new(variant: :glass, glow: true, classes: "space-y-4")) do %>
-    <div class="flex items-center gap-4">
-      <%= icon "support", {classes: "h-8"} %>
-      <h1>Ticket #<%= ticket.id %> - <%= ticket.title %></h1>
-      <%= render(Core::BadgeComponent.new(label: ticket.status.humanize, theme: ticket_status_theme(ticket.status), icon: "info", size: :md)) %>
-    </div>
-    <%= render Core::BoxComponent.new do %>
-      <%= render Core::DefinitionListComponent.new(variant: :info, gap: :sm) do |dl| %>
-        <% dl.with_item(term: "Category") do %>
-          <%= ticket.category.humanize %>
-        <% end %>
-        <% dl.with_item(term: "Created by") do %>
-          <%= ticket.created.email %>
-        <% end %>
-        <% dl.with_item(term: "Assigned to") do %>
-          <%= ticket.assigned&.email || "-" %>
-        <% end %>
-        <% dl.with_item(term: "Priority") do %>
-          <%= ticket.priority %>
-        <% end %>
-        <% dl.with_item(term: "Created on") do %>
-          <%= ticket.created_at %>
-        <% end %>
-        <% dl.with_item(term: "Status") do %>
-          <%= render(Core::BadgeComponent.new(label: ticket.status, theme: ticket_status_theme(ticket.status), icon: "info", size: :md)) %>
-        <% end %>
-      <% end %>
+  <!-- Top Row: Info and Notes -->
+  <div class="flex space-x-2">
+    <%= render(Core::CardComponent.new(classes: "basis-1/2 flex flex-col overflow-y-auto space-y-4")) do %>
+      <%= render Adminit::TicketInfoComponent.new(ticket: ticket) %>
+      <h3 class="font-bold leading-tight">
+        <%= ticket.title %>
+      </h3>
+      <p class="leading-relaxed">
+        <%= ticket.description %>
+      </p>
+      <%= render Support::AttachmentsComponent.new(ticket: ticket, show_upload_form: false) %>
     <% end %>
-  <% end %>
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-    <div class="lg:col-span-2 space-y-6">
-      <%= render(Core::CardComponent.new(variant: :glass, glow: true, classes: "space-y-4")) do %>
-          <h2 class="text-2xl font-bold leading-tight">
-            <%= ticket.title %>
-          </h2>
-          <p class="leading-relaxed">
-            <%= ticket.description %>
-          </p>
+
+    <%= render(Core::CardComponent.new(classes: "basis-1/2 flex flex-col overflow-hidden")) do %>
+      <div class="flex flex-col h-full min-h-0">
+        <div class="mb-4 shrink-0">
+          <%= render Adminit::Tickets::NoteFormComponent.new(ticket: ticket) %>
         </div>
-      <% end %>
-      <%= render(Core::CardComponent.new(variant: :glass, glow: true, classes: "space-y-4")) do %>
-        <%= render Support::AttachmentsComponent.new(ticket: ticket, show_upload_form: false) %>
-      <% end %>
-    </div>
+        <div class="flex-1 overflow-y-auto pr-2 space-y-3 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700 min-h-0">
+          <% if @notes.any? %>
+            <%= render Adminit::Tickets::NoteComponent.with_collection(@notes, as: :note) %>
+          <% else %>
+            <p class="text-sm text-slate-500 italic text-center py-4">No notes yet.</p>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Bottom Row: Conversation -->
+  <div class="space-y-6">
     <%= render(Core::CardComponent.new(variant: :glass, glow: true, classes: "space-y-4")) do %>
       <%= render Support::ConversationComponent.new(
             conversation: @conversation,
             messages: @messages
           ) do %>
-        <turbo-show when="current-user-id" is="<%= @ticket.assigned_id.to_s %>">
-          <%= render "support/conversations/message_form", ticket: ticket %>
-        </turbo-show>
+        <%= render "support/conversations/message_form", ticket: ticket %>
       <% end %>
     <% end %>
   </div>

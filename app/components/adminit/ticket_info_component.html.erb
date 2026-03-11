@@ -1,0 +1,32 @@
+<div class="flex flex-col">
+  <div class="flex items-center gap-4 mb-4">
+    <%= helpers.icon "support", {classes: "h-8 dark:text-white"} %>
+    <h1 class="font-bold">Ticket #<%= ticket.id %></h1>
+    <%= render(Core::BadgeComponent.new(label: ticket.status.humanize, theme: status_theme, icon: "info", size: :md)) %>
+  </div>
+  <%= render Core::BoxComponent.new do %>
+    <%= render Core::DefinitionListComponent.new(variant: :info, gap: :sm) do |dl| %>
+      <% dl.with_item(term: "Title") do %>
+        <%= ticket.title %>
+      <% end %>
+      <% dl.with_item(term: "Category") do %>
+        <%= ticket.category.humanize %>
+      <% end %>
+      <% dl.with_item(term: "Created by") do %>
+        <%= ticket.created.email %>
+      <% end %>
+      <% dl.with_item(term: "Assigned to") do %>
+        <%= ticket.assigned&.email || "-" %>
+      <% end %>
+      <% dl.with_item(term: "Priority") do %>
+        <%= ticket.priority %>
+      <% end %>
+      <% dl.with_item(term: "Created on") do %>
+        <%= ticket.created_at.strftime("%Y-%m-%d %H:%M") %>
+      <% end %>
+      <% dl.with_item(term: "Status") do %>
+        <%= render(Core::BadgeComponent.new(label: ticket.status, theme: status_theme, icon: "info", size: :md)) %>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>

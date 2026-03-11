@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_26_030336) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_27_190939) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -177,13 +177,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_26_030336) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "support_notes", force: :cascade do |t|
+    t.bigint "account_id"
+    t.text "body"
+    t.datetime "created_at", null: false
+    t.integer "kind"
+    t.bigint "ticket_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_support_notes_on_account_id"
+    t.index ["ticket_id"], name: "index_support_notes_on_ticket_id"
+  end
+
   create_table "tickets", force: :cascade do |t|
     t.bigint "assigned_id"
     t.integer "category", default: 0, null: false
     t.datetime "created_at", null: false
     t.bigint "created_id"
     t.text "description"
-    t.integer "priority", default: 4
+    t.integer "priority", default: 3
     t.integer "status", default: 0
     t.string "title"
     t.datetime "updated_at", null: false
@@ -203,6 +214,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_26_030336) do
   add_foreign_key "conversations", "tickets"
   add_foreign_key "messages", "accounts"
   add_foreign_key "messages", "conversations"
+  add_foreign_key "support_notes", "accounts"
+  add_foreign_key "support_notes", "tickets"
   add_foreign_key "tickets", "accounts", column: "assigned_id"
   add_foreign_key "tickets", "accounts", column: "created_id"
 end
