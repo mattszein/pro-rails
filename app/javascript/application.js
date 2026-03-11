@@ -5,6 +5,7 @@ import LocalTime from "local-time"
 import "@hotwired/turbo";
 import { start } from "@anycable/turbo-stream";
 import cable from "cable";
+import "lexxy"
 
 start(cable, { requestSocketIDHeader: true })
 

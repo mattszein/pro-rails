@@ -1,6 +1,6 @@
 <%= render(Core::CardComponent.new) do %>
   <h1 class=""><%= @announcement.title %></h1>
-  <p class="py-3">
-    <%= @announcement.body %>
-  </p>
+  <div class="prose dark:prose-invert max-w-none py-3">
+    <%= @announcement.rich_body %>
+  </div>
 <% end %>

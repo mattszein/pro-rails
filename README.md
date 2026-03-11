@@ -6,6 +6,31 @@ A production-ready Rails 8 starter template built for real-world web products. T
 
 The goal: skip the weeks of boilerplate setup on every new project and start building what actually matters. Every pattern and feature in this template is a deliberate choice, showing how authentication, authorization, real-time, background jobs, and UI components fit together in a clean, maintainable way. Designed for products with global users in mind, with the architecture decisions already made and working as a reference for how a well-structured Rails app fits together.
 
+## 🛠 Getting Started
+
+`Tip: Dockerize your life`
+Why spend three hours fighting with local Ruby versions and native extensions when you can let Docker do the heavy lifting? To get the entire stack breathing, just execute:
+
+```
+chmod +x init.sh
+./init.sh
+```
+
+The init.sh Quick Breakdown.
+
+- Check: Verifies gawk and docker are installed.
+- Build: Prepares the Docker images and environment.
+- Bundle: Runs bundle install inside a volume.
+- Database: Boots the PostgreSQL service in the background.
+- Wait: Pauses 5 seconds for the DB to initialize.
+- Setup: Runs db:setup and db:seed to prep your data.
+
+If you want to up your server just execute:
+
+```
+docker compose up rails
+```
+
 ## What's included
 
 ### Authentication — [Rodauth](https://rodauth.jeremyevans.net/)
@@ -94,14 +119,14 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed patterns, conventions, and d
 ### Announcements
 
 - [ ] Email template for announcement notifications
-- [ ] Rich text support via ActionText. Test Lexxy
+- [x] Rich text support via ActionText. Test Lexxy. Add reference.
 
 ### Support tickets
 
 - [ ] Expand ticket states beyond `open / in_progress / closed` — add `initial`, `reopened`, and others as needed.
 - [ ] User that opened a ticket only can send messages in the conversation when is in_progress.
-- [ ] Add notes (only admins can create them, visualize and delete them, normal users cant see them) to a ticket. 
-- [ ] Add tickets references. You can link ticket to others that has the same root problem and solution! 
+- [ ] Add notes (only admins can create them, visualize and delete them, normal users cant see them) to a ticket.
+- [ ] Add tickets references. You can link ticket to others that has the same root problem and solution!
 
 ### Architecture & refactoring
 
@@ -118,6 +143,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed patterns, conventions, and d
 - [ ] Lookbook: update previews to cover all core components and recently added features
 
 ### Accounts
+
 - [ ] Add profile with avatar upload
 - [ ] Add AI(rubyllm) to make an example for an image generation for the account avatar
 

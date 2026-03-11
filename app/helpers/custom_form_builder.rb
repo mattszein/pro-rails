@@ -32,6 +32,10 @@ class CustomFormBuilder < ActionView::Helpers::FormBuilder
     render_component("form::Select", @object_name, method, choices, options, html_options.merge(multiple: true))
   end
 
+  def rich_text_area(method, options = {})
+    render_component("form::RichTextArea", @object_name, method, objectify_options(options))
+  end
+
   def text_area(method, options = {})
     render_component("form::TextArea", @object_name, method, objectify_options(options))
   end

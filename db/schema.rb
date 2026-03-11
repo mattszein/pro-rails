@@ -16,30 +16,34 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_27_190939) do
   enable_extension "pg_catalog.plpgsql"
 
   create_table "account_email_auth_keys", force: :cascade do |t|
-    t.datetime "create_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.datetime "deadline", null: false
     t.datetime "email_last_sent", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.string "key", null: false
   end
 
   create_table "account_login_change_keys", force: :cascade do |t|
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }
     t.datetime "deadline", null: false
     t.string "key", null: false
     t.string "login", null: false
   end
 
   create_table "account_password_reset_keys", force: :cascade do |t|
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }
     t.datetime "deadline", null: false
     t.datetime "email_last_sent", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.string "key", null: false
   end
 
   create_table "account_remember_keys", force: :cascade do |t|
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }
     t.datetime "deadline", null: false
     t.string "key", null: false
   end
 
   create_table "account_verification_keys", force: :cascade do |t|
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }
     t.datetime "email_last_sent", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.string "key", null: false
     t.datetime "requested_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -54,6 +58,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_27_190939) do
     t.index ["email"], name: "index_accounts_on_email", unique: true, where: "(status = ANY (ARRAY[1, 2]))"
     t.index ["role_id"], name: "index_accounts_on_role_id"
     t.check_constraint "email ~ '^[^,;@ \r\n]+@[^,@; \r\n]+.[^,@; \r\n]+$'::citext", name: "valid_email"
+  end
+
+  create_table "action_text_rich_texts", force: :cascade do |t|
+    t.text "body"
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.bigint "record_id", null: false
+    t.string "record_type", null: false
+    t.datetime "updated_at", null: false
+    t.index ["record_type", "record_id", "name"], name: "index_action_text_rich_texts_uniqueness", unique: true
   end
 
   create_table "active_storage_attachments", force: :cascade do |t|
@@ -86,12 +100,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_27_190939) do
 
   create_table "announcements", force: :cascade do |t|
     t.bigint "author_id", null: false
-    t.text "body", null: false
+    t.text "body"
     t.datetime "created_at", null: false
     t.datetime "published_at"
+    t.string "reference", null: false
     t.datetime "scheduled_at"
     t.integer "status", default: 0, null: false
-    t.string "title", null: false
+    t.string "title"
     t.datetime "updated_at", null: false
     t.index ["author_id"], name: "index_announcements_on_author_id"
     t.index ["status", "scheduled_at"], name: "index_announcements_on_status_and_scheduled_at"
@@ -179,7 +194,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_27_190939) do
     t.datetime "created_at", null: false
     t.bigint "created_id"
     t.text "description"
-    t.integer "priority"
+    t.integer "priority", default: 3
     t.integer "status", default: 0
     t.string "title"
     t.datetime "updated_at", null: false
