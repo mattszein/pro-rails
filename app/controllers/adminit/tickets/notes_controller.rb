@@ -5,7 +5,7 @@ module Adminit
 
       def create
         authorize! @ticket, to: :update?, with: Adminit::TicketPolicy
-        
+
         @note = @ticket.notes.build(note_params)
         @note.account = current_account
         @note.kind = :internal

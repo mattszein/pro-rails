@@ -37,7 +37,7 @@ RSpec.describe "Ticket Workflow", type: :interactor do
     it "handles reopen rejection" do
       ticket.update!(status: :finished)
       Support::Tickets::RequestReopen.call(ticket: ticket, account: user, body: "Reopen please")
-      
+
       result = Adminit::Tickets::RejectReopen.call(ticket: ticket, account: admin, body: "Not valid reason")
       expect(result.success?).to be(true), result.error
       expect(ticket.reload.status).to eq("closed")

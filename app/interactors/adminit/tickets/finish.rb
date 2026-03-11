@@ -8,7 +8,7 @@ module Adminit
       def call
         ActiveRecord::Base.transaction do
           ticket.finish!
-          
+
           ticket.notes.create!(
             account: account,
             kind: :system,

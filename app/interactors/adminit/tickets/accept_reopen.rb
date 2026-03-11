@@ -8,7 +8,7 @@ module Adminit
       def call
         ActiveRecord::Base.transaction do
           ticket.accept_reopen!
-          
+
           ticket.notes.create!(
             account: account,
             kind: :system,

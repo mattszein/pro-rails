@@ -8,7 +8,7 @@ module Support
       def call
         ActiveRecord::Base.transaction do
           ticket.request_reopen!
-          
+
           # Create the message with the reason for reopening
           ticket.conversation.messages.create!(
             account: account,

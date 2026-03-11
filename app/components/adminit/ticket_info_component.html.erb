@@ -4,7 +4,6 @@
     <h1 class="font-bold">Ticket #<%= ticket.id %></h1>
     <%= render(Core::BadgeComponent.new(label: ticket.status.humanize, theme: status_theme, icon: "info", size: :md)) %>
   </div>
-
   <%= render Core::BoxComponent.new do %>
     <%= render Core::DefinitionListComponent.new(variant: :info, gap: :sm) do |dl| %>
       <% dl.with_item(term: "Title") do %>

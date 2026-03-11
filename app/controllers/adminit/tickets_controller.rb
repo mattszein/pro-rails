@@ -52,7 +52,7 @@ class Adminit::TicketsController < Adminit::ApplicationController
   def take
     authorize! @ticket, to: :take?, with: Adminit::TicketPolicy
     result = Adminit::Tickets::Take.call(ticket: @ticket, account: current_account)
-    
+
     respond_to do |format|
       if result.success?
         format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, adminit_ticket_path(@ticket)) }
@@ -137,11 +137,10 @@ class Adminit::TicketsController < Adminit::ApplicationController
       result = Adminit::Tickets::RejectReopen.call(ticket: @ticket, account: current_account, body: params[:reason])
 
       respond_to do |format|
+        format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, adminit_ticket_path(@ticket)) }
         if result.success?
-          format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, adminit_ticket_path(@ticket)) }
           format.html { redirect_to adminit_ticket_path(@ticket), notice: "Reopen request rejected." }
         else
-          format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, adminit_ticket_path(@ticket)) }
           format.html { redirect_to adminit_ticket_path(@ticket), alert: result.error }
         end
       end

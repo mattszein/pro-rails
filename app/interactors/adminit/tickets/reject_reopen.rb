@@ -8,7 +8,7 @@ module Adminit
       def call
         ActiveRecord::Base.transaction do
           ticket.reject_reopen!
-          
+
           note_body = "Admin rejected the reopen request. Status changed to closed."
           note_body += " Reason: #{body}" if body.present?
 
