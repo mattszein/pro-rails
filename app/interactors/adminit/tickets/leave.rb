@@ -10,8 +10,9 @@ module Adminit
           if ticket.assigned_id == account.id
             ticket.update!(assigned: nil, status: :open)
             ticket.notes.create!(
+              account: account,
               kind: :system,
-              body: "#{account.email} left the ticket. Status changed to open."
+              body: "Left the ticket. Status changed to open."
             )
           else
             context.fail!(error: "You are not assigned to this ticket.")

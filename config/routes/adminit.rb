@@ -9,7 +9,7 @@ namespace :adminit do
       post :finish
       post :reopen
       post :accept_reopen
-      get :reject_reopen
+      get :reject_reopen, action: :new_reject_reopen
       post :reject_reopen
     end
     resources :notes, only: [:create], controller: "tickets/notes"

@@ -40,14 +40,20 @@ module Support
     end
 
     after_update_commit do |ticket|
-      # For the individual show page
+      # Admin show page
       broadcast_replace_later_to ActionView::RecordIdentifier.dom_id(ticket, "admin"),
         target: ActionView::RecordIdentifier.dom_id(ticket, "admin"),
         partial: "adminit/tickets/ticket"
 
+      # Admin index page
       broadcast_replace_later_to "admin_tickets",
         target: ActionView::RecordIdentifier.dom_id(ticket, "admin"),
         partial: "adminit/tickets/ticket_row"
+
+      # User show page — update message form area on status change
+      broadcast_replace_later_to ActionView::RecordIdentifier.dom_id(ticket),
+        target: ActionView::RecordIdentifier.dom_id(ticket, "message_form"),
+        partial: "support/conversations/message_form_status"
     end
 
     def messageable?

@@ -2,36 +2,24 @@ module Support
   class TicketStatusBannerComponent < ApplicationViewComponent
     option :ticket
 
+    THEME_MAPPINGS = {
+      green: "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-800 dark:text-green-300",
+      yellow: "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 text-yellow-800 dark:text-yellow-300",
+      red: "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-800 dark:text-red-300",
+      orange: "bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800 text-orange-800 dark:text-orange-300"
+    }.freeze
+
     def render?
       !ticket.messageable?
     end
 
-    BANNER_CONFIG = {
-      "finished" => {
-        wrapper: "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300",
-        icon: "info",
-        message: "This ticket is marked as finished."
-      },
-      "reopen_requested" => {
-        wrapper: "bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800 text-orange-800 dark:text-orange-300",
-        icon: "info",
-        message: "Reopen request pending approval. You will be able to message once an admin accepts it."
-      },
-      "closed" => {
-        wrapper: "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-800 dark:text-red-300",
-        icon: "lock",
-        message: "This ticket is permanently closed."
-      }
-    }.freeze
+    def theme
+      status_theme = helpers.ticket_status_theme(ticket.status)
+      THEME_MAPPINGS.fetch(status_theme, THEME_MAPPINGS[:green])
+    end
 
-    DEFAULT_CONFIG = {
-      wrapper: "bg-slate-50 dark:bg-slate-900/20 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400",
-      icon: "clock",
-      message: "Waiting for an admin to take this ticket. You can send messages once the ticket is in progress."
-    }.freeze
-
-    def banner_config
-      BANNER_CONFIG.fetch(ticket.status, DEFAULT_CONFIG)
+    def message
+      I18n.t("support.ticket_status_banner.#{ticket.status}", default: I18n.t("support.ticket_status_banner.default"))
     end
   end
 end

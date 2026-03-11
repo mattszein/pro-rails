@@ -43,6 +43,12 @@ en:
     deleted: "%{model} was successfully deleted."
   errors:
     record_not_found: "The resource you are looking for could not be found."
+  support:
+    ticket_status_banner:
+      finished: "This ticket is marked as finished."
+      reopen_requested: "Reopen request pending approval. You will be able to message once an admin accepts it."
+      closed: "This ticket is permanently closed."
+      default: "Waiting for an admin to take this ticket. You can send messages once the ticket is in progress."
   notifiers:
     announcement_notifier:
       notification:

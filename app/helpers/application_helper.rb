@@ -40,9 +40,9 @@ module ApplicationHelper
   TICKET_STATUS_THEME = {
     open: :green,
     in_progress: :yellow,
-    finished: :primary,
+    finished: :red,
     reopen_requested: :orange,
-    reopened: :secondary,
+    reopened: :green,
     closed: :red
   }
   def ticket_status_theme(status)

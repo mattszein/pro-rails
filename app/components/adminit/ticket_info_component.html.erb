@@ -1,6 +1,6 @@
 <div class="flex flex-col">
   <div class="flex items-center gap-4 mb-4">
-    <%= helpers.icon "support", {classes: "h-8"} %>
+    <%= helpers.icon "support", {classes: "h-8 dark:text-white"} %>
     <h1 class="font-bold">Ticket #<%= ticket.id %></h1>
     <%= render(Core::BadgeComponent.new(label: ticket.status.humanize, theme: status_theme, icon: "info", size: :md)) %>
   </div>

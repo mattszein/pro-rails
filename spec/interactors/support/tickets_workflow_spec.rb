@@ -12,7 +12,7 @@ RSpec.describe "Ticket Workflow", type: :interactor do
       expect(result.success?).to be(true), result.error
       expect(ticket.reload.status).to eq("in_progress")
       expect(ticket.assigned).to eq(admin)
-      expect(ticket.notes.first.body).to include("assigned to")
+      expect(ticket.notes.first.body).to include("taken and assigned")
 
       # 2. Admin finishes the ticket
       result = Adminit::Tickets::Finish.call(ticket: ticket, account: admin)
@@ -24,8 +24,8 @@ RSpec.describe "Ticket Workflow", type: :interactor do
       result = Support::Tickets::RequestReopen.call(ticket: ticket, account: user, body: "It is still broken")
       expect(result.success?).to be(true), result.error
       expect(ticket.reload.status).to eq("reopen_requested")
-      expect(ticket.conversation.messages.last.content).to eq("It is still broken")
       expect(ticket.notes.first.body).to include("requested to reopen")
+      expect(ticket.notes.first.body).to include("It is still broken")
 
       # 4. Admin accepts reopen
       result = Adminit::Tickets::AcceptReopen.call(ticket: ticket, account: admin)

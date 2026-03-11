@@ -17,17 +17,15 @@
     <% end %>
   </div>
 
-  <!-- Bottom Row: Description/Attachments and Conversation -->
-    <div class="space-y-6">
-      <%= render(Core::CardComponent.new(variant: :glass, glow: true, classes: "space-y-4")) do %>
-        <%= render Support::ConversationComponent.new(
-              conversation: @conversation,
-              messages: @messages
-            ) do %>
-          <% if allowed_to?(:update?, ticket, with: Adminit::TicketPolicy) %>
-            <%= render "support/conversations/message_form", ticket: ticket %>
-          <% end %>
-        <% end %>
+  <!-- Bottom Row: Conversation -->
+  <div class="space-y-6">
+    <%= render(Core::CardComponent.new(variant: :glass, glow: true, classes: "space-y-4")) do %>
+      <%= render Support::ConversationComponent.new(
+            conversation: @conversation,
+            messages: @messages
+          ) do %>
+        <%= render "support/conversations/message_form", ticket: ticket %>
       <% end %>
-    </div>
+    <% end %>
+  </div>
 </div>

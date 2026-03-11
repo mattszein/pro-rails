@@ -9,16 +9,13 @@ module Support
         ActiveRecord::Base.transaction do
           ticket.request_reopen!
 
-          # Create the message with the reason for reopening
-          ticket.conversation.messages.create!(
-            account: account,
-            content: body
-          )
+          note_body = "User requested to reopen the ticket."
+          note_body += " Reason: #{body}" if body.present?
 
-          # Create a system note for the transition
           ticket.notes.create!(
+            account: account,
             kind: :system,
-            body: "User requested to reopen the ticket."
+            body: note_body
           )
         end
       rescue Support::Ticket::InvalidTransition, ActiveRecord::RecordInvalid => e

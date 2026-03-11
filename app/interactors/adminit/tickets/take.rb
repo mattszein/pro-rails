@@ -10,8 +10,9 @@ module Adminit
           if ticket.assigned_id.nil?
             ticket.update!(assigned: account, status: :in_progress)
             ticket.notes.create!(
+              account: account,
               kind: :system,
-              body: "Ticket assigned to #{account.email}."
+              body: "Ticket taken and assigned."
             )
           else
             context.fail!(error: "Ticket already assigned.")

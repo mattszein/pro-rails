@@ -1,7 +1,6 @@
 class Adminit::TicketsController < Adminit::ApplicationController
-  before_action :set_ticket, only: %i[show edit update destroy take leave finish reopen accept_reopen reject_reopen]
-  before_action :ensure_frame_response, only: %i[edit]
-  before_action :ensure_frame_response, only: %i[reject_reopen], if: -> { request.get? }
+  before_action :set_ticket, only: %i[show edit update destroy take leave finish reopen accept_reopen new_reject_reopen reject_reopen]
+  before_action :ensure_frame_response, only: %i[edit new_reject_reopen]
 
   # GET /tickets or /tickets.json
   def index
@@ -126,23 +125,22 @@ class Adminit::TicketsController < Adminit::ApplicationController
     end
   end
 
-  # GET /tickets/1/reject_reopen - render form in modal
-  # POST /tickets/1/reject_reopen - process rejection
+  # GET /tickets/1/reject_reopen
+  def new_reject_reopen
+    authorize! @ticket, to: :reject_reopen?, with: Adminit::TicketPolicy
+  end
+
+  # POST /tickets/1/reject_reopen
   def reject_reopen
     authorize! @ticket, with: Adminit::TicketPolicy
+    result = Adminit::Tickets::RejectReopen.call(ticket: @ticket, account: current_account, body: params[:reason])
 
-    if request.get?
-      render :reject_reopen
-    else
-      result = Adminit::Tickets::RejectReopen.call(ticket: @ticket, account: current_account, body: params[:reason])
-
-      respond_to do |format|
-        format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, adminit_ticket_path(@ticket)) }
-        if result.success?
-          format.html { redirect_to adminit_ticket_path(@ticket), notice: "Reopen request rejected." }
-        else
-          format.html { redirect_to adminit_ticket_path(@ticket), alert: result.error }
-        end
+    respond_to do |format|
+      format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, adminit_ticket_path(@ticket)) }
+      if result.success?
+        format.html { redirect_to adminit_ticket_path(@ticket), notice: "Reopen request rejected." }
+      else
+        format.html { redirect_to adminit_ticket_path(@ticket), alert: result.error }
       end
     end
   end
