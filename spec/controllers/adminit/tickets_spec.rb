@@ -7,7 +7,7 @@ describe Adminit::TicketsController, type: :controller do
   include_context "user and permissions adminit"
 
   let(:creator_account) { create(:account, :verified) }
-  let(:ticket_permission) { create(:permission, resource: Adminit::TicketPolicy.identifier, roles: [user.role, user_superadmin.role]) }
+  let(:ticket_permission) { create(:permission, resource: :ticket, roles: [user.role, user_superadmin.role]) }
 
   describe "GET #index" do
     subject { get :index, params: {} }

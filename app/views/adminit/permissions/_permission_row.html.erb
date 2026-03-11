@@ -1,6 +1,6 @@
 <tr id="<%= ActionView::RecordIdentifier.dom_id(permission) %>">
   <%= render Core::TableCellComponent.new do %>
-    <%= permission.resource %>
+    <%= permission.resource.titleize %>
   <% end %>
   <%= render Core::TableCellComponent.new do %>
   <%= form_with(url: adminit_permission_path(id: permission.id), scope: "permission", data: {turbo: true}, method: :put) do |f|

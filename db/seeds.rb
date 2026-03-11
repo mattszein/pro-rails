@@ -31,26 +31,26 @@ Account.find_or_create_by!(email: "user@user.com") do |account|
 end
 
 # Create permissions with roles assigned from the start
-Permission.find_or_create_by!(resource: Adminit::ApplicationPolicy.identifier) do |permission|
+Permission.find_or_create_by!(resource: :application) do |permission|
   permission.roles = [role_superadmin, role_support]
 end
 
-Permission.find_or_create_by!(resource: Adminit::AccountPolicy.identifier) do |permission|
+Permission.find_or_create_by!(resource: :account) do |permission|
   permission.roles = [role_superadmin, role_support]
 end
 
-Permission.find_or_create_by!(resource: Adminit::TicketPolicy.identifier) do |permission|
+Permission.find_or_create_by!(resource: :ticket) do |permission|
   permission.roles = [role_superadmin, role_support]
 end
 
-Permission.find_or_create_by!(resource: Adminit::RolePolicy.identifier) do |permission|
+Permission.find_or_create_by!(resource: :role) do |permission|
   permission.roles = [role_superadmin]
 end
 
-Permission.find_or_create_by!(resource: Adminit::AnnouncementPolicy.identifier) do |permission|
+Permission.find_or_create_by!(resource: :announcement) do |permission|
   permission.roles = [role_superadmin]
 end
 
-Permission.find_or_create_by!(resource: Adminit::PermissionPolicy.identifier) do |permission|
+Permission.find_or_create_by!(resource: :permission) do |permission|
   permission.roles = [role_superadmin]
 end

@@ -103,8 +103,9 @@ Required environment variables for tests:
 - Freezolite adds `frozen_string_literal: true` to all files automatically (disabled in test env)
 - Components must be in `app/components/` and are autoloaded
 - Adminit area requires accounts to have a role assigned (three-layer authorization)
-- Permission resources are identified by policy class identifiers as symbols (e.g., `:"Adminit::AccountPolicy"`)
-- Policies must define `self.identifier` to work with the Permission model
+- Permission `resource` column is an integer enum (`Permission::RESOURCE_REGISTRY`). Never reuse integer values when removing a resource
+- Policies must define `POLICY_RESOURCE` (matching an enum key, e.g., `:account`) and `self.identifier` (for ActionPolicy)
+- When adding a new Adminit policy, add the resource to `Permission::RESOURCE_REGISTRY` and set `POLICY_RESOURCE` on the policy
 - HABTM associations used for roles/permissions (not has_many :through)
 - Support models are namespaced under `Support::` (Ticket, Conversation, Message)
 - Account model has two ticket associations: as creator (`:created_id`) and assignee (`:assigned_id`)

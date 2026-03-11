@@ -158,7 +158,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_27_190939) do
 
   create_table "permissions", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.string "resource"
+    t.integer "resource"
     t.datetime "updated_at", null: false
     t.index ["resource"], name: "index_permissions_on_resource", unique: true
   end
@@ -194,7 +194,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_27_190939) do
     t.datetime "created_at", null: false
     t.bigint "created_id"
     t.text "description"
-    t.integer "priority", default: 3
+    t.integer "priority", default: 4
     t.integer "status", default: 0
     t.string "title"
     t.datetime "updated_at", null: false

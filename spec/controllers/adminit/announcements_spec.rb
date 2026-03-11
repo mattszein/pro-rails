@@ -4,7 +4,7 @@ require Rails.root.join("spec/controllers/shared/responds.rb")
 describe Adminit::AnnouncementsController, type: :controller do
   include_context "user and permissions adminit"
 
-  let(:announcement_permission) { create(:permission, resource: Adminit::AnnouncementPolicy.identifier, roles: [user.role, user_superadmin.role]) }
+  let(:announcement_permission) { create(:permission, resource: :announcement, roles: [user.role, user_superadmin.role]) }
 
   describe "GET #index" do
     subject { get :index }
