@@ -13,7 +13,18 @@
     <% end %>
 
     <%= render(Core::CardComponent.new(classes: "basis-1/2 flex flex-col overflow-hidden")) do %>
-      <%= render Support::NotesComponent.new(ticket: ticket, notes: @notes) %>
+      <div class="flex flex-col h-full min-h-0">
+        <div class="mb-4 shrink-0">
+          <%= render Adminit::Tickets::NoteFormComponent.new(ticket: ticket) %>
+        </div>
+        <div class="flex-1 overflow-y-auto pr-2 space-y-3 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700 min-h-0">
+          <% if @notes.any? %>
+            <%= render Adminit::Tickets::NoteComponent.with_collection(@notes, as: :note) %>
+          <% else %>
+            <p class="text-sm text-slate-500 italic text-center py-4">No notes yet.</p>
+          <% end %>
+        </div>
+      </div>
     <% end %>
   </div>
 
