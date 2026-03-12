@@ -132,7 +132,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed patterns, conventions, and d
 
 - [x] Upgrade all gems to latest versions
 - [ ] Base controller shared between Adminit and Dashboard to reduce duplication
-- [ ] Adminit menu: replace `allowed_to?` iteration in the view with a helper that resolves permitted items for the current user
+- [x] Adminit menu: replace `allowed_to?` iteration in the view with a helper that resolves permitted items for the current user
 - [ ] Permissions: replace string-based controller references with integer enums
 - [ ] Generator: scaffold a new Adminit resource (controller, views, policy, and specs) in one command
 - [ ] Adminit dashboard: analytics, stats, and quick actions, with role-specific views per role

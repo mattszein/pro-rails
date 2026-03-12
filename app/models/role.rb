@@ -11,4 +11,12 @@ class Role < ApplicationRecord
   def superadmin?
     name == SUPERADMIN
   end
+
+  def permitted_resources
+    @permitted_resources ||= permissions.pluck(:resource).to_set
+  end
+
+  def permitted?(resource_key)
+    permitted_resources.include?(resource_key.to_s)
+  end
 end

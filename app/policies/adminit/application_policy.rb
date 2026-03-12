@@ -20,6 +20,6 @@ class Adminit::ApplicationPolicy < ActionPolicy::Base
 
   def get_access(key = self.class::POLICY_RESOURCE)
     return false unless user&.role
-    user.role.permissions.exists?(resource: key)
+    user.role.permitted?(key)
   end
 end

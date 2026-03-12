@@ -181,7 +181,7 @@ module Adminit
 end
 ```
 
-Each policy defines a `POLICY_RESOURCE` constant that maps to an integer enum on the `Permission` model. The enum registry (`Permission::RESOURCE_REGISTRY`) assigns stable integers to each resource key, so renaming a policy class never breaks existing permissions. The base `get_access` method uses `self.class::POLICY_RESOURCE` to look up whether the user's role has the matching permission.
+Each policy defines a `POLICY_RESOURCE` constant that maps to an integer enum on the `Permission` model. The enum registry (`Permission::RESOURCE_REGISTRY`) assigns stable integers to each resource key, so renaming a policy class never breaks existing permissions. The base `get_access` method uses `self.class::POLICY_RESOURCE` to check whether the user's role has the matching permission via `Role#permitted?`, which is backed by a memoized `Set` of resource keys (`Role#permitted_resources`). This means only one query is executed per request regardless of how many policy checks are performed.
 
 ### Controller Usage
 
