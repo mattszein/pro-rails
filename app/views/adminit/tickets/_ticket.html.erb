@@ -21,7 +21,7 @@
           <% if @notes.any? %>
             <%= render Adminit::Tickets::NoteComponent.with_collection(@notes, as: :note) %>
           <% else %>
-            <p class="text-sm text-slate-500 italic text-center py-4">No notes yet.</p>
+            <p class="text-sm text-slate-500 italic text-center py-4"><%= t("adminit.tickets.no_notes") %></p>
           <% end %>
         </div>
       </div>

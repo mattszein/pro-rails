@@ -8,6 +8,7 @@ class ApplicationController < ActionController::Base
   include ActionPolicyHandler
   include RecordNotFoundHandler
   include LocaleMessages
+  include Localizable
 
   def index
   end

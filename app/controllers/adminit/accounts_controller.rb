@@ -17,7 +17,7 @@ class Adminit::AccountsController < Adminit::ApplicationController
     @account.destroy!
 
     respond_to do |format|
-      format.html { redirect_to adminit_accounts_url, notice: "Account was successfully destroyed." }
+      format.html { redirect_to adminit_accounts_url, notice: I18n.t("adminit.accounts.destroyed") }
       format.json { head :no_content }
     end
   end

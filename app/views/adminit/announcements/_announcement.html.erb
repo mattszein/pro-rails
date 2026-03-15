@@ -3,32 +3,32 @@
     <div class="flex items-center gap-4">
       <%= icon "adminit/announcement", {classes: "h-8"} %>
       <h1><%= announcement.reference %></h1>
-      <%= render(Core::BadgeComponent.new(label: announcement.status.humanize,
+      <%= render(Core::BadgeComponent.new(label: t("enums.announcement.status.#{announcement.status}"),
             theme: announcement_status_theme(announcement.status), icon: "info", size: :md)) %>
     </div>
 
     <%= render Core::BoxComponent.new do %>
       <%= render Core::DefinitionListComponent.new(variant: :info, gap: :sm) do |dl| %>
-        <% dl.with_item(term: "Reference") do %>
+        <% dl.with_item(term: t("views.labels.reference")) do %>
           <%= announcement.reference %>
         <% end %>
-        <% dl.with_item(term: "Author") do %>
+        <% dl.with_item(term: t("views.labels.author")) do %>
           <%= announcement.author.email %>
         <% end %>
-        <% dl.with_item(term: "Status") do %>
-          <%= announcement.status.humanize %>
+        <% dl.with_item(term: t("views.labels.status")) do %>
+          <%= t("enums.announcement.status.#{announcement.status}") %>
         <% end %>
         <% if announcement.scheduled_at.present? %>
-          <% dl.with_item(term: "Scheduled for") do %>
+          <% dl.with_item(term: t("views.labels.scheduled_for")) do %>
             <%= announcement.scheduled_at.strftime("%B %d, %Y at %I:%M %p") %>
           <% end %>
         <% end %>
         <% if announcement.published_at.present? %>
-          <% dl.with_item(term: "Published on") do %>
+          <% dl.with_item(term: t("views.labels.published_on")) do %>
             <%= announcement.published_at.strftime("%B %d, %Y at %I:%M %p") %>
           <% end %>
         <% end %>
-        <% dl.with_item(term: "Created on") do %>
+        <% dl.with_item(term: t("views.labels.created_on")) do %>
           <%= announcement.created_at.strftime("%B %d, %Y at %I:%M %p") %>
         <% end %>
 

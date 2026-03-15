@@ -10,17 +10,17 @@
       </ul>
     </div>
   <% end %>
-  <%= form.text_field :reference, {autofocus: true, required: true, placeholder: " ", autocomplete: "off", class: "w-full"} %>
-  <%= form.text_field :title, {placeholder: " ", autocomplete: "title", class: "w-full"} %>
+  <%= form.text_field :reference, {autofocus: true, required: true, placeholder: " ", autocomplete: "off", label: t("views.labels.reference"), class: "w-full"} %>
+  <%= form.text_field :title, {placeholder: " ", autocomplete: "title", label: t("views.labels.title"), class: "w-full"} %>
   <div>
-    <%= form.label :rich_body, "Content", class: "block text-sm font-medium mb-2" %>
+    <%= form.label :rich_body, t("views.labels.content"), class: "block text-sm font-medium mb-2" %>
     <%= form.rich_text_area :rich_body %>
   </div>
   <%= form.date_time :scheduled_at, disabled: !announcement.scheduled_at_editable? %>
   <% if !announcement.scheduled_at_editable? %>
-    <p class="text-sm text-gray-500 mt-1">Scheduled time cannot be changed once the announcement is scheduled or published.</p>
+    <p class="text-sm text-gray-500 mt-1"><%= t("adminit.announcements.scheduled_time_notice") %></p>
   <% end %>
   <div class="mt-6">
-    <%= form.button "Save Draft", {theme: :create, fullw: true} %>
+    <%= form.button t("adminit.announcements.save_draft"), {theme: :create, fullw: true} %>
   </div>
 <% end %>

@@ -1,5 +1,5 @@
 <div class="flex justify-between items-center">
-  <h3>Attachments</h3>
+  <h3><%= t("support.attachments.title") %></h3>
 </div>
 <% if has_attachments? %>
   <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -10,9 +10,9 @@
 <% else %>
   <p class="text-gray-500 text-sm">
     <% if show_upload_form %>
-      No attachments yet. Click "Add Files" to upload.
+      <%= t("support.attachments.no_attachments_upload") %>
     <% else %>
-      No attachments.
+      <%= t("support.attachments.no_attachments") %>
     <% end %>
   </p>
 <% end %>

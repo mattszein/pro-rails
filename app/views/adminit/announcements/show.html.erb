@@ -1,20 +1,20 @@
 <div class="w-full">
   <div class="flex justify-between items-center pb-2">
-    <%= link_to "Back to Announcements", adminit_announcements_path, class: "text-indigo-500" %>
+    <%= link_to t("adminit.announcements.back_to_announcements"), adminit_announcements_path, class: "text-indigo-500" %>
     <div class="flex gap-2 items-center px-4">
       <% if @announcement.draft? %>
-        <%= render(Core::LinkComponent.new(name: "Publish", url: schedule_adminit_announcement_path(@announcement),
+        <%= render(Core::LinkComponent.new(name: t("views.buttons.publish"), url: schedule_adminit_announcement_path(@announcement),
               style: :as_button, theme: :edit, size: :sm, html_options: {method: :post, data: {turbo: true, turbo_method: :post}})) %>
-        <%= render(Core::LinkComponent.new(name: "Delete", url: adminit_announcement_path(@announcement),
+        <%= render(Core::LinkComponent.new(name: t("views.shared.delete"), url: adminit_announcement_path(@announcement),
               style: :as_button, theme: :delete, size: :sm, html_options: {method: :delete,
-                                                                           data: {turbo: true, turbo_method: :delete, turbo_confirm: "Are you sure?"}})) %>
+                                                                           data: {turbo: true, turbo_method: :delete, turbo_confirm: t("views.shared.are_you_sure")}})) %>
       <% end %>
       <% if @announcement.scheduled? %>
-        <%= render(Core::LinkComponent.new(name: "Stop Publish", url: unschedule_adminit_announcement_path(@announcement),
+        <%= render(Core::LinkComponent.new(name: t("views.buttons.stop_publish"), url: unschedule_adminit_announcement_path(@announcement),
               style: :as_button, theme: :delete, size: :sm, html_options: {method: :post, data: {turbo: true, turbo_method: :post}})) %>
       <% end %>
       <% unless @announcement.published? %>
-        <%= render(Core::LinkComponent.new(name: "Edit", url: edit_adminit_announcement_path(@announcement),
+        <%= render(Core::LinkComponent.new(name: t("views.shared.edit"), url: edit_adminit_announcement_path(@announcement),
               style: :as_button, theme: :edit, size: :sm, html_options: {data: {turbo_frame: "modal"}})) %>
       <% end %>
     </div>

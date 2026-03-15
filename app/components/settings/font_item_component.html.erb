@@ -12,5 +12,5 @@
     </div>
   </button>
   <p class="text-primary-700 peer-[.selected]:text-primary-800 dark:text-primary-100 dark:peer-[.selected]:text-primary-50 peer-[.selected]:font-semibold peer-[.selected]:border-b-2 peer-[.selected]:border-b-secondary-500 dark:peer-[.selected]:border-b-secondary-300"><%= font.name %></p>
-  <p class="text-slate-600 peer-[.selected]:text-slate-700 dark:text-slate-200 dark:peer-[.selected]:text-slate-100 peer-[.selected]:font-semibold"><%= font.description %></p>
+  <p class="text-slate-600 peer-[.selected]:text-slate-700 dark:text-slate-200 dark:peer-[.selected]:text-slate-100 peer-[.selected]:font-semibold"><%= I18n.t("components.settings.font.descriptions.#{font.description_key}") %></p>
 </div>

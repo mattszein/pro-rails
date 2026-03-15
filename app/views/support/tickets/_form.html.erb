@@ -10,29 +10,29 @@
       </ul>
     </div>
   <% end %>
-    <%= form.text_field :title, {autofocus: true, required: true, placeholder: " ", autocomplete: "title", label: "Title", class: "w-full"} %>
+    <%= form.text_field :title, {autofocus: true, required: true, placeholder: " ", autocomplete: "title", label: t("views.labels.title"), class: "w-full"} %>
     <div class="mt-6">
       <%= form.label :category, class: "block text-sm font-medium text-gray-700 mb-2" %>
       <%= form.select :category,
-            options_for_select(Support::Ticket.categories.keys.map { |cat| [cat.humanize, cat] }, ticket.persisted? ? ticket.category : nil),
-            {include_blank: "Select a category"},
+            options_for_select(Support::Ticket.categories.keys.map { |cat| [t("enums.ticket.category.#{cat}"), cat] }, ticket.persisted? ? ticket.category : nil),
+            {include_blank: t("support.tickets.select_category")},
             {required: true, class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"} %>
     </div>
     <div class="mt-6">
     <%= form.label :description, class: "sr-only" %>
-    <%= form.text_area :description, rows: 4, placeholder: "Write your ticket description here", class: "w-full mt-4" %>
+    <%= form.text_area :description, rows: 4, placeholder: t("support.tickets.description_placeholder"), class: "w-full mt-4" %>
     </div>
     <% unless ticket.persisted? %>
       <div class="mt-6">
         <%= form.file_field :attachments,
               multiple: true,
               accept: FileUploadConfig.allowed_content_types_list.join(","),
-              label: "Attach files (images, PDF - max 2MB each)",
-              helper_text: "You can upload up to #{FileUploadConfig.max_files_per_ticket} files",
+              label: t("support.tickets.attach_files_label"),
+              helper_text: t("support.tickets.upload_limit", max_files: FileUploadConfig.max_files_per_ticket),
               icon: "plus" %>
       </div>
     <% end %>
   <div class="mt-6">
-    <%= form.button "Save", {theme: :create, fullw: true} %>
+    <%= form.button t("views.shared.save"), {theme: :create, fullw: true} %>
   </div>
 <% end %>

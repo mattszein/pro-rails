@@ -1,10 +1,10 @@
 <div class="md:flex items-center justify-between mb-4">
   <h1 class="text-xl">
-    <%= link_to "Roles", adminit_roles_path, class: "text-indigo-500" %>
+    <%= link_to t("adminit.navigation.roles"), adminit_roles_path, class: "text-indigo-500" %>
   </h1>
 
   <div class="flex gap-2 items-center px-4">
-    <%= link_to "Add role", account_select_adminit_role_path(@role), data: {turbo_frame: "modal"}, class: "block bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow" %>
+    <%= link_to t("adminit.roles.add_role"), account_select_adminit_role_path(@role), data: {turbo_frame: "modal"}, class: "block bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow" %>
   </div>
 </div>
 
@@ -12,15 +12,15 @@
 <%= render(Core::CardComponent.new(padding: :sm)) do %>
 <dl class="text-gray-900 dark:text-white dark:divide-gray-700 text-left grid grid-cols-3 gap-4">
     <div>
-        <dt class="text-gray-500 md:text-md dark:text-gray-400">Id</dt>
+        <dt class="text-gray-500 md:text-md dark:text-gray-400"><%= t("views.labels.id") %></dt>
         <dd class="text-md font-semibold"><%= @role.id %></dd>
     </div>
     <div>
-        <dt class="text-gray-500 md:text-md dark:text-gray-400">Name</dt>
+        <dt class="text-gray-500 md:text-md dark:text-gray-400"><%= t("views.labels.name") %></dt>
         <dd class="text-md font-semibold"><%= @role.name %></dd>
     </div>
     <div>
-        <dt class="text-gray-500 md:text-md dark:text-gray-400">Accounts</dt>
+        <dt class="text-gray-500 md:text-md dark:text-gray-400"><%= t("adminit.navigation.accounts") %></dt>
         <dd class="text-md font-semibold"><%= @role.accounts.length %></dd>
     </div>
 </dl>
@@ -31,10 +31,10 @@
         <thead class="text-sm text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
                 <th scope="col" class="px-6 py-3">
-                  Email
+                  <%= t("views.labels.email") %>
                 </th>
                 <th scope="col" class="px-6 py-3">
-                  Actions
+                  <%= t("views.shared.actions") %>
                 </th>
             </tr>
         </thead>

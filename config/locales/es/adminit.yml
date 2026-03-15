@@ -1,0 +1,58 @@
+es:
+  adminit:
+    tickets:
+      updated: "El ticket fue actualizado exitosamente."
+      destroyed: "El ticket fue eliminado exitosamente."
+      assigned: "El ticket fue asignado a ti exitosamente."
+      left: "Has dejado el ticket."
+      finished: "Ticket marcado como finalizado."
+      reopened: "Ticket reabierto."
+      reopen_accepted: "Solicitud de reapertura aceptada."
+      reopen_rejected: "Solicitud de reapertura rechazada."
+      already_assigned: "El ticket ya está asignado."
+      not_assigned: "No estás asignado a este ticket."
+      note_added: "Nota agregada."
+      note_error: "No se pudo agregar la nota: %{errors}"
+      no_notes: "Sin notas aún."
+      back_to_tickets: "Volver a Tickets"
+      reject_reopen_title: "Rechazar Solicitud de Reapertura"
+      reject_reopen_placeholder: "Explica por qué se rechaza esta solicitud..."
+      reject_reopen_button: "Rechazar Solicitud"
+      reopen_confirm: "¿Estás seguro de que quieres reabrir este ticket?"
+      note_form_placeholder: "Agregar una nota interna..."
+      add_note: "Agregar Nota"
+    announcements:
+      cannot_edit: "No se puede editar este anuncio."
+      scheduled: "Anuncio programado para %{time}."
+      unscheduled: "El anuncio fue desprogramado."
+      back_to_announcements: "Volver a Anuncios"
+      new_announcement: "Nuevo Anuncio"
+      scheduled_time_notice: "La hora de programación no se puede cambiar una vez que el anuncio está programado o publicado."
+      save_draft: "Guardar Borrador"
+    roles:
+      account_removed: "La cuenta fue eliminada del rol exitosamente."
+      account_not_removed: "La cuenta no fue eliminada del rol."
+      account_added: "La cuenta fue agregada al rol exitosamente."
+      account_not_added: "La cuenta no fue agregada al rol."
+      add_role: "Agregar rol"
+      remove_role: "Eliminar rol"
+      add_account_to: "Agregar cuenta a %{role}"
+    permissions:
+      updated: "El rol fue actualizado exitosamente."
+      not_updated: "El rol no fue actualizado."
+      invalid_roles: "El rol no fue actualizado. Rol(es) seleccionado(s) no válido(s)."
+    accounts:
+      destroyed: "La cuenta fue eliminada exitosamente."
+    dashboard:
+      title: "Adminit Rails App"
+      welcome: "Hola, bienvenido de nuevo admin %{email}"
+    navigation:
+      dash: "Inicio"
+      accounts: "Cuentas"
+      announcements: "Anuncios"
+      permissions: "Permisos"
+      roles: "Roles"
+      tickets: "Tickets"
+      back_to_app: "Volver a la App"
+    layout:
+      title_prefix: "Adminit:"

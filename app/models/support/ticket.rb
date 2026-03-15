@@ -61,27 +61,27 @@ module Support
     end
 
     def finish!
-      raise InvalidTransition, "Can only finish in-progress or reopened tickets" unless in_progress? || reopened?
+      raise InvalidTransition, I18n.t("ticket.transitions.can_only_finish") unless in_progress? || reopened?
       update!(status: :finished)
     end
 
     def reopen!
-      raise InvalidTransition, "Can only reopen finished tickets" unless finished?
+      raise InvalidTransition, I18n.t("ticket.transitions.can_only_reopen") unless finished?
       update!(status: :reopened)
     end
 
     def request_reopen!
-      raise InvalidTransition, "Can only request reopen on finished tickets" unless finished?
+      raise InvalidTransition, I18n.t("ticket.transitions.can_only_request_reopen") unless finished?
       update!(status: :reopen_requested)
     end
 
     def accept_reopen!
-      raise InvalidTransition, "Can only accept reopen on reopen-requested tickets" unless reopen_requested?
+      raise InvalidTransition, I18n.t("ticket.transitions.can_only_accept_reopen") unless reopen_requested?
       update!(status: :reopened)
     end
 
     def reject_reopen!
-      raise InvalidTransition, "Can only reject reopen on reopen-requested tickets" unless reopen_requested?
+      raise InvalidTransition, I18n.t("ticket.transitions.can_only_reject_reopen") unless reopen_requested?
       update!(status: :closed)
     end
 
@@ -96,18 +96,18 @@ module Support
 
       # Validate number of attachments
       if attachments.count > FileUploadConfig.max_files_per_ticket
-        errors.add(:attachments, "cannot exceed #{FileUploadConfig.max_files_per_ticket} files")
+        errors.add(:attachments, I18n.t("activerecord.errors.models.support/ticket.attributes.attachments.too_many_files", max_files: FileUploadConfig.max_files_per_ticket))
       end
 
       attachments.each do |attachment|
         # Validate file size
         if attachment.byte_size > FileUploadConfig.max_file_size_bytes
-          errors.add(:attachments, "#{attachment.filename} is too large (max #{FileUploadConfig.max_file_size_mb}MB)")
+          errors.add(:attachments, I18n.t("activerecord.errors.models.support/ticket.attributes.attachments.file_too_large", filename: attachment.filename, max_size: FileUploadConfig.max_file_size_mb))
         end
 
         # Validate content type
         unless FileUploadConfig.allowed_content_types_list.include?(attachment.content_type)
-          errors.add(:attachments, "#{attachment.filename} has an invalid file type")
+          errors.add(:attachments, I18n.t("activerecord.errors.models.support/ticket.attributes.attachments.invalid_file_type", filename: attachment.filename))
         end
       end
     end

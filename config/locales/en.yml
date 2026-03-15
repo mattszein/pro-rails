@@ -1,37 +1,23 @@
-# Files in the config/locales directory are used for internationalization and
-# are automatically loaded by Rails. If you want to use locales other than
-# English, add the necessary files in this directory.
-#
-# To use the locales, use `I18n.t`:
-#
-#     I18n.t "hello"
-#
-# In views, this is aliased to just `t`:
-#
-#     <%= t("hello") %>
-#
-# To use a different locale, set it with `I18n.locale`:
-#
-#     I18n.locale = :es
-#
-# This would use the information in config/locales/es.yml.
-#
-# To learn more about the API, please read the Rails Internationalization guide
-# at https://guides.rubyonrails.org/i18n.html.
-#
-# Be aware that YAML interprets the following case-insensitive strings as
-# booleans: `true`, `false`, `on`, `off`, `yes`, `no`. Therefore, these strings
-# must be quoted to be interpreted as strings. For example:
-#
-#     en:
-#       "yes": yup
-#       enabled: "ON"
-
 en:
   activerecord:
     models:
       announcement: Announcement
       ticket: Ticket
+    errors:
+      models:
+        announcement:
+          attributes:
+            scheduled_at:
+              immutable_when_scheduled: "cannot be changed when scheduled. Unschedule first."
+            base:
+              cannot_update_published: "Cannot update a published announcement"
+              only_draft_deletable: "Only draft announcements can be deleted"
+        support/ticket:
+          attributes:
+            attachments:
+              too_many_files: "cannot exceed %{max_files} files"
+              file_too_large: "%{filename} is too large (max %{max_size}MB)"
+              invalid_file_type: "%{filename} has an invalid file type"
   authentication:
     unauthenticated: "You need to sign in before continuing."
   adminit:
@@ -43,6 +29,7 @@ en:
     deleted: "%{model} was successfully deleted."
   errors:
     record_not_found: "The resource you are looking for could not be found."
+    page_not_found: "Page Not Found"
   support:
     ticket_status_banner:
       finished: "This ticket is marked as finished."
@@ -53,3 +40,40 @@ en:
     announcement_notifier:
       notification:
         title: "New Announcement"
+  enums:
+    ticket:
+      status:
+        open: "Open"
+        in_progress: "In Progress"
+        finished: "Finished"
+        reopen_requested: "Reopen Requested"
+        reopened: "Reopened"
+        closed: "Closed"
+      category:
+        account_access: "Account Access"
+        technical_issue: "Technical Issue"
+        billing: "Billing"
+        feature_request: "Feature Request"
+        other: "Other"
+    announcement:
+      status:
+        draft: "Draft"
+        scheduled: "Scheduled"
+        published: "Published"
+  announcement:
+    transitions:
+      cannot_schedule_published: "Cannot schedule a published announcement"
+      already_scheduled: "Already scheduled"
+      scheduled_time_required: "Scheduled time is required"
+      scheduled_time_future: "Scheduled time must be in the future"
+      title_content_required: "Title and content are required to schedule"
+      can_only_unschedule_scheduled: "Can only unschedule scheduled announcements"
+      already_published: "Already published"
+      must_be_scheduled_first: "Must be scheduled first"
+  ticket:
+    transitions:
+      can_only_finish: "Can only finish in-progress or reopened tickets"
+      can_only_reopen: "Can only reopen finished tickets"
+      can_only_request_reopen: "Can only request reopen on finished tickets"
+      can_only_accept_reopen: "Can only accept reopen on reopen-requested tickets"
+      can_only_reject_reopen: "Can only reject reopen on reopen-requested tickets"

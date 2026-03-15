@@ -4,17 +4,17 @@
     <div class="flex items-center gap-4">
       <%= icon "support", {classes: "h-8"} %>
       <h1>Ticket #<%= ticket.id %> - <%= ticket.title %></h1>
-      <%= render(Core::BadgeComponent.new(label: ticket.status.humanize, theme: ticket_status_theme(ticket.status), icon: "info", size: :md)) %>
+      <%= render(Core::BadgeComponent.new(label: t("enums.ticket.status.#{ticket.status}"), theme: ticket_status_theme(ticket.status), icon: "info", size: :md)) %>
     </div>
     <%= render Core::BoxComponent.new do %>
       <%= render Core::DefinitionListComponent.new(variant: :info, gap: :sm) do |dl| %>
-        <% dl.with_item(term: "Category") do %>
-          <%= ticket.category.humanize %>
+        <% dl.with_item(term: t("views.labels.category")) do %>
+          <%= t("enums.ticket.category.#{ticket.category}") %>
         <% end %>
-        <% dl.with_item(term: "Assigned to") do %>
+        <% dl.with_item(term: t("views.labels.assigned_to")) do %>
           <%= ticket.assigned&.email || "-" %>
         <% end %>
-        <% dl.with_item(term: "Created on") do %>
+        <% dl.with_item(term: t("views.labels.created_on")) do %>
           <%= ticket.created_at %>
         <% end %>
       <% end %>

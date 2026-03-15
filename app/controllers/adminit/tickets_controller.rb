@@ -27,7 +27,7 @@ class Adminit::TicketsController < Adminit::ApplicationController
     respond_to do |format|
       if @ticket.update(ticket_params)
         format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, request.referer) }
-        format.html { redirect_to adminit_ticket_url(@ticket), notice: "Ticket was successfully updated." }
+        format.html { redirect_to adminit_ticket_url(@ticket), notice: I18n.t("adminit.tickets.updated") }
         format.json { render :show, status: :ok, location: @ticket }
       else
         format.turbo_stream { render turbo_stream: turbo_stream.replace("ticket_form", partial: "adminit/tickets/form", locals: {ticket: @ticket}), status: :unprocessable_content }
@@ -42,7 +42,7 @@ class Adminit::TicketsController < Adminit::ApplicationController
     @ticket.destroy!
 
     respond_to do |format|
-      format.html { redirect_to adminit_tickets_url, notice: "Ticket was successfully destroyed." }
+      format.html { redirect_to adminit_tickets_url, notice: I18n.t("adminit.tickets.destroyed") }
       format.json { head :no_content }
     end
   end
@@ -55,7 +55,7 @@ class Adminit::TicketsController < Adminit::ApplicationController
     respond_to do |format|
       if result.success?
         format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, adminit_ticket_path(@ticket)) }
-        format.html { redirect_to adminit_ticket_path(@ticket), notice: "Ticket was successfully assigned to you." }
+        format.html { redirect_to adminit_ticket_path(@ticket), notice: I18n.t("adminit.tickets.assigned") }
         format.json { render :show, status: :ok, location: @ticket }
       else
         format.turbo_stream { render turbo_stream: turbo_stream.replace(ActionView::RecordIdentifier.dom_id(@ticket, "admin"), partial: "adminit/tickets/ticket_row", locals: {ticket: @ticket}), status: :unprocessable_content }
@@ -73,7 +73,7 @@ class Adminit::TicketsController < Adminit::ApplicationController
     respond_to do |format|
       if result.success?
         format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, adminit_tickets_path) }
-        format.html { redirect_to adminit_tickets_url, notice: "You have left the ticket." }
+        format.html { redirect_to adminit_tickets_url, notice: I18n.t("adminit.tickets.left") }
         format.json { render :show, status: :ok, location: @ticket }
       else
         format.turbo_stream { render turbo_stream: turbo_stream.replace(ActionView::RecordIdentifier.dom_id(@ticket, "admin"), partial: "adminit/tickets/ticket_row", locals: {ticket: @ticket}), status: :unprocessable_content }
@@ -90,7 +90,7 @@ class Adminit::TicketsController < Adminit::ApplicationController
 
     respond_to do |format|
       if result.success?
-        format.html { redirect_to adminit_ticket_path(@ticket), notice: "Ticket marked as finished." }
+        format.html { redirect_to adminit_ticket_path(@ticket), notice: I18n.t("adminit.tickets.finished") }
       else
         format.html { redirect_to adminit_ticket_path(@ticket), alert: result.error }
       end
@@ -104,7 +104,7 @@ class Adminit::TicketsController < Adminit::ApplicationController
 
     respond_to do |format|
       if result.success?
-        format.html { redirect_to adminit_ticket_path(@ticket), notice: "Ticket reopened." }
+        format.html { redirect_to adminit_ticket_path(@ticket), notice: I18n.t("adminit.tickets.reopened") }
       else
         format.html { redirect_to adminit_ticket_path(@ticket), alert: result.error }
       end
@@ -118,7 +118,7 @@ class Adminit::TicketsController < Adminit::ApplicationController
 
     respond_to do |format|
       if result.success?
-        format.html { redirect_to adminit_ticket_path(@ticket), notice: "Reopen request accepted." }
+        format.html { redirect_to adminit_ticket_path(@ticket), notice: I18n.t("adminit.tickets.reopen_accepted") }
       else
         format.html { redirect_to adminit_ticket_path(@ticket), alert: result.error }
       end
@@ -138,7 +138,7 @@ class Adminit::TicketsController < Adminit::ApplicationController
     respond_to do |format|
       format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, adminit_ticket_path(@ticket)) }
       if result.success?
-        format.html { redirect_to adminit_ticket_path(@ticket), notice: "Reopen request rejected." }
+        format.html { redirect_to adminit_ticket_path(@ticket), notice: I18n.t("adminit.tickets.reopen_rejected") }
       else
         format.html { redirect_to adminit_ticket_path(@ticket), alert: result.error }
       end

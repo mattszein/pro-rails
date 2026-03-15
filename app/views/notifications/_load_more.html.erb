@@ -1,7 +1,7 @@
 <%= turbo_frame_tag "notifications_page_#{pagy.next}" do %>
   <div class="p-4 text-center">
     <%= render Core::LinkComponent.new(
-          name: "More notifications",
+          name: t("views.shared.more_notifications"),
           url: notifications_path(page: pagy.next),
           style: :as_button, theme: :secondary, size: :sm
         ) %>

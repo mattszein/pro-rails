@@ -1,3 +1,3 @@
-<%= render(Core::ModalComponent.new(title: "Add Ticket")) do %>
+<%= render(Core::ModalComponent.new(title: t("support.tickets.add_ticket_title"))) do %>
   <%= render "form", ticket: @ticket %>
 <% end %>

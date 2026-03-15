@@ -1,8 +1,8 @@
-<%= render(Core::ModalComponent.new(title: "Add account to #{@role.name}")) do %>
+<%= render(Core::ModalComponent.new(title: t("adminit.roles.add_account_to", role: @role.name))) do %>
 <%= form_with(scope: :role, url: account_adminit_role_path(@role)) do |form| %>
   <%= form.text_field :email, {required: true, placeholder: " "} %>
   <div class="mt-2">
-    <%= form.button "Create", {fullw: true} %>
+    <%= form.button t("views.shared.create"), {fullw: true} %>
   </div>
 <% end %>
 <% end %>

@@ -23,6 +23,7 @@ Pro-Rails is a Rails 8.0 application using modern Rails stack with Hotwire (Turb
 - **Testing**: RSpec with FactoryBot, Shoulda-Matchers, Capybara + Cuprite for system tests
 - **Code Quality**: Standard Ruby linter, Brakeman for security scanning
 - **Code Conventions**: Freezolite auto-adds frozen_string_literals (disabled in test environment)
+- **I18n**: rails-i18n gem for built-in locale data, URL-based locale switching (`/:locale/` prefix)
 
 ## Development Commands
 
@@ -98,6 +99,20 @@ Required environment variables for tests:
 - ANYCABLE_SECRET, ANYCABLE_WEBSOCKET_URL
 - FREEZOLITE_DISABLED=true (for test environment)
 
+## I18n Conventions
+
+- **Available locales**: English (`:en`, default) and Spanish (`:es`)
+- **Locale switching**: URL-based with optional `/:locale/` prefix (e.g., `/es/dashboard`). English has no prefix.
+- **Locale files**: Split by domain under `config/locales/{locale}/` subdirectories (`adminit.yml`, `support.yml`, `views.yml`, `rodauth.yml`, `components.yml`, `mailers.yml`)
+- **Translation key convention**: Explicit namespaced keys (e.g., `t("adminit.tickets.updated")`), not lazy lookup
+- **Enum display values**: Use `t("enums.ticket.status.#{status}")` instead of `.humanize`
+- **Form labels**: Always pass explicit `label: t(...)` to form fields — don't rely on `.humanize` auto-generation
+- **System notes in interactors**: Keep in English — they are internal audit records stored in the DB
+- **Turbo broadcasts**: Keep locale-neutral — they render data, not translated labels
+- **Locale concern**: `Localizable` concern (included in both `ApplicationController` and `Adminit::ApplicationController`) handles `around_action :switch_locale` and `default_url_options` with locale
+- **Fallbacks**: Enabled globally — missing Spanish keys fall back to English
+- **Adding new strings**: Always add to both `en/` and `es/` locale files. Never hardcode user-facing strings in views, controllers, or components
+
 ## Common Gotchas
 
 - Freezolite adds `frozen_string_literal: true` to all files automatically (disabled in test env)
@@ -113,6 +128,8 @@ Required environment variables for tests:
 - Turbo broadcasts use AnyCable secret for signed stream verification
 - `dom_id` is NOT available in model context — use `ActionView::RecordIdentifier.dom_id(record, "prefix")`
 - Use `:unprocessable_content` not `:unprocessable_entity` (Rack deprecation)
+- Routes are wrapped in `scope "(:locale)", locale: /en|es/` — all route helpers automatically include locale via `default_url_options`. Health check, MissionControl, and Lookbook remain outside the scope
+- `default_url_options` sets `locale: nil` for English (omits prefix) and `locale: :es` for Spanish — this prevents positional route args (like model records) from being misinterpreted as the locale param
 
 ## Controller Testing Gotchas
 

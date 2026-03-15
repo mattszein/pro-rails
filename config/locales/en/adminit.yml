@@ -1,0 +1,58 @@
+en:
+  adminit:
+    tickets:
+      updated: "Ticket was successfully updated."
+      destroyed: "Ticket was successfully destroyed."
+      assigned: "Ticket was successfully assigned to you."
+      left: "You have left the ticket."
+      finished: "Ticket marked as finished."
+      reopened: "Ticket reopened."
+      reopen_accepted: "Reopen request accepted."
+      reopen_rejected: "Reopen request rejected."
+      already_assigned: "Ticket already assigned."
+      not_assigned: "You are not assigned to this ticket."
+      note_added: "Note added."
+      note_error: "Note could not be added: %{errors}"
+      no_notes: "No notes yet."
+      back_to_tickets: "Back to Tickets"
+      reject_reopen_title: "Reject Reopen Request"
+      reject_reopen_placeholder: "Explain why this request is being rejected..."
+      reject_reopen_button: "Reject Request"
+      reopen_confirm: "Are you sure you want to reopen this ticket?"
+      note_form_placeholder: "Add an internal note..."
+      add_note: "Add Note"
+    announcements:
+      cannot_edit: "Cannot edit this announcement."
+      scheduled: "Announcement scheduled for %{time}."
+      unscheduled: "Announcement was unscheduled."
+      back_to_announcements: "Back to Announcements"
+      new_announcement: "New Announcement"
+      scheduled_time_notice: "Scheduled time cannot be changed once the announcement is scheduled or published."
+      save_draft: "Save Draft"
+    roles:
+      account_removed: "Account was successfully removed from the role."
+      account_not_removed: "Account wasn't removed from the role."
+      account_added: "Account was successfully added to the role."
+      account_not_added: "Account wasn't added to the role."
+      add_role: "Add role"
+      remove_role: "Remove role"
+      add_account_to: "Add account to %{role}"
+    permissions:
+      updated: "Role was successfully updated."
+      not_updated: "Role wasn't updated."
+      invalid_roles: "Role wasn't updated. Invalid role(s) selected."
+    accounts:
+      destroyed: "Account was successfully destroyed."
+    dashboard:
+      title: "Adminit Rails App"
+      welcome: "Hey, welcome back admin %{email}"
+    navigation:
+      dash: "Dash"
+      accounts: "Accounts"
+      announcements: "Announcements"
+      permissions: "Permissions"
+      roles: "Roles"
+      tickets: "Tickets"
+      back_to_app: "Back to App"
+    layout:
+      title_prefix: "Adminit:"

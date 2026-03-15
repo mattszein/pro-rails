@@ -1,7 +1,7 @@
 <div class="w-full">
   <div class="flex justify-between items-center pb-2">
-    <h1 class="text-xl font-semibold">Tickets</h1>
-    <%= render(Core::LinkComponent.new(name: "Add ticket", url: new_support_ticket_path, style: :as_button, theme: :create, size: :sm, html_options: {data: {turbo_frame: "modal"}})) %>
+    <h1 class="text-xl font-semibold"><%= t("support.tickets.title") %></h1>
+    <%= render(Core::LinkComponent.new(name: t("support.tickets.add_ticket"), url: new_support_ticket_path, style: :as_button, theme: :create, size: :sm, html_options: {data: {turbo_frame: "modal"}})) %>
   </div>
   <%= turbo_stream_from "tickets" %>
   <%= render Core::CardComponent.new(padding: :none) do %>
@@ -9,11 +9,11 @@
       <%= render Core::TableComponent.new(
             rows: @tickets,
             columns: [
-              {label: "Title"},
-              {label: "Category"},
-              {label: "Description"},
-              {label: "Status"},
-              {label: "Actions"}
+              {label: t("views.labels.title")},
+              {label: t("views.labels.category")},
+              {label: t("views.labels.description")},
+              {label: t("views.labels.status")},
+              {label: t("views.shared.actions")}
             ],
             options: {ids: {tbody: "tickets"}}
           ) do %>

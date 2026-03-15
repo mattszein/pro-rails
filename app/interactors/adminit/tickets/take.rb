@@ -15,7 +15,7 @@ module Adminit
               body: "Ticket taken and assigned."
             )
           else
-            context.fail!(error: "Ticket already assigned.")
+            context.fail!(error: I18n.t("adminit.tickets.already_assigned"))
           end
         end
       rescue Support::Ticket::InvalidTransition, ActiveRecord::RecordInvalid => e

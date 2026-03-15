@@ -1,6 +1,6 @@
 <div class="w-full">
   <div class="flex justify-between items-center pb-2">
-    <h1 class="text-xl font-semibold">Tickets</h1>
+    <h1 class="text-xl font-semibold"><%= t("adminit.navigation.tickets") %></h1>
   </div>
   <%= turbo_stream_from "admin_tickets" %>
   <%= render Core::CardComponent.new(padding: :none) do %>

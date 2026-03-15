@@ -1,0 +1,41 @@
+en:
+  components:
+    core:
+      form:
+        toggle: "Toggle me"
+        decrement: "Decrement"
+        increment: "Increment"
+        select_datetime: "Select date & time..."
+        enter_code: "Enter code"
+      drawer:
+        menu: "Menu"
+      toast:
+        close: "Close"
+    settings:
+      font:
+        choose_typeface: "Choose Your Typeface"
+        descriptions:
+          inter: "Clean & versatile"
+          plus_jakarta: "Soft & readable"
+          space_grotesk: "Futuristic & quirky"
+          outfit: "Bold & energetic"
+          bricolage: "Cozy & characterful"
+          google_code: "Developer-friendly"
+          orbitron: "Sci-fi & neon"
+          manrope: "Swiss & professional"
+      theme:
+        tech_edge:
+          title: "Tech Edge"
+          description: "Modern and sharp"
+        serene:
+          title: "Serene"
+          description: "Calm and balance"
+        cosmic:
+          title: "Cosmic"
+          description: "Futuristic and spatial"
+        vivid:
+          title: "Vivid"
+          description: "Bold and energetic"
+        night_owl:
+          title: "Night owl"
+          description: "Warm and cozy"

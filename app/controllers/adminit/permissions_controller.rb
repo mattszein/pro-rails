@@ -14,12 +14,12 @@ class Adminit::PermissionsController < Adminit::ApplicationController
     begin
       @permission.role_ids = permission_params[:role_ids]
       if @permission.save
-        flash[:notice] = "Role was successfully updated."
+        flash[:notice] = I18n.t("adminit.permissions.updated")
       else
-        flash[:alert] = "Role wasn't updated."
+        flash[:alert] = I18n.t("adminit.permissions.not_updated")
       end
     rescue ActiveRecord::RecordNotFound
-      flash[:alert] = "Role wasn't updated. Invalid role(s) selected."
+      flash[:alert] = I18n.t("adminit.permissions.invalid_roles")
     end
     redirect_to adminit_permissions_path
   end

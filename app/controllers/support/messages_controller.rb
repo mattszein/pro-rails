@@ -14,7 +14,7 @@ module Support
           format.turbo_stream {
             render "support/messages/create"
           }
-          format.html { redirect_to request.referer || root_path, notice: "Message sent." }
+          format.html { redirect_to request.referer || root_path, notice: I18n.t("support.messages.sent") }
         end
       else
         respond_to do |format|
@@ -25,7 +25,7 @@ module Support
               locals: {ticket: @ticket, message: @message}
             )
           }
-          format.html { redirect_to request.referer || root_path, alert: "Message could not be sent." }
+          format.html { redirect_to request.referer || root_path, alert: I18n.t("support.messages.not_sent") }
         end
       end
     end

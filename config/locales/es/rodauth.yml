@@ -1,0 +1,19 @@
+es:
+  rodauth:
+    labels:
+      email: "Correo electrónico"
+      password: "Contraseña"
+      password_confirm: "Confirmar Contraseña"
+    login: "Iniciar Sesión"
+    register: "Registrarse"
+    send_login_via_email: "Enviar Inicio de Sesión por Email"
+    change_login: "Cambiar Correo"
+    change_password: "Cambiar Contraseña"
+    close_account: "Cerrar Cuenta"
+    reset_password: "Restablecer Contraseña"
+    request_password: "Solicitar Contraseña"
+    verify_account: "Verificar Cuenta"
+    send_verification_again: "Enviar Verificación de nuevo"
+    verify_login_change: "Verificar Cambio de Correo"
+    remember: "Recordar"
+    logout: "Cerrar Sesión"

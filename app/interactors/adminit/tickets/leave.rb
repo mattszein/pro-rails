@@ -15,7 +15,7 @@ module Adminit
               body: "Left the ticket. Status changed to open."
             )
           else
-            context.fail!(error: "You are not assigned to this ticket.")
+            context.fail!(error: I18n.t("adminit.tickets.not_assigned"))
           end
         end
       rescue Support::Ticket::InvalidTransition, ActiveRecord::RecordInvalid => e
