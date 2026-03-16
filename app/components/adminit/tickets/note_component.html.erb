@@ -2,7 +2,7 @@
   <div class="flex justify-between items-start mb-1">
     <span class="text-xs font-bold uppercase tracking-wider <%= label_classes %>">
       <% if note.system? %>
-        <%= t("adminit.notes.system") %><%= " • by #{note.account.email}" if note.account %>
+        <%= t("adminit.notes.system") %><% if note.account %> • <%= t("adminit.notes.by", email: note.account.email) %><% end %>
       <% else %>
         <%= t("adminit.notes.note_by") %> <%= note.account&.email || t("adminit.notes.unknown") %>
       <% end %>

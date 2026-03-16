@@ -25,7 +25,7 @@
         <%= ticket.created_at.strftime("%Y-%m-%d %H:%M") %>
       <% end %>
       <% dl.with_item(term: t("shared.labels.status")) do %>
-        <%= render(Core::BadgeComponent.new(label: ticket.status, theme: status_theme, icon: "info", size: :md)) %>
+        <%= render(Core::BadgeComponent.new(label: t("enums.ticket.status.#{ticket.status}"), theme: status_theme, icon: "info", size: :md)) %>
       <% end %>
     <% end %>
   <% end %>
