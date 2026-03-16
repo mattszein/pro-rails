@@ -95,11 +95,11 @@ class Settings::ThemePickerComponent < ApplicationViewComponent
   end
 
   def section_title_words(section)
-    I18n.t("components.settings.theme.#{section.key}.title").split(" ")
+    I18n.t("settings.theme.#{section.key}.title").split(" ")
   end
 
   def section_desc_words(section)
-    I18n.t("components.settings.theme.#{section.key}.description").split(" ")
+    I18n.t("settings.theme.#{section.key}.description").split(" ")
   end
 
   def color_for(colors, index)

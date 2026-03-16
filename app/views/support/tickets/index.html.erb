@@ -9,11 +9,11 @@
       <%= render Core::TableComponent.new(
             rows: @tickets,
             columns: [
-              {label: t("views.labels.title")},
-              {label: t("views.labels.category")},
-              {label: t("views.labels.description")},
-              {label: t("views.labels.status")},
-              {label: t("views.shared.actions")}
+              {label: t("shared.labels.title")},
+              {label: t("shared.labels.category")},
+              {label: t("shared.labels.description")},
+              {label: t("shared.labels.status")},
+              {label: t("shared.common.actions")}
             ],
             options: {ids: {tbody: "tickets"}}
           ) do %>

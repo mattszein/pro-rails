@@ -12,13 +12,13 @@
     class="hidden absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50">
     <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
       <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">
-        <%= t("views.notifications.title") %>
+        <%= t("shared.notifications.title") %>
       </h3>
       <%= button_to mark_all_read_notifications_path,
             method: :post,
             class: "text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors",
             form: {data: {turbo_stream: true}} do %>
-        <%= t("views.notifications.mark_all_read") %>
+        <%= t("shared.notifications.mark_all_read") %>
       <% end %>
     </div>
     <div
@@ -35,7 +35,7 @@
               turbo_frame: "_top"
             },
             class: "text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 font-medium transition-colors block text-center" do %>
-        <%= t("views.notifications.view_all") %>
+        <%= t("shared.notifications.view_all") %>
       <% end %>
     </div>
   </div>

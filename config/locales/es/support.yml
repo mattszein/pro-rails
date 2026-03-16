@@ -2,6 +2,7 @@ es:
   support:
     tickets:
       title: "Tickets"
+      ticket_number: "Ticket #%{id}"
       add_ticket: "Agregar ticket"
       add_ticket_title: "Agregar Ticket"
       editing_ticket: "Editando Ticket"
@@ -15,6 +16,9 @@ es:
       description_placeholder: "Escribe la descripción de tu ticket aquí"
       attach_files_label: "Adjuntar archivos (imágenes, PDF - máx. 2MB cada uno)"
       upload_limit: "Puedes subir hasta %{max_files} archivos"
+    message:
+      support_badge: "Soporte"
+      edit: "Editar"
     messages:
       sent: "Mensaje enviado."
       not_sent: "No se pudo enviar el mensaje."

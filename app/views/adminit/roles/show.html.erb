@@ -12,11 +12,11 @@
 <%= render(Core::CardComponent.new(padding: :sm)) do %>
 <dl class="text-gray-900 dark:text-white dark:divide-gray-700 text-left grid grid-cols-3 gap-4">
     <div>
-        <dt class="text-gray-500 md:text-md dark:text-gray-400"><%= t("views.labels.id") %></dt>
+        <dt class="text-gray-500 md:text-md dark:text-gray-400"><%= t("shared.labels.id") %></dt>
         <dd class="text-md font-semibold"><%= @role.id %></dd>
     </div>
     <div>
-        <dt class="text-gray-500 md:text-md dark:text-gray-400"><%= t("views.labels.name") %></dt>
+        <dt class="text-gray-500 md:text-md dark:text-gray-400"><%= t("shared.labels.name") %></dt>
         <dd class="text-md font-semibold"><%= @role.name %></dd>
     </div>
     <div>
@@ -31,10 +31,10 @@
         <thead class="text-sm text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
                 <th scope="col" class="px-6 py-3">
-                  <%= t("views.labels.email") %>
+                  <%= t("shared.labels.email") %>
                 </th>
                 <th scope="col" class="px-6 py-3">
-                  <%= t("views.shared.actions") %>
+                  <%= t("shared.common.actions") %>
                 </th>
             </tr>
         </thead>

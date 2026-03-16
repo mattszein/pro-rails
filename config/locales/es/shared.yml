@@ -1,6 +1,6 @@
 es:
-  views:
-    shared:
+  shared:
+    common:
       save: "Guardar"
       show: "Ver"
       edit: "Editar"
@@ -55,25 +55,20 @@ es:
       title: "Notificaciones"
       mark_all_read: "Marcar todo como leído"
       view_all: "Ver todas las notificaciones →"
-    notes:
-      system: "Sistema"
-      by: "por"
-      note_by: "Nota de"
-      unknown: "Desconocido"
-      ago: "atrás"
-    message:
-      support_badge: "Soporte"
-      edit: "Editar"
-    dashboard:
-      title: "Super Rails App"
-      signed_in_as: "Has iniciado sesión como %{email}"
-    settings:
-      font_theme_title: "Selector de Fuente y Tema"
-      font_theme_subtitle: "Personalización elegante para tu experiencia"
-      profile: "Perfil"
-      appearance: "Apariencia"
-      password: "Contraseña"
-      remember: "Recordar"
     layout:
       app_title: "Pro Rails"
       app_menu: "RailsApp | Menú"
+    dashboard:
+      title: "Super Rails App"
+      signed_in_as: "Has iniciado sesión como %{email}"
+    components:
+      form:
+        toggle: "Activar/Desactivar"
+        decrement: "Disminuir"
+        increment: "Incrementar"
+        select_datetime: "Seleccionar fecha y hora..."
+        enter_code: "Ingresar código"
+      drawer:
+        menu: "Menú"
+      toast:
+        close: "Cerrar"

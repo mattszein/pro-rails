@@ -3,6 +3,6 @@
     <%= account.email %>
     </td>
     <td class="px-6 py-4">
-        <%= link_to t("adminit.roles.remove_role"), account_adminit_role_path(@role, account_id: account.id), data: {turbo_method: :delete, turbo_confirm: t("views.shared.are_you_sure")}, class: "text-blue-600 dark:text-blue-500 hover:underline" %>
+        <%= link_to t("adminit.roles.remove_role"), account_adminit_role_path(@role, account_id: account.id), data: {turbo_method: :delete, turbo_confirm: t("shared.common.are_you_sure")}, class: "text-blue-600 dark:text-blue-500 hover:underline" %>
     </td>
 </tr>

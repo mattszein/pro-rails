@@ -1,6 +1,6 @@
 en:
-  views:
-    shared:
+  shared:
+    common:
       save: "Save"
       show: "Show"
       edit: "Edit"
@@ -55,25 +55,20 @@ en:
       title: "Notifications"
       mark_all_read: "Mark all as read"
       view_all: "View all notifications →"
-    notes:
-      system: "System"
-      by: "by"
-      note_by: "Note by"
-      unknown: "Unknown"
-      ago: "ago"
-    message:
-      support_badge: "Support"
-      edit: "Edit"
-    dashboard:
-      title: "Super Rails App"
-      signed_in_as: "You are signed in as %{email}"
-    settings:
-      font_theme_title: "Font & Theme Selector"
-      font_theme_subtitle: "Elegant customization for your experience"
-      profile: "Profile"
-      appearance: "Appearance"
-      password: "Password"
-      remember: "Remember"
     layout:
       app_title: "Pro Rails"
       app_menu: "RailsApp | Menu"
+    dashboard:
+      title: "Super Rails App"
+      signed_in_as: "You are signed in as %{email}"
+    components:
+      form:
+        toggle: "Toggle me"
+        decrement: "Decrement"
+        increment: "Increment"
+        select_datetime: "Select date & time..."
+        enter_code: "Enter code"
+      drawer:
+        menu: "Menu"
+      toast:
+        close: "Close"

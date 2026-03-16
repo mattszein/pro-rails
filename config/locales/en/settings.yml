@@ -1,0 +1,35 @@
+en:
+  settings:
+    font_theme_title: "Font & Theme Selector"
+    font_theme_subtitle: "Elegant customization for your experience"
+    profile: "Profile"
+    appearance: "Appearance"
+    password: "Password"
+    remember: "Remember"
+    font:
+      choose_typeface: "Choose Your Typeface"
+      descriptions:
+        inter: "Clean & versatile"
+        plus_jakarta: "Soft & readable"
+        space_grotesk: "Futuristic & quirky"
+        outfit: "Bold & energetic"
+        bricolage: "Cozy & characterful"
+        google_code: "Developer-friendly"
+        orbitron: "Sci-fi & neon"
+        manrope: "Swiss & professional"
+    theme:
+      tech_edge:
+        title: "Tech Edge"
+        description: "Modern and sharp"
+      serene:
+        title: "Serene"
+        description: "Calm and balance"
+      cosmic:
+        title: "Cosmic"
+        description: "Futuristic and spatial"
+      vivid:
+        title: "Vivid"
+        description: "Bold and energetic"
+      night_owl:
+        title: "Night owl"
+        description: "Warm and cozy"

@@ -54,5 +54,11 @@ en:
       roles: "Roles"
       tickets: "Tickets"
       back_to_app: "Back to App"
+    notes:
+      system: "System"
+      by: "by"
+      note_by: "Note by"
+      unknown: "Unknown"
+      ago: "ago"
     layout:
       title_prefix: "Adminit:"

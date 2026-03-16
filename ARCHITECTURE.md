@@ -890,15 +890,17 @@ We use URL-based locale switching with English (default) and Spanish support.
 
 ```
 config/locales/
-  en.yml / es.yml          # Core: activerecord, errors, enums, transitions
+  en.yml / es.yml          # Model layer: ActiveRecord, enums, transitions
   en/ & es/
-    adminit.yml            # Admin controllers & views
-    support.yml            # Support controllers & views
-    views.yml              # Shared UI (buttons, labels, navigation)
+    shared.yml             # Cross-domain: labels, buttons, navigation, layout, dashboard, notifications
+    adminit.yml            # Admin area: flash messages, titles, navigation, notes
+    support.yml            # Support area: flash messages, titles, conversation, attachments
+    settings.yml           # Settings area: tabs, fonts, themes
     rodauth.yml            # Auth pages
-    components.yml         # ViewComponent strings
     mailers.yml            # Email content
 ```
+
+**Decision rule**: used by 2+ domains → `shared.yml`; specific to one domain → that domain's file; model-layer → root `en.yml`/`es.yml`.
 
 ### Controller Usage
 
@@ -918,7 +920,7 @@ Use the `t()` helper for all user-facing strings:
 
 ```erb
 <h1><%= t("support.tickets.title") %></h1>
-<%= form.button t("views.shared.save"), theme: :create %>
+<%= form.button t("shared.common.save"), theme: :create %>
 <%= link_to t("adminit.tickets.back_to_tickets"), adminit_tickets_path %>
 ```
 
@@ -962,7 +964,7 @@ context.fail!(error: I18n.t("adminit.tickets.already_assigned"))
 Always pass explicit translated labels to form fields:
 
 ```erb
-<%= form.text_field :title, label: t("views.labels.title") %>
+<%= form.text_field :title, label: t("shared.labels.title") %>
 ```
 
 ### Adding New Strings

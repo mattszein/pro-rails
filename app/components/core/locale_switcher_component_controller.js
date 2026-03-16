@@ -1,8 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static values = { currentPath: String }
-
   change(event) {
     const locale = event.target.value
     const currentPath = window.location.pathname

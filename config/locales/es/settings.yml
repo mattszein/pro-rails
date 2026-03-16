@@ -1,0 +1,35 @@
+es:
+  settings:
+    font_theme_title: "Selector de Fuente y Tema"
+    font_theme_subtitle: "Personalización elegante para tu experiencia"
+    profile: "Perfil"
+    appearance: "Apariencia"
+    password: "Contraseña"
+    remember: "Recordar"
+    font:
+      choose_typeface: "Elige Tu Tipografía"
+      descriptions:
+        inter: "Limpia y versátil"
+        plus_jakarta: "Suave y legible"
+        space_grotesk: "Futurista y peculiar"
+        outfit: "Audaz y enérgica"
+        bricolage: "Acogedora y con carácter"
+        google_code: "Para desarrolladores"
+        orbitron: "Ciencia ficción y neón"
+        manrope: "Suiza y profesional"
+    theme:
+      tech_edge:
+        title: "Tech Edge"
+        description: "Moderno y definido"
+      serene:
+        title: "Sereno"
+        description: "Calma y equilibrio"
+      cosmic:
+        title: "Cósmico"
+        description: "Futurista y espacial"
+      vivid:
+        title: "Vívido"
+        description: "Audaz y enérgico"
+      night_owl:
+        title: "Nocturno"
+        description: "Cálido y acogedor"

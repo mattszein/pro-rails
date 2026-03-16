@@ -1,6 +1,6 @@
 <%= render(Core::CardComponent.new) do %>
-  <h1 class="text-3xl text-center"><%= t("views.dashboard.title") %></h1>
+  <h1 class="text-3xl text-center"><%= t("shared.dashboard.title") %></h1>
   <p class="py-3">
-    <%= t("views.dashboard.signed_in_as", email: @current_account.email) %>
+    <%= t("shared.dashboard.signed_in_as", email: @current_account.email) %>
   </p>
 <% end %>

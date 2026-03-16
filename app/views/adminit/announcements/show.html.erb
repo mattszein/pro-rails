@@ -3,18 +3,18 @@
     <%= link_to t("adminit.announcements.back_to_announcements"), adminit_announcements_path, class: "text-indigo-500" %>
     <div class="flex gap-2 items-center px-4">
       <% if @announcement.draft? %>
-        <%= render(Core::LinkComponent.new(name: t("views.buttons.publish"), url: schedule_adminit_announcement_path(@announcement),
+        <%= render(Core::LinkComponent.new(name: t("shared.buttons.publish"), url: schedule_adminit_announcement_path(@announcement),
               style: :as_button, theme: :edit, size: :sm, html_options: {method: :post, data: {turbo: true, turbo_method: :post}})) %>
-        <%= render(Core::LinkComponent.new(name: t("views.shared.delete"), url: adminit_announcement_path(@announcement),
+        <%= render(Core::LinkComponent.new(name: t("shared.common.delete"), url: adminit_announcement_path(@announcement),
               style: :as_button, theme: :delete, size: :sm, html_options: {method: :delete,
-                                                                           data: {turbo: true, turbo_method: :delete, turbo_confirm: t("views.shared.are_you_sure")}})) %>
+                                                                           data: {turbo: true, turbo_method: :delete, turbo_confirm: t("shared.common.are_you_sure")}})) %>
       <% end %>
       <% if @announcement.scheduled? %>
-        <%= render(Core::LinkComponent.new(name: t("views.buttons.stop_publish"), url: unschedule_adminit_announcement_path(@announcement),
+        <%= render(Core::LinkComponent.new(name: t("shared.buttons.stop_publish"), url: unschedule_adminit_announcement_path(@announcement),
               style: :as_button, theme: :delete, size: :sm, html_options: {method: :post, data: {turbo: true, turbo_method: :post}})) %>
       <% end %>
       <% unless @announcement.published? %>
-        <%= render(Core::LinkComponent.new(name: t("views.shared.edit"), url: edit_adminit_announcement_path(@announcement),
+        <%= render(Core::LinkComponent.new(name: t("shared.common.edit"), url: edit_adminit_announcement_path(@announcement),
               style: :as_button, theme: :edit, size: :sm, html_options: {data: {turbo_frame: "modal"}})) %>
       <% end %>
     </div>

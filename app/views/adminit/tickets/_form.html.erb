@@ -10,7 +10,7 @@
       </ul>
     </div>
   <% end %>
-    <%= form.text_field :title, {autofocus: true, required: true, placeholder: " ", autocomplete: "title", label: t("views.labels.title"), class: "w-full"} %>
+    <%= form.text_field :title, {autofocus: true, required: true, placeholder: " ", autocomplete: "title", label: t("shared.labels.title"), class: "w-full"} %>
     <div class="mt-6">
     <%= form.label :description, class: "sr-only" %>
     <%= form.text_area :description, rows: 4, placeholder: t("support.tickets.description_placeholder"), class: "w-full mt-4" %>
@@ -26,6 +26,6 @@
     <% end %>
     <%= form.hidden_field :created_id, value: current_account.id %>
   <div class="mt-6">
-    <%= form.button t("views.shared.save"), {theme: :create, fullw: true} %>
+    <%= form.button t("shared.common.save"), {theme: :create, fullw: true} %>
   </div>
 <% end %>

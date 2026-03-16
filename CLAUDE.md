@@ -103,8 +103,9 @@ Required environment variables for tests:
 
 - **Available locales**: English (`:en`, default) and Spanish (`:es`)
 - **Locale switching**: URL-based with optional `/:locale/` prefix (e.g., `/es/dashboard`). English has no prefix.
-- **Locale files**: Split by domain under `config/locales/{locale}/` subdirectories (`adminit.yml`, `support.yml`, `views.yml`, `rodauth.yml`, `components.yml`, `mailers.yml`)
-- **Translation key convention**: Explicit namespaced keys (e.g., `t("adminit.tickets.updated")`), not lazy lookup
+- **Locale files**: Split by domain under `config/locales/{locale}/` subdirectories (`shared.yml`, `adminit.yml`, `support.yml`, `settings.yml`, `rodauth.yml`, `mailers.yml`)
+- **Locale file organization**: Domain-based — all text about a domain goes in that domain's file. Cross-domain shared text (labels, buttons, navigation, layout) goes in `shared.yml`. Decision rule: used by 2+ domains → `shared.yml`; specific to one domain → that domain's file; model-layer (enums, validations) → root `en.yml`/`es.yml`
+- **Translation key convention**: Explicit namespaced keys (e.g., `t("adminit.tickets.updated")`, `t("shared.labels.title")`), not lazy lookup
 - **Enum display values**: Use `t("enums.ticket.status.#{status}")` instead of `.humanize`
 - **Form labels**: Always pass explicit `label: t(...)` to form fields — don't rely on `.humanize` auto-generation
 - **System notes in interactors**: Keep in English — they are internal audit records stored in the DB

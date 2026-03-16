@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || t("views.layout.app_title") %></title>
+    <title><%= content_for(:title) || t("shared.layout.app_title") %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="view-transition" content="same-origin">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -28,16 +28,12 @@
     <% end %>
   </head>
   <body class="antialiased bg-default" data-controller="closer">
-    <%= render(Core::SidebarComponent.new(open: false, title: t("views.layout.app_menu"))) do %>
+    <%= render(Core::SidebarComponent.new(open: false, title: t("shared.layout.app_menu"))) do %>
       <%= render "partials/navigation" %>
     <% end %>
     <div class="flex pt-4 pr-4 justify-end">
-      <div class="flex items-center mr-2" data-controller="locale-switcher">
-        <select data-action="change->locale-switcher#change" class="text-sm rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 py-1 px-2 focus:ring-primary-500 focus:border-primary-500">
-          <% I18n.available_locales.each do |loc| %>
-            <option value="<%= loc %>" <%= "selected" if I18n.locale == loc %>><%= loc.to_s.upcase %></option>
-            <% end %>
-          </select>
+      <div class="mr-2">
+          <%= render Core::LocaleSwitcherComponent.new %>
         </div>
         <%= turbo_frame_tag :main_notifications, src: user_notifications_path, loading: :lazy, data: {turbo_permanent: true} do %>
           <div class="relative p-2.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-200 hover:outline-none hover:ring-2 hover:ring-primary-200 text-primary-400" aria-label="Notifications" aria-expanded="false">

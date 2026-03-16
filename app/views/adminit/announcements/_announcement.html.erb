@@ -9,26 +9,26 @@
 
     <%= render Core::BoxComponent.new do %>
       <%= render Core::DefinitionListComponent.new(variant: :info, gap: :sm) do |dl| %>
-        <% dl.with_item(term: t("views.labels.reference")) do %>
+        <% dl.with_item(term: t("shared.labels.reference")) do %>
           <%= announcement.reference %>
         <% end %>
-        <% dl.with_item(term: t("views.labels.author")) do %>
+        <% dl.with_item(term: t("shared.labels.author")) do %>
           <%= announcement.author.email %>
         <% end %>
-        <% dl.with_item(term: t("views.labels.status")) do %>
+        <% dl.with_item(term: t("shared.labels.status")) do %>
           <%= t("enums.announcement.status.#{announcement.status}") %>
         <% end %>
         <% if announcement.scheduled_at.present? %>
-          <% dl.with_item(term: t("views.labels.scheduled_for")) do %>
+          <% dl.with_item(term: t("shared.labels.scheduled_for")) do %>
             <%= announcement.scheduled_at.strftime("%B %d, %Y at %I:%M %p") %>
           <% end %>
         <% end %>
         <% if announcement.published_at.present? %>
-          <% dl.with_item(term: t("views.labels.published_on")) do %>
+          <% dl.with_item(term: t("shared.labels.published_on")) do %>
             <%= announcement.published_at.strftime("%B %d, %Y at %I:%M %p") %>
           <% end %>
         <% end %>
-        <% dl.with_item(term: t("views.labels.created_on")) do %>
+        <% dl.with_item(term: t("shared.labels.created_on")) do %>
           <%= announcement.created_at.strftime("%B %d, %Y at %I:%M %p") %>
         <% end %>
 

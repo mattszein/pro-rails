@@ -9,7 +9,7 @@
               message_form_target: "textarea",
               action: "keydown->message-form#handleKeydown"
             } %>
-      <%= form.button t("views.buttons.send"), {theme: :primary}, data: {message_form_target: "submit"} %>
+      <%= form.button t("shared.buttons.send"), {theme: :primary}, data: {message_form_target: "submit"} %>
     <% end %>
   <% elsif ticket.finished? && current_account&.id == ticket.created_id %>
     <%= render Support::ReopenFormComponent.new(ticket: ticket) %>

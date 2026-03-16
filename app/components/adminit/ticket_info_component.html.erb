@@ -1,30 +1,30 @@
 <div class="flex flex-col">
   <div class="flex items-center gap-4 mb-4">
     <%= helpers.icon "support", {classes: "h-8 dark:text-white"} %>
-    <h1 class="font-bold">Ticket #<%= ticket.id %></h1>
+    <h1 class="font-bold"><%= t("support.tickets.ticket_number", id: ticket.id) %></h1>
     <%= render(Core::BadgeComponent.new(label: t("enums.ticket.status.#{ticket.status}"), theme: status_theme, icon: "info", size: :md)) %>
   </div>
   <%= render Core::BoxComponent.new do %>
     <%= render Core::DefinitionListComponent.new(variant: :info, gap: :sm) do |dl| %>
-      <% dl.with_item(term: t("views.labels.title")) do %>
+      <% dl.with_item(term: t("shared.labels.title")) do %>
         <%= ticket.title %>
       <% end %>
-      <% dl.with_item(term: t("views.labels.category")) do %>
+      <% dl.with_item(term: t("shared.labels.category")) do %>
         <%= t("enums.ticket.category.#{ticket.category}") %>
       <% end %>
-      <% dl.with_item(term: t("views.labels.created_by")) do %>
+      <% dl.with_item(term: t("shared.labels.created_by")) do %>
         <%= ticket.created.email %>
       <% end %>
-      <% dl.with_item(term: t("views.labels.assigned_to")) do %>
+      <% dl.with_item(term: t("shared.labels.assigned_to")) do %>
         <%= ticket.assigned&.email || "-" %>
       <% end %>
-      <% dl.with_item(term: t("views.labels.priority")) do %>
+      <% dl.with_item(term: t("shared.labels.priority")) do %>
         <%= ticket.priority %>
       <% end %>
-      <% dl.with_item(term: t("views.labels.created_on")) do %>
+      <% dl.with_item(term: t("shared.labels.created_on")) do %>
         <%= ticket.created_at.strftime("%Y-%m-%d %H:%M") %>
       <% end %>
-      <% dl.with_item(term: t("views.labels.status")) do %>
+      <% dl.with_item(term: t("shared.labels.status")) do %>
         <%= render(Core::BadgeComponent.new(label: ticket.status, theme: status_theme, icon: "info", size: :md)) %>
       <% end %>
     <% end %>

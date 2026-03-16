@@ -1,0 +1,7 @@
+<div class="flex items-center" data-controller="core--locale-switcher-component">
+  <select data-action="change->core--locale-switcher-component#change" class="text-sm rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 py-1 px-2 focus:ring-primary-500 focus:border-primary-500">
+    <% locales.each do |loc| %>
+      <option value="<%= loc %>" <%= "selected" if current_locale == loc %>><%= loc.to_s.upcase %></option>
+    <% end %>
+  </select>
+</div>

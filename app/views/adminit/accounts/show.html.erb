@@ -8,11 +8,11 @@
 <%= render(Core::CardComponent.new(padding: :sm)) do %>
 <dl class="dark:divide-gray-700 text-left grid grid-cols-3 gap-4">
     <div>
-        <dt class="md:text-md"><%= t("views.labels.id") %></dt>
+        <dt class="md:text-md"><%= t("shared.labels.id") %></dt>
         <dd class="text-md font-semibold"><%= @account.id %></dd>
     </div>
     <div>
-        <dt class="md:text-md"><%= t("views.labels.name") %></dt>
+        <dt class="md:text-md"><%= t("shared.labels.name") %></dt>
         <dd class="text-md font-semibold"><%= @account.email %></dd>
     </div>
 </dl>
