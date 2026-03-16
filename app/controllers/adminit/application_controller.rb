@@ -3,6 +3,7 @@ module Adminit
     default_form_builder CustomFormBuilder
     include LocaleMessages
     include ActionPolicyHandler
+    include Localizable
 
     before_action :authorize_adminit_access
 

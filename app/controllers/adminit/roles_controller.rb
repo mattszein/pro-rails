@@ -16,9 +16,9 @@ class Adminit::RolesController < Adminit::ApplicationController
     us = Account.find(params[:account_id])
     us.role = nil
     if us.save
-      flash[:notice] = "account was successfully removed from the role."
+      flash[:notice] = I18n.t("adminit.roles.account_removed")
     else
-      flash[:alert] = "account wasn't removed from the role."
+      flash[:alert] = I18n.t("adminit.roles.account_not_removed")
     end
     redirect_to adminit_role_path(@role)
   end
@@ -31,9 +31,9 @@ class Adminit::RolesController < Adminit::ApplicationController
     authorize! @role
     account = Account.find_by(email: role_params[:email])
     if account.update(role: @role)
-      flash[:notice] = "account was successfully added to the role."
+      flash[:notice] = I18n.t("adminit.roles.account_added")
     else
-      flash[:alert] = "account wasn't added to the role."
+      flash[:alert] = I18n.t("adminit.roles.account_not_added")
     end
     redirect_to adminit_role_path(@role)
   end

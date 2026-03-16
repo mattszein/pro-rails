@@ -1,5 +1,5 @@
 <%= render(Core::CardComponent.new(classes: "flex justify-center")) do %>
   <%= form_with url: rodauth.email_auth_path, method: :post, data: {turbo: false}, class: "mx-auto" do |form| %>
-    <%= form.button "Login" %>
+    <%= form.button t("rodauth.login") %>
   <% end %>
 <% end %>

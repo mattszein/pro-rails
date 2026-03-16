@@ -37,7 +37,7 @@ module Support
       authorize! @ticket
       respond_to do |format|
         if @ticket.save
-          flash[:notice] = "Ticket was successfully created"
+          flash[:notice] = I18n.t("support.tickets.created")
           format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, support_ticket_url(@ticket)) }
           format.html { redirect_to support_ticket_url(@ticket) }
           format.json { render :show, status: :created, location: @ticket }
@@ -55,7 +55,7 @@ module Support
       respond_to do |format|
         if @ticket.update(ticket_params)
           format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, request.referer) }
-          format.html { redirect_to support_ticket_url(@ticket), notice: "Ticket was successfully updated." }
+          format.html { redirect_to support_ticket_url(@ticket), notice: I18n.t("support.tickets.updated") }
           format.json { render :show, status: :ok, location: @ticket }
         else
           format.turbo_stream { render turbo_stream: turbo_stream.replace("ticket_form", partial: "support/tickets/form", locals: {ticket: @ticket}), status: :unprocessable_content }
@@ -70,12 +70,12 @@ module Support
       if params[:support_ticket] && params[:support_ticket][:attachments]
         @ticket.attachments.attach(params[:support_ticket][:attachments])
         if @ticket.save
-          flash[:notice] = "Files were successfully attached"
+          flash[:notice] = I18n.t("support.tickets.files_attached")
         else
           flash[:alert] = @ticket.errors.full_messages.join(", ")
         end
       else
-        flash[:alert] = "No files selected"
+        flash[:alert] = I18n.t("support.tickets.no_files_selected")
       end
       redirect_to support_ticket_path(@ticket)
     end
@@ -90,7 +90,7 @@ module Support
       )
 
       if result.success?
-        redirect_to support_ticket_path(@ticket), notice: "Reopen request sent."
+        redirect_to support_ticket_path(@ticket), notice: I18n.t("support.tickets.reopen_sent")
       else
         redirect_to support_ticket_path(@ticket), alert: result.error
       end

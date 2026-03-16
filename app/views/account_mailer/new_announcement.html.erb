@@ -1,4 +1,4 @@
-<h1>This is a new announcement, <%= @user.email %></h1>
+<h1><%= t("mailers.account_mailer.new_announcement.greeting", email: @user.email) %></h1>
 <p>
-  this is the info: <%= @announcement.rich_body %>.<br>
+  <%= t("mailers.account_mailer.new_announcement.info") %> <%= @announcement.rich_body %>.<br>
 </p>

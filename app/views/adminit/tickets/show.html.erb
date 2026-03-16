@@ -1,25 +1,25 @@
 <div class="w-full">
   <div class="flex justify-between items-center pb-2">
-    <%= link_to "Back to Tickets", adminit_tickets_path, class: "text-indigo-500" %>
+    <%= link_to t("adminit.tickets.back_to_tickets"), adminit_tickets_path, class: "text-indigo-500" %>
     <div class="flex gap-2 items-center px-4">
-      <%= render(Core::LinkComponent.new(name: "Edit", url: edit_adminit_ticket_path(@ticket), style: :as_button, theme: :edit, size: :sm, html_options: {data: {turbo_frame: "modal"}})) %>
+      <%= render(Core::LinkComponent.new(name: t("shared.common.edit"), url: edit_adminit_ticket_path(@ticket), style: :as_button, theme: :edit, size: :sm, html_options: {data: {turbo_frame: "modal"}})) %>
       <% if @ticket.assigned_id.nil? && allowed_to?(:take?, @ticket, with: Adminit::TicketPolicy) %>
-        <%= render(Core::LinkComponent.new(name: "Take", url: take_adminit_ticket_path(@ticket), style: :as_button, theme: :create, size: :sm, html_options: {data: {turbo_method: :post}, method: :post})) %>
+        <%= render(Core::LinkComponent.new(name: t("shared.buttons.take"), url: take_adminit_ticket_path(@ticket), style: :as_button, theme: :create, size: :sm, html_options: {data: {turbo_method: :post}, method: :post})) %>
       <% elsif @ticket.assigned_id == current_account.id && allowed_to?(:leave?, @ticket, with: Adminit::TicketPolicy) %>
-        <%= render(Core::LinkComponent.new(name: "Leave", url: leave_adminit_ticket_path(@ticket), style: :as_button, theme: :delete, size: :sm, html_options: {data: {turbo_method: :post}, method: :post})) %>
+        <%= render(Core::LinkComponent.new(name: t("shared.buttons.leave"), url: leave_adminit_ticket_path(@ticket), style: :as_button, theme: :delete, size: :sm, html_options: {data: {turbo_method: :post}, method: :post})) %>
       <% end %>
 
       <% if allowed_to?(:finish?, @ticket, with: Adminit::TicketPolicy) %>
-        <%= render(Core::LinkComponent.new(name: "Finish", url: finish_adminit_ticket_path(@ticket), style: :as_button, theme: :create, size: :sm, html_options: {data: {turbo_method: :post, turbo_confirm: "Are you sure?"}, method: :post})) %>
+        <%= render(Core::LinkComponent.new(name: t("shared.buttons.finish"), url: finish_adminit_ticket_path(@ticket), style: :as_button, theme: :create, size: :sm, html_options: {data: {turbo_method: :post, turbo_confirm: t("shared.common.are_you_sure")}, method: :post})) %>
       <% end %>
 
       <% if allowed_to?(:reopen?, @ticket, with: Adminit::TicketPolicy) %>
-        <%= render(Core::LinkComponent.new(name: "Reopen", url: reopen_adminit_ticket_path(@ticket), style: :as_button, theme: :edit, size: :sm, html_options: {data: {turbo_method: :post, turbo_confirm: "Are you sure you want to reopen this ticket?"}, method: :post})) %>
+        <%= render(Core::LinkComponent.new(name: t("shared.buttons.reopen"), url: reopen_adminit_ticket_path(@ticket), style: :as_button, theme: :edit, size: :sm, html_options: {data: {turbo_method: :post, turbo_confirm: t("adminit.tickets.reopen_confirm")}, method: :post})) %>
       <% end %>
 
       <% if allowed_to?(:accept_reopen?, @ticket, with: Adminit::TicketPolicy) %>
-        <%= render(Core::LinkComponent.new(name: "Accept Reopen", url: accept_reopen_adminit_ticket_path(@ticket), style: :as_button, theme: :create, size: :sm, html_options: {data: {turbo_method: :post}, method: :post})) %>
-        <%= render(Core::LinkComponent.new(name: "Reject Reopen", url: reject_reopen_adminit_ticket_path(@ticket), style: :as_button, theme: :delete, size: :sm, html_options: {data: {turbo_frame: "modal"}})) %>
+        <%= render(Core::LinkComponent.new(name: t("shared.buttons.accept_reopen"), url: accept_reopen_adminit_ticket_path(@ticket), style: :as_button, theme: :create, size: :sm, html_options: {data: {turbo_method: :post}, method: :post})) %>
+        <%= render(Core::LinkComponent.new(name: t("shared.buttons.reject_reopen"), url: reject_reopen_adminit_ticket_path(@ticket), style: :as_button, theme: :delete, size: :sm, html_options: {data: {turbo_frame: "modal"}})) %>
       <% end %>
     </div>
   </div>

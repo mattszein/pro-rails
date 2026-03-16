@@ -17,7 +17,7 @@ class Adminit::AnnouncementsController < Adminit::ApplicationController
 
   def edit
     unless @announcement.editable?
-      respond_error("Cannot edit this announcement.")
+      respond_error(I18n.t("adminit.announcements.cannot_edit"))
     end
   end
 
@@ -46,7 +46,7 @@ class Adminit::AnnouncementsController < Adminit::ApplicationController
     result = Announcements::Schedule.call(announcement: @announcement)
     if result.success?
       respond_success(
-        "Announcement scheduled for #{@announcement.scheduled_at.strftime("%B %d, %Y at %I:%M %p")}.",
+        I18n.t("adminit.announcements.scheduled", time: I18n.l(@announcement.scheduled_at, format: :long)),
         adminit_announcement_path(@announcement)
       )
     else
@@ -57,7 +57,7 @@ class Adminit::AnnouncementsController < Adminit::ApplicationController
   def unschedule
     result = Announcements::Unschedule.call(announcement: @announcement)
     if result.success?
-      respond_success("Announcement was unscheduled.", adminit_announcement_path(@announcement))
+      respond_success(I18n.t("adminit.announcements.unscheduled"), adminit_announcement_path(@announcement))
     else
       respond_error(result.error)
     end

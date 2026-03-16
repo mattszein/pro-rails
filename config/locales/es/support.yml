@@ -1,0 +1,40 @@
+es:
+  support:
+    tickets:
+      title: "Tickets"
+      ticket_number: "Ticket #%{id}"
+      add_ticket: "Agregar ticket"
+      add_ticket_title: "Agregar Ticket"
+      editing_ticket: "Editando Ticket"
+      created: "El ticket fue creado exitosamente"
+      updated: "El ticket fue actualizado exitosamente."
+      files_attached: "Los archivos fueron adjuntados exitosamente"
+      no_files_selected: "No se seleccionaron archivos"
+      reopen_sent: "Solicitud de reapertura enviada."
+      back_to_tickets: "Volver a Tickets"
+      select_category: "Seleccionar una categoría"
+      description_placeholder: "Escribe la descripción de tu ticket aquí"
+      attach_files_label: "Adjuntar archivos (imágenes, PDF - máx. 2MB cada uno)"
+      upload_limit: "Puedes subir hasta %{max_files} archivos"
+    message:
+      support_badge: "Soporte"
+      edit: "Editar"
+    messages:
+      sent: "Mensaje enviado."
+      not_sent: "No se pudo enviar el mensaje."
+      placeholder: "Escribe tu mensaje..."
+    conversation:
+      title: "Conversación"
+      ticket_active: "Este ticket ahora está activo. Actualiza la página para enviar mensajes."
+    reopen_form:
+      finished_notice: "Este ticket está marcado como finalizado."
+      reopen_instruction: "Si tu problema no está resuelto, puedes solicitar reabrir proporcionando una razón a continuación."
+      reason_placeholder: "Razón para reabrir..."
+      request_reopen: "Solicitar Reapertura"
+    attachments:
+      title: "Adjuntos"
+      no_attachments_upload: "Sin adjuntos aún. Haz clic en \"Agregar Archivos\" para subir."
+      no_attachments: "Sin adjuntos."
+      select_files: "Seleccionar archivos para subir"
+      upload_helper: "Máx. 2MB por archivo. Hasta %{max_files} archivos en total."
+      upload_button: "Subir Archivos"

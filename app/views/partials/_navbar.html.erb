@@ -6,21 +6,15 @@
         <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">ProRails</span>
       </a>
     </div>
-    <div class="items-center justify-center hidden w-full md:flex md:w-auto basis-4/6" id="navbar-cta">
+    <div class="items-center justify-center hidden w-full md:flex md:w-auto basis-3/6" id="navbar-cta">
     </div>
-    <div class="flex basis-1/6 flex-row-reverse gap-2">
-      <button class="order-2 p-2 mr-2 text-gray-600 rounded-lg cursor-pointer hover:text-gray-900 hover:bg-gray-100 focus:bg-gray-100 dark:focus:bg-gray-700 focus:ring-2 focus:ring-gray-100 dark:focus:ring-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white" data-controller="dark-mode" data-dark-mode-target="themeToggle" data-action="click->dark-mode#toggleTheme">
-        <svg class="h-8 text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-blue-500 transition duration-200 hidden" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20" data-dark-mode-target="darkIcon">
-          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.509 5.75c0-1.493.394-2.96 1.144-4.25h-.081a8.5 8.5 0 1 0 7.356 12.746A8.5 8.5 0 0 1 8.509 5.75Z" />
-        </svg>
-        <svg class="h-8 text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-blue-500 transition duration-20 hidden" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" data-dark-mode-target="lightIcon">
-          <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd" />
-        </svg>
-        <span class="sr-only">Theme</span>
-      </button>
-      <%= render(Core::LinkComponent.new(name: "Sign In", url: rodauth.login_path, style: :default, html_options: {class: "order-5"})) %>
+    <div class="flex basis-2/6 flex-row-reverse gap-1">
+      <%= render Core::DarkLightComponent.new %>
+      <%= render Core::LocaleSwitcherComponent.new %>
+      <div class="inline-flex items-center"><span class="dark:text-gray-100 px-2"> | </span></div>
+      <%= render(Core::LinkComponent.new(name: t("shared.navigation.sign_in"), url: rodauth.login_path, style: :default, html_options: {class: "order-5"})) %>
       <div class="inline-flex items-center order-6"><span class="dark:text-gray-100 px-2"> - </span></div>
-      <%= render(Core::LinkComponent.new(name: "Register", url: rodauth.create_account_path, style: :default, html_options: {class: "order-7"})) %>
+      <%= render(Core::LinkComponent.new(name: t("shared.navigation.register"), url: rodauth.create_account_path, style: :default, html_options: {class: "order-7"})) %>
     </div>
   </div>
 </nav>

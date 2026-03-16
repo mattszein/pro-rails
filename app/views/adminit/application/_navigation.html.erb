@@ -1,26 +1,26 @@
-  <%= render(Core::SidebarLinkComponent.new(label: "Dash", path: adminit_root_path, active_paths: [adminit_root_path], icon_name: "admin")) %>
+  <%= render(Core::SidebarLinkComponent.new(label: t("adminit.navigation.dash"), path: adminit_root_path, active_paths: [adminit_root_path], icon_name: "admin")) %>
   <% if allowed_to? :manage?, with: Adminit::AccountPolicy %>
-    <%= render(Core::SidebarLinkComponent.new(label: "Accounts", path: adminit_accounts_path, active_paths: [adminit_accounts_path], icon_name: "adminit/accounts")) %>
+    <%= render(Core::SidebarLinkComponent.new(label: t("adminit.navigation.accounts"), path: adminit_accounts_path, active_paths: [adminit_accounts_path], icon_name: "adminit/accounts")) %>
   <% end %>
 
   <% if allowed_to? :manage?, with: Adminit::AnnouncementPolicy %>
-    <%= render(Core::SidebarLinkComponent.new(label: "Announcements", path: adminit_announcements_path, active_paths: [adminit_announcements_path], icon_name: "adminit/announcement")) %>
+    <%= render(Core::SidebarLinkComponent.new(label: t("adminit.navigation.announcements"), path: adminit_announcements_path, active_paths: [adminit_announcements_path], icon_name: "adminit/announcement")) %>
   <% end %>
 
   <% if allowed_to? :manage?, with: Adminit::PermissionPolicy %>
-    <%= render(Core::SidebarLinkComponent.new(label: "Permissions", path: adminit_permissions_path, active_paths: [adminit_permissions_path], icon_name: "adminit/permissions")) %>
+    <%= render(Core::SidebarLinkComponent.new(label: t("adminit.navigation.permissions"), path: adminit_permissions_path, active_paths: [adminit_permissions_path], icon_name: "adminit/permissions")) %>
   <% end %>
 
   <% if allowed_to? :manage?, with: Adminit::RolePolicy %>
-    <%= render(Core::SidebarLinkComponent.new(label: "Roles", path: adminit_roles_path, active_paths: [adminit_roles_path], icon_name: "adminit/roles")) %>
+    <%= render(Core::SidebarLinkComponent.new(label: t("adminit.navigation.roles"), path: adminit_roles_path, active_paths: [adminit_roles_path], icon_name: "adminit/roles")) %>
   <% end %>
 
   <% if allowed_to? :manage?, with: Adminit::TicketPolicy %>
-    <%= render(Core::SidebarLinkComponent.new(label: "Tickets", path: adminit_tickets_path, active_paths: [adminit_tickets_path], icon_name: "adminit/tickets")) %>
+    <%= render(Core::SidebarLinkComponent.new(label: t("adminit.navigation.tickets"), path: adminit_tickets_path, active_paths: [adminit_tickets_path], icon_name: "adminit/tickets")) %>
   <% end %>
 
   <hr class="my-4 border-gray-300 dark:border-gray-700">
 
-  <%= render(Core::SidebarLinkComponent.new(label: "Dark - Light", path: "#", icon_name: "theme", html_options: {data: {turbo: "false", controller: "dark-mode", dark_mode_target: "themeToggle", action: "click->dark-mode#toggleTheme"}})) %>
-  <%= render(Core::SidebarLinkComponent.new(label: "Back to App", path: dashboard_path, icon_name: "adminit/back")) %>
-  <%= render(Core::SidebarLinkComponent.new(label: "Logout", path: rodauth.logout_path, icon_name: "logout", html_options: {data: {turbo_prefetch: "false", turbo_method: "post"}, method: :post})) %>
+  <%= render(Core::SidebarLinkComponent.new(label: t("shared.common.dark_light"), path: "#", icon_name: "theme", html_options: {data: {turbo: "false", controller: "dark-mode", dark_mode_target: "themeToggle", action: "click->dark-mode#toggleTheme"}})) %>
+  <%= render(Core::SidebarLinkComponent.new(label: t("adminit.navigation.back_to_app"), path: dashboard_path, icon_name: "adminit/back")) %>
+  <%= render(Core::SidebarLinkComponent.new(label: t("shared.common.logout"), path: rodauth.logout_path, icon_name: "logout", html_options: {data: {turbo_prefetch: "false", turbo_method: "post"}, method: :post})) %>

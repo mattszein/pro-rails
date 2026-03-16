@@ -3,11 +3,11 @@
     <%= form.file_field :attachments,
           multiple: true,
           accept: allowed_types,
-          label: "Select files to upload",
-          helper_text: "Max 2MB per file. Up to #{max_files} files total.",
+          label: t("support.attachments.select_files"),
+          helper_text: t("support.attachments.upload_helper", max_files: max_files),
           icon: "plus" %>
     <div class="flex gap-2">
-      <%= form.button "Upload Files", {theme: :create, size: :sm} %>
+      <%= form.button t("support.attachments.upload_button"), {theme: :create, size: :sm} %>
     </div>
   <% end %>
 </div>

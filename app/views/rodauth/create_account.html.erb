@@ -1,12 +1,12 @@
 <%= render(Core::CardComponent.new) do %>
   <%= form_with url: rodauth.create_account_path, method: :post, data: {turbo: false}, class: form_classes do |form| %>
-    <%= form.text_field :email, {label: "Email", required: true, autofocus: true, placeholder: " ", value: params[rodauth.login_param], aria: ({invalid: true, describedby: "login_error_message"} if rodauth.field_error(rodauth.login_param))} %>
+    <%= form.text_field :email, {label: t("rodauth.labels.email"), required: true, autofocus: true, placeholder: " ", value: params[rodauth.login_param], aria: ({invalid: true, describedby: "login_error_message"} if rodauth.field_error(rodauth.login_param))} %>
     <%= error_tag(rodauth.field_error(rodauth.login_param), id: "login_error_message") if rodauth.field_error(rodauth.login_param) %>
-    <%= form.password_field :password, {label: "Password", required: true, placeholder: " "} %>
+    <%= form.password_field :password, {label: t("rodauth.labels.password"), required: true, placeholder: " "} %>
     <%= error_tag(rodauth.field_error(rodauth.password_param), id: "password_error_message") if rodauth.field_error(rodauth.password_param) %>
-    <%= form.password_field "password-confirm", {label: "Password Confirm", required: true, placeholder: " "} %>
+    <%= form.password_field "password-confirm", {label: t("rodauth.labels.password_confirm"), required: true, placeholder: " "} %>
     <div class="mt-6">
-      <%= form.button "Register", {fullw: true} %>
+      <%= form.button t("rodauth.register"), {fullw: true} %>
     </div>
   <% end %>
 <% end %>

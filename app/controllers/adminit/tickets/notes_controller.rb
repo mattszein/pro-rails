@@ -11,9 +11,9 @@ module Adminit
         @note.kind = :internal
 
         if @note.save
-          redirect_to adminit_ticket_path(@ticket), notice: "Note added."
+          redirect_to adminit_ticket_path(@ticket), notice: I18n.t("adminit.tickets.note_added")
         else
-          redirect_to adminit_ticket_path(@ticket), alert: "Note could not be added: #{@note.errors.full_messages.join(", ")}"
+          redirect_to adminit_ticket_path(@ticket), alert: I18n.t("adminit.tickets.note_error", errors: @note.errors.full_messages.join(", "))
         end
       end
 

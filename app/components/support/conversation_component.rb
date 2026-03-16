@@ -4,7 +4,7 @@ module Support
     option :messages
 
     def title
-      "Conversation"
+      I18n.t("support.conversation.title")
     end
   end
 end

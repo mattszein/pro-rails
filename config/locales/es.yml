@@ -1,0 +1,79 @@
+es:
+  activerecord:
+    models:
+      announcement: Anuncio
+      ticket: Ticket
+    errors:
+      models:
+        announcement:
+          attributes:
+            scheduled_at:
+              immutable_when_scheduled: "no se puede cambiar cuando está programado. Desprograme primero."
+            base:
+              cannot_update_published: "No se puede actualizar un anuncio publicado"
+              only_draft_deletable: "Solo se pueden eliminar anuncios en borrador"
+        support/ticket:
+          attributes:
+            attachments:
+              too_many_files: "no puede exceder %{max_files} archivos"
+              file_too_large: "%{filename} es demasiado grande (máx. %{max_size}MB)"
+              invalid_file_type: "%{filename} tiene un tipo de archivo no válido"
+  authentication:
+    unauthenticated: "Necesitas iniciar sesión antes de continuar."
+  adminit:
+    authorization:
+      unauthorized: "¡No tienes permisos!"
+  messages:
+    created: "%{model} fue creado exitosamente."
+    updated: "%{model} fue actualizado exitosamente."
+    deleted: "%{model} fue eliminado exitosamente."
+  errors:
+    record_not_found: "El recurso que buscas no fue encontrado."
+    page_not_found: "Página No Encontrada"
+  support:
+    ticket_status_banner:
+      finished: "Este ticket está marcado como finalizado."
+      reopen_requested: "Solicitud de reapertura pendiente de aprobación. Podrás enviar mensajes una vez que un administrador la acepte."
+      closed: "Este ticket está cerrado permanentemente."
+      default: "Esperando que un administrador tome este ticket. Podrás enviar mensajes una vez que el ticket esté en progreso."
+  notifiers:
+    announcement_notifier:
+      notification:
+        title: "Nuevo Anuncio"
+  enums:
+    ticket:
+      status:
+        open: "Abierto"
+        in_progress: "En Progreso"
+        finished: "Finalizado"
+        reopen_requested: "Reapertura Solicitada"
+        reopened: "Reabierto"
+        closed: "Cerrado"
+      category:
+        account_access: "Acceso a Cuenta"
+        technical_issue: "Problema Técnico"
+        billing: "Facturación"
+        feature_request: "Solicitud de Función"
+        other: "Otro"
+    announcement:
+      status:
+        draft: "Borrador"
+        scheduled: "Programado"
+        published: "Publicado"
+  announcement:
+    transitions:
+      cannot_schedule_published: "No se puede programar un anuncio publicado"
+      already_scheduled: "Ya está programado"
+      scheduled_time_required: "Se requiere hora de programación"
+      scheduled_time_future: "La hora de programación debe ser en el futuro"
+      title_content_required: "Se requieren título y contenido para programar"
+      can_only_unschedule_scheduled: "Solo se pueden desprogramar anuncios programados"
+      already_published: "Ya está publicado"
+      must_be_scheduled_first: "Debe estar programado primero"
+  ticket:
+    transitions:
+      can_only_finish: "Solo se pueden finalizar tickets en progreso o reabiertos"
+      can_only_reopen: "Solo se pueden reabrir tickets finalizados"
+      can_only_request_reopen: "Solo se puede solicitar reapertura en tickets finalizados"
+      can_only_accept_reopen: "Solo se puede aceptar reapertura en tickets con solicitud de reapertura"
+      can_only_reject_reopen: "Solo se puede rechazar reapertura en tickets con solicitud de reapertura"

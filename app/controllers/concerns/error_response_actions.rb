@@ -1,6 +1,6 @@
 module ErrorResponseActions
   def route_not_found
-    render_error("Page Not Found")
+    render_error(I18n.t("errors.page_not_found"))
   end
 
   def render_error(message)

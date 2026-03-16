@@ -1,0 +1,19 @@
+en:
+  rodauth:
+    labels:
+      email: "Email"
+      password: "Password"
+      password_confirm: "Password Confirm"
+    login: "Login"
+    register: "Register"
+    send_login_via_email: "Send Login Via Email"
+    change_login: "Change Login"
+    change_password: "Change Password"
+    close_account: "Close Account"
+    reset_password: "Reset Password"
+    request_password: "Request Password"
+    verify_account: "Verify Account"
+    send_verification_again: "Send Verification again"
+    verify_login_change: "Verify Login Change"
+    remember: "Remember"
+    logout: "Logout"

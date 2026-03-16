@@ -1,7 +1,7 @@
 <div id="<%= ActionView::RecordIdentifier.dom_id(ticket, "message_form") %>">
   <% if ticket.messageable? %>
     <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-xl border border-green-200 dark:border-green-800 flex items-center gap-3 text-green-800 dark:text-green-300">
-      <p class="font-medium">This ticket is now active. Refresh the page to send messages.</p>
+      <p class="font-medium"><%= t("support.conversation.ticket_active") %></p>
     </div>
   <% else %>
     <%= render Support::TicketStatusBannerComponent.new(ticket: ticket) %>

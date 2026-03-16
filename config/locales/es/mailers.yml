@@ -1,0 +1,6 @@
+es:
+  mailers:
+    account_mailer:
+      new_announcement:
+        greeting: "Este es un nuevo anuncio, %{email}"
+        info: "esta es la información:"

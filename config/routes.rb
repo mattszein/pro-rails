@@ -6,38 +6,42 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", :as => :rails_health_check
   mount MissionControl::Jobs::Engine, at: "/jobs"
 
-  root "application#index"
-  draw :adminit
   if Rails.env.development?
     mount Lookbook::Engine, at: "/lookbook"
   end
 
-  get "dashboard" => "dashboard#index", :as => :dashboard
-  resources :notifications, only: [:index, :show] do
-    collection do
-      post :mark_all_read
-      get :user
-    end
-    member do
-      post :mark_as_read
-    end
-  end
+  scope "(:locale)", locale: /en|es/ do
+    root "application#index"
+    draw :adminit
 
-  resources :announcements, only: [:show]
-
-  namespace :support do
-    resources :tickets, except: [:destroy] do
-      member do
-        post :attach_files
-        post :request_reopen
+    get "dashboard" => "dashboard#index", :as => :dashboard
+    resources :notifications, only: [:index, :show] do
+      collection do
+        post :mark_all_read
+        get :user
       end
-      resources :messages, only: [:create]
+      member do
+        post :mark_as_read
+      end
+    end
+
+    resources :announcements, only: [:show]
+
+    namespace :support do
+      resources :tickets, except: [:destroy] do
+        member do
+          post :attach_files
+          post :request_reopen
+        end
+        resources :messages, only: [:create]
+      end
+    end
+
+    namespace :settings do
+      resources :appearance, only: [:index]
     end
   end
 
-  namespace :settings do
-    resources :appearance, only: [:index]
-  end
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker

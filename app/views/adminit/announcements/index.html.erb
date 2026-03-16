@@ -1,7 +1,7 @@
 <div class="w-full">
   <div class="flex justify-between items-center pb-2">
-    <h1 class="text-xl font-semibold">Announcements</h1>
-      <%= render(Core::LinkComponent.new(name: "New Announcement", url: new_adminit_announcement_path, style: :as_button, theme: :create, size: :sm, html_options: {data: {turbo_frame: "modal"}})) %>
+    <h1 class="text-xl font-semibold"><%= t("adminit.navigation.announcements") %></h1>
+      <%= render(Core::LinkComponent.new(name: t("adminit.announcements.new_announcement"), url: new_adminit_announcement_path, style: :as_button, theme: :create, size: :sm, html_options: {data: {turbo_frame: "modal"}})) %>
   </div>
   <%= render Core::CardComponent.new(padding: :none) do %>
     <div class="flex p-4 gap-4">

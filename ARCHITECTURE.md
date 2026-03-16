@@ -91,7 +91,7 @@ def schedule
   result = Announcements::Schedule.call(announcement: @announcement)
 
   if result.success?
-    redirect_to @announcement, notice: "Scheduled"
+    redirect_to @announcement, notice: I18n.t("adminit.announcements.scheduled", time: I18n.l(@announcement.scheduled_at, format: :long))
   else
     redirect_to @announcement, alert: result.error
   end
@@ -236,7 +236,7 @@ private
 
 def cannot_update_when_published
   if status_was == "published"
-    errors.add(:base, "Cannot update a published record")
+    errors.add(:base, I18n.t("activerecord.errors.models.announcement.attributes.base.cannot_update_published"))
   end
 end
 ```
@@ -263,15 +263,15 @@ For state changes. Called by interactors. Pure database operations, **no side ef
 
 ```ruby
 def schedule!
-  raise InvalidTransition, "Cannot schedule" if published?
-  raise InvalidTransition, "Already scheduled" if scheduled?
-  
+  raise InvalidTransition, I18n.t("announcement.transitions.cannot_schedule_published") if published?
+  raise InvalidTransition, I18n.t("announcement.transitions.already_scheduled") if scheduled?
+
   update!(status: :scheduled)
 end
 
 def publish!
-  raise InvalidTransition, "Must be scheduled first" unless scheduled?
-  
+  raise InvalidTransition, I18n.t("announcement.transitions.must_be_scheduled_first") unless scheduled?
+
   update!(status: :published, published_at: Time.current)
 end
 ```
@@ -296,7 +296,7 @@ private
 
 def ensure_destroyable
   unless draft?
-    errors.add(:base, "Only drafts can be deleted")
+    errors.add(:base, I18n.t("activerecord.errors.models.announcement.attributes.base.only_draft_deletable"))
     throw(:abort)
   end
 end
@@ -311,7 +311,7 @@ class Announcement < ApplicationRecord
   class InvalidTransition < StandardError; end
   
   def publish!
-    raise InvalidTransition, "Already published" if published?
+    raise InvalidTransition, I18n.t("announcement.transitions.already_published") if published?
     # ...
   end
 end
@@ -835,7 +835,7 @@ RSpec.describe Announcements::Schedule, type: :interactor do
       it "fails" do
         result = described_class.call(announcement: announcement)
         expect(result).to be_failure
-        expect(result.error).to eq("Already published")
+        expect(result.error).to eq(I18n.t("announcement.transitions.already_published"))
       end
     end
   end
@@ -879,6 +879,99 @@ Service objects for external APIs live in `app/services/external_services/`.
 Notifiers live in `app/notifiers/`.
 
 Configuration classes live in `config/configs/`.
+
+---
+
+## Internationalization (I18n)
+
+We use URL-based locale switching with English (default) and Spanish support.
+
+### Locale File Structure
+
+```
+config/locales/
+  en.yml / es.yml          # Model layer: ActiveRecord, enums, transitions
+  en/ & es/
+    shared.yml             # Cross-domain: labels, buttons, navigation, layout, dashboard, notifications
+    adminit.yml            # Admin area: flash messages, titles, navigation, notes
+    support.yml            # Support area: flash messages, titles, conversation, attachments
+    settings.yml           # Settings area: tabs, fonts, themes
+    rodauth.yml            # Auth pages
+    mailers.yml            # Email content
+```
+
+**Decision rule**: used by 2+ domains → `shared.yml`; specific to one domain → that domain's file; model-layer → root `en.yml`/`es.yml`.
+
+### Controller Usage
+
+Use `I18n.t()` for flash messages. The `Localizable` concern handles locale detection and URL generation:
+
+```ruby
+def update
+  if @ticket.update(ticket_params)
+    redirect_to ticket_path(@ticket), notice: I18n.t("adminit.tickets.updated")
+  end
+end
+```
+
+### View Usage
+
+Use the `t()` helper for all user-facing strings:
+
+```erb
+<h1><%= t("support.tickets.title") %></h1>
+<%= form.button t("shared.common.save"), theme: :create %>
+<%= link_to t("adminit.tickets.back_to_tickets"), adminit_tickets_path %>
+```
+
+### Enum Display Values
+
+Never use `.humanize` for enum values. Use i18n lookups:
+
+```erb
+<%# BAD %>
+<%= ticket.status.humanize %>
+
+<%# GOOD %>
+<%= t("enums.ticket.status.#{ticket.status}") %>
+```
+
+### Model Transition Messages
+
+Model transition errors use i18n:
+
+```ruby
+def schedule!
+  raise InvalidTransition, I18n.t("announcement.transitions.cannot_schedule_published") if published?
+  update!(status: :scheduled)
+end
+```
+
+### System Notes
+
+Interactor system notes (stored in DB) stay in English. Only user-facing error messages are translated:
+
+```ruby
+# System note — English (stored in DB)
+ticket.notes.create!(body: "Ticket taken and assigned.", kind: :system)
+
+# User-facing error — translated
+context.fail!(error: I18n.t("adminit.tickets.already_assigned"))
+```
+
+### Form Labels
+
+Always pass explicit translated labels to form fields:
+
+```erb
+<%= form.text_field :title, label: t("shared.labels.title") %>
+```
+
+### Adding New Strings
+
+1. Add the key to the English locale file under the appropriate domain
+2. Add the Spanish translation to the corresponding `es/` file
+3. Use `I18n.t("namespace.key")` in controllers or `t("namespace.key")` in views/components
 
 ---
 

@@ -1,0 +1,40 @@
+en:
+  support:
+    tickets:
+      title: "Tickets"
+      ticket_number: "Ticket #%{id}"
+      add_ticket: "Add ticket"
+      add_ticket_title: "Add Ticket"
+      editing_ticket: "Editing Ticket"
+      created: "Ticket was successfully created"
+      updated: "Ticket was successfully updated."
+      files_attached: "Files were successfully attached"
+      no_files_selected: "No files selected"
+      reopen_sent: "Reopen request sent."
+      back_to_tickets: "Back to Tickets"
+      select_category: "Select a category"
+      description_placeholder: "Write your ticket description here"
+      attach_files_label: "Attach files (images, PDF - max 2MB each)"
+      upload_limit: "You can upload up to %{max_files} files"
+    message:
+      support_badge: "Support"
+      edit: "Edit"
+    messages:
+      sent: "Message sent."
+      not_sent: "Message could not be sent."
+      placeholder: "Type your message..."
+    conversation:
+      title: "Conversation"
+      ticket_active: "This ticket is now active. Refresh the page to send messages."
+    reopen_form:
+      finished_notice: "This ticket is marked as finished."
+      reopen_instruction: "If your issue is not resolved, you can request to reopen it by providing a reason below."
+      reason_placeholder: "Reason for reopening..."
+      request_reopen: "Request Reopen"
+    attachments:
+      title: "Attachments"
+      no_attachments_upload: "No attachments yet. Click \"Add Files\" to upload."
+      no_attachments: "No attachments."
+      select_files: "Select files to upload"
+      upload_helper: "Max 2MB per file. Up to %{max_files} files total."
+      upload_button: "Upload Files"

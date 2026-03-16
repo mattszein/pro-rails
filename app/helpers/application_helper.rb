@@ -4,17 +4,17 @@ module ApplicationHelper
   def sidebar_links
     [
       {
-        label: "Home",
+        label: I18n.t("shared.navigation.home"),
         path: :dashboard_path,
         icon_name: "home"
       },
       {
-        label: "Settings",
+        label: I18n.t("shared.navigation.settings"),
         path: :dashboard_path, # Replace with actual path
         icon_name: "settings"
       },
       {
-        label: "Log out",
+        label: I18n.t("shared.common.logout"),
         path: rodauth.logout_path,
         icon_name: "logout",
         options: {data: {turbo_prefetch: "false", turbo_method: "post"}, method: :post}
@@ -56,13 +56,13 @@ module ApplicationHelper
   def accounts_columns
     [
       {
-        label: "Email",
+        label: I18n.t("shared.labels.email"),
         renderer: ->(account) { account.email }
       },
       {
-        label: "Actions",
+        label: I18n.t("shared.common.actions"),
         renderer: ->(account) {
-          render(Core::LinkComponent.new(name: "Show", url: adminit_account_path(account), style: :as_button, theme: :show, size: :xs, html_options: {data: {turbo_prefetch: false}}))
+          render(Core::LinkComponent.new(name: I18n.t("shared.common.show"), url: adminit_account_path(account), style: :as_button, theme: :show, size: :xs, html_options: {data: {turbo_prefetch: false}}))
         }
       }
     ]
@@ -71,13 +71,13 @@ module ApplicationHelper
   def roles_columns
     [
       {
-        label: "Name",
+        label: I18n.t("shared.labels.name"),
         renderer: ->(role) { role.name }
       },
       {
-        label: "Actions",
+        label: I18n.t("shared.common.actions"),
         renderer: ->(role) {
-          render(Core::LinkComponent.new(name: "Show", url: adminit_role_path(role), style: :as_button, theme: :show, size: :xs, html_options: {data: {turbo_prefetch: false}}))
+          render(Core::LinkComponent.new(name: I18n.t("shared.common.show"), url: adminit_role_path(role), style: :as_button, theme: :show, size: :xs, html_options: {data: {turbo_prefetch: false}}))
         }
       }
     ]
@@ -91,28 +91,28 @@ module ApplicationHelper
   def announcement_columns
     [
       {
-        label: "Reference",
+        label: I18n.t("shared.labels.reference"),
         renderer: ->(announcement) { announcement.reference }
       },
       {
-        label: "Status",
+        label: I18n.t("shared.labels.status"),
         renderer: ->(announcement) do
-          render(Core::BadgeComponent.new(label: announcement.status.humanize,
+          render(Core::BadgeComponent.new(label: I18n.t("enums.announcement.status.#{announcement.status}"),
             theme: announcement_status_theme(announcement.status)))
         end
       },
       {
-        label: "Author",
+        label: I18n.t("shared.labels.author"),
         renderer: ->(announcement) { announcement.author.email }
       },
       {
-        label: "Scheduled At",
+        label: I18n.t("shared.labels.scheduled_at"),
         renderer: ->(announcement) { announcement.scheduled_at&.strftime("%Y-%m-%d %H:%M") || "-" }
       },
       {
-        label: "Actions",
+        label: I18n.t("shared.common.actions"),
         renderer: ->(announcement) {
-          render(Core::LinkComponent.new(name: "Show", url: adminit_announcement_path(announcement),
+          render(Core::LinkComponent.new(name: I18n.t("shared.common.show"), url: adminit_announcement_path(announcement),
             style: :as_button, theme: :show, size: :xs, html_options: {data: {turbo_prefetch: false}}))
         }
       }

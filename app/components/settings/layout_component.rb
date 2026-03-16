@@ -3,10 +3,10 @@ class Settings::LayoutComponent < ApplicationViewComponent
 
   def sections
     [
-      Core::SubmenuComponent::Section.new(key: :profile, name: "Profile", path: "#"),
-      Core::SubmenuComponent::Section.new(key: :appearance, name: "Appearance", path: helpers.settings_appearance_index_path),
-      Core::SubmenuComponent::Section.new(key: :password, name: "Password", path: helpers.rodauth.change_password_path),
-      Core::SubmenuComponent::Section.new(key: :remember, name: "Remember", path: helpers.rodauth.remember_path)
-    ].freeze
+      Core::SubmenuComponent::Section.new(key: :profile, name: I18n.t("settings.profile"), path: "#"),
+      Core::SubmenuComponent::Section.new(key: :appearance, name: I18n.t("settings.appearance"), path: helpers.settings_appearance_index_path),
+      Core::SubmenuComponent::Section.new(key: :password, name: I18n.t("settings.password"), path: helpers.rodauth.change_password_path),
+      Core::SubmenuComponent::Section.new(key: :remember, name: I18n.t("settings.remember"), path: helpers.rodauth.remember_path)
+    ]
   end
 end

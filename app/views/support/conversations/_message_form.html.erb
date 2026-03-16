@@ -3,13 +3,13 @@
     <%= form_with model: Support::Message.new, url: support_ticket_messages_path(ticket), id: "message_form", class: "flex gap-3", data: {controller: "message-form", action: "turbo:submit-start->message-form#beforeSubmit turbo:submit-end->message-form#afterSubmit"} do |form| %>
       <%= form.text_area :content,
             rows: 1,
-            placeholder: "Type your message...",
+            placeholder: t("support.messages.placeholder"),
             class: "flex-1 px-4 py-3 rounded-xl resize-none",
             data: {
               message_form_target: "textarea",
               action: "keydown->message-form#handleKeydown"
             } %>
-      <%= form.button "Send", {theme: :primary}, data: {message_form_target: "submit"} %>
+      <%= form.button t("shared.buttons.send"), {theme: :primary}, data: {message_form_target: "submit"} %>
     <% end %>
   <% elsif ticket.finished? && current_account&.id == ticket.created_id %>
     <%= render Support::ReopenFormComponent.new(ticket: ticket) %>

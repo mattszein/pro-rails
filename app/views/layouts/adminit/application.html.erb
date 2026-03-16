@@ -9,7 +9,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <%= turbo_refreshes_with method: :morph, scroll: :preserve %>
     <title>
-      Adminit: <%= Rails.application.class %>
+      <%= t("adminit.layout.title_prefix") %> <%= Rails.application.class %>
     </title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -35,6 +35,9 @@
   <body class="min-h-screen bg-indigo-50 dark:bg-black">
 
     <div class="flex pt-4 pr-4 justify-end">
+      <div class="mr-2">
+        <%= render Core::LocaleSwitcherComponent.new %>
+      </div>
     <%= turbo_frame_tag :main_notifications, src: user_notifications_path, loading: :lazy, data: {turbo_permanent: true} do %>
       <div class="relative p-2.5 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-200 hover:outline-none hover:ring-2 hover:ring-primary-200 text-primary-400" aria-label="Notifications" aria-expanded="false">
           <%= icon("bell", classes: "w-7 h-7 animate-pulse") %>
@@ -45,7 +48,7 @@
       <% end %>
       </div>
     <div class="md:flex w-full min-h-screen z-30">
-      <%= render(Core::SidebarComponent.new(open: false, title: "RailsApp | Menu")) do %>
+      <%= render(Core::SidebarComponent.new(open: false, title: t("shared.layout.app_menu"))) do %>
         <%= render "navigation" %>
       <% end %>
       <main class="grow pt-16 px-8 overflow-x-scroll" role="main">

@@ -44,23 +44,23 @@ class Announcement < ApplicationRecord
 
   # Transitions states
   def schedule!
-    raise InvalidTransition, "Cannot schedule a published announcement" if published?
-    raise InvalidTransition, "Already scheduled" if scheduled?
-    raise InvalidTransition, "Scheduled time is required" if scheduled_at.blank?
-    raise InvalidTransition, "Scheduled time must be in the future" if scheduled_at < SCHEDULE_TOLERANCE.ago
-    raise InvalidTransition, "Title and content are required to schedule" if title.blank? || rich_body.blank?
+    raise InvalidTransition, I18n.t("announcement.transitions.cannot_schedule_published") if published?
+    raise InvalidTransition, I18n.t("announcement.transitions.already_scheduled") if scheduled?
+    raise InvalidTransition, I18n.t("announcement.transitions.scheduled_time_required") if scheduled_at.blank?
+    raise InvalidTransition, I18n.t("announcement.transitions.scheduled_time_future") if scheduled_at < SCHEDULE_TOLERANCE.ago
+    raise InvalidTransition, I18n.t("announcement.transitions.title_content_required") if title.blank? || rich_body.blank?
 
     update!(status: :scheduled)
   end
 
   def unschedule!
-    raise InvalidTransition, "Can only unschedule scheduled announcements" unless scheduled?
+    raise InvalidTransition, I18n.t("announcement.transitions.can_only_unschedule_scheduled") unless scheduled?
     update!(status: :draft)
   end
 
   def publish!
-    raise InvalidTransition, "Already published" if published?
-    raise InvalidTransition, "Must be scheduled first" unless scheduled?
+    raise InvalidTransition, I18n.t("announcement.transitions.already_published") if published?
+    raise InvalidTransition, I18n.t("announcement.transitions.must_be_scheduled_first") unless scheduled?
 
     update!(status: :published, published_at: Time.current)
   end
@@ -94,19 +94,19 @@ class Announcement < ApplicationRecord
 
   def scheduled_at_immutable_when_scheduled
     if scheduled? && scheduled_at_changed?
-      errors.add(:scheduled_at, "cannot be changed when scheduled. Unschedule first.")
+      errors.add(:scheduled_at, I18n.t("activerecord.errors.models.announcement.attributes.scheduled_at.immutable_when_scheduled"))
     end
   end
 
   def cannot_update_when_published
     if status_was == "published"
-      errors.add(:base, "Cannot update a published announcement")
+      errors.add(:base, I18n.t("activerecord.errors.models.announcement.attributes.base.cannot_update_published"))
     end
   end
 
   def ensure_destroyable
     unless draft?
-      errors.add(:base, "Only draft announcements can be deleted")
+      errors.add(:base, I18n.t("activerecord.errors.models.announcement.attributes.base.only_draft_deletable"))
       throw(:abort)
     end
   end

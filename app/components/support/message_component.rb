@@ -21,7 +21,7 @@ module Support
     def author_badge
       return nil unless is_support?
 
-      content_tag(:span, "Support",
+      content_tag(:span, I18n.t("support.message.support_badge"),
         class: "text-xs bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200 px-2 py-0.5 rounded-full")
     end
   end

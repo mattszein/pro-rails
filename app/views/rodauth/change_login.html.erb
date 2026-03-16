@@ -9,6 +9,6 @@
     <%= form.password_field :password, {required: true, placeholder: " ", value: "", id: "password", autocomplete: rodauth.password_field_autocomplete_value, aria: ({invalid: true, describedby: "password_error_message"} if rodauth.field_error(rodauth.password_param))} %>
   <% end %>
   <div class="mt-6">
-    <%= form.button "Change Login", {fullw: true} %>
+    <%= form.button t("rodauth.change_login"), {fullw: true} %>
   </div>
 <% end %>
