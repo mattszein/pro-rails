@@ -56,7 +56,7 @@ es:
       back_to_app: "Volver a la App"
     notes:
       system: "Sistema"
-      by: "por"
+      by: "por %{email}"
       note_by: "Nota de"
       unknown: "Desconocido"
       ago: "atrás"

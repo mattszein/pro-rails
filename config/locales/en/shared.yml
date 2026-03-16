@@ -13,6 +13,7 @@ en:
       loading: "Loading..."
       close_modal: "Close modal"
       more_notifications: "More notifications"
+      select_language: "Select language"
     navigation:
       home: "Home"
       admin: "Admin"

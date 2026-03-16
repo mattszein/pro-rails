@@ -1,5 +1,5 @@
 <div data-controller="theme" class="text-center flex flex-col space-y-8">
-  <% sections.each do |section| %>
+  <% SECTIONS.each do |section| %>
     <hr class="border-gray-300 dark:border-gray-700">
     <h2 class="flex gap-2 justify-center <%= section.h2_class %>">
       <% section_title_words(section).each_with_index do |word, i| %>

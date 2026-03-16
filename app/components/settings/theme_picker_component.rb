@@ -59,40 +59,38 @@ class Settings::ThemePickerComponent < ApplicationViewComponent
     Theme.new(id: "twilight", name: "Twilight")
   ]
 
-  def sections
-    [
-      Section.new(
-        key: "tech_edge", themes: THEMES_TECH_EDGE,
-        title_colors: %w[text-purple-500 text-cyan-500],
-        desc_colors: %w[text-pink-500 text-slate-400\ dark:text-slate-300 text-blue-500],
-        h2_class: nil
-      ),
-      Section.new(
-        key: "serene", themes: THEMES_SERENE,
-        title_colors: %w[text-emerald-500],
-        desc_colors: %w[text-cyan-500 text-slate-400\ dark:text-slate-300 text-yellow-500],
-        h2_class: "text-white"
-      ),
-      Section.new(
-        key: "cosmic", themes: THEMES_COSMIC,
-        title_colors: %w[text-sky-500],
-        desc_colors: %w[text-fuchsia-500 text-slate-400\ dark:text-slate-300 text-orange-500],
-        h2_class: nil
-      ),
-      Section.new(
-        key: "vivid", themes: THEMES_VIVID,
-        title_colors: %w[text-red-500],
-        desc_colors: %w[text-lime-500 text-slate-400\ dark:text-slate-300 text-pink-500],
-        h2_class: nil
-      ),
-      Section.new(
-        key: "night_owl", themes: THEMES_NIGHT_OWL,
-        title_colors: %w[text-orange-500 text-amber-500],
-        desc_colors: %w[text-yellow-500 text-slate-400\ dark:text-slate-300 text-rose-500],
-        h2_class: nil
-      )
-    ]
-  end
+  SECTIONS = [
+    Section.new(
+      key: "tech_edge", themes: THEMES_TECH_EDGE,
+      title_colors: %w[text-purple-500 text-cyan-500],
+      desc_colors: %w[text-pink-500 text-slate-400\ dark:text-slate-300 text-blue-500],
+      h2_class: nil
+    ),
+    Section.new(
+      key: "serene", themes: THEMES_SERENE,
+      title_colors: %w[text-emerald-500],
+      desc_colors: %w[text-cyan-500 text-slate-400\ dark:text-slate-300 text-yellow-500],
+      h2_class: "text-white"
+    ),
+    Section.new(
+      key: "cosmic", themes: THEMES_COSMIC,
+      title_colors: %w[text-sky-500],
+      desc_colors: %w[text-fuchsia-500 text-slate-400\ dark:text-slate-300 text-orange-500],
+      h2_class: nil
+    ),
+    Section.new(
+      key: "vivid", themes: THEMES_VIVID,
+      title_colors: %w[text-red-500],
+      desc_colors: %w[text-lime-500 text-slate-400\ dark:text-slate-300 text-pink-500],
+      h2_class: nil
+    ),
+    Section.new(
+      key: "night_owl", themes: THEMES_NIGHT_OWL,
+      title_colors: %w[text-orange-500 text-amber-500],
+      desc_colors: %w[text-yellow-500 text-slate-400\ dark:text-slate-300 text-rose-500],
+      h2_class: nil
+    )
+  ].freeze
 
   def section_title_words(section)
     I18n.t("settings.theme.#{section.key}.title").split(" ")

@@ -13,6 +13,7 @@ es:
       loading: "Cargando..."
       close_modal: "Cerrar modal"
       more_notifications: "Más notificaciones"
+      select_language: "Seleccionar idioma"
     navigation:
       home: "Inicio"
       admin: "Admin"

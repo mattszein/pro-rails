@@ -6,7 +6,7 @@ export default class extends Controller {
     const currentPath = window.location.pathname
 
     // Remove existing locale prefix
-    const pathWithoutLocale = currentPath.replace(/^\/(en|es)/, "") || "/"
+    const pathWithoutLocale = currentPath.replace(/^\/(en|es)(\/|$)/, "/") || "/"
 
     // Add new locale prefix (omit for English/default)
     const newPath = locale === "en" ? pathWithoutLocale : `/${locale}${pathWithoutLocale}`
