@@ -29,7 +29,14 @@ class RodauthMain < Rodauth::Rails::Auth
     # hmac_secret "b5e36518c7c74ec38a58bbc79b9d47c5df5b7ae7360c1416862573d359ba68b84f0aff5339d3d76117a2d44997641b4bb5dcadacc3629b0f329ab46b7b6cc1fe"
 
     # Use path prefix for all routes.
-    # prefix "/auth"
+    # Include locale prefix for non-default locales (e.g. /es/login)
+    prefix do
+      if I18n.locale == I18n.default_locale
+        ""
+      else
+        "/#{I18n.locale}"
+      end
+    end
 
     # Specify the controller used for view rendering, CSRF, and callbacks.
     rails_controller { RodauthController }
@@ -135,7 +142,7 @@ class RodauthMain < Rodauth::Rails::Auth
 
     # ==> Redirects
     # Redirect to home page after logout.
-    logout_redirect "/"
+    logout_redirect { "/" }
 
     # Redirect to wherever login redirects to after account verification.
     verify_account_redirect { login_redirect }

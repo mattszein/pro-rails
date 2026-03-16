@@ -62,6 +62,31 @@ RSpec.describe "Locale routing", type: :request do
     end
   end
 
+  describe "rodauth locale routes" do
+    before { reset! } # clear logged-in session
+
+    it "GET /es/login responds with success" do
+      get "/es/login"
+      expect(response).to have_http_status(:success)
+    end
+
+    it "renders Spanish content on /es/login" do
+      get "/es/login"
+      expect(response.body).to include("Iniciar Sesión")
+    end
+
+    it "GET /login responds with English content" do
+      get "/login"
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include("Login")
+    end
+
+    it "GET /es/create-account responds with success" do
+      get "/es/create-account"
+      expect(response).to have_http_status(:success)
+    end
+  end
+
   describe "invalid locale" do
     it "does not match unknown locale prefixes" do
       get "/fr/dashboard"
