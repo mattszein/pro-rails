@@ -113,8 +113,8 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed patterns, conventions, and d
 
 ### Internationalization
 
-- [ ] Add a second locale (non-English) to validate the i18n setup end-to-end
-- [ ] Replace hardcoded strings across views and mailers with i18n keys
+- [x] Add a second locale (non-English) to validate the i18n setup end-to-end
+- [x] Replace hardcoded strings across views and mailers with i18n keys
 
 ### Announcements
 
