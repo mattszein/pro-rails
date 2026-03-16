@@ -44,3 +44,91 @@ a:active, a:focus {
   border: none;
   -moz-outline-style: none;
 }
+
+/* TomSelect dark mode */
+:is(.dark .ts-wrapper .ts-control),
+:is(.dark .ts-wrapper.full .ts-control) {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+:is(.dark .ts-wrapper.focus .ts-control),
+:is(.dark .ts-wrapper.input-active .ts-control),
+:is(.dark .ts-wrapper.dropdown-active .ts-control),
+:is(.dark .ts-wrapper.single.input-active .ts-control) {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgb(99 102 241 / 0.2);
+  background-color: #1e293b;
+}
+
+:is(.dark .ts-wrapper .ts-control input) {
+  color: #f1f5f9;
+}
+
+:is(.dark .ts-wrapper .ts-control input::placeholder) {
+  color: #94a3b8;
+}
+
+/* Multi-select pills */
+:is(.dark .ts-wrapper.multi .ts-control > div) {
+  background: #334155;
+  color: #f1f5f9;
+  border-color: #475569;
+}
+
+:is(.dark .ts-wrapper.multi .ts-control > div.active) {
+  background: #475569;
+  color: #f1f5f9;
+  border-color: #64748b;
+}
+
+:is(.dark .ts-wrapper.multi .ts-control > div [data-value]) {
+  color: #f1f5f9;
+}
+
+/* Remove button in pills */
+:is(.dark .ts-wrapper .ts-control .remove) {
+  color: #94a3b8;
+}
+
+:is(.dark .ts-wrapper .ts-control .remove:hover) {
+  color: #f1f5f9;
+}
+
+/* Dropdown */
+:is(.dark .ts-dropdown) {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+:is(.dark .ts-dropdown .option),
+:is(.dark .ts-dropdown .create) {
+  color: #f1f5f9;
+}
+
+:is(.dark .ts-dropdown .option:hover),
+:is(.dark .ts-dropdown .option.active),
+:is(.dark .ts-dropdown .active.create) {
+  background-color: #334155;
+  color: #f1f5f9;
+}
+
+:is(.dark .ts-dropdown [data-selectable] .highlight) {
+  background: rgb(99 102 241 / 0.25);
+}
+
+:is(.dark .ts-dropdown .optgroup-header) {
+  background-color: #0f172a;
+  color: #94a3b8;
+}
+
+:is(.dark .ts-dropdown .no-results) {
+  background-color: #1e293b;
+  color: #94a3b8;
+}
+
+:is(.dark .ts-dropdown .spinner::after) {
+  border-color: #475569 transparent #475569 transparent;
+}

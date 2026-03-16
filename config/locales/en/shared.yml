@@ -41,6 +41,10 @@ en:
       created_on: "Created on"
       created_by: "Created by"
       assigned_to: "Assigned to"
+      role: "Role"
+      members: "Members"
+      tickets_created: "Tickets Created"
+      tickets_assigned: "Tickets Assigned"
     buttons:
       publish: "Publish"
       stop_publish: "Stop Publish"

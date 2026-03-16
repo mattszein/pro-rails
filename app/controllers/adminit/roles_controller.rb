@@ -1,5 +1,6 @@
 class Adminit::RolesController < Adminit::ApplicationController
-  before_action :set_role, only: [:remove_account, :add_account, :account_select]
+  before_action :set_role, only: [:remove_account, :add_account, :account_select, :search_accounts]
+  verify_authorized
 
   def index
     authorize!
@@ -7,7 +8,7 @@ class Adminit::RolesController < Adminit::ApplicationController
   end
 
   def show
-    @role = Role.includes(:accounts).find(params[:id])
+    @role = Role.includes(:accounts, :permissions).find(params[:id])
     authorize!
   end
 
@@ -36,6 +37,15 @@ class Adminit::RolesController < Adminit::ApplicationController
       flash[:alert] = I18n.t("adminit.roles.account_not_added")
     end
     redirect_to adminit_role_path(@role)
+  end
+
+  def search_accounts
+    authorize!
+    query = params[:q].to_s.strip
+    accounts = Account.where("email ILIKE ?", "%#{query}%")
+      .where.not(id: @role.account_ids)
+      .limit(10)
+    render json: accounts.map { |a| {value: a.email, text: a.email} }
   end
 
   private

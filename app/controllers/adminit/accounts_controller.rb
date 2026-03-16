@@ -8,6 +8,9 @@ class Adminit::AccountsController < Adminit::ApplicationController
   end
 
   def show
+    @remember_key = AccountRememberKey.find_by(id: @account.id)
+    @tickets_created_count = Support::Ticket.where(created_id: @account.id).count
+    @tickets_assigned_count = Support::Ticket.where(assigned_id: @account.id).count
   end
 
   def edit

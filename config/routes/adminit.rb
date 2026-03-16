@@ -21,6 +21,7 @@ namespace :adminit do
 
   resources :roles, only: [:index, :show] do
     get "account_select", on: :member
+    get "search_accounts", on: :member
     delete "account", to: "roles#remove_account", on: :member
     post "account", to: "roles#add_account", on: :member
   end

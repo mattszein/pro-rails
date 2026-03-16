@@ -1,7 +1,9 @@
 en:
   activerecord:
     models:
+      account: Account
       announcement: Announcement
+      role: Role
       ticket: Ticket
     errors:
       models:
@@ -41,6 +43,11 @@ en:
       notification:
         title: "New Announcement"
   enums:
+    account:
+      status:
+        unverified: "Unverified"
+        verified: "Verified"
+        closed: "Closed"
     ticket:
       status:
         open: "Open"
