@@ -1,4 +1,8 @@
 class SharedBaseController < ApplicationController
+  include Pagy::Backend
+  include ActionPolicyHandler
+  include RecordNotFoundHandler
+
   private
 
   def current_account
