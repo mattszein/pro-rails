@@ -1,7 +1,7 @@
 <%= render(Core::ModalComponent.new(title: t("adminit.roles.add_account_to", role: @role.name))) do %>
   <%= form_with(scope: :role, url: account_adminit_role_path(@role)) do |form| %>
     <div class="space-y-4">
-      <%= select_tag "role[email]", options_for_select([]), data: {
+      <%= select_tag "role[email]", options_for_select([]), required: true, data: {
             controller: "role-account-search",
             role_account_search_url_value: search_accounts_adminit_role_path(@role),
             placeholder: t("shared.labels.email")

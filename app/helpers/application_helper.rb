@@ -99,7 +99,7 @@ module ApplicationHelper
       {
         label: I18n.t("shared.common.actions"),
         renderer: ->(account) {
-          render(Core::LinkComponent.new(name: I18n.t("adminit.roles.remove_role"), url: account_adminit_role_path(role, account_id: account.id), style: :as_button, theme: :delete, size: :xs, html_options: {data: {turbo_method: :delete, turbo_confirm: I18n.t("shared.common.are_you_sure")}}))
+          render(Core::LinkComponent.new(name: I18n.t("adminit.roles.remove_member"), url: account_adminit_role_path(role, account_id: account.id), style: :as_button, theme: :delete, size: :xs, html_options: {data: {turbo_method: :delete, turbo_confirm: I18n.t("shared.common.are_you_sure")}}))
         }
       }
     ]

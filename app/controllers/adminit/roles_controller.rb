@@ -9,19 +9,18 @@ class Adminit::RolesController < Adminit::ApplicationController
 
   def show
     @role = Role.includes(:accounts, :permissions).find(params[:id])
-    authorize!
+    authorize! @role
   end
 
   def remove_account
     authorize! @role
-    us = Account.find(params[:account_id])
-    us.role = nil
-    if us.save
-      flash[:notice] = I18n.t("adminit.roles.account_removed")
+    account = Account.find(params[:account_id])
+    account.role = nil
+    if account.save
+      redirect_to adminit_role_path(@role), notice: I18n.t("adminit.roles.account_removed")
     else
-      flash[:alert] = I18n.t("adminit.roles.account_not_removed")
+      redirect_to adminit_role_path(@role), alert: I18n.t("adminit.roles.account_not_removed")
     end
-    redirect_to adminit_role_path(@role)
   end
 
   def account_select
@@ -30,21 +29,20 @@ class Adminit::RolesController < Adminit::ApplicationController
 
   def add_account
     authorize! @role
-    account = Account.find_by(email: role_params[:email])
-    if account.update(role: @role)
-      flash[:notice] = I18n.t("adminit.roles.account_added")
+    result = Adminit::Roles::AddMember.call(role: @role, email: role_params[:email])
+    if result.success?
+      redirect_to adminit_role_path(@role), notice: I18n.t("adminit.roles.account_added")
     else
-      flash[:alert] = I18n.t("adminit.roles.account_not_added")
+      redirect_to adminit_role_path(@role), alert: result.error
     end
-    redirect_to adminit_role_path(@role)
   end
 
   def search_accounts
     authorize!
     query = params[:q].to_s.strip
-    accounts = Account.where("email ILIKE ?", "%#{query}%")
-      .where.not(id: @role.account_ids)
-      .limit(10)
+    return render(json: []) if query.length < 2
+
+    accounts = Account.search_by_email(query).not_in_role(@role).limit(50)
     render json: accounts.map { |a| {value: a.email, text: a.email} }
   end
 
