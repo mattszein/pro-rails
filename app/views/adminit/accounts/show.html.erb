@@ -25,7 +25,7 @@
             <%= render(Core::BadgeComponent.new(label: t("enums.account.status.#{@account.status}"), theme: account_status_theme(@account.status))) %>
           <% end %>
           <% dl.with_item(term: t("shared.labels.created_on")) do %>
-            <%= @account.created_at.strftime("%B %d, %Y") %>
+            <%= l(@account.created_at.to_date, format: :long) %>
           <% end %>
         <% end %>
       <% end %>
@@ -49,7 +49,7 @@
       <h2 class="font-semibold"><%= t("adminit.accounts.session") %></h2>
       <% if @remember_key %>
         <%= render Core::BoxComponent.new(variant: :success) do %>
-          <p class="text-sm"><%= t("adminit.accounts.session_expires", date: @remember_key.deadline.strftime("%B %d, %Y at %I:%M %p")) %></p>
+          <p class="text-sm"><%= t("adminit.accounts.session_expires", date: l(@remember_key.deadline, format: :long)) %></p>
         <% end %>
       <% else %>
         <%= render Core::BoxComponent.new(variant: :neutral) do %>

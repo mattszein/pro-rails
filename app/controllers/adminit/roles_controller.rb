@@ -14,7 +14,7 @@ class Adminit::RolesController < Adminit::ApplicationController
 
   def remove_account
     authorize! @role
-    account = Account.find(params[:account_id])
+    account = @role.accounts.find(params[:account_id])
     account.role = nil
     if account.save
       redirect_to adminit_role_path(@role), notice: I18n.t("adminit.roles.account_removed")

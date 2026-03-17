@@ -4,7 +4,7 @@ class Adminit::AccountsController < Adminit::ApplicationController
 
   def index
     authorize!
-    @accounts = Account.all
+    @accounts = Account.includes(:role).all
   end
 
   def show
