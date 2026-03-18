@@ -53,6 +53,12 @@ module ApplicationHelper
     "w-full max-w-sm space-y-4"
   end
 
+  ACCOUNT_STATUS_THEME = {unverified: :yellow, verified: :green, closed: :red}.freeze
+
+  def account_status_theme(status)
+    ACCOUNT_STATUS_THEME[status.to_sym]
+  end
+
   def accounts_columns
     [
       {
@@ -60,9 +66,40 @@ module ApplicationHelper
         renderer: ->(account) { account.email }
       },
       {
+        label: I18n.t("shared.labels.status"),
+        renderer: ->(account) {
+          render(Core::BadgeComponent.new(label: I18n.t("enums.account.status.#{account.status}"), theme: account_status_theme(account.status)))
+        }
+      },
+      {
+        label: I18n.t("shared.labels.role"),
+        renderer: ->(account) { account.role&.name || "-" }
+      },
+      {
         label: I18n.t("shared.common.actions"),
         renderer: ->(account) {
           render(Core::LinkComponent.new(name: I18n.t("shared.common.show"), url: adminit_account_path(account), style: :as_button, theme: :show, size: :xs, html_options: {data: {turbo_prefetch: false}}))
+        }
+      }
+    ]
+  end
+
+  def role_member_columns(role)
+    [
+      {
+        label: I18n.t("shared.labels.email"),
+        renderer: ->(account) { account.email }
+      },
+      {
+        label: I18n.t("shared.labels.status"),
+        renderer: ->(account) {
+          render(Core::BadgeComponent.new(label: I18n.t("enums.account.status.#{account.status}"), theme: account_status_theme(account.status)))
+        }
+      },
+      {
+        label: I18n.t("shared.common.actions"),
+        renderer: ->(account) {
+          render(Core::LinkComponent.new(name: I18n.t("adminit.roles.remove_member"), url: account_adminit_role_path(role, account_id: account.id), style: :as_button, theme: :delete, size: :xs, html_options: {data: {turbo_method: :delete, turbo_confirm: I18n.t("shared.common.are_you_sure")}}))
         }
       }
     ]

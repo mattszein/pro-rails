@@ -1,20 +1,61 @@
-<div class="md:flex items-center justify-between mb-4">
-  <h1 class="text-xl">
-    <%= link_to t("adminit.navigation.accounts"), adminit_accounts_path, class: "text-indigo-500" %>
-  </h1>
-</div>
+<div class="w-full">
+  <div class="flex justify-between items-center pb-2">
+    <%= link_to t("adminit.accounts.back_to_accounts"), adminit_accounts_path, class: "text-indigo-500" %>
+  </div>
 
-<div class="flex flex-col gap-6">
-<%= render(Core::CardComponent.new(padding: :sm)) do %>
-<dl class="dark:divide-gray-700 text-left grid grid-cols-3 gap-4">
-    <div>
-        <dt class="md:text-md"><%= t("shared.labels.id") %></dt>
-        <dd class="text-md font-semibold"><%= @account.id %></dd>
-    </div>
-    <div>
-        <dt class="md:text-md"><%= t("shared.labels.name") %></dt>
-        <dd class="text-md font-semibold"><%= @account.email %></dd>
-    </div>
-</dl>
-<% end %>
-<div>
+  <div class="space-y-4">
+    <%= render(Core::CardComponent.new(classes: "space-y-4")) do %>
+      <div class="flex items-center gap-4">
+        <h1 class="text-xl font-bold"><%= Account.model_name.human %>: <%= @account.email %></h1>
+        <%= render(Core::BadgeComponent.new(label: t("enums.account.status.#{@account.status}"), theme: account_status_theme(@account.status), size: :md)) %>
+      </div>
+
+      <%= render Core::BoxComponent.new do %>
+        <%= render Core::DefinitionListComponent.new(variant: :info, gap: :sm) do |dl| %>
+          <% dl.with_item(term: t("shared.labels.id")) do %>
+            <%= @account.id %>
+          <% end %>
+          <% dl.with_item(term: t("shared.labels.email")) do %>
+            <%= @account.email %>
+          <% end %>
+          <% dl.with_item(term: t("shared.labels.role")) do %>
+            <%= @account.role&.name || "-" %>
+          <% end %>
+          <% dl.with_item(term: t("shared.labels.status")) do %>
+            <%= render(Core::BadgeComponent.new(label: t("enums.account.status.#{@account.status}"), theme: account_status_theme(@account.status))) %>
+          <% end %>
+          <% dl.with_item(term: t("shared.labels.created_on")) do %>
+            <%= l(@account.created_at.to_date, format: :long) %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <%= render(Core::CardComponent.new(classes: "space-y-4")) do %>
+      <h2 class="font-semibold"><%= t("adminit.accounts.activity") %></h2>
+      <%= render Core::BoxComponent.new(variant: :neutral) do %>
+        <%= render Core::DefinitionListComponent.new(variant: :default, gap: :sm) do |dl| %>
+          <% dl.with_item(term: t("shared.labels.tickets_created")) do %>
+            <%= @tickets_created_count %>
+          <% end %>
+          <% dl.with_item(term: t("shared.labels.tickets_assigned")) do %>
+            <%= @tickets_assigned_count %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <%= render(Core::CardComponent.new(classes: "space-y-4")) do %>
+      <h2 class="font-semibold"><%= t("adminit.accounts.session") %></h2>
+      <% if @remember_key %>
+        <%= render Core::BoxComponent.new(variant: :success) do %>
+          <p class="text-sm"><%= t("adminit.accounts.session_expires", date: l(@remember_key.deadline, format: :long)) %></p>
+        <% end %>
+      <% else %>
+        <%= render Core::BoxComponent.new(variant: :neutral) do %>
+          <p class="text-sm"><%= t("adminit.accounts.no_session") %></p>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

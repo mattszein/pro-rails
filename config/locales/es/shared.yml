@@ -41,6 +41,10 @@ es:
       created_on: "Creado el"
       created_by: "Creado por"
       assigned_to: "Asignado a"
+      role: "Rol"
+      members: "Miembros"
+      tickets_created: "Tickets Creados"
+      tickets_assigned: "Tickets Asignados"
     buttons:
       publish: "Publicar"
       stop_publish: "Detener Publicación"

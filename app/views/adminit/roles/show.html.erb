@@ -1,46 +1,57 @@
-<div class="md:flex items-center justify-between mb-4">
-  <h1 class="text-xl">
-    <%= link_to t("adminit.navigation.roles"), adminit_roles_path, class: "text-indigo-500" %>
-  </h1>
+<div class="w-full">
+  <div class="flex justify-between items-center pb-2">
+    <%= link_to t("adminit.roles.back_to_roles"), adminit_roles_path, class: "text-indigo-500" %>
+    <div class="flex gap-2 items-center px-4">
+      <%= render(Core::LinkComponent.new(name: t("adminit.roles.add_member"), url: account_select_adminit_role_path(@role), style: :as_button, theme: :create, size: :sm, html_options: {data: {turbo_frame: "modal"}})) %>
+    </div>
+  </div>
 
-  <div class="flex gap-2 items-center px-4">
-    <%= link_to t("adminit.roles.add_role"), account_select_adminit_role_path(@role), data: {turbo_frame: "modal"}, class: "block bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow" %>
+  <div class="space-y-4">
+    <%= render(Core::CardComponent.new(classes: "space-y-4")) do %>
+      <div class="flex items-center gap-4">
+        <h1 class="text-xl font-bold"><%= Role.model_name.human %>: <%= @role.name %></h1>
+        <% if @role.superadmin? %>
+          <%= render(Core::BadgeComponent.new(label: t("adminit.roles.superadmin"), theme: :primary, size: :md)) %>
+        <% end %>
+      </div>
+
+      <%= render Core::BoxComponent.new do %>
+        <%= render Core::DefinitionListComponent.new(variant: :info, gap: :sm) do |dl| %>
+          <% dl.with_item(term: t("shared.labels.id")) do %>
+            <%= @role.id %>
+          <% end %>
+          <% dl.with_item(term: t("shared.labels.name")) do %>
+            <%= @role.name %>
+          <% end %>
+          <% dl.with_item(term: t("shared.labels.members")) do %>
+            <%= @role.accounts.size %>
+          <% end %>
+        <% end %>
+      <% end %>
+
+      <% if @role.permissions.any? %>
+        <div>
+          <p class="text-sm font-semibold mb-2"><%= t("adminit.roles.permissions_label") %></p>
+          <div class="flex flex-wrap gap-2">
+            <% @role.permissions.each do |permission| %>
+              <%= render(Core::BadgeComponent.new(label: permission.resource, theme: :secondary, size: :sm)) %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+
+    <%= render Core::CardComponent.new do %>
+      <div class="flex items-center justify-between p-4">
+        <h2 class="font-semibold"><%= t("shared.labels.members") %></h2>
+      </div>
+      <% if @role.accounts.any? %>
+        <div class="px-4 pb-4">
+          <%= render Core::TableComponent.new(rows: @role.accounts, columns: role_member_columns(@role)) %>
+        </div>
+      <% else %>
+        <p class="text-sm text-slate-500 italic px-4 pb-4"><%= t("adminit.roles.no_members") %></p>
+      <% end %>
+    <% end %>
   </div>
 </div>
-
-<div class="flex flex-col gap-6">
-<%= render(Core::CardComponent.new(padding: :sm)) do %>
-<dl class="text-gray-900 dark:text-white dark:divide-gray-700 text-left grid grid-cols-3 gap-4">
-    <div>
-        <dt class="text-gray-500 md:text-md dark:text-gray-400"><%= t("shared.labels.id") %></dt>
-        <dd class="text-md font-semibold"><%= @role.id %></dd>
-    </div>
-    <div>
-        <dt class="text-gray-500 md:text-md dark:text-gray-400"><%= t("shared.labels.name") %></dt>
-        <dd class="text-md font-semibold"><%= @role.name %></dd>
-    </div>
-    <div>
-        <dt class="text-gray-500 md:text-md dark:text-gray-400"><%= t("adminit.navigation.accounts") %></dt>
-        <dd class="text-md font-semibold"><%= @role.accounts.length %></dd>
-    </div>
-</dl>
-<% end %>
-
-<%= render(Core::CardComponent.new(padding: :sm)) do %>
-   <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-        <thead class="text-sm text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-            <tr>
-                <th scope="col" class="px-6 py-3">
-                  <%= t("shared.labels.email") %>
-                </th>
-                <th scope="col" class="px-6 py-3">
-                  <%= t("shared.common.actions") %>
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-          <%= render partial: "role_accounts", collection: @role.accounts, as: :account %>
-        </tbody>
-    </table>
-<% end %>
-<div>

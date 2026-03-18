@@ -4,10 +4,13 @@ class Adminit::AccountsController < Adminit::ApplicationController
 
   def index
     authorize!
-    @accounts = Account.all
+    @accounts = Account.includes(:role).all
   end
 
   def show
+    @remember_key = AccountRememberKey.find_by(id: @account.id)
+    @tickets_created_count = Support::Ticket.where(created_id: @account.id).count
+    @tickets_assigned_count = Support::Ticket.where(assigned_id: @account.id).count
   end
 
   def edit

@@ -138,7 +138,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed patterns, conventions, and d
 - [ ] Adminit dashboard: analytics, stats, and quick actions, with role-specific views per role
 - [x] Refactoring view components to use same patterns
 - [ ] Table component should support sorting, filtering, and pagination (client vs server ?)
-- [ ] Fix old adminit components (Roles views, account views)
+- [x] Fix old adminit components (Roles views, account views)
 - [ ] Components should be refactored to use primary / secondary colors? messages in conversation, box component, notifications
 - [ ] Lookbook: update previews to cover all core components and recently added features
 
