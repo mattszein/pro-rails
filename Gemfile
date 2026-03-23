@@ -58,7 +58,7 @@ gem "interactor", "~> 3.0"
 gem "mission_control-jobs"
 gem "local_time"
 gem "noticed", "~> 3.0"
-gem "pagy", "~> 9.0"
+gem "pagy", "~> 43.4"
 gem "rails-i18n", "~> 8.0"
 
 group :development, :test do
