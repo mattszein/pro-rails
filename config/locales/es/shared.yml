@@ -45,6 +45,8 @@ es:
       members: "Miembros"
       tickets_created: "Tickets Creados"
       tickets_assigned: "Tickets Asignados"
+      username: "Nombre de usuario"
+      bio: "Biografía"
     buttons:
       publish: "Publicar"
       stop_publish: "Detener Publicación"

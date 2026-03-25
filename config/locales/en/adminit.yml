@@ -53,6 +53,8 @@ en:
       destroyed: "Account was successfully destroyed."
       back_to_accounts: "Back to Accounts"
       activity: "Activity"
+      profile: "Profile"
+      no_profile: "No profile set."
       session: "Remember-Me Session"
       session_expires: "Active until %{date}"
       no_session: "No active remember-me session."
