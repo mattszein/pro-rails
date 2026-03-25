@@ -45,6 +45,8 @@ en:
       members: "Members"
       tickets_created: "Tickets Created"
       tickets_assigned: "Tickets Assigned"
+      username: "Username"
+      bio: "Bio"
     buttons:
       publish: "Publish"
       stop_publish: "Stop Publish"

@@ -3,9 +3,19 @@ es:
     font_theme_title: "Selector de Fuente y Tema"
     font_theme_subtitle: "Personalización elegante para tu experiencia"
     profile: "Perfil"
+    profile_title: "Ajustes del Perfil"
+    profile_subtitle: "Actualiza tu información personal y foto de perfil"
+    profile_username: "Nombre de usuario"
+    profile_bio: "Biografía"
+    profile_bio_placeholder: "Cuéntanos un poco sobre ti"
+    choose_profile_photo: "Elegir foto de perfil"
+    save_profile: "Guardar Perfil"
     appearance: "Apariencia"
     password: "Contraseña"
     remember: "Recordar"
+    profiles:
+      update:
+        success: "Perfil actualizado con éxito"
     font:
       choose_typeface: "Elige Tu Tipografía"
       descriptions:

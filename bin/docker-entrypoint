@@ -1,9 +1,21 @@
 #!/bin/bash -e
 
+# Wait for PostgreSQL
+until pg_isready -h "$DB_HOST" -p "${DB_PORT:-5432}" -U "$DB_USERNAME" -q; do
+  echo "Waiting for PostgreSQL at $DB_HOST..."
+  sleep 2
+done
+
+# Wait for Redis/Valkey
+until redis-cli -u "$REDIS_URL" ping 2>/dev/null | grep -q PONG; do
+  echo "Waiting for Redis at $REDIS_URL..."
+  sleep 2
+done
+
 # Enable jemalloc for reduced memory usage and latency.
 if [ -z "${LD_PRELOAD+x}" ]; then
-    LD_PRELOAD=$(find /usr/lib -name libjemalloc.so.2 -print -quit)
-    export LD_PRELOAD
+  LD_PRELOAD=$(find /usr/lib -name libjemalloc.so.2 -print -quit)
+  export LD_PRELOAD
 fi
 
 # If running the rails server then create or migrate existing database

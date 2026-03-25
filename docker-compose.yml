@@ -9,20 +9,19 @@ services:
         PG_MAJOR: "17"
     environment: &backend_environment
       RAILS_ENV: ${RAILS_ENV:-development}
-      DB_USERNAME: postgres
-      DB_PASSWORD: postgres
-      DB_PORT: 5432
-      DB_HOST: db
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_HOST: ${DB_HOST:-db} # local: "db" vía red infra. homelab: host.docker.internal
+      DB_NAME_PREFIX: ${DB_NAME_PREFIX:-pro_rails}
+      HOST_PORT: ${HOST_PORT:-3000}
       RAILS_MAX_THREADS: 5
       MAILER_ADDRESS: "maildev"
-      MAILER_PORT: 1025
-      REDIS_URL: redis://redis:6379/1
-      ANYCABLE_CABLE_URL: ws://localhost:8080/cable
-      ANYCABLE_SECRET: anycable_key
-      CHROME_URL: ${CHROME_URL:-http://chrome:3333}
-      # ----
-      # Dev tools
-      # ----
+      MAILER_PORT: ${MAILDEV_SMTP_PORT:-1025}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/1}
+      ANYCABLE_CABLE_URL: ws://localhost:${WS_PORT:-8080}/cable
+      ANYCABLE_SECRET: ${ANYCABLE_SECRET:-anycable_key}
+      CHROME_URL: ${CHROME_URL:-http://chrome:${CHROME_PORT:-3333}}
       HISTFILE: /usr/local/hist/.bash_history
       IRB_HISTFILE: /usr/local/hist/.irb_history
       PSQL_HISTFILE: /usr/local/hist/.psql_history
@@ -38,27 +37,14 @@ services:
     tmpfs:
       - /tmp:exec
       - /app/tmp/pids
+    networks:
+      - default
+      - infra # se conecta a la red global para ver db y redis
+    extra_hosts: 
+      - host.docker.internal:host-gateway
     depends_on: &backend_depends_on
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
       ws:
         condition: service_started
-
-  db:
-    image: "postgres:17.5-alpine3.22"
-    volumes:
-      - pro-rails-postgres-db:/var/lib/postgresql/data
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      PGDATA: /var/lib/postgresql/data/pgdata
-      PSQL_HISTFILE: /root/log/.psql_history
-    healthcheck:
-      test: pg_isready -U postgres -h 127.0.0.1
-      interval: 5s
 
   jobs:
     <<: *backend
@@ -67,8 +53,6 @@ services:
       <<: *backend_environment
       RAILS_LOG_TO_STDOUT: "true"
     tty: true
-    depends_on:
-      <<: *backend_depends_on
 
   rails:
     <<: *backend
@@ -79,8 +63,8 @@ services:
       ANYCABLE_DEBUG: "1"
       ANYCABLE_LOG_LEVEL: "debug"
     ports:
-      - 3000:3000
-      - 50051:50051
+      - "${RAILS_PORT:-3000}:3000"
+      - "50051" # sin binding al host — solo interno
     tty: true
     depends_on:
       <<: *backend_depends_on
@@ -89,17 +73,53 @@ services:
       jobs:
         condition: service_started
 
-  redis:
-    image: redis:8.2.0-alpine3.22
-    volumes:
-      - pro-rails-redis:/data
+  ws:
+    image: anycable/anycable-go:1.6.3-alpine
     ports:
-      - 6379:6379
-    healthcheck:
-      test: redis-cli ping
-      interval: 1s
-      timeout: 3s
-      retries: 30
+      - "${WS_PORT:-8080}:8080"
+      - "${WS_BROADCAST_PORT:-8090}:8090"
+    environment:
+      ANYCABLE_HOST: "0.0.0.0"
+      ANYCABLE_PORT: 8080
+      ANYCABLE_REDIS_URL: ${REDIS_URL:-redis://redis:6379/1}
+      ANYCABLE_RPC_HOST: rails:50051
+      ANYCABLE_DEBUG: true
+      ANYCABLE_TURBO_STREAMS: true
+      ANYCABLE_SECRET: ${ANYCABLE_SECRET:-anycable_key}
+      ANYCABLE_JWT_ID_KEY: ${ANYCABLE_JWT_ID_KEY:-anycable_key}
+      ANYCABLE_BROADCAST_ADAPTER: "redisx"
+      ANYCABLE_BROKER: "memory"
+      ANYCABLE_REDIS_CHANNEL: __anycable__
+    networks:
+      - default
+      - infra
+
+  maildev:
+    image: maildev/maildev
+    restart: always
+    environment:
+      MAILDEV_SMTP_PORT: 1025
+      MAILDEV_WEB_PORT: 8025
+      MAILDEV_MAIL_DIRECTORY: /home/node/data
+    volumes:
+      - pro-rails-mc-data:/home/node
+    ports:
+      - "${MAILDEV_SMTP_PORT:-1025}:1025"
+      - "${MAILDEV_WEB_PORT:-8025}:8025"
+
+  chrome:
+    image: browserless/chrome:latest
+    ports:
+      - "${CHROME_PORT:-3333}:3333"
+    volumes:
+      - .:/rails-app
+    environment:
+      PORT: 3333
+      CONNECTION_TIMEOUT: 600000
+      MAX_CONCURRENT_SESSIONS: 1
+      QUEUE_LENGTH: 2
+      PREBOOT_CHROME: "true"
+      KEEP_ALIVE: "true"
 
   test_system:
     <<: *backend
@@ -124,78 +144,36 @@ services:
       default:
         aliases:
           - anycable.test
-
-  ws: &ws
-    image: anycable/anycable-go:1.6.3-alpine
-    ports:
-      - "8080:8080"
-      - "8090:8090"
-    environment: &ws_environment
-      ANYCABLE_HOST: "0.0.0.0"
-      ANYCABLE_PORT: 8080
-      ANYCABLE_REDIS_URL: redis://redis:6379/1
-      ANYCABLE_RPC_HOST: rails:50051
-      ANYCABLE_DEBUG: true
-      ANYCABLE_TURBO_STREAMS: true
-      ANYCABLE_SECRET: anycable_key
-      ANYCABLE_JWT_ID_KEY: anycable_key
-      ANYCABLE_BROADCAST_ADAPTER: "redisx"
-      ANYCABLE_BROKER: "memory"
-      ANYCABLE_REDIS_CHANNEL: __anycable__
-    depends_on:
-      redis:
-        condition: service_healthy
+      infra: {}
 
   ws_test:
-    <<: *ws
+    image: anycable/anycable-go:1.6.3-alpine
     ports:
-      - "8081:8081"
+      - "8081:8081" # puerto fijo — test_system solo corre en un worktree a la vez
     environment:
-      <<: *ws_environment
+      ANYCABLE_HOST: "0.0.0.0"
       ANYCABLE_PORT: "8081"
-      # Disable broker to avoid race conditions when
-      # we load history since from previous examples
+      ANYCABLE_REDIS_URL: ${REDIS_URL:-redis://redis:6379/1}
       ANYCABLE_BROKER: ""
       ANYCABLE_RPC_HOST: anycable.test:50051
+      ANYCABLE_SECRET: ${ANYCABLE_SECRET:-anycable_key}
+      ANYCABLE_JWT_ID_KEY: ${ANYCABLE_JWT_ID_KEY:-anycable_key}
+      ANYCABLE_BROADCAST_ADAPTER: "redisx"
+      ANYCABLE_TURBO_STREAMS: true
+      ANYCABLE_REDIS_CHANNEL: __anycable__
     networks:
       default:
         aliases:
           - ws.anycable.test
+      infra: {}
 
-  maildev:
-    image: maildev/maildev
-    restart: always
-    environment:
-      MAILDEV_SMTP_PORT: 1025
-      MAILDEV_WEB_PORT: 8025
-      MAILDEV_MAIL_DIRECTORY: /home/node/data
-    volumes:
-      - pro-rails-mc-data:/home/node
-    ports:
-      - "1025:1025"
-      - "8025:8025"
-
-  chrome:
-    # Currently, Apple M1 is only supported in unnumbered "latest" versions.
-    # See https://github.com/browserless/chrome/issues/1393
-    image: browserless/chrome:latest
-    ports:
-      - "3333:3333"
-    volumes:
-      - .:/rails-app
-    environment:
-      PORT: 3333
-      # Set connection timeout for debugging
-      # https://docs.browserless.io/docs/docker.html#connection-timeout
-      CONNECTION_TIMEOUT: 600000
-      # Add these for better stability
-      MAX_CONCURRENT_SESSIONS: 1
-      QUEUE_LENGTH: 2
-      PREBOOT_CHROME: "true"
-      KEEP_ALIVE: "true"
+networks:
+  default: {}
+  infra:
+    external: true
+    name: pro-rails-infra # se conecta a la red del infra compose
 
 volumes:
-  pro-rails-postgres-db:
   pro-rails-bundle:
   pro-rails-cache:
   pro-rails-builds:
@@ -203,4 +181,5 @@ volumes:
   pro-rails-storage:
   pro-rails-history:
   pro-rails-mc-data:
-  pro-rails-redis:
+  # Nota: pro-rails-postgres-db y pro-rails-redis NO están acá,
+  # pertenecen al infra compose y tienen nombres fijos.
