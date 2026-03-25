@@ -53,9 +53,9 @@ RUN bundle install
 COPY . $APP_HOME
 
 # al final del Dockerfile, antes del EXPOSE
-COPY bin/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-ENTRYPOINT ["docker-entrypoint.sh"]
+COPY bin/docker-entrypoint /usr/local/bin/docker-entrypoint
+RUN chmod +x /usr/local/bin/docker-entrypoint
+ENTRYPOINT ["docker-entrypoint"]
 
 EXPOSE 3000
 # Use Bash as the default command
