@@ -12,7 +12,7 @@ services:
       DB_USERNAME: ${DB_USERNAME:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-postgres}
       DB_PORT: ${DB_PORT:-5432}
-      DB_HOST: ${DB_HOST:-db} # local: "db" vía red infra. homelab: host.docker.internal
+      DB_HOST: ${DB_HOST:-db} 
       DB_NAME_PREFIX: ${DB_NAME_PREFIX:-pro_rails}
       HOST_PORT: ${HOST_PORT:-3000}
       RAILS_MAX_THREADS: 5
@@ -39,7 +39,7 @@ services:
       - /app/tmp/pids
     networks:
       - default
-      - infra # se conecta a la red global para ver db y redis
+      - infra 
     extra_hosts: 
       - host.docker.internal:host-gateway
     depends_on: &backend_depends_on
@@ -64,7 +64,7 @@ services:
       ANYCABLE_LOG_LEVEL: "debug"
     ports:
       - "${RAILS_PORT:-3000}:3000"
-      - "50051" # sin binding al host — solo interno
+      - "50051" 
     tty: true
     depends_on:
       <<: *backend_depends_on
@@ -149,7 +149,7 @@ services:
   ws_test:
     image: anycable/anycable-go:1.6.3-alpine
     ports:
-      - "8081:8081" # puerto fijo — test_system solo corre en un worktree a la vez
+      - "8081:8081" 
     environment:
       ANYCABLE_HOST: "0.0.0.0"
       ANYCABLE_PORT: "8081"
@@ -171,7 +171,7 @@ networks:
   default: {}
   infra:
     external: true
-    name: pro-rails-infra # se conecta a la red del infra compose
+    name: pro-rails-infra 
 
 volumes:
   pro-rails-bundle:
@@ -181,5 +181,3 @@ volumes:
   pro-rails-storage:
   pro-rails-history:
   pro-rails-mc-data:
-  # Nota: pro-rails-postgres-db y pro-rails-redis NO están acá,
-  # pertenecen al infra compose y tienen nombres fijos.
