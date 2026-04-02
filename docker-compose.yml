@@ -12,7 +12,7 @@ services:
       DB_USERNAME: ${DB_USERNAME:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-postgres}
       DB_PORT: ${DB_PORT:-5432}
-      DB_HOST: ${DB_HOST:-db} 
+      DB_HOST: ${DB_HOST:-db}
       DB_NAME_PREFIX: ${DB_NAME_PREFIX:-pro_rails}
       APP_HOST: ${APP_HOST:-localhost}
       APP_PORT: ${APP_PORT:-3000}
@@ -40,12 +40,45 @@ services:
       - /app/tmp/pids
     networks:
       - default
-      - infra 
-    extra_hosts: 
+    extra_hosts:
       - host.docker.internal:host-gateway
     depends_on: &backend_depends_on
       ws:
         condition: service_started
+      db:
+        condition: service_healthy
+        required: false
+      redis:
+        condition: service_healthy
+        required: false
+
+  db:
+    image: "postgres:17.5-alpine3.22"
+    profiles: [infra]
+    volumes:
+      - pro-rails-postgres-db:/var/lib/postgresql/data
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
+      PSQL_HISTFILE: /root/log/.psql_history
+    healthcheck:
+      test: pg_isready -U postgres -h 127.0.0.1
+      interval: 5s
+
+  redis:
+    image: redis:8.2.0-alpine3.22
+    profiles: [infra]
+    volumes:
+      - pro-rails-redis:/data
+    ports:
+      - 6379:6379
+    healthcheck:
+      test: redis-cli ping
+      interval: 1s
+      timeout: 3s
+      retries: 30
 
   jobs:
     <<: *backend
@@ -65,7 +98,7 @@ services:
       ANYCABLE_LOG_LEVEL: "debug"
     ports:
       - "${RAILS_PORT:-3000}:3000"
-      - "50051" 
+      - "50051"
     tty: true
     depends_on:
       <<: *backend_depends_on
@@ -93,7 +126,6 @@ services:
       ANYCABLE_REDIS_CHANNEL: __anycable__
     networks:
       - default
-      - infra
 
   maildev:
     image: maildev/maildev
@@ -145,12 +177,11 @@ services:
       default:
         aliases:
           - anycable.test
-      infra: {}
 
   ws_test:
     image: anycable/anycable-go:1.6.3-alpine
     ports:
-      - "8081:8081" 
+      - "8081:8081"
     environment:
       ANYCABLE_HOST: "0.0.0.0"
       ANYCABLE_PORT: "8081"
@@ -166,15 +197,12 @@ services:
       default:
         aliases:
           - ws.anycable.test
-      infra: {}
 
 networks:
   default: {}
-  infra:
-    external: true
-    name: pro-rails-infra 
 
 volumes:
+  pro-rails-postgres-db:
   pro-rails-bundle:
   pro-rails-cache:
   pro-rails-builds:
@@ -182,3 +210,4 @@ volumes:
   pro-rails-storage:
   pro-rails-history:
   pro-rails-mc-data:
+  pro-rails-redis:
