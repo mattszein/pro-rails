@@ -20,7 +20,7 @@ services:
       MAILER_ADDRESS: "maildev"
       MAILER_PORT: 1025
       REDIS_URL: ${REDIS_URL:-redis://redis:6379/1}
-      ANYCABLE_WEBSOCKET_URL: ws://${APP_HOST:-localhost}:${WS_PORT:-8080}/cable
+      ANYCABLE_WEBSOCKET_URL: ${ANYCABLE_WEBSOCKET_URL:-ws://localhost:8080/cable}
       ANYCABLE_SECRET: ${ANYCABLE_SECRET:-anycable_key}
       CHROME_URL: ${CHROME_URL:-http://chrome:3333}
       HISTFILE: /usr/local/hist/.bash_history
@@ -72,8 +72,6 @@ services:
     profiles: [infra]
     volumes:
       - pro-rails-redis:/data
-    ports:
-      - 6379:6379
     healthcheck:
       test: redis-cli ping
       interval: 1s
@@ -96,9 +94,6 @@ services:
       ANYCABLE_RPC_HOST: 0.0.0.0:50051
       ANYCABLE_DEBUG: "1"
       ANYCABLE_LOG_LEVEL: "debug"
-    ports:
-      - "${RAILS_PORT:-3000}:3000"
-      - "50051"
     tty: true
     depends_on:
       <<: *backend_depends_on
@@ -109,9 +104,6 @@ services:
 
   ws:
     image: anycable/anycable-go:1.6.3-alpine
-    ports:
-      - "${WS_PORT:-8080}:8080"
-      - "${WS_BROADCAST_PORT:-8090}:8090"
     environment:
       ANYCABLE_HOST: "0.0.0.0"
       ANYCABLE_PORT: 8080
@@ -136,14 +128,9 @@ services:
       MAILDEV_MAIL_DIRECTORY: /home/node/data
     volumes:
       - pro-rails-mc-data:/home/node
-    ports:
-      - "${MAILDEV_SMTP_PORT:-1025}:1025"
-      - "${MAILDEV_WEB_PORT:-8025}:8025"
 
   chrome:
     image: browserless/chrome:latest
-    ports:
-      - "${CHROME_PORT:-3333}:3333"
     volumes:
       - .:/rails-app
     environment:
@@ -157,9 +144,6 @@ services:
   test_system:
     <<: *backend
     command: rspec spec/system
-    ports:
-      - "3001:3001"
-      - "50051"
     environment:
       <<: *backend_environment
       RAILS_ENV: test
@@ -180,8 +164,6 @@ services:
 
   ws_test:
     image: anycable/anycable-go:1.6.3-alpine
-    ports:
-      - "8081:8081"
     environment:
       ANYCABLE_HOST: "0.0.0.0"
       ANYCABLE_PORT: "8081"
