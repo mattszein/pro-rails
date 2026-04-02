@@ -14,14 +14,15 @@ services:
       DB_PORT: ${DB_PORT:-5432}
       DB_HOST: ${DB_HOST:-db} 
       DB_NAME_PREFIX: ${DB_NAME_PREFIX:-pro_rails}
-      HOST_PORT: ${HOST_PORT:-3000}
+      APP_HOST: ${APP_HOST:-localhost}
+      APP_PORT: ${APP_PORT:-3000}
       RAILS_MAX_THREADS: 5
       MAILER_ADDRESS: "maildev"
-      MAILER_PORT: ${MAILDEV_SMTP_PORT:-1025}
+      MAILER_PORT: 1025
       REDIS_URL: ${REDIS_URL:-redis://redis:6379/1}
-      ANYCABLE_CABLE_URL: ws://localhost:${WS_PORT:-8080}/cable
+      ANYCABLE_WEBSOCKET_URL: ws://${APP_HOST:-localhost}:${WS_PORT:-8080}/cable
       ANYCABLE_SECRET: ${ANYCABLE_SECRET:-anycable_key}
-      CHROME_URL: ${CHROME_URL:-http://chrome:${CHROME_PORT:-3333}}
+      CHROME_URL: ${CHROME_URL:-http://chrome:3333}
       HISTFILE: /usr/local/hist/.bash_history
       IRB_HISTFILE: /usr/local/hist/.irb_history
       PSQL_HISTFILE: /usr/local/hist/.psql_history

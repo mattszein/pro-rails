@@ -40,7 +40,7 @@ Rails.application.configure do
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
     address: ENV.fetch("MAILER_ADDRESS", "maildev"),
-    port: ENV.fetch("MAILER_PORT", "maildev")
+    port: ENV.fetch("MAILER_PORT", 1025)
   }
 
   # Set localhost to be used by links generated in mailer templates.
