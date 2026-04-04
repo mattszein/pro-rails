@@ -35,10 +35,10 @@ services:
 
 networks:
   pro-rails-infra:
-    name: pro-rails-infra # nombre fijo, los worktrees se conectan a esta red
+    name: pro-rails-infra 
 
 volumes:
   pro-rails-postgres-db:
-    name: pro-rails-infra-postgres-db # nombre fijo, no prefijado por proyecto
+    name: pro-rails-infra-postgres-db 
   pro-rails-redis:
     name: pro-rails-infra-redis

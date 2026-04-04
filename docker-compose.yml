@@ -12,16 +12,17 @@ services:
       DB_USERNAME: ${DB_USERNAME:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-postgres}
       DB_PORT: ${DB_PORT:-5432}
-      DB_HOST: ${DB_HOST:-db} # local: "db" vía red infra. homelab: host.docker.internal
+      DB_HOST: ${DB_HOST:-db}
       DB_NAME_PREFIX: ${DB_NAME_PREFIX:-pro_rails}
-      HOST_PORT: ${HOST_PORT:-3000}
+      APP_HOST: ${APP_HOST:-localhost}
+      APP_PORT: ${APP_PORT:-3000}
       RAILS_MAX_THREADS: 5
       MAILER_ADDRESS: "maildev"
-      MAILER_PORT: ${MAILDEV_SMTP_PORT:-1025}
+      MAILER_PORT: 1025
       REDIS_URL: ${REDIS_URL:-redis://redis:6379/1}
-      ANYCABLE_CABLE_URL: ws://localhost:${WS_PORT:-8080}/cable
+      ANYCABLE_WEBSOCKET_URL: ${ANYCABLE_WEBSOCKET_URL:-ws://localhost:8080/cable}
       ANYCABLE_SECRET: ${ANYCABLE_SECRET:-anycable_key}
-      CHROME_URL: ${CHROME_URL:-http://chrome:${CHROME_PORT:-3333}}
+      CHROME_URL: ${CHROME_URL:-http://chrome:3333}
       HISTFILE: /usr/local/hist/.bash_history
       IRB_HISTFILE: /usr/local/hist/.irb_history
       PSQL_HISTFILE: /usr/local/hist/.psql_history
@@ -39,12 +40,43 @@ services:
       - /app/tmp/pids
     networks:
       - default
-      - infra # se conecta a la red global para ver db y redis
-    extra_hosts: 
+    extra_hosts:
       - host.docker.internal:host-gateway
     depends_on: &backend_depends_on
       ws:
         condition: service_started
+      db:
+        condition: service_healthy
+        required: false
+      redis:
+        condition: service_healthy
+        required: false
+
+  db:
+    image: "postgres:17.5-alpine3.22"
+    profiles: [infra]
+    volumes:
+      - pro-rails-postgres-db:/var/lib/postgresql/data
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
+      PSQL_HISTFILE: /root/log/.psql_history
+    healthcheck:
+      test: pg_isready -U postgres -h 127.0.0.1
+      interval: 5s
+
+  redis:
+    image: redis:8.2.0-alpine3.22
+    profiles: [infra]
+    volumes:
+      - pro-rails-redis:/data
+    healthcheck:
+      test: redis-cli ping
+      interval: 1s
+      timeout: 3s
+      retries: 30
 
   jobs:
     <<: *backend
@@ -62,9 +94,6 @@ services:
       ANYCABLE_RPC_HOST: 0.0.0.0:50051
       ANYCABLE_DEBUG: "1"
       ANYCABLE_LOG_LEVEL: "debug"
-    ports:
-      - "${RAILS_PORT:-3000}:3000"
-      - "50051" # sin binding al host — solo interno
     tty: true
     depends_on:
       <<: *backend_depends_on
@@ -75,9 +104,6 @@ services:
 
   ws:
     image: anycable/anycable-go:1.6.3-alpine
-    ports:
-      - "${WS_PORT:-8080}:8080"
-      - "${WS_BROADCAST_PORT:-8090}:8090"
     environment:
       ANYCABLE_HOST: "0.0.0.0"
       ANYCABLE_PORT: 8080
@@ -92,7 +118,6 @@ services:
       ANYCABLE_REDIS_CHANNEL: __anycable__
     networks:
       - default
-      - infra
 
   maildev:
     image: maildev/maildev
@@ -103,14 +128,9 @@ services:
       MAILDEV_MAIL_DIRECTORY: /home/node/data
     volumes:
       - pro-rails-mc-data:/home/node
-    ports:
-      - "${MAILDEV_SMTP_PORT:-1025}:1025"
-      - "${MAILDEV_WEB_PORT:-8025}:8025"
 
   chrome:
     image: browserless/chrome:latest
-    ports:
-      - "${CHROME_PORT:-3333}:3333"
     volumes:
       - .:/rails-app
     environment:
@@ -124,9 +144,6 @@ services:
   test_system:
     <<: *backend
     command: rspec spec/system
-    ports:
-      - "3001:3001"
-      - "50051"
     environment:
       <<: *backend_environment
       RAILS_ENV: test
@@ -144,12 +161,9 @@ services:
       default:
         aliases:
           - anycable.test
-      infra: {}
 
   ws_test:
     image: anycable/anycable-go:1.6.3-alpine
-    ports:
-      - "8081:8081" # puerto fijo — test_system solo corre en un worktree a la vez
     environment:
       ANYCABLE_HOST: "0.0.0.0"
       ANYCABLE_PORT: "8081"
@@ -165,15 +179,12 @@ services:
       default:
         aliases:
           - ws.anycable.test
-      infra: {}
 
 networks:
   default: {}
-  infra:
-    external: true
-    name: pro-rails-infra # se conecta a la red del infra compose
 
 volumes:
+  pro-rails-postgres-db:
   pro-rails-bundle:
   pro-rails-cache:
   pro-rails-builds:
@@ -181,5 +192,4 @@ volumes:
   pro-rails-storage:
   pro-rails-history:
   pro-rails-mc-data:
-  # Nota: pro-rails-postgres-db y pro-rails-redis NO están acá,
-  # pertenecen al infra compose y tienen nombres fijos.
+  pro-rails-redis:
