@@ -1,0 +1,44 @@
+# docker compose -f docker-compose.infra.yml -p pro-rails-infra up -d
+# global infra compose —shared between worktrees.
+
+services:
+  db:
+    image: "postgres:17.5-alpine3.22"
+    volumes:
+      - pro-rails-postgres-db:/var/lib/postgresql/data
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: pg_isready -U postgres -h 127.0.0.1
+      interval: 5s
+    networks:
+      - pro-rails-infra
+
+  redis:
+    image: redis:8.2.0-alpine3.22
+    volumes:
+      - pro-rails-redis:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: redis-cli ping
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    networks:
+      - pro-rails-infra
+
+networks:
+  pro-rails-infra:
+    name: pro-rails-infra 
+
+volumes:
+  pro-rails-postgres-db:
+    name: pro-rails-infra-postgres-db 
+  pro-rails-redis:
+    name: pro-rails-infra-redis

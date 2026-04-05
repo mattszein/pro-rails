@@ -40,13 +40,22 @@ Rails.application.configure do
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
     address: ENV.fetch("MAILER_ADDRESS", "maildev"),
-    port: ENV.fetch("MAILER_PORT", "maildev")
+    port: ENV.fetch("MAILER_PORT", 1025)
   }
 
   # Set localhost to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = {host: "localhost", port: 3000}
+  # config.action_mailer.default_url_options = {host: "localhost", port: 3000}
+  # Rails.application.routes.default_url_options[:host] = "localhost:3000"
+  host = ENV.fetch("APP_HOST", "localhost")
+  port = ENV.fetch("APP_PORT", "3000")
 
-  Rails.application.routes.default_url_options[:host] = "localhost:3000"
+  url_options = {host: host}
+  url_options[:port] = port unless %w[80 443].include?(port.to_s)
+
+  config.action_mailer.default_url_options = url_options
+  Rails.application.routes.default_url_options = url_options
+
+  config.hosts << /.*\.homelab\z/
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log

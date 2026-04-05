@@ -1,0 +1,38 @@
+# docker-compose.override.example.yml
+# To use it rename it to docker-compose.override.yml
+# Auto-merged by Docker Compose when present.
+# Publishes ports to the host for local dev (single worktree, no Traefik).
+# On homelab: don't include this file — Traefik routes by hostname instead.
+
+services:
+  rails:
+    ports:
+      - "${RAILS_PORT:-3000}:3000"
+      - "50051"
+
+  ws:
+    ports:
+      - "${WS_PORT:-8080}:8080"
+      - "${WS_BROADCAST_PORT:-8090}:8090"
+
+  maildev:
+    ports:
+      - "${MAILDEV_SMTP_PORT:-1025}:1025"
+      - "${MAILDEV_WEB_PORT:-8025}:8025"
+
+  chrome:
+    ports:
+      - "${CHROME_PORT:-3333}:3333"
+
+  redis:
+    ports:
+      - "6379:6379"
+
+  test_system:
+    ports:
+      - "3001:3001"
+      - "50051"
+
+  ws_test:
+    ports:
+      - "8081:8081"

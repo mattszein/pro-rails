@@ -37,7 +37,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get -yq dist-upgrade && \
   DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends \
   libpq-dev \
-  postgresql-client-$PG_MAJOR
+  postgresql-client-$PG_MAJOR \
+  redis-tools 
 
 # Configure bundler
 ENV LANG=C.UTF-8 \
@@ -50,6 +51,11 @@ COPY Gemfile $APP_HOME/Gemfile
 COPY Gemfile.lock $APP_HOME/Gemfile.lock
 RUN bundle install
 COPY . $APP_HOME
+
+# al final del Dockerfile, antes del EXPOSE
+COPY bin/docker-entrypoint /usr/local/bin/docker-entrypoint
+RUN chmod +x /usr/local/bin/docker-entrypoint
+ENTRYPOINT ["docker-entrypoint"]
 
 EXPOSE 3000
 # Use Bash as the default command
