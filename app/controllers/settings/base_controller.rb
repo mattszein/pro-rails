@@ -1,4 +1,5 @@
 class Settings::BaseController < DashboardController
+  before_action :require_account
   before_action :set_settings_submenu
 
   private

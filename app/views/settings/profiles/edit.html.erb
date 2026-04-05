@@ -1,0 +1,28 @@
+<%= render Settings::LayoutComponent.new(active_section: :profile) do %>
+  <%= render Core::CardComponent.new do %>
+    <h1><%= t("settings.profile_title") %></h1>
+    <p><%= t("settings.profile_subtitle") %></p>
+
+    <% if @profile.errors.any? %>
+      <div class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+        <ul>
+          <% @profile.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%= form_with model: @profile, url: settings_profile_path, method: :patch do |f| %>
+      <div class="flex items-center gap-4 mb-6">
+        <%= render Core::AvatarComponent.new(profile: @profile, size: :xl) %>
+        <%= f.file_field :avatar, label: t("settings.choose_profile_photo") %>
+      </div>
+
+      <%= f.text_field :username, label: t("settings.profile_username") %>
+      <%= f.text_area :bio, label: t("settings.profile_bio"), placeholder: t("settings.profile_bio_placeholder"), rows: 4 %>
+
+      <%= f.button t("settings.save_profile"), type: :submit %>
+    <% end %>
+  <% end %>
+<% end %>

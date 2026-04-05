@@ -1,0 +1,7 @@
+<% if profile.avatar.attached? %>
+  <%= image_tag profile.avatar.variant(avatar_variant), class: "#{size_class} rounded-full object-cover" %>
+<% else %>
+  <div class="<%= size_class %> rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center font-bold text-gray-500 dark:text-gray-300">
+    <%= fallback_initial %>
+  </div>
+<% end %>
