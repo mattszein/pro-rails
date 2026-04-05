@@ -49,7 +49,7 @@ Rails.application.configure do
   host = ENV.fetch("APP_HOST", "localhost")
   port = ENV.fetch("APP_PORT", "3000")
 
-  url_options = { host: host }
+  url_options = {host: host}
   url_options[:port] = port unless %w[80 443].include?(port.to_s)
 
   config.action_mailer.default_url_options = url_options
