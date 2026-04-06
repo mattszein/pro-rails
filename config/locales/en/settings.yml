@@ -3,7 +3,7 @@ en:
     font_theme_title: "Font & Theme Selector"
     font_theme_subtitle: "Elegant customization for your experience"
     profile: "Profile"
-    profile_title: "Profile Settings"
+    profile_title: "Profile"
     profile_subtitle: "Update your personal information and profile picture"
     profile_username: "Username"
     profile_bio: "Bio"

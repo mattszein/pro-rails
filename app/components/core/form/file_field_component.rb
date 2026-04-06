@@ -28,7 +28,7 @@ class Core::Form::FileFieldComponent < Core::Form::FieldComponent
   end
 
   def input_classes
-    "block w-full text-sm text-slate-600 file:mr-4 file:py-2.5 file:px-5 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-slate-800 file:text-white hover:file:bg-slate-900 file:cursor-pointer file:transition-all file:duration-200 cursor-pointer border border-slate-300 rounded-full bg-white p-3 hover:border-slate-400 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
+    "block text-sm text-slate-600 file:mr-4 file:py-2.5 file:px-5 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-primary-800 file:text-white hover:file:bg-primary-900 file:cursor-pointer file:transition-all file:duration-200 cursor-pointer border border-slate-300 rounded-full bg-primary p-3 hover:border-slate-400 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
   end
 
   def input_tag

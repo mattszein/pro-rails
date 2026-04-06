@@ -116,6 +116,8 @@ services:
       ANYCABLE_BROADCAST_ADAPTER: "redisx"
       ANYCABLE_BROKER: "memory"
       ANYCABLE_REDIS_CHANNEL: __anycable__
+    extra_hosts:
+      - host.docker.internal:host-gateway
     networks:
       - default
 

@@ -1,6 +1,7 @@
 class Core::AvatarComponent < ApplicationViewComponent
   option :profile
   option :size, default: -> { :md }
+  option :editable, default: -> { false }
 
   SIZE_CLASSES = {
     sm: "h-8 w-8 text-xs",
@@ -19,5 +20,9 @@ class Core::AvatarComponent < ApplicationViewComponent
 
   def fallback_initial
     profile.username&.first&.upcase || "?"
+  end
+
+  def hover_ring_classes
+    "ring-2 ring-transparent group-hover:ring-primary-400 transition-all"
   end
 end

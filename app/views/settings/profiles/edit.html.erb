@@ -1,5 +1,5 @@
 <%= render Settings::LayoutComponent.new(active_section: :profile) do %>
-  <%= render Core::CardComponent.new do %>
+  <%= render Core::CardComponent.new(classes: "space-y-2")do %>
     <h1><%= t("settings.profile_title") %></h1>
     <p><%= t("settings.profile_subtitle") %></p>
 
@@ -13,16 +13,16 @@
       </div>
     <% end %>
 
-    <%= form_with model: @profile, url: settings_profile_path, method: :patch do |f| %>
-      <div class="flex items-center gap-4 mb-6">
-        <%= render Core::AvatarComponent.new(profile: @profile, size: :xl) %>
-        <%= f.file_field :avatar, label: t("settings.choose_profile_photo") %>
-      </div>
-
+    <%= form_with model: @profile, url: settings_profile_path, method: :patch, class: "mx-auto space-y-4" do |f| %>
+      <%= render Core::BoxComponent.new(variant: :primary, classes: "text-center") do %>
+        <div data-controller="click-forwarder" class="flex flex-col items-center gap-4">
+          <%= render Core::AvatarComponent.new(profile: @profile, size: :xl, editable: true) %>
+          <%= f.file_field :avatar, label: t("settings.choose_profile_photo"), data: { click_forwarder_target: "receiver" } %>
+        </div>
+      <% end %>
       <%= f.text_field :username, label: t("settings.profile_username") %>
-      <%= f.text_area :bio, label: t("settings.profile_bio"), placeholder: t("settings.profile_bio_placeholder"), rows: 4 %>
-
-      <%= f.button t("settings.save_profile"), type: :submit %>
+      <%= f.text_area :bio, label: t("settings.profile_bio"), placeholder: t("settings.profile_bio_placeholder"), rows: 4, class: "flex-1 px-4 py-3 rounded-xl resize-none focus:ring-0 focus:border-transparent focus:outline-none w-full" %>
+      <%= f.button t("settings.save_profile"), type: :submit, fullw: true %>
     <% end %>
   <% end %>
 <% end %>

@@ -1,4 +1,4 @@
-class CreateProfiles < ActiveRecord::Migration[8.0]
+class CreateProfiles < ActiveRecord::Migration[8.1]
   def change
     create_table :profiles do |t|
       t.references :account, null: false, foreign_key: true, index: {unique: true}
