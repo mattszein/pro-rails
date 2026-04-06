@@ -5,6 +5,7 @@ class Core::BoxComponent < ApplicationViewComponent
   option :classes, default: -> { "" }
 
   VARIANT_STYLES = {
+    primary: "bg-gradient-to-r from-primary-50 to-secondary-50 dark:from-primary-950/30 dark:to-secondary-950/30 border border-primary-200 dark:border-primary-800",
     info: "bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border border-blue-200 dark:border-blue-800 text-blue-900 dark:text-blue-100",
     success: "bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-950/30 dark:to-green-950/30 border border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-100",
     warning: "bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/30 dark:to-yellow-950/30 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-100",

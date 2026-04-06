@@ -3,10 +3,18 @@ es:
     models:
       account: Cuenta
       announcement: Anuncio
+      profile: Perfil
       role: Rol
       ticket: Ticket
     errors:
       models:
+        profile:
+          attributes:
+            avatar:
+              invalid_content_type: "debe ser una imagen JPEG, PNG, GIF o WebP"
+              file_too_large: "debe ser menor a 10 MB"
+            username:
+              invalid_format: "solo puede contener letras, números y guiones bajos"
         announcement:
           attributes:
             scheduled_at:

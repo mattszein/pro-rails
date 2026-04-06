@@ -39,6 +39,7 @@ Rails.application.routes.draw do
 
     namespace :settings do
       resources :appearance, only: [:index]
+      resource :profile, only: [:edit, :update]
     end
   end
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_27_190939) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_21_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -171,6 +171,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_27_190939) do
     t.index ["role_id"], name: "index_permissions_roles_on_role_id"
   end
 
+  create_table "profiles", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.string "username"
+    t.text "bio"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_profiles_on_account_id", unique: true
+    t.index ["username"], name: "index_profiles_on_username", unique: true, where: "((username IS NOT NULL) AND ((username)::text <> ''::text))"
+  end
+
   create_table "roles", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name"
@@ -214,6 +224,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_27_190939) do
   add_foreign_key "conversations", "tickets"
   add_foreign_key "messages", "accounts"
   add_foreign_key "messages", "conversations"
+  add_foreign_key "profiles", "accounts"
   add_foreign_key "support_notes", "accounts"
   add_foreign_key "support_notes", "tickets"
   add_foreign_key "tickets", "accounts", column: "assigned_id"

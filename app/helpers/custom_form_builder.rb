@@ -53,6 +53,7 @@ class CustomFormBuilder < ActionView::Helpers::FormBuilder
   end
 
   def file_field(method, options = {})
+    @multipart = true
     render_component("form::FileField", @object_name, method, objectify_options(options))
   end
 
