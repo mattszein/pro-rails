@@ -1,5 +1,5 @@
 <% if editable %>
-  <div class="relative inline-block cursor-pointer group" data-action="click->click-forwarder#forward">
+  <button type="button" class="relative inline-block group bg-transparent border-0 p-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 rounded-full" data-action="click->click-forwarder#forward">
     <% if profile.avatar.attached? %>
       <%= image_tag profile.avatar.variant(avatar_variant), alt: profile.username.to_s, class: "#{size_class} rounded-full object-cover #{hover_ring_classes}" %>
     <% else %>
@@ -10,7 +10,7 @@
     <div class="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
       <%= helpers.icon("camera", classes: "w-7 h-7 text-white") %>
     </div>
-  </div>
+  </button>
 <% else %>
   <% if profile.avatar.attached? %>
     <%= image_tag profile.avatar.variant(avatar_variant), alt: profile.username.to_s, class: "#{size_class} rounded-full object-cover" %>
