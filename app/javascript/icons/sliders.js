@@ -1,4 +1,4 @@
-import { animate } from "motion"
+import { animate } from "motion/dom"
 
 const q = (svg, name) => svg.querySelector(`[data-element="${name}"]`)
 const SPRING = { easing: "spring(100, 12, 0.4)" }
