@@ -1,0 +1,63 @@
+en:
+  landing:
+    page_title: "Pro Rails — Launch Production-Ready Apps in Days"
+    hero:
+      title: "Launch Production-Ready Apps in Days, Not Weeks."
+      subtitle: "A Rails 8 starter template with auth, RBAC, real-time, background jobs, and a component library — all wired up and tested."
+    features:
+      authentication:
+        title: "Authentication (Rodauth)"
+        description: "Full auth flow out of the box: multi-phase login, email verification, passkeys, and magic links. Runs entirely as Rack middleware—no monkey-patching, no engine magic."
+      authorization:
+        title: "Authorization (ActionPolicy + RBAC)"
+        description: "Policy-based authorization and a custom RBAC system. Roles and permissions are stored in the database and fully manageable at runtime."
+      real_time:
+        title: "Real-Time by Design"
+        description: "AnyCable replaces Action Cable with a standalone Go server for massive concurrency. Turbo Streams and Stimulus handle frontend reactivity without a JS framework."
+      admin_panel:
+        title: "Built-in Admin Panel"
+        description: "No admin gem, no DSL to learn, no fighting a framework. Just plain controllers, views, and policies you already know how to change and extend."
+      ui_components:
+        title: "UI Component Library"
+        description: "A fully custom ViewComponent library for UI building blocks and forms. No third-party gems. Everything is previewed in development via Lookbook."
+      support_tickets:
+        title: "Real-Time Support Tickets"
+        description: "A built-in reference implementation of a chat-based support system. Users and admins converse instantly without page reloads, powered by AnyCable and Turbo."
+      profile_settings:
+        title: "Profile & Settings"
+        description: "Ready-to-use user settings pages with profile configuration, secure avatar uploads via Active Storage, and straightforward account management."
+      theme_support:
+        title: "Extensive Theme Support"
+        description: "Ship with beautiful aesthetics out of the box. Includes full support for 40 distinct themes and 8 curated typography options to match any brand."
+    architecture:
+      title: "Architecture & Developer Experience"
+      quality:
+        heading: "Architecture & Quality"
+        interactors:
+          title: "Clean Architecture (Interactors)"
+          description: "Workflow orchestration lives in single-purpose interactors, not models or controllers. Models stay clean, controllers stay thin."
+        testing:
+          title: "Comprehensive Testing"
+          description: "Full RSpec suite with Shoulda-Matchers, FactoryBot, policy/interactor specs, and system tests running against a real Chromium browser via Cuprite."
+        code_quality:
+          title: "Code Quality Enforced"
+          description: "RuboCop extended with Standard, Brakeman for security, ERB linting/formatting scripts, and Freezolite for automatic string freezing."
+      infrastructure:
+        heading: "Infrastructure & Config"
+        jobs:
+          title: "Database-Backed Jobs"
+          description: "Powered by Solid Queue and PostgreSQL. No Redis required. Jobs are transactional, inspectable, and manageable via the Mission Control web UI."
+        i18n:
+          title: "I18n Ready"
+          description: "Internationalization support is wired up from the start, with locale files cleanly organized by domain so you never have to retrofit it later."
+        notifications:
+          title: "Multi-Channel Notifications"
+          description: "Powered by Noticed. Deliver alerts to your users across multiple channels, including email and in-app real-time Turbo Streams."
+        assets:
+          title: "Modern Asset Pipeline"
+          description: "TailwindCSS 4 and Propshaft. No webpack, no Node build step, and a clean component-driven CSS structure."
+        config:
+          title: "Typed Configuration"
+          description: "Anyway Config provides typed configuration classes loaded from ENV vars, credentials, or YAML instead of scattered ENV[] calls."
+    footer:
+      text: "Pro Rails. Built for developers."

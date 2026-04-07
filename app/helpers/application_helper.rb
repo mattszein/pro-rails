@@ -23,14 +23,24 @@ module ApplicationHelper
   end
 
   def icon(name, options = {})
+    animated_type = options.delete(:animated_type)
     options[:title] ||= name.underscore.humanize
     options[:aria] = true
     options[:nocomment] = true
     # options[:variant] ||= :outline
     options[:class] = options.fetch(:classes, nil)
     path = options.fetch(:path, "icons/#{name}.svg")
-    icon = path
-    inline_svg_tag(icon, options)
+    svg = inline_svg_tag(path, options)
+
+    if animated_type
+      content_tag(:div, svg,
+        data: {
+          controller: "animated-icon",
+          animated_icon_type_value: animated_type
+        })
+    else
+      svg
+    end
   end
 
   def error_tag(content, options = {})
