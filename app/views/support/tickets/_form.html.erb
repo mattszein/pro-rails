@@ -10,7 +10,8 @@
       </ul>
     </div>
   <% end %>
-    <%= form.text_field :title, {autofocus: true, required: true, placeholder: " ", autocomplete: "title", label: t("shared.labels.title"), class: "w-full"} %>
+    <%= form.label :title, t("shared.labels.title") %>
+    <%= form.text_field :title, {autofocus: true, required: true, placeholder: t("shared.placeholders.title"), autocomplete: "title", class: "w-full"} %>
     <div class="mt-6">
       <%= form.label :category, class: "block text-sm font-medium text-gray-700 mb-2" %>
       <%= form.select :category,

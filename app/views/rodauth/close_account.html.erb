@@ -1,7 +1,8 @@
 <%= render(Core::CardComponent.new) do %>
   <%= form_with url: rodauth.close_account_path, method: :post, data: {turbo: false}, class: "w-full max-w-sm" do |form| %>
     <% if rodauth.close_account_requires_password? %>
-      <%= form.password_field rodauth.password_param, {required: true, placeholder: " ", value: "", id: "password", autofocus: true, autocomplete: rodauth.password_field_autocomplete_value, aria: ({invalid: true, describedby: "password_error_message"} if rodauth.field_error(rodauth.password_param))} %>
+      <%= form.label rodauth.password_param, t("rodauth.labels.password") %>
+      <%= form.password_field rodauth.password_param, {required: true, placeholder: t("rodauth.placeholders.password"), value: "", id: "password", autofocus: true, autocomplete: rodauth.password_field_autocomplete_value, aria: ({invalid: true, describedby: "password_error_message"} if rodauth.field_error(rodauth.password_param))} %>
       <%= error_tag(rodauth.field_error(rodauth.password_param), id: "password_error_message") if rodauth.field_error(rodauth.password_param) %>
     <% end %>
     <div class="mt-6">

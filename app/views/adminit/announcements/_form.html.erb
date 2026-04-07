@@ -10,8 +10,10 @@
       </ul>
     </div>
   <% end %>
-  <%= form.text_field :reference, {autofocus: true, required: true, placeholder: " ", autocomplete: "off", label: t("shared.labels.reference"), class: "w-full"} %>
-  <%= form.text_field :title, {placeholder: " ", autocomplete: "title", label: t("shared.labels.title"), class: "w-full"} %>
+  <%= form.label :reference, t("shared.labels.reference") %>
+  <%= form.text_field :reference, {autofocus: true, required: true, placeholder: t("shared.placeholders.reference"), autocomplete: "off", class: "w-full"} %>
+  <%= form.label :title, t("shared.labels.title") %>
+  <%= form.text_field :title, {placeholder: t("shared.placeholders.title"), autocomplete: "title", class: "w-full"} %>
   <div>
     <%= form.label :rich_body, t("shared.labels.content"), class: "block text-sm font-medium mb-2" %>
     <%= form.rich_text_area :rich_body %>
