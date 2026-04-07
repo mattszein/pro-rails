@@ -16,7 +16,7 @@ class Core::Form::TextAreaComponent < Core::Form::FieldComponent
   end
 
   def html_class
-    class_names("block p-2 text-md text-gray-900 rounded-lg border border-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white outline-none", THEMES[theme])
+    class_names("bg-default block p-2 text-md text-gray-900 rounded border focus:ring-2 focus:border-transparent border-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white outline-none transition-all", THEMES[theme])
   end
 
   def call

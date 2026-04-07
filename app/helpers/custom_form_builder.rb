@@ -12,16 +12,22 @@ class CustomFormBuilder < ActionView::Helpers::FormBuilder
     render_component("form::Code", @object_name, method, length)
   end
 
+  def label(method, text = nil, options = {}, &block)
+    default_classes = "block font-medium text-gray-700 dark:text-gray-400 mb-2"
+    options[:class] = "#{default_classes} #{options[:class]}".strip
+    super(method, text, options, &block)  
+  end
+
   def labeled(method, text = nil, options = {}, &block)
     render_component("form::Labeled", @object_name, method, text, objectify_options(options), &block)
   end
 
   def number_field(method, options = {})
-    render_component("form::MaterialInput", @object_name, method, objectify_options(options.merge(input_type: :number)))
+    render_component("form::NumberField", @object_name, method, objectify_options(options.merge(input_type: :number)))
   end
 
   def password_field(method, options = {})
-    render_component("form::MaterialInput", @object_name, method, objectify_options(options.merge(input_type: :password)))
+    render_component("form::PasswordField", @object_name, method, objectify_options(options.merge(input_type: :password)))
   end
 
   def select(method, choices = nil, options = {}, html_options = {}, &block)
@@ -41,7 +47,7 @@ class CustomFormBuilder < ActionView::Helpers::FormBuilder
   end
 
   def text_field(method, options = {})
-    render_component("form::MaterialInput", @object_name, method, objectify_options(options.merge(input_type: :text)))
+    render_component("form::TextField", @object_name, method, objectify_options(options.merge(input_type: :text)))
   end
 
   def toggle(method, options = {}, checked_value = "1", unchecked_value = "0")

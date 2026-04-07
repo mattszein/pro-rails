@@ -1,6 +1,6 @@
 @theme {
-  --color-default: theme(colors.gray.50);
-  --color-highlight: theme(colors.white);
+  --color-default: theme(--color-slate-50);
+  --color-highlight:  theme(colors.white);
 
   --color-text-heading-strong: theme(colors.gray.900); /* H1 */
   --color-text-heading-soft:   theme(colors.gray.800); /* H2, H3 */

@@ -1,7 +1,7 @@
 class Core::BoxComponent < ApplicationViewComponent
   option :variant, default: -> { :info }
   option :padding, default: -> { :sm }
-  option :rounded, default: -> { :xl }
+  option :rounded, default: -> { :sm }
   option :classes, default: -> { "" }
 
   VARIANT_STYLES = {
