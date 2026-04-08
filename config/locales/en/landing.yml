@@ -31,33 +31,31 @@ en:
         description: "Ship with beautiful aesthetics out of the box. Includes full support for 40 distinct themes and 8 curated typography options to match any brand."
     architecture:
       title: "Architecture & Developer Experience"
-      quality:
-        heading: "Architecture & Quality"
-        interactors:
-          title: "Clean Architecture (Interactors)"
-          description: "Workflow orchestration lives in single-purpose interactors, not models or controllers. Models stay clean, controllers stay thin."
-        testing:
-          title: "Comprehensive Testing"
-          description: "Full RSpec suite with Shoulda-Matchers, FactoryBot, policy/interactor specs, and system tests running against a real Chromium browser via Cuprite."
-        code_quality:
-          title: "Code Quality Enforced"
-          description: "RuboCop extended with Standard, Brakeman for security, ERB linting/formatting scripts, and Freezolite for automatic string freezing."
-      infrastructure:
-        heading: "Infrastructure & Config"
-        jobs:
-          title: "Database-Backed Jobs"
-          description: "Powered by Solid Queue and PostgreSQL. No Redis required. Jobs are transactional, inspectable, and manageable via the Mission Control web UI."
-        i18n:
-          title: "I18n Ready"
-          description: "Internationalization support is wired up from the start, with locale files cleanly organized by domain so you never have to retrofit it later."
-        notifications:
-          title: "Multi-Channel Notifications"
-          description: "Powered by Noticed. Deliver alerts to your users across multiple channels, including email and in-app real-time Turbo Streams."
-        assets:
-          title: "Modern Asset Pipeline"
-          description: "TailwindCSS 4 and Propshaft. No webpack, no Node build step, and a clean component-driven CSS structure."
-        config:
-          title: "Typed Configuration"
-          description: "Anyway Config provides typed configuration classes loaded from ENV vars, credentials, or YAML instead of scattered ENV[] calls."
+      quality_heading: "Architecture & Quality"
+      infrastructure_heading: "Infrastructure & Config"
+      interactors:
+        title: "Clean Architecture (Interactors)"
+        description: "Workflow orchestration lives in single-purpose interactors, not models or controllers. Models stay clean, controllers stay thin."
+      testing:
+        title: "Comprehensive Testing"
+        description: "Full RSpec suite with Shoulda-Matchers, FactoryBot, policy/interactor specs, and system tests running against a real Chromium browser via Cuprite."
+      code_quality:
+        title: "Code Quality Enforced"
+        description: "RuboCop extended with Standard, Brakeman for security, ERB linting/formatting scripts, and Freezolite for automatic string freezing."
+      jobs:
+        title: "Database-Backed Jobs"
+        description: "Powered by Solid Queue and PostgreSQL. No Redis required. Jobs are transactional, inspectable, and manageable via the Mission Control web UI."
+      i18n:
+        title: "I18n Ready"
+        description: "Internationalization support is wired up from the start, with locale files cleanly organized by domain so you never have to retrofit it later."
+      notifications:
+        title: "Multi-Channel Notifications"
+        description: "Powered by Noticed. Deliver alerts to your users across multiple channels, including email and in-app real-time Turbo Streams."
+      assets:
+        title: "Modern Asset Pipeline"
+        description: "TailwindCSS 4 and Propshaft. No webpack, no Node build step, and a clean component-driven CSS structure."
+      config:
+        title: "Typed Configuration"
+        description: "Anyway Config provides typed configuration classes loaded from ENV vars, credentials, or YAML instead of scattered ENV[] calls."
     footer:
       text: "Pro Rails. Built for developers."

@@ -31,33 +31,31 @@ es:
         description: "Envía con una estética hermosa desde el primer día. Incluye soporte completo para 40 temas distintos y 8 opciones de tipografía para adaptarse a cualquier marca."
     architecture:
       title: "Arquitectura y Experiencia de Desarrollo"
-      quality:
-        heading: "Arquitectura y Calidad"
-        interactors:
-          title: "Arquitectura Limpia (Interactors)"
-          description: "La orquestación de workflows vive en interactors de propósito único, no en modelos ni controladores. Los modelos se mantienen limpios, los controladores delgados."
-        testing:
-          title: "Testing Exhaustivo"
-          description: "Suite completa de RSpec con Shoulda-Matchers, FactoryBot, specs de políticas e interactors, y tests de sistema contra un navegador Chromium real con Cuprite."
-        code_quality:
-          title: "Calidad de Código Garantizada"
-          description: "RuboCop extendido con Standard, Brakeman para seguridad, scripts de linting ERB y Freezolite para congelado automático de strings."
-      infrastructure:
-        heading: "Infraestructura y Configuración"
-        jobs:
-          title: "Jobs Respaldados por Base de Datos"
-          description: "Impulsado por Solid Queue y PostgreSQL. Sin Redis requerido. Los jobs son transaccionales, inspeccionables y gestionables con la UI de Mission Control."
-        i18n:
-          title: "I18n Listo"
-          description: "El soporte de internacionalización está configurado desde el inicio, con archivos de locale organizados por dominio para no tener que añadirlo después."
-        notifications:
-          title: "Notificaciones Multicanal"
-          description: "Impulsado por Noticed. Envía alertas a tus usuarios por múltiples canales, incluyendo email y Turbo Streams en tiempo real dentro de la app."
-        assets:
-          title: "Pipeline de Assets Moderno"
-          description: "TailwindCSS 4 y Propshaft. Sin webpack, sin pasos de build con Node, y una estructura CSS limpia orientada a componentes."
-        config:
-          title: "Configuración Tipada"
-          description: "Anyway Config provee clases de configuración tipadas cargadas desde variables de entorno, credenciales o YAML, en lugar de llamadas ENV[] dispersas."
+      quality_heading: "Arquitectura y Calidad"
+      infrastructure_heading: "Infraestructura y Configuración"
+      interactors:
+        title: "Arquitectura Limpia (Interactors)"
+        description: "La orquestación de workflows vive en interactors de propósito único, no en modelos ni controladores. Los modelos se mantienen limpios, los controladores delgados."
+      testing:
+        title: "Testing Exhaustivo"
+        description: "Suite completa de RSpec con Shoulda-Matchers, FactoryBot, specs de políticas e interactors, y tests de sistema contra un navegador Chromium real con Cuprite."
+      code_quality:
+        title: "Calidad de Código Garantizada"
+        description: "RuboCop extendido con Standard, Brakeman para seguridad, scripts de linting ERB y Freezolite para congelado automático de strings."
+      jobs:
+        title: "Jobs Respaldados por Base de Datos"
+        description: "Impulsado por Solid Queue y PostgreSQL. Sin Redis requerido. Los jobs son transaccionales, inspeccionables y gestionables con la UI de Mission Control."
+      i18n:
+        title: "I18n Listo"
+        description: "El soporte de internacionalización está configurado desde el inicio, con archivos de locale organizados por dominio para no tener que añadirlo después."
+      notifications:
+        title: "Notificaciones Multicanal"
+        description: "Impulsado por Noticed. Envía alertas a tus usuarios por múltiples canales, incluyendo email y Turbo Streams en tiempo real dentro de la app."
+      assets:
+        title: "Pipeline de Assets Moderno"
+        description: "TailwindCSS 4 y Propshaft. Sin webpack, sin pasos de build con Node, y una estructura CSS limpia orientada a componentes."
+      config:
+        title: "Configuración Tipada"
+        description: "Anyway Config provee clases de configuración tipadas cargadas desde variables de entorno, credenciales o YAML, en lugar de llamadas ENV[] dispersas."
     footer:
       text: "Pro Rails. Hecho para desarrolladores."

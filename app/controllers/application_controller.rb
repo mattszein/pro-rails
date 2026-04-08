@@ -8,5 +8,6 @@ class ApplicationController < ActionController::Base
   include Localizable
 
   def index
+    render layout: "landing"
   end
 end

@@ -1,7 +1,8 @@
 class Landing::FeatureCardComponent < ApplicationViewComponent
   option :icon
   option :color
-  option :i18n_key
+  option :title
+  option :description
   option :animated_type
 
   BORDER_HOVER = {

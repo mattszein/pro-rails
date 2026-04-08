@@ -20,8 +20,7 @@
     <%= javascript_importmap_tags %>
   </head>
   <body class="antialiased bg-default" data-controller="closer">
-    <%= render partial: "partials/navbar" %>
-    <main class="pt-20 px-8 h-full mx-auto flex justify-center dark:text-gray-200">
+    <main class="min-h-screen">
       <%= turbo_frame_tag "modal", target: "_top" %>
       <%= yield %>
     </main>
