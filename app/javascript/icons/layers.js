@@ -1,14 +1,25 @@
 import { animate } from "motion/dom"
 
 const q = (svg, name) => svg.querySelector(`[data-element="${name}"]`)
-const SPRING = { easing: "spring(300, 20)" }
+const SPRING = { easing: "spring(100, 14)" }
 
-export function start(svg) {
-  animate(q(svg, "top"), { y: -2 }, SPRING)
-  animate(q(svg, "bot"), { y: 2 }, SPRING)
+export async function start(svg) {
+  const bottom = q(svg, "bottom")
+  const middle = q(svg, "middle")
+  if (!bottom || !middle) return
+
+  await Promise.all([
+    animate(bottom, { y: -9 }, SPRING).finished,
+    animate(middle, { y: -5 }, SPRING).finished,
+  ])
+
+  animate(bottom, { y: 0 }, SPRING)
+  animate(middle, { y: 0 }, SPRING)
 }
 
 export function stop(svg) {
-  animate(q(svg, "top"), { y: 0 }, SPRING)
-  animate(q(svg, "bot"), { y: 0 }, SPRING)
+  const bottom = q(svg, "bottom")
+  const middle = q(svg, "middle")
+  if (bottom) animate(bottom, { y: 0 }, SPRING)
+  if (middle) animate(middle, { y: 0 }, SPRING)
 }

@@ -622,6 +622,91 @@ Lookbook is available in development at `/lookbook` to preview and test componen
 
 ---
 
+## Animated Icons
+
+SVG icons that animate on hover using [Motion](https://motion.dev/) (`motion/dom`) and a single Stimulus controller.
+
+### How It Works
+
+Each animated icon is a three-part system:
+
+1. **SVG file** (`app/assets/images/icons/<name>.svg`) — marks animatable elements with `data-element` attributes
+2. **JS module** (`app/javascript/icons/<name>.js`) — exports `start(svg)` and `stop(svg)` functions
+3. **Stimulus controller** (`animated_icon_controller.js`) — bridges hover events to the correct JS module via a registry
+
+The `icon()` helper in `ApplicationHelper` renders SVGs inline via `inline_svg_tag`. When used inside a component that hosts the Stimulus controller (like `FeatureCardComponent`), no extra wrapper is needed.
+
+### SVG Conventions
+
+Add `data-element="<name>"` to any path, circle, or group that the animation targets:
+
+```svg
+<svg viewBox="0 0 24 24" ...>
+  <path d="..."/>  <!-- static, no attribute -->
+  <path data-element="bottom" d="..."/>
+  <path data-element="middle" d="..."/>
+</svg>
+```
+
+For draw-in effects, add `pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"` so the element starts hidden:
+
+```svg
+<path data-element="bar-1" d="M8 17v-3" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
+```
+
+### JS Module Contract
+
+Every module in `app/javascript/icons/` must export exactly two functions:
+
+```js
+import { animate } from "motion/dom"
+
+const q = (svg, name) => svg.querySelector(`[data-element="${name}"]`)
+
+export function start(svg) { /* animate to active state */ }
+export function stop(svg)  { /* animate back to resting state */ }
+```
+
+For sequential animations, `await` the `.finished` promise between phases:
+
+```js
+export async function start(svg) {
+  await Promise.all([
+    animate(el1, { y: -9 }, SPRING).finished,
+    animate(el2, { y: -5 }, SPRING).finished,
+  ])
+  animate(el1, { y: 0 }, SPRING)
+  animate(el2, { y: 0 }, SPRING)
+}
+```
+
+### Stimulus Controller
+
+`animated_icon_controller.js` holds a static registry mapping type names to modules. The controller and its `data-action` must be on the **same element** (Stimulus resolves controllers by looking up the DOM, not down into descendants):
+
+```js
+const REGISTRY = { lock, connect, charts, ... }
+
+export default class extends Controller {
+  static values = { type: String }
+  connect() {
+    this.animation = REGISTRY[this.typeValue]
+    this.svg = this.element.querySelector("svg")
+  }
+  start() { if (this.animation && this.svg) this.animation.start(this.svg) }
+  stop()  { if (this.animation && this.svg) this.animation.stop(this.svg) }
+}
+```
+
+### Adding a New Animated Icon
+
+1. Create the SVG in `app/assets/images/icons/<name>.svg` with `data-element` attributes on animated children
+2. Create `app/javascript/icons/<name>.js` exporting `start(svg)` and `stop(svg)`
+3. Add `import * as <name> from "icons/<name>"` and the key to `REGISTRY` in `animated_icon_controller.js`
+4. Use in a component: pass `animated_type: "<name>"` — the component puts `data-controller`, `data-animated-icon-type-value`, and `data-action` on the same outer element, and calls `helpers.icon("<name>")` (no `animated_type:`) inside
+
+---
+
 ## Configuration
 
 We use Anyway Config for typed configuration classes.
