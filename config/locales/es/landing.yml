@@ -1,0 +1,61 @@
+es:
+  landing:
+    page_title: "Pro Rails — Lanza apps listas para producción en días"
+    hero:
+      title: "Lanza apps listas para producción en días, no semanas."
+      subtitle: "Una plantilla Rails 8 con autenticación, RBAC, tiempo real, jobs en background y una librería de componentes — todo configurado y probado."
+    features:
+      authentication:
+        title: "Autenticación (Rodauth)"
+        description: "Flujo de autenticación completo: login multifase, verificación de email, passkeys y magic links. Funciona como middleware Rack, sin monkey-patching ni magia de engine."
+      authorization:
+        title: "Autorización (ActionPolicy + RBAC)"
+        description: "Autorización basada en políticas y un sistema RBAC personalizado. Los roles y permisos se guardan en la base de datos y son gestionables en tiempo de ejecución."
+      real_time:
+        title: "Tiempo Real por Diseño"
+        description: "AnyCable reemplaza Action Cable con un servidor Go independiente para alta concurrencia. Turbo Streams y Stimulus gestionan la reactividad frontend sin frameworks JS."
+      admin_panel:
+        title: "Panel de Administración Incluido"
+        description: "Sin gemas de admin, sin DSL que aprender, sin pelear con un framework. Solo controladores, vistas y políticas que ya sabes cómo modificar y extender."
+      ui_components:
+        title: "Librería de Componentes UI"
+        description: "Una librería de ViewComponent completamente personalizada para bloques de UI y formularios. Sin gemas de terceros. Todo se previsualiza en desarrollo con Lookbook."
+      support_tickets:
+        title: "Tickets de Soporte en Tiempo Real"
+        description: "Una implementación de referencia de un sistema de soporte por chat. Usuarios y admins conversan al instante sin recargar la página, impulsado por AnyCable y Turbo."
+      profile_settings:
+        title: "Perfil y Configuración"
+        description: "Páginas de configuración de usuario listas para usar con gestión de perfil, subida segura de avatares con Active Storage y administración de cuenta sencilla."
+      theme_support:
+        title: "Soporte de Temas Extenso"
+        description: "Envía con una estética hermosa desde el primer día. Incluye soporte completo para 40 temas distintos y 8 opciones de tipografía para adaptarse a cualquier marca."
+    architecture:
+      title: "Arquitectura y Experiencia de Desarrollo"
+      quality_heading: "Arquitectura y Calidad"
+      infrastructure_heading: "Infraestructura y Configuración"
+      interactors:
+        title: "Arquitectura Limpia (Interactors)"
+        description: "La orquestación de workflows vive en interactors de propósito único, no en modelos ni controladores. Los modelos se mantienen limpios, los controladores delgados."
+      testing:
+        title: "Testing Exhaustivo"
+        description: "Suite completa de RSpec con Shoulda-Matchers, FactoryBot, specs de políticas e interactors, y tests de sistema contra un navegador Chromium real con Cuprite."
+      code_quality:
+        title: "Calidad de Código Garantizada"
+        description: "RuboCop extendido con Standard, Brakeman para seguridad, scripts de linting ERB y Freezolite para congelado automático de strings."
+      jobs:
+        title: "Jobs Respaldados por Base de Datos"
+        description: "Impulsado por Solid Queue y PostgreSQL. Sin Redis requerido. Los jobs son transaccionales, inspeccionables y gestionables con la UI de Mission Control."
+      i18n:
+        title: "I18n Listo"
+        description: "El soporte de internacionalización está configurado desde el inicio, con archivos de locale organizados por dominio para no tener que añadirlo después."
+      notifications:
+        title: "Notificaciones Multicanal"
+        description: "Impulsado por Noticed. Envía alertas a tus usuarios por múltiples canales, incluyendo email y Turbo Streams en tiempo real dentro de la app."
+      assets:
+        title: "Pipeline de Assets Moderno"
+        description: "TailwindCSS 4 y Propshaft. Sin webpack, sin pasos de build con Node, y una estructura CSS limpia orientada a componentes."
+      config:
+        title: "Configuración Tipada"
+        description: "Anyway Config provee clases de configuración tipadas cargadas desde variables de entorno, credenciales o YAML, en lugar de llamadas ENV[] dispersas."
+    footer:
+      text: "Pro Rails. Hecho para desarrolladores."

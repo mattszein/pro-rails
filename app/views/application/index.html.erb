@@ -1,7 +1,64 @@
-<%= render(Core::CardComponent.new(classes: "space-y-4")) do %>
-  <p class="text-lg"><%= t("home.welcome") %></p>
-  <div class="flex items-center space-x-3 justify-center">
-    <%= render(Core::LinkComponent.new(name: t("shared.navigation.sign_in"), url: rodauth.login_path, style: :as_button, theme: :primary, size: :sm)) %>
-    <%= render(Core::LinkComponent.new(name: t("shared.navigation.register"), url: rodauth.create_account_path, style: :as_button, theme: :secondary, size: :sm)) %>
+<% content_for(:title) { t("landing.page_title") } %>
+<div class="bg-[#f8f9fa] dark:bg-[#0f0f11] text-slate-900 dark:text-slate-200 transition-colors duration-300 selection:bg-[#c25044]/20 selection:text-[#c25044] dark:selection:text-[#e2a8a0]">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 space-y-24 md:space-y-32">
+    <section class="text-center max-w-3xl mx-auto">
+      <div class="p-8 md:p-12 w-full rounded-2xl bg-white/90 dark:bg-[#1a1a1c]/90 backdrop-blur-md border border-slate-200 dark:border-[#222225] shadow-sm dark:shadow-none mb-8 transition-colors duration-300">
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 pb-2 text-transparent bg-clip-text bg-gradient-to-r from-[#8a3333] via-[#e25d4f] to-[#5a2323] dark:from-[#ffc4bc] dark:via-[#e2a8a0] dark:to-[#a86860] animate-gradient-x [background-size:200%_auto]">
+          <%= t("landing.hero.title") %>
+        </h1>
+        <p class="text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
+          <%= t("landing.hero.subtitle") %>
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <%= render(Landing::FeatureCardComponent.new(icon: "lock",    color: "blue",    title: t("landing.features.authentication.title"),   description: t("landing.features.authentication.description"),   animated_type: "lock")) %>
+        <%= render(Landing::FeatureCardComponent.new(icon: "shield",  color: "emerald", title: t("landing.features.authorization.title"),    description: t("landing.features.authorization.description"),    animated_type: "shield")) %>
+        <%= render(Landing::FeatureCardComponent.new(icon: "connect", color: "violet",  title: t("landing.features.real_time.title"),        description: t("landing.features.real_time.description"),        animated_type: "connect")) %>
+        <%= render(Landing::FeatureCardComponent.new(icon: "charts",  color: "rose",    title: t("landing.features.admin_panel.title"),      description: t("landing.features.admin_panel.description"),      animated_type: "charts")) %>
+        <%= render(Landing::FeatureCardComponent.new(icon: "layers",  color: "amber",   title: t("landing.features.ui_components.title"),    description: t("landing.features.ui_components.description"),    animated_type: "layers")) %>
+        <%= render(Landing::FeatureCardComponent.new(icon: "chat",    color: "cyan",    title: t("landing.features.support_tickets.title"),  description: t("landing.features.support_tickets.description"),  animated_type: "chat")) %>
+        <%= render(Landing::FeatureCardComponent.new(icon: "sliders", color: "orange",  title: t("landing.features.profile_settings.title"), description: t("landing.features.profile_settings.description"), animated_type: "sliders")) %>
+        <%= render(Landing::FeatureCardComponent.new(icon: "grip",    color: "fuchsia", title: t("landing.features.theme_support.title"),    description: t("landing.features.theme_support.description"),    animated_type: "grip")) %>
+      </div>
+    </section>
+
+    <section class="border-t border-slate-200 dark:border-[#222225] pt-16">
+      <h2 class="text-2xl font-semibold mb-12 text-slate-900 dark:text-slate-100 text-center">
+        <%= t("landing.architecture.title") %>
+      </h2>
+      <div class="space-y-12">
+        <div>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-6 px-2">
+            <%= t("landing.architecture.quality_heading") %>
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <%= render(Landing::StickyNoteCardComponent.new(icon_name: "network", title: t("landing.architecture.interactors.title"),  description: t("landing.architecture.interactors.description"))) %>
+            <%= render(Landing::StickyNoteCardComponent.new(icon_name: "flask",   title: t("landing.architecture.testing.title"),     description: t("landing.architecture.testing.description"))) %>
+            <%= render(Landing::StickyNoteCardComponent.new(icon_name: "code",    title: t("landing.architecture.code_quality.title"), description: t("landing.architecture.code_quality.description"))) %>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-6 px-2">
+            <%= t("landing.architecture.infrastructure_heading") %>
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <%= render(Landing::StickyNoteCardComponent.new(icon_name: "database", title: t("landing.architecture.jobs.title"),          description: t("landing.architecture.jobs.description"))) %>
+            <%= render(Landing::StickyNoteCardComponent.new(icon_name: "globe",    title: t("landing.architecture.i18n.title"),          description: t("landing.architecture.i18n.description"))) %>
+            <%= render(Landing::StickyNoteCardComponent.new(icon_name: "bell",     title: t("landing.architecture.notifications.title"), description: t("landing.architecture.notifications.description"))) %>
+            <%= render(Landing::StickyNoteCardComponent.new(icon_name: "zap",      title: t("landing.architecture.assets.title"),        description: t("landing.architecture.assets.description"))) %>
+          </div>
+          <div class="grid grid-cols-1 mt-4">
+            <%= render(Landing::StickyNoteCardComponent.new(icon_name: "wrench", title: t("landing.architecture.config.title"), description: t("landing.architecture.config.description"))) %>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
-<% end %>
+
+  <footer class="py-8 text-center text-sm text-slate-500 dark:text-slate-600 border-t border-slate-200 dark:border-[#222225] mt-24">
+    <p>&copy; <%= Date.current.year %> <%= t("landing.footer.text") %></p>
+  </footer>
+</div>
