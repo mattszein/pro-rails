@@ -4,7 +4,7 @@ class Core::SubmenuComponent < ApplicationViewComponent
   option :sections, default: -> { [] }
   option :current_section, default: -> { :none }
 
-  BASE_STYLES = "px-6 py-3 text-sm transition-all duration-200 relative whitespace-nowrap".freeze
+  BASE_STYLES = "px-6 py-3 transition-all duration-200 relative whitespace-nowrap".freeze
 
   ACTIVE_STYLES = {
     true => "text-primary-600 dark:text-primary-400 font-bold",

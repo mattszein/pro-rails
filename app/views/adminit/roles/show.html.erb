@@ -1,6 +1,6 @@
 <div class="w-full">
   <div class="flex justify-between items-center pb-2">
-    <%= link_to t("adminit.roles.back_to_roles"), adminit_roles_path, class: "text-indigo-500" %>
+    <%= render(Core::LinkComponent.new(name: t("adminit.roles.back_to_roles"), url: adminit_roles_path, style: :link)) %>
     <div class="flex gap-2 items-center px-4">
       <%= render(Core::LinkComponent.new(name: t("adminit.roles.add_member"), url: account_select_adminit_role_path(@role), style: :as_button, theme: :create, size: :sm, html_options: {data: {turbo_frame: "modal"}})) %>
     </div>
@@ -48,7 +48,7 @@
       <% if @role.accounts.any? %>
           <%= render Core::TableComponent.new(rows: @role.accounts, columns: role_member_columns(@role)) %>
       <% else %>
-        <p class="text-sm text-slate-500 italic px-4 pb-4"><%= t("adminit.roles.no_members") %></p>
+        <p class="text-slate-500 italic px-4 pb-4"><%= t("adminit.roles.no_members") %></p>
       <% end %>
     <% end %>
   </div>

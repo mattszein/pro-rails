@@ -20,13 +20,13 @@ es:
       choose_typeface: "Elige Tu Tipografía"
       descriptions:
         inter: "Limpia y versátil"
-        plus_jakarta: "Suave y legible"
+        lora: "Clásica y editorial"
         space_grotesk: "Futurista y peculiar"
         outfit: "Audaz y enérgica"
-        bricolage: "Acogedora y con carácter"
+        jost: "Elegante y minimalista"
         google_code: "Para desarrolladores"
         orbitron: "Ciencia ficción y neón"
-        manrope: "Suiza y profesional"
+        chakra_petch: "Mecha y alta tecnología"
     theme:
       tech_edge:
         title: "Tech Edge"

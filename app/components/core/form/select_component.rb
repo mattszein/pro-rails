@@ -1,7 +1,7 @@
 class Core::Form::SelectComponent < Core::Form::FieldComponent
   attr_reader :choices, :select_options
 
-  DEFAULT_CLASS = "bg-default border border-gray-300 text-gray-900 text-sm rounded-sm focus:outline-none focus:ring-2 focus:border-transparent focus:ring-primary-500 block w-full p-2.5 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500"
+  DEFAULT_CLASS = "bg-default border border-gray-300 text-gray-900 rounded-sm focus:outline-none focus:ring-2 focus:border-transparent focus:ring-primary-500 block w-full p-2.5 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500"
 
   def initialize(form, object_name, method_name, choices, select_options, html_options)
     @choices = choices

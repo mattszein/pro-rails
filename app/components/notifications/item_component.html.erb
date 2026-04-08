@@ -17,10 +17,10 @@
       <p class="text-md mb-0.5" data-role="title">
         <%= @notification.title %>
       </p>
-      <p class="text-sm line-clamp-2" data-role="subtitle">
+      <p class="line-clamp-2" data-role="subtitle">
         <%= @notification.subtitle %>
       </p>
-      <p class="text-sm mt-1.5">
+      <p class="mt-1.5">
         <%= helpers.local_time_ago(@notification.created_at) %>
       </p>
     </div>

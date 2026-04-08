@@ -2,8 +2,8 @@
 @layer utilities {
   .theme-twilight {
     /* PRIMARY (Hue: 340, Chroma: 0.14) */
-    --color-primary-50: oklch(0.98 0.05600000000000001 340);
-    --color-primary-100: oklch(0.95 0.05600000000000001 340);
+    --color-primary-50: oklch(0.99 0.014 340);
+    --color-primary-100: oklch(0.96 0.028 340);
     --color-primary-200: oklch(0.9 0.14 340);
     --color-primary-300: oklch(0.82 0.14 340);
     --color-primary-400: oklch(0.72 0.14 340);
@@ -11,11 +11,11 @@
     --color-primary-600: oklch(0.52 0.14 340);
     --color-primary-700: oklch(0.42 0.14 340);
     --color-primary-800: oklch(0.32 0.14 340);
-    --color-primary-900: oklch(0.22 0.098 340);
-    --color-primary-950: oklch(0.12 0.07 340);
+    --color-primary-900: oklch(0.22 0.084 340);
+    --color-primary-950: oklch(0.16 0.056 340);
     /* SECONDARY (Hue: 40, Chroma: 0.14) */
-    --color-secondary-50: oklch(0.98 0.05600000000000001 40);
-    --color-secondary-100: oklch(0.95 0.05600000000000001 40);
+    --color-secondary-50: oklch(0.99 0.014 40);
+    --color-secondary-100: oklch(0.96 0.028 40);
     --color-secondary-200: oklch(0.9 0.14 40);
     --color-secondary-300: oklch(0.82 0.14 40);
     --color-secondary-400: oklch(0.72 0.14 40);
@@ -23,8 +23,8 @@
     --color-secondary-600: oklch(0.52 0.14 40);
     --color-secondary-700: oklch(0.42 0.14 40);
     --color-secondary-800: oklch(0.32 0.14 40);
-    --color-secondary-900: oklch(0.22 0.098 40);
-    --color-secondary-950: oklch(0.12 0.07 40);
+    --color-secondary-900: oklch(0.22 0.084 40);
+    --color-secondary-950: oklch(0.16 0.056 40);
 
     /* SEMANTIC TEXT MAPPING */
     --color-text-heading-strong: var(--color-primary-900);

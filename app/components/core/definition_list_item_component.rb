@@ -1,7 +1,7 @@
 # app/components/core/definition_list_item_component.rb
 class Core::DefinitionListItemComponent < ApplicationViewComponent
   option :term
-  option :size, default: -> { :sm }
+  option :size, default: -> { :base }
   option :term_gap, default: -> { :sm }
 
   SIZE_STYLES = {

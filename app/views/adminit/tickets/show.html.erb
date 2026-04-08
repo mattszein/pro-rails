@@ -1,6 +1,6 @@
 <div class="w-full">
   <div class="flex justify-between items-center pb-2">
-    <%= link_to t("adminit.tickets.back_to_tickets"), adminit_tickets_path, class: "text-indigo-500" %>
+    <%= render(Core::LinkComponent.new(name: t("adminit.tickets.back_to_tickets"), url: adminit_tickets_path, style: :link)) %>
     <div class="flex gap-2 items-center px-4">
       <%= render(Core::LinkComponent.new(name: t("shared.common.edit"), url: edit_adminit_ticket_path(@ticket), style: :as_button, theme: :edit, size: :sm, html_options: {data: {turbo_frame: "modal"}})) %>
       <% if @ticket.assigned_id.nil? && allowed_to?(:take?, @ticket, with: Adminit::TicketPolicy) %>

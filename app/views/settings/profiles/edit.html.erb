@@ -22,6 +22,7 @@
       <% end %>
       <%= f.label :username, t("settings.profile_username") %>
       <%= f.text_field :username, placeholder: t("shared.placeholders.username") %>
+      <%= f.label :bio, t("settings.profile_bio") %>
       <%= f.text_area :bio, label: t("settings.profile_bio"), placeholder: t("settings.profile_bio_placeholder"), rows: 4, class: "flex-1 px-4 py-3 rounded-xl resize-none focus:ring-0 focus:border-transparent focus:outline-none w-full" %>
       <%= f.button t("settings.save_profile"), type: :submit, fullw: true %>
     <% end %>

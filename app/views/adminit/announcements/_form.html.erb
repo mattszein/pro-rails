@@ -15,12 +15,12 @@
   <%= form.label :title, t("shared.labels.title") %>
   <%= form.text_field :title, {placeholder: t("shared.placeholders.title"), autocomplete: "title", class: "w-full"} %>
   <div>
-    <%= form.label :rich_body, t("shared.labels.content"), class: "block text-sm font-medium mb-2" %>
+    <%= form.label :rich_body, t("shared.labels.content"), class: "block mb-2" %>
     <%= form.rich_text_area :rich_body %>
   </div>
   <%= form.date_time :scheduled_at, disabled: !announcement.scheduled_at_editable? %>
   <% if !announcement.scheduled_at_editable? %>
-    <p class="text-sm text-gray-500 mt-1"><%= t("adminit.announcements.scheduled_time_notice") %></p>
+    <p class="text-gray-500 mt-1"><%= t("adminit.announcements.scheduled_time_notice") %></p>
   <% end %>
   <div class="mt-6">
     <%= form.button t("adminit.announcements.save_draft"), {theme: :create, fullw: true} %>

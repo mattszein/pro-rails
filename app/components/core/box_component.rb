@@ -5,8 +5,8 @@ class Core::BoxComponent < ApplicationViewComponent
   option :classes, default: -> { "" }
 
   VARIANT_STYLES = {
-    primary: "bg-primary-50 dark:bg-primary-950 border border-primary-200 dark:border-primary-800 text-primary-900 dark:text-primary-100",
-    secondary: "bg-secondary-50 dark:bg-secondary-950 border border-secondary-200 dark:border-secondary-800 text-secondary-900 dark:text-secondary-100",
+    primary: "bg-primary-50/60 dark:bg-primary-950 border border-primary-200 dark:border-primary-800 text-primary-900 dark:text-primary-100",
+    secondary: "bg-secondary-50/60 dark:bg-secondary-950 border border-secondary-200 dark:border-secondary-800 text-secondary-900 dark:text-secondary-100",
     info: "bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 text-blue-900 dark:text-blue-100",
     success: "bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-100",
     warning: "bg-amber-50 dark:bg-emerald-950 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-100",
