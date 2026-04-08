@@ -10,9 +10,10 @@
       </ul>
     </div>
   <% end %>
-    <%= form.text_field :title, {autofocus: true, required: true, placeholder: " ", autocomplete: "title", label: t("shared.labels.title"), class: "w-full"} %>
+    <%= form.label :title, t("shared.labels.title") %>
+    <%= form.text_field :title, {autofocus: true, required: true, placeholder: t("shared.placeholders.title"), autocomplete: "title", class: "w-full"} %>
     <div class="mt-6">
-    <%= form.label :description, class: "sr-only" %>
+    <%= form.label :description %>
     <%= form.text_area :description, rows: 4, placeholder: t("support.tickets.description_placeholder"), class: "w-full mt-4" %>
     </div>
     <div class="mt-6">

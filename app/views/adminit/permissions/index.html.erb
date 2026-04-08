@@ -2,8 +2,8 @@
   <div class="flex justify-between items-center pb-2">
     <h1 class="text-xl font-semibold">Permissions</h1>
   </div>
-  <%= render Core::CardComponent.new(padding: :none) do %>
-    <div class="flex p-4 gap-4">
+  <%= render Core::CardComponent.new do %>
+    <div class="flex">
       <%= render Core::TableComponent.new(rows: @permissions, columns: [{label: "Policy"}, {label: "Roles"}]) do |table| %>
         <% @permissions.each_with_index do |permission, index| %>
           <%= render "permission_row", permission: permission, roles: @roles, index: index %>

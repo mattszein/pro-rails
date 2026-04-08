@@ -47,6 +47,10 @@ en:
       tickets_assigned: "Tickets Assigned"
       username: "Username"
       bio: "Bio"
+    placeholders:
+      title: "Enter a title"
+      reference: "Enter a reference"
+      username: "Enter your username"
     buttons:
       publish: "Publish"
       stop_publish: "Stop Publish"

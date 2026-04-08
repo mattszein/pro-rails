@@ -2,14 +2,77 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 @layer base {
-  .font-inter, .font-default { font-family: 'Inter', system-ui, sans-serif; }
-  .font-plus-jakarta { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
-  .font-space-grotesk { font-family: 'Space Grotesk', monospace, sans-serif; }
-  .font-outfit { font-family: 'Outfit', system-ui, sans-serif; }
-  .font-bricolage { font-family: 'Bricolage Grotesque', system-ui, sans-serif; }
-  .font-google-sans-code { font-family: 'Google Sans Code', monospace, sans-serif; }
-  .font-orbitron { font-family: 'Orbitron', system-ui, sans-serif; }
-  .font-manrope { font-family: 'Manrope', system-ui, sans-serif; }
+  .font-inter, .font-default { 
+    font-family: 'Inter', system-ui, sans-serif; 
+    --tracking-h1: -0.02em;
+    --tracking-h2: -0.015em;
+    --lh-heading: 1.1;
+    --size-p: 1rem;
+    --lh-p: 1.6;
+  }
+  
+  .font-lora { 
+    font-family: 'Lora', serif; 
+    --tracking-h1: -0.01em;
+    --tracking-h2: normal;
+    --lh-heading: 1.2;
+    --size-p: 1.0625rem;
+    --lh-p: 1.7; 
+  }
+  
+  .font-space-grotesk { 
+    font-family: 'Space Grotesk', monospace, sans-serif; 
+    --tracking-h1: -0.03em;
+    --tracking-h2: -0.02em;
+    --lh-heading: 1.05;
+    --size-p: 1.0625rem;
+    --lh-p: 1.5;
+  }
+  
+  .font-outfit { 
+    font-family: 'Outfit', system-ui, sans-serif; 
+    --tracking-h1: -0.01em;
+    --tracking-h2: normal;
+    --lh-heading: 1.1;
+    --size-p: 1.0625rem;
+    --lh-p: 1.6;
+  }
+
+  .font-jost { 
+    font-family: 'Jost', system-ui, sans-serif; 
+    --tracking-h1: -0.01em;
+    --tracking-h2: normal;
+    --lh-heading: 1.15;
+    --size-p: 1.125rem;
+    --lh-p: 1.65;
+  }
+
+  .font-google-sans-code { 
+    font-family: 'Google Sans Code', monospace, sans-serif; 
+    --tracking-h1: normal;
+    --tracking-h2: normal;
+    --lh-heading: 1.2;
+    --size-p: 0.9375rem;
+    --lh-p: 1.7;
+  }
+  
+  .font-orbitron { 
+    font-family: 'Orbitron', system-ui, sans-serif; 
+    --tracking-h1: 0.02em;
+    --tracking-h2: 0.01em;
+    --lh-heading: 1.2;
+    --size-p: 1rem;
+    --lh-p: 1.6;
+  }
+
+  .font-chakra-petch { 
+    font-family: 'Chakra Petch', system-ui, sans-serif; 
+    --tracking-h1: 0.02em; /* Títulos más espaciados para look tech */
+    --tracking-h2: 0.01em;
+    --lh-heading: 1.2;
+    --size-p: 1.125rem; /* Párrafos más grandes para mejor legibilidad */
+    --lh-p: 1.7;
+  }
 
   .dark {
     --color-default: var(--color-zinc-950);
@@ -19,53 +82,57 @@
   h1 {
     font-size: 2.5rem;
     font-weight: 700;
-    color: var(--color-text-heading-strong); /* Dynamic */
+    line-height: var(--lh-heading, 1.1);
+    letter-spacing: var(--tracking-h1, normal);
+    color: var(--color-text-heading-strong);
   }
   
   h2 {
     font-size: 2.25rem;
     font-weight: 700;
-    color: var(--color-text-heading-soft); /* Dynamic */
+    line-height: var(--lh-heading, 1.2);
+    letter-spacing: var(--tracking-h2, normal);
+    color: var(--color-text-heading-soft);
   }
   
   h3 {
     font-size: 1.875rem;
     font-weight: 600;
-    color: var(--color-text-heading-soft); /* Dynamic */
+    line-height: var(--lh-heading, 1.2);
+    letter-spacing: var(--tracking-h2, normal);
+    color: var(--color-text-heading-soft);
   }
   
   h4 {
-
     font-size: 1.5rem;
     font-weight: 600;
-    color: var(--color-text-body-strong); /* Dynamic */
+    color: var(--color-text-body-strong);
   }
   
   h5 {
-
     font-size: 1.25rem;
     font-weight: 500;
-    color: var(--color-text-body-strong); /* Dynamic */
+    color: var(--color-text-body-strong);
   }
   
   h6 {
     font-size: 1.125rem;
     font-weight: 500;
-    color: var(--color-text-body-strong); /* Dynamic */
+    color: var(--color-text-body-strong);
   }
   
   p {
-    font-size: 1.125rem;
-    line-height: 1.625;
-    color: var(--color-text-body); /* Dynamic */
+    font-size: var(--size-p, 1rem);
+    line-height: var(--lh-p, 1.625);
+    color: var(--color-text-body);
   }
 
   td {
-    color: var(--color-text-body); /* Dynamic */
+    color: var(--color-text-body);
   }
 
   label {
-    color: var(--color-text-body); /* Dynamic */
+    color: var(--color-text-body);
   }
 }
 

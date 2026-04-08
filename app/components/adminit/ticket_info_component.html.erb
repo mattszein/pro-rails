@@ -1,11 +1,11 @@
 <div class="flex flex-col">
   <div class="flex items-center gap-4 mb-4">
     <%= helpers.icon "support", {classes: "h-8 dark:text-white"} %>
-    <h1 class="font-bold"><%= t("support.tickets.ticket_number", id: ticket.id) %></h1>
+    <h3><%= t("support.tickets.ticket_number", id: ticket.id) %></h3>
     <%= render(Core::BadgeComponent.new(label: t("enums.ticket.status.#{ticket.status}"), theme: status_theme, icon: "info", size: :md)) %>
   </div>
   <%= render Core::BoxComponent.new do %>
-    <%= render Core::DefinitionListComponent.new(variant: :info, gap: :sm) do |dl| %>
+    <%= render Core::DefinitionListComponent.new(gap: :sm) do |dl| %>
       <% dl.with_item(term: t("shared.labels.title")) do %>
         <%= ticket.title %>
       <% end %>

@@ -3,7 +3,7 @@
   <div class="flex space-x-2">
     <%= render(Core::CardComponent.new(classes: "basis-1/2 flex flex-col overflow-y-auto space-y-4")) do %>
       <%= render Adminit::TicketInfoComponent.new(ticket: ticket) %>
-      <h3 class="font-bold leading-tight">
+      <h3 class="leading-tight">
         <%= ticket.title %>
       </h3>
       <p class="leading-relaxed">
@@ -21,7 +21,7 @@
           <% if @notes.any? %>
             <%= render Adminit::Tickets::NoteComponent.with_collection(@notes, as: :note) %>
           <% else %>
-            <p class="text-sm text-slate-500 italic text-center py-4"><%= t("adminit.tickets.no_notes") %></p>
+            <p class="text-slate-500 italic text-center py-4"><%= t("adminit.tickets.no_notes") %></p>
           <% end %>
         </div>
       </div>

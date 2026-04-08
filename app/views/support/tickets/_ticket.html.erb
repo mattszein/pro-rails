@@ -1,13 +1,13 @@
 <div id="<%= dom_id ticket %>" class="space-y-4">
   <!-- Header -->
-  <%= render(Core::CardComponent.new(variant: :glass, glow: true, classes: "space-y-4")) do %>
+  <%= render(Core::CardComponent.new(classes: "space-y-4")) do %>
     <div class="flex items-center gap-4">
       <%= icon "support", {classes: "h-8"} %>
       <h1><%= t("support.tickets.ticket_number", id: ticket.id) %> - <%= ticket.title %></h1>
       <%= render(Core::BadgeComponent.new(label: t("enums.ticket.status.#{ticket.status}"), theme: ticket_status_theme(ticket.status), icon: "info", size: :md)) %>
     </div>
     <%= render Core::BoxComponent.new do %>
-      <%= render Core::DefinitionListComponent.new(variant: :info, gap: :sm) do |dl| %>
+      <%= render Core::DefinitionListComponent.new(gap: :sm) do |dl| %>
         <% dl.with_item(term: t("shared.labels.category")) do %>
           <%= t("enums.ticket.category.#{ticket.category}") %>
         <% end %>
@@ -22,7 +22,7 @@
   <% end %>
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
     <div class="lg:col-span-2 space-y-6">
-      <%= render(Core::CardComponent.new(variant: :glass, glow: true, classes: "space-y-4")) do %>
+      <%= render(Core::CardComponent.new(classes: "space-y-4")) do %>
           <h2 class="text-2xl font-bold leading-tight">
             <%= ticket.title %>
           </h2>
@@ -31,12 +31,12 @@
           </p>
         </div>
       <% end %>
-      <%= render(Core::CardComponent.new(variant: :glass, glow: true, classes: "space-y-4")) do %>
+      <%= render(Core::CardComponent.new(classes: "space-y-4")) do %>
         <%= render Support::AttachmentsComponent.new(ticket: ticket, show_upload_form: true) %>
       <% end %>
     </div>
 
-    <%= render(Core::CardComponent.new(variant: :glass, glow: true, classes: "space-y-4")) do %>
+    <%= render(Core::CardComponent.new(classes: "space-y-4")) do %>
       <%= render Support::ConversationComponent.new(
             conversation: @conversation,
             messages: @messages

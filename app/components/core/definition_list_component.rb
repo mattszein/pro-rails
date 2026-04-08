@@ -2,13 +2,15 @@
 class Core::DefinitionListComponent < ApplicationViewComponent
   renders_many :items, Core::DefinitionListItemComponent
 
-  option :variant, default: -> { :default }
+  option :variant, default: -> { :primary }
   option :gap, default: -> { :md }
   option :layout, default: -> { :stacked }
   option :classes, default: -> { "" }
 
   VARIANT_STYLES = {
     default: "text-gray-900 dark:text-gray-100",
+    primary: "text-primary-900 dark:text-primary-100",
+    secondary: "text-secondary-900 dark:text-secondary-100",
     info: "text-blue-900 dark:text-blue-100",
     success: "text-emerald-900 dark:text-emerald-100",
     warning: "text-amber-900 dark:text-amber-100",

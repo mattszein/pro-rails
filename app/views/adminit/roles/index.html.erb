@@ -4,8 +4,6 @@
   </div>
 
   <%= render Core::CardComponent.new do %>
-    <div class="flex p-4 gap-4">
       <%= render Core::TableComponent.new(rows: @roles, columns: roles_columns) %>
-    </div>
   <% end %>
 </div>
