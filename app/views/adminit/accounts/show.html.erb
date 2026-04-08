@@ -48,7 +48,7 @@
     </div>
     <%= render(Core::CardComponent.new(classes: "space-y-4")) do %>
       <h2 class="font-semibold"><%= t("adminit.accounts.activity") %></h2>
-      <%= render Core::BoxComponent.new() do %>
+      <%= render Core::BoxComponent.new do %>
         <%= render Core::DefinitionListComponent.new(gap: :sm) do |dl| %>
           <% dl.with_item(term: t("shared.labels.tickets_created")) do %>
             <%= @tickets_created_count %>

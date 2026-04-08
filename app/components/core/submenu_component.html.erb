@@ -1,10 +1,10 @@
 <div class="flex border-b border-primary-300 mb-8" role="group">
   <% @sections.each do |section| %>
     <%= link_to section.path, class: link_classes(section) do %>
-    <%= section.name %>
-    <% if active?(section) %>
-      <span class="absolute bottom-[-1px] left-0 w-full h-[1px] bg-secondary-300 dark:bg-secondary-300 shadow-secondary-400 dark:shadow-secondary-200 shadow-[0_0_4px_var(--tw-shadow-color)]"></span>
-    <% end %>
+      <%= section.name %>
+      <% if active?(section) %>
+        <span class="absolute bottom-[-1px] left-0 w-full h-[1px] bg-secondary-300 dark:bg-secondary-300 shadow-secondary-400 dark:shadow-secondary-200 shadow-[0_0_4px_var(--tw-shadow-color)]"></span>
+      <% end %>
     <% end %>
   <% end %>
-  </div>
+</div>

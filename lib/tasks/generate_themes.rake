@@ -3,7 +3,7 @@ namespace :themes do
   task generate: :environment do
     def generate_scale(name, hue, chroma)
       css = []
-      
+
       hue_adjustment = case hue
       when 60..120 then 0.05
       when 180..240 then -0.03
@@ -42,7 +42,7 @@ namespace :themes do
 
         css << "    --color-#{name}-#{shade}: oklch(#{safe_lightness} #{safe_chroma} #{hue});"
       end
-      
+
       css.join("\n")
     end
 

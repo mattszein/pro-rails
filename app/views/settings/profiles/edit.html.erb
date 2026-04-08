@@ -17,7 +17,7 @@
       <%= render Core::BoxComponent.new(variant: :primary, classes: "text-center") do %>
         <div data-controller="click-forwarder" class="flex flex-col items-center gap-4">
           <%= render Core::AvatarComponent.new(profile: @profile, size: :xl, editable: true) %>
-          <%= f.file_field :avatar, label: t("settings.choose_profile_photo"), data: { click_forwarder_target: "receiver" } %>
+          <%= f.file_field :avatar, label: t("settings.choose_profile_photo"), data: {click_forwarder_target: "receiver"} %>
         </div>
       <% end %>
       <%= f.label :username, t("settings.profile_username") %>

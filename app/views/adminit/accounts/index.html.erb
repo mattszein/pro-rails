@@ -2,7 +2,7 @@
   <div class="flex justify-between items-center pb-2">
     <h1 class="text-xl font-semibold"><%= t("adminit.navigation.accounts") %></h1>
   </div>
-  <%= render Core::CardComponent.new() do %>
+  <%= render Core::CardComponent.new do %>
     <div class="flex">
       <%= render Core::TableComponent.new(rows: @accounts, columns: accounts_columns) %>
     </div>

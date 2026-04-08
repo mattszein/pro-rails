@@ -10,7 +10,7 @@ class Settings::FontItemComponent < ApplicationViewComponent
     elegant: " group-hover:bg-amber-600/50 group-[.selected]:bg-amber-500/20 group-[.selected]:ring-amber-500 ",
     code: " group-hover:bg-emerald-600/50 group-[.selected]:bg-emerald-500/20 group-[.selected]:ring-emerald-500 ",
     cyberpunk: " group-hover:bg-purple-600/50 group-[.selected]:bg-purple-500/20 group-[.selected]:ring-purple-500 ",
-    anime: " group-hover:bg-cyan-600/50 group-[.selected]:bg-cyan-500/20 group-[.selected]:ring-cyan-500 ",
+    anime: " group-hover:bg-cyan-600/50 group-[.selected]:bg-cyan-500/20 group-[.selected]:ring-cyan-500 "
   }
 
   def font_id

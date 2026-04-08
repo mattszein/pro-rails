@@ -9,7 +9,7 @@ class Core::CardComponent < ApplicationViewComponent
   VARIANT_STYLES = {
     default: "border border-primary-500/20 dark:border-primary-500/20 dark:shadow-primary-500/80 hover:shadow-primary-500/20 dark:hover:shadow-primary-500/20 focus-within:shadow-primary-500/10 dark:focus-within:shadow-primary-500/20",
     primary: "border border-primary-500/45 dark:border-primary-400/20 shadow-primary-500/8 dark:shadow-primary-400/15 hover:shadow-primary-500/15 dark:hover:shadow-primary-400/25",
-    secondary: "border border-secondary-500/15 dark:border-secondary-400/25 shadow-secondary-500/8 dark:shadow-secondary-400/15 hover:shadow-secondary-500/15 dark:hover:shadow-secondary-400/25",
+    secondary: "border border-secondary-500/15 dark:border-secondary-400/25 shadow-secondary-500/8 dark:shadow-secondary-400/15 hover:shadow-secondary-500/15 dark:hover:shadow-secondary-400/25"
   }.freeze
 
   PADDING_STYLES = {

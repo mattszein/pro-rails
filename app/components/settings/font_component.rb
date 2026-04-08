@@ -10,6 +10,6 @@ class Settings::FontComponent < ApplicationViewComponent
     Font.new(id: "jost", name: "Jost", category: "elegant", description_key: "jost"),
     Font.new(id: "google-sans-code", name: "Google Code", category: "code", description_key: "google_code"),
     Font.new(id: "orbitron", name: "Orbitron", category: "cyberpunk", description_key: "orbitron"),
-    Font.new(id: "chakra-petch", name: "Chakra Petch", category: "anime", description_key: "chakra_petch"),
+    Font.new(id: "chakra-petch", name: "Chakra Petch", category: "anime", description_key: "chakra_petch")
   ]
 end

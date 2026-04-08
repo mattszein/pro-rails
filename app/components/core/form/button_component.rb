@@ -81,9 +81,9 @@ class Core::Form::ButtonComponent < ApplicationViewComponent
   def html_class
     theme_config = THEME_MAPPINGS[@theme]
     class_names(
-      "relative overflow-hidden rounded border isolate", 
+      "relative overflow-hidden rounded border isolate",
       "font-medium text-center font-semibold inline-block",
-      "dark:hover:bg-default dark:focus:bg-default hover:shadow-md", 
+      "dark:hover:bg-default dark:focus:bg-default hover:shadow-md",
       "cursor-pointer select-none transition-all",
       theme_config[:base],
       theme_config[:text_base],
