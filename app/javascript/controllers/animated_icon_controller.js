@@ -4,12 +4,12 @@ import * as lock from "icons/lock"
 import * as connect from "icons/connect"
 import * as charts from "icons/charts"
 import * as sliders from "icons/sliders"
-import * as contrast from "icons/contrast"
+import * as grip from "icons/grip"
 import * as shield from "icons/shield"
 import * as layers from "icons/layers"
 import * as chat from "icons/chat"
 
-const REGISTRY = { lock, connect, charts, sliders, contrast, shield, layers, chat }
+const REGISTRY = { lock, connect, charts, sliders, grip, shield, layers, chat }
 
 export default class extends Controller {
   static values = { type: String }
