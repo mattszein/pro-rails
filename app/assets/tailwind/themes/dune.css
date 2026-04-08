@@ -3,7 +3,7 @@
   .theme-dune {
     /* PRIMARY (Hue: 110, Chroma: 0.1) */
     --color-primary-50: oklch(0.99 0.01 110);
-    --color-primary-100: oklch(1.01 0.02 110);
+    --color-primary-100: oklch(1.0 0.02 110);
     --color-primary-200: oklch(0.95 0.1 110);
     --color-primary-300: oklch(0.87 0.1 110);
     --color-primary-400: oklch(0.77 0.1 110);

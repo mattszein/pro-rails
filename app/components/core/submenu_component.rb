@@ -8,7 +8,7 @@ class Core::SubmenuComponent < ApplicationViewComponent
 
   ACTIVE_STYLES = {
     true => "text-primary-600 dark:text-primary-400 font-bold",
-    false => "font-semi-bold text-primary-500 border-secondary-300 dark:text-primary-300 dark:border-secondary-500"
+    false => "font-semibold text-primary-500 border-secondary-300 dark:text-primary-300 dark:border-secondary-500"
   }.freeze
 
   def before_render

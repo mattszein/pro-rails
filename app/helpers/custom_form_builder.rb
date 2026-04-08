@@ -23,11 +23,11 @@ class CustomFormBuilder < ActionView::Helpers::FormBuilder
   end
 
   def number_field(method, options = {})
-    render_component("form::NumberField", @object_name, method, objectify_options(options.merge(input_type: :number)))
+    render_component("form::NumberField", @object_name, method, objectify_options(options))
   end
 
   def password_field(method, options = {})
-    render_component("form::PasswordField", @object_name, method, objectify_options(options.merge(input_type: :password)))
+    render_component("form::PasswordField", @object_name, method, objectify_options(options))
   end
 
   def select(method, choices = nil, options = {}, html_options = {}, &block)
@@ -47,7 +47,7 @@ class CustomFormBuilder < ActionView::Helpers::FormBuilder
   end
 
   def text_field(method, options = {})
-    render_component("form::TextField", @object_name, method, objectify_options(options.merge(input_type: :text)))
+    render_component("form::TextField", @object_name, method, objectify_options(options))
   end
 
   def toggle(method, options = {}, checked_value = "1", unchecked_value = "0")

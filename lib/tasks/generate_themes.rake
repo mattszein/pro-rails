@@ -37,7 +37,7 @@ namespace :themes do
         else chroma
         end
 
-        safe_lightness = lightness.round(4)
+        safe_lightness = lightness.clamp(0.0, 1.0).round(4)
         safe_chroma = adjusted_chroma.round(4)
 
         css << "    --color-#{name}-#{shade}: oklch(#{safe_lightness} #{safe_chroma} #{hue});"

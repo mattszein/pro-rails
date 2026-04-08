@@ -1,5 +1,5 @@
 @theme {
-  --color-default: theme(--color-slate-50);
+  --color-default: theme(colors.slate.50);
   --color-highlight:  theme(colors.white);
 
   --color-text-heading-strong: theme(colors.gray.900); /* H1 */

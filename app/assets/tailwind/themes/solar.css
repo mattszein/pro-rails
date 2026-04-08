@@ -3,7 +3,7 @@
   .theme-solar {
     /* PRIMARY (Hue: 75, Chroma: 0.2) */
     --color-primary-50: oklch(0.99 0.02 75);
-    --color-primary-100: oklch(1.01 0.04 75);
+    --color-primary-100: oklch(1.0 0.04 75);
     --color-primary-200: oklch(0.95 0.2 75);
     --color-primary-300: oklch(0.87 0.2 75);
     --color-primary-400: oklch(0.77 0.2 75);

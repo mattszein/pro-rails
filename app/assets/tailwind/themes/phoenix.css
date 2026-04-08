@@ -15,7 +15,7 @@
     --color-primary-950: oklch(0.16 0.096 25);
     /* SECONDARY (Hue: 60, Chroma: 0.22) */
     --color-secondary-50: oklch(0.99 0.022 60);
-    --color-secondary-100: oklch(1.01 0.044 60);
+    --color-secondary-100: oklch(1.0 0.044 60);
     --color-secondary-200: oklch(0.95 0.22 60);
     --color-secondary-300: oklch(0.87 0.22 60);
     --color-secondary-400: oklch(0.77 0.22 60);

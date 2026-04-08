@@ -48,7 +48,7 @@ describe "Authentication Routes", type: :request do
 
       it "shows validation error" do
         subject
-        expect(response.body).to match(/email.*required|can't be blank/i)
+        expect(response.body).to match(/invalid login|not a valid email/i)
       end
     end
 
