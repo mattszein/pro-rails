@@ -155,6 +155,7 @@
   --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   --animate-slide-in-right: slideInRight 0.4s ease-out;
   --animate-slide-out-right: slideOutRight 0.4s ease-in;
+  --animate-gradient-x: gradient-x 4s ease infinite;
 
   @keyframes fadeIn {
       0% { opacity: 0; }
@@ -193,6 +194,11 @@
       transform: translateX(100%);
       opacity: 0;
     }
+  }
+
+  @keyframes gradient-x {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
   }
 
 }

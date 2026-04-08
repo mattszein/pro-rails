@@ -1,21 +1,10 @@
 <% content_for(:title) { t("landing.page_title") } %>
-<% content_for :head do %>
-  <style>
-    @keyframes gradient-x {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-    }
-    .animate-gradient-x {
-      background-size: 200% auto;
-      animation: gradient-x 4s ease infinite;
-    }
-  </style>
-<% end %>
+<% content_for(:main_class) { "min-h-screen" } %>
 <div class="bg-[#f8f9fa] dark:bg-[#0f0f11] text-slate-900 dark:text-slate-200 transition-colors duration-300 selection:bg-[#c25044]/20 selection:text-[#c25044] dark:selection:text-[#e2a8a0]">
   <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 space-y-24 md:space-y-32">
     <section class="text-center max-w-3xl mx-auto">
       <div class="p-8 md:p-12 w-full rounded-2xl bg-white/90 dark:bg-[#1a1a1c]/90 backdrop-blur-md border border-slate-200 dark:border-[#222225] shadow-sm dark:shadow-none mb-8 transition-colors duration-300">
-        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 pb-2 text-transparent bg-clip-text bg-gradient-to-r from-[#8a3333] via-[#e25d4f] to-[#5a2323] dark:from-[#ffc4bc] dark:via-[#e2a8a0] dark:to-[#a86860] animate-gradient-x">
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 pb-2 text-transparent bg-clip-text bg-gradient-to-r from-[#8a3333] via-[#e25d4f] to-[#5a2323] dark:from-[#ffc4bc] dark:via-[#e2a8a0] dark:to-[#a86860] animate-gradient-x [background-size:200%_auto]">
           <%= t("landing.hero.title") %>
         </h1>
         <p class="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
