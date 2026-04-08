@@ -8,7 +8,7 @@
     </div>
 
     <%= render Core::BoxComponent.new do %>
-      <%= render Core::DefinitionListComponent.new(variant: :info, gap: :sm) do |dl| %>
+      <%= render Core::DefinitionListComponent.new(gap: :sm) do |dl| %>
         <% dl.with_item(term: t("shared.labels.reference")) do %>
           <%= announcement.reference %>
         <% end %>

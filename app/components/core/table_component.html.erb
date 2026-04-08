@@ -1,14 +1,14 @@
-<table class="min-w-full divide-y divide-gray-200 text-left">
+<table class="min-w-full divide-y divide-gray-300 dark:divide-gray-200 text-left">
   <thead>
-    <tr class="border-b border-gray-200">
+    <tr class="border-b border-secondary-400 dark:border-secondary-300">
       <% @columns.each do |col| %>
-        <th class="py-2 px-4 text-left text-xs text-gray-500 font-medium uppercase whitespace-nowrap">
+        <th class="py-2 px-4 text-left font-bold text-gray-500 dark:text-gray-200 uppercase whitespace-nowrap">
           <%= col[:label] %>
         </th>
       <% end %>
     </tr>
   </thead>
-  <tbody id="<%= tbody_id %>" class="text-sm divide-y divide-primary-300">
+  <tbody id="<%= tbody_id %>" class="text-sm divide-y divide-primary-400 dark:divide-primary-200">
     <% if content.present? %>
       <%= content %>
     <% else %>

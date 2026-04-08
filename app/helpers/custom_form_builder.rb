@@ -13,7 +13,7 @@ class CustomFormBuilder < ActionView::Helpers::FormBuilder
   end
 
   def label(method, text = nil, options = {}, &block)
-    default_classes = "block font-medium text-gray-700 dark:text-gray-400 mb-2"
+    default_classes = "block font-medium text-gray-700 dark:text-gray-200 mb-2"
     options[:class] = "#{default_classes} #{options[:class]}".strip
     super(method, text, options, &block)  
   end

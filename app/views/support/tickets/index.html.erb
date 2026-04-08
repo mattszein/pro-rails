@@ -1,8 +1,10 @@
-<div class="w-full">
-  <div class="flex justify-between items-center pb-2">
-    <h1 class="text-xl font-semibold"><%= t("support.tickets.title") %></h1>
-    <%= render(Core::LinkComponent.new(name: t("support.tickets.add_ticket"), url: new_support_ticket_path, style: :as_button, theme: :create, size: :sm, html_options: {data: {turbo_frame: "modal"}})) %>
-  </div>
+<div class="w-full space-y-2">
+  <%= render Core::CardComponent.new(padding: :sm) do %>
+    <div class="flex justify-between items-center">
+      <h1 class="text-xl font-semibold"><%= t("support.tickets.title") %></h1>
+      <%= render(Core::LinkComponent.new(name: t("support.tickets.add_ticket"), url: new_support_ticket_path, style: :as_button, theme: :create, size: :sm, html_options: {data: {turbo_frame: "modal"}})) %>
+    </div>
+  <% end %>
   <%= turbo_stream_from "tickets" %>
   <%= render Core::CardComponent.new(padding: :none) do %>
     <div class="flex p-4 gap-4">

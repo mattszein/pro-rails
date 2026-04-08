@@ -1,8 +1,7 @@
-<div class="container mx-auto px-4 py-8 max-w-7xl">
-  <div class="flex justify-between items-center pb-2">
-    <%= link_to t("support.tickets.back_to_tickets"), support_tickets_path, class: "text-indigo-500" %>
-  </div>
-
+<div class="container mx-auto px-4 py-8 space-y-2">
+    <div class="flex justify-between items-center pb-2">
+      <%= render(Core::LinkComponent.new(name: t("support.tickets.back_to_tickets"), url: support_tickets_path, style: :as_button, theme: :primary, size: :sm)) %>
+    </div>
   <%= turbo_stream_from dom_id @ticket %>
   <%= render "support/tickets/ticket", ticket: @ticket %>
 </div>

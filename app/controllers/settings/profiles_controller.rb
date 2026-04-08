@@ -4,7 +4,7 @@ module Settings
     verify_authorized
 
     def edit
-      authorize! @profile
+      authorize! @profile, with: Settings::ProfilePolicy
     end
 
     def update

@@ -5,7 +5,7 @@
     <%= render(Core::BadgeComponent.new(label: t("enums.ticket.status.#{ticket.status}"), theme: status_theme, icon: "info", size: :md)) %>
   </div>
   <%= render Core::BoxComponent.new do %>
-    <%= render Core::DefinitionListComponent.new(variant: :info, gap: :sm) do |dl| %>
+    <%= render Core::DefinitionListComponent.new(gap: :sm) do |dl| %>
       <% dl.with_item(term: t("shared.labels.title")) do %>
         <%= ticket.title %>
       <% end %>
