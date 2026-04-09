@@ -1,3 +1,11 @@
-<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7.75 4H19M7.75 4a2.25 2.25 0 0 1-4.5 0m4.5 0a2.25 2.25 0 0 0-4.5 0M1 4h2.25m13.5 6H19m-2.25 0a2.25 2.25 0 0 1-4.5 0m4.5 0a2.25 2.25 0 0 0-4.5 0M1 10h11.25m-4.5 6H19M7.75 16a2.25 2.25 0 0 1-4.5 0m4.5 0a2.25 2.25 0 0 0-4.5 0M1 16h2.25"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <line data-element="track-1a" x1="21" x2="14" y1="4" y2="4"/>
+  <line data-element="track-1b" x1="10" x2="3" y1="4" y2="4"/>
+  <line data-element="track-2a" x1="21" x2="12" y1="12" y2="12"/>
+  <line data-element="track-2b" x1="8" x2="3" y1="12" y2="12"/>
+  <line data-element="track-3a" x1="3" x2="12" y1="20" y2="20"/>
+  <line data-element="track-3b" x1="16" x2="21" y1="20" y2="20"/>
+  <line data-element="knob-1" x1="14" x2="14" y1="2" y2="6"/>
+  <line data-element="knob-2" x1="8" x2="8" y1="10" y2="14"/>
+  <line data-element="knob-3" x1="16" x2="16" y1="18" y2="22"/>
 </svg>

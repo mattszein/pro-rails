@@ -8,8 +8,35 @@ import * as grip from "icons/grip"
 import * as shield from "icons/shield"
 import * as layers from "icons/layers"
 import * as chat from "icons/chat"
+import * as home from "icons/home"
+import * as logout from "icons/logout"
+import * as sunmoon from "icons/sunmoon"
+import * as support from "icons/support"
+import * as accounts from "icons/accounts"
+import * as bookText from "icons/book-text"
+import * as gavel from "icons/gavel"
+import * as idCard from "icons/id-card"
+import * as back from "icons/back"
 
-const REGISTRY = { lock, connect, charts, sliders, grip, shield, layers, chat }
+const REGISTRY = {
+  lock,
+  connect,
+  charts,
+  sliders,
+  grip,
+  shield,
+  layers,
+  chat,
+  home,
+  logout,
+  sunmoon,
+  support,
+  accounts,
+  "book-text": bookText,
+  gavel,
+  "id-card": idCard,
+  back
+}
 
 export default class extends Controller {
   static values = { type: String }
