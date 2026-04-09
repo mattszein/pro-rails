@@ -6,6 +6,7 @@ class Core::SidebarLinkComponent < ApplicationViewComponent
   option :icon_name
   option :active_paths, default: -> { [] }
   option :html_options, default: -> { {} }
+  option :animated_type, default: -> { nil }
 
   ICON_STYLES = {
     true => "text-secondary-500 dark:text-secondary-500",
@@ -16,6 +17,8 @@ class Core::SidebarLinkComponent < ApplicationViewComponent
     true => "text-primary-500 dark:text-primary-400 border-b-2 border-secondary-400",
     false => "text-gray-600 dark:text-white"
   }.freeze
+
+  ANIMATED_ICON_ACTION = "mouseenter->animated-icon#start mouseleave->animated-icon#stop"
 
   def link_classes
     "flex gap-2 items-center p-3 hover:cursor-pointer rounded-sm w-full group/link"
@@ -30,10 +33,23 @@ class Core::SidebarLinkComponent < ApplicationViewComponent
   end
 
   def link_html_options
-    {class: link_classes}.deep_merge(html_options)
+    merged = {class: link_classes}.deep_merge(html_options)
+    return merged unless animated_type
+
+    existing_data = merged[:data] || {}
+    merged[:data] = existing_data.merge(
+      controller: join_tokens(existing_data[:controller], "animated-icon"),
+      animated_icon_type_value: animated_type,
+      action: join_tokens(existing_data[:action], ANIMATED_ICON_ACTION)
+    )
+    merged
   end
 
   private
+
+  def join_tokens(existing, added)
+    [existing, added].compact.reject(&:empty?).join(" ")
+  end
 
   def active?
     return false if active_paths.empty?

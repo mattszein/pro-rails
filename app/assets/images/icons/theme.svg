@@ -1,5 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-  <g fill="currentColor"><path d="M12 16a4 4 0 0 0 0-8z"/>
-    <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10s10-4.477 10-10S17.523 2 12 2m0 2v4a4 4 0 1 0 0 8v4a8 8 0 1 0 0-16" clip-rule="evenodd"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <g data-element="sun">
+    <path d="M12 8a2.83 2.83 0 0 0 4 4 4 4 0 1 1-4-4"/>
   </g>
+  <path data-element="ray-1" d="M12 2v2"/>
+  <path data-element="ray-2" d="M12 20v2"/>
+  <path data-element="ray-3" d="m4.9 4.9 1.4 1.4"/>
+  <path data-element="ray-4" d="m17.7 17.7 1.4 1.4"/>
+  <path data-element="ray-5" d="M2 12h2"/>
+  <path data-element="ray-6" d="M20 12h2"/>
+  <path data-element="ray-7" d="m6.3 17.7-1.4 1.4"/>
+  <path data-element="ray-8" d="m19.1 4.9-1.4 1.4"/>
 </svg>
