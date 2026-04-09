@@ -18,7 +18,7 @@ class Core::SidebarLinkComponent < ApplicationViewComponent
     false => "text-gray-600 dark:text-white"
   }.freeze
 
-  ANIMATED_ICON_ACTION = "mouseenter->animated-icon#start mouseleave->animated-icon#stop"
+  ANIMATED_ICON_ACTION = "mouseenter->animated-icon#start mouseleave->animated-icon#stop focusin->animated-icon#start focusout->animated-icon#stop"
 
   def link_classes
     "flex gap-2 items-center p-3 hover:cursor-pointer rounded-sm w-full group/link"
