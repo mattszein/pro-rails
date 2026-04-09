@@ -6,7 +6,7 @@ class Core::SidebarLinkComponent < ApplicationViewComponent
   option :icon_name
   option :active_paths, default: -> { [] }
   option :html_options, default: -> { {} }
-  option :animated_type, default: -> { nil }
+  option :animated_type, default: -> {}
 
   ICON_STYLES = {
     true => "text-secondary-500 dark:text-secondary-500",
