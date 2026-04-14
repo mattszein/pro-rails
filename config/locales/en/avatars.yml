@@ -1,0 +1,296 @@
+en:
+  avatars:
+    profile:
+      generate_with_ai: "Generate with AI"
+      gallery: "My Avatars"
+
+    gallery:
+      title: "Avatar Gallery"
+      subtitle: "All your avatars — choose your active look"
+      new_avatar: "New Avatar"
+      empty: "No avatars yet"
+      create_first: "Create your first avatar"
+      item_alt: "Avatar"
+      active: "Active"
+      use: "Use"
+      evolve: "Evolve"
+      hide: "Hide from gallery"
+      show: "Show in gallery"
+      back: "Back to gallery"
+
+    new:
+      title: "Create Avatar"
+      subtitle: "Choose how you want to create your avatar"
+      guided:
+        title: "Guided Path"
+        description: "Answer a few creative questions and we'll generate a unique avatar tailored to your style."
+        steps: "6 steps · ~3 minutes"
+      freeform:
+        title: "Freeform Path"
+        description: "Describe your vision in your own words, then explore a mood board to refine it."
+        steps: "5 steps · ~5 minutes"
+      or_upload: "Or upload a photo"
+      upload_photo: "Upload photo"
+
+    upload:
+      success: "Avatar uploaded and set as active."
+
+    select:
+      success: "Avatar set as active."
+
+    evolve:
+      success: "Avatar cloned — customize and regenerate."
+
+    wizard:
+      review: "Review & Forge"
+      review_title: "Ready to Forge?"
+      review_subtitle: "Your creative choices will be assembled into a prompt and sent to the AI"
+      back_to_edit: "Back to edit"
+      forge_avatar: "Forge Avatar"
+      forge_confirm: "This will use one of your daily generation credits. Continue?"
+      model_label: "Generation Model"
+      select_one: "Please select an option before continuing."
+
+    in_progress:
+      title: "In Progress"
+      subtitle: "Avatars currently being created or that need attention"
+      path_label: "%{path} path · %{date}"
+      path:
+        guided: "Guided"
+        freeform: "Freeform"
+      status:
+        generating: "Generating"
+        failed: "Failed"
+        draft: "Draft"
+      action:
+        view: "View"
+        retry: "Retry"
+        continue: "Continue"
+
+    generation:
+      forging: "Forging your avatar..."
+      forging_subtitle: "The AI is crafting your unique avatar. This may take a moment."
+      failed: "Generation failed"
+      try_again: "Try Again"
+
+    result:
+      title: "Your Avatar is Ready!"
+      subtitle: "Accept it as your active avatar or explore other options"
+      preview_alt: "Generated avatar"
+      use_this: "Use This Avatar"
+      evolve: "Evolve This"
+      show_dna: "How was this made?"
+
+    dna:
+      style: "Style"
+      archetype: "Archetype"
+      color_mood: "Color mood"
+      elements: "Elements"
+      mood: "Mood"
+      background: "Background"
+      spark_text: "Your idea"
+
+    errors:
+      invalid_content_type: "must be a JPEG, PNG, GIF, or WebP image"
+      file_too_large: "must be less than 10MB"
+      rate_limit_exceeded: "You've reached your daily generation limit. Try again tomorrow."
+      not_selectable: "This avatar cannot be selected — it must be completed first."
+      not_evolvable: "Only completed generated avatars can be evolved."
+      invalid_method: "Invalid creation method. Please choose guided or freeform."
+
+    styles:
+      pixel_art: "Pixel Art"
+      watercolor: "Watercolor"
+      geometric: "Geometric"
+      anime: "Anime / Manga"
+      3d_clay: "3D Clay"
+      line_art: "Line Art"
+      collage: "Collage"
+      surrealist: "Surrealist"
+      retro_sci_fi: "Retro Sci-Fi"
+      vaporwave: "Vaporwave"
+      impressionist: "Impressionist"
+      gothic: "Gothic"
+      cyberpunk: "Cyberpunk"
+      fantasy: "Fantasy"
+
+    guided:
+      step1:
+        title: "Choose Your Style Universe"
+        subtitle: "What aesthetic speaks to you?"
+        options:
+          pixel_art:
+            label: "Pixel Art / Retro"
+            description: "8-bit nostalgia"
+          watercolor:
+            label: "Watercolor / Painterly"
+            description: "Soft and dreamy"
+          geometric:
+            label: "Geometric / Abstract"
+            description: "Bold shapes"
+          anime:
+            label: "Anime / Manga"
+            description: "Japanese inspired"
+          3d_clay:
+            label: "3D Render / Clay"
+            description: "Smooth and tactile"
+          line_art:
+            label: "Line Art / Minimalist"
+            description: "Clean and elegant"
+          collage:
+            label: "Collage / Mixed Media"
+            description: "Layered textures"
+          surrealist:
+            label: "Surrealist / Dreamlike"
+            description: "Fantastical"
+
+      step2:
+        title: "Your Archetype"
+        subtitle: "What energy does this avatar project?"
+        options:
+          explorer:
+            label: "The Explorer"
+            description: "Curious and adventurous"
+          builder:
+            label: "The Builder"
+            description: "Creative and determined"
+          guardian:
+            label: "The Guardian"
+            description: "Strong and dependable"
+          trickster:
+            label: "The Trickster"
+            description: "Clever and playful"
+          sage:
+            label: "The Sage"
+            description: "Wise and mysterious"
+          spark:
+            label: "The Spark"
+            description: "Energetic and inspiring"
+
+      step3:
+        title: "Color Mood"
+        subtitle: "Pick a palette that feels right"
+        options:
+          warm_sunset:
+            label: "Warm Sunset"
+            colors: ["#FF6B35", "#F7931E", "#FFD700"]
+          deep_ocean:
+            label: "Deep Ocean"
+            colors: ["#003366", "#006994", "#40E0D0"]
+          neon_night:
+            label: "Neon Night"
+            colors: ["#FF007F", "#7F00FF", "#00FFFF"]
+          earth_moss:
+            label: "Earth & Moss"
+            colors: ["#4A5240", "#8B7355", "#D4C5A9"]
+          monochrome:
+            label: "Monochrome"
+            colors: ["#000000", "#808080", "#FFFFFF"]
+          candy_pop:
+            label: "Candy Pop"
+            colors: ["#FFB3C6", "#A8DADC", "#FFD166"]
+
+      step4:
+        title: "Elements & Symbols"
+        subtitle: "What should appear? Pick 2-3"
+        options:
+          fox: { label: "Fox" }
+          wolf: { label: "Wolf" }
+          cat: { label: "Cat" }
+          owl: { label: "Owl" }
+          dragon: { label: "Dragon" }
+          phoenix: { label: "Phoenix" }
+          flowers: { label: "Flowers" }
+          mountains: { label: "Mountains" }
+          ocean: { label: "Ocean" }
+          crystals: { label: "Crystals" }
+          lightning: { label: "Lightning" }
+          stars: { label: "Stars" }
+          gears: { label: "Gears" }
+          books: { label: "Books" }
+          music: { label: "Music" }
+          compass: { label: "Compass" }
+          spirals: { label: "Spirals" }
+          triangles: { label: "Triangles" }
+
+      step5:
+        title: "Mood & Atmosphere"
+        subtitle: "The feeling you want to evoke"
+        options:
+          calm:
+            label: "Calm & Serene"
+            description: "Peaceful energy"
+          bold:
+            label: "Bold & Powerful"
+            description: "Commanding presence"
+          mysterious:
+            label: "Mysterious & Dark"
+            description: "Enigmatic allure"
+          whimsical:
+            label: "Whimsical & Fun"
+            description: "Playful spirit"
+          futuristic:
+            label: "Futuristic & Tech"
+            description: "Digital frontier"
+          nostalgic:
+            label: "Nostalgic & Vintage"
+            description: "Timeless warmth"
+
+      step6:
+        title: "Background"
+        subtitle: "Set the scene"
+        options:
+          transparent:
+            label: "None / Transparent"
+            description: "Clean cutout"
+          gradient:
+            label: "Gradient"
+            description: "Smooth blend"
+          scene:
+            label: "Scene"
+            description: "Full environment"
+          pattern:
+            label: "Pattern"
+            description: "Repeating motif"
+
+    freeform:
+      text_model_label: "AI Model"
+      step1:
+        title: "The Spark"
+        subtitle: "Describe your ideal avatar in a few words"
+        placeholder: "e.g. a cosmic cat floating in space..."
+        hint: "Be as specific or abstract as you like (max 200 characters)"
+        examples_label: "Need inspiration?"
+        examples:
+          - "a cosmic cat floating in space"
+          - "something dark and geometric"
+          - "a forest spirit made of light"
+          - "a robot with a warm soul"
+          - "chaos and order in balance"
+
+      step2:
+        title: "Mood Board"
+        subtitle: "Tap the concepts that resonate with you"
+        generating: "Generating your mood board..."
+        select_hint: "Select 2-4 that feel right"
+
+      step3:
+        title: "Style Match"
+        subtitle: "Based on your selections, choose an art style"
+
+      step4:
+        title: "Remix Round"
+        subtitle: "Pick the concept interpretation that resonates most"
+        generating: "Generating concept descriptions..."
+
+      step5:
+        title: "Color & Polish"
+        subtitle: "Final touches before forging"
+        color_label: "Color preference"
+        background_label: "Background"
+        colors:
+          warm: "Warm"
+          cool: "Cool"
+          vibrant: "Vibrant"
+          muted: "Muted"
+          auto: "Auto"

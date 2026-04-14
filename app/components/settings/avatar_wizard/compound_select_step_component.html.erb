@@ -1,0 +1,44 @@
+<div class="space-y-6">
+  <%= render Settings::AvatarWizard::StepComponent.new(
+    step: config[:step], total: config[:total],
+    title: t("#{config[:i18n_key]}.title"),
+    subtitle: t("#{config[:i18n_key]}.subtitle", default: nil)
+  ) %>
+
+  <%= form_with url: settings_avatar_path(avatar),
+      method: :patch,
+      data: { turbo_frame: "avatar_wizard_step" } do |f| %>
+
+    <div class="space-y-4">
+      <% config[:sections].each do |section| %>
+        <div>
+          <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+            <%= t(section[:label_i18n]) %>
+          </p>
+          <div class="<%= section_grid_class(section) %>">
+            <% section_options(section).each do |key, option| %>
+              <% label_text = option.is_a?(Hash) ? option[:label] : option %>
+              <%= render Settings::AvatarWizard::OptionCardComponent.new(
+                name: "avatar[dna][#{section[:dna_field]}]",
+                value: key,
+                label: label_text,
+                selected: selected_for(section[:dna_field], key)
+              ) %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="flex justify-between mt-6">
+      <%= render(Core::LinkComponent.new(
+        name: t("shared.common.back"),
+        url: back_url,
+        style: :as_button,
+        theme: :secondary,
+        html_options: { data: { turbo_frame: "avatar_wizard_step" } }
+      )) %>
+      <%= f.button submit_label, type: :submit, class: "btn btn-primary" %>
+    </div>
+  <% end %>
+</div>

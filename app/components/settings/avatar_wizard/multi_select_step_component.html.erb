@@ -1,0 +1,52 @@
+<div class="space-y-6" <% if mood_board? %>data-controller="mood-board"<% end %>>
+  <%= render Settings::AvatarWizard::StepComponent.new(
+    step: config[:step], total: config[:total],
+    title: t("#{config[:i18n_key]}.title"),
+    subtitle: t("#{config[:i18n_key]}.subtitle", default: nil)
+  ) %>
+
+  <%= form_with url: settings_avatar_path(avatar),
+      method: :patch,
+      data: { turbo_frame: "avatar_wizard_step" } do |f| %>
+    <% if config[:next_step] %>
+      <%= f.hidden_field :next_step, value: config[:next_step], name: "next_step" %>
+    <% end %>
+
+    <% if mood_board? %>
+      <% if loading? %>
+        <%= helpers.turbo_stream_from "avatar_#{avatar.id}_wizard" %>
+        <div class="text-center py-8 text-gray-400">
+          <p><%= t("#{config[:i18n_key]}.generating", default: t("avatars.wizard.generating")) %></p>
+        </div>
+      <% else %>
+        <% prompts = avatar.dna["mood_board_prompts"] || [] %>
+        <%= render Settings::AvatarWizard::MoodBoardComponent.new(
+          prompts: prompts,
+          selected_indices: selected_values
+        ) %>
+      <% end %>
+    <% else %>
+      <div class="<%= grid_class %>">
+        <% options.each do |key, option| %>
+          <label class="flex items-center gap-3 p-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 cursor-pointer hover:border-primary-400 transition-all has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50 dark:has-[:checked]:bg-primary-900/20">
+            <%= check_box_tag "avatar[dna][#{config[:dna_field]}][]", key,
+                selected_values.include?(key.to_s),
+                class: "rounded text-primary-500" %>
+            <span class="text-sm font-medium"><%= option[:label] %></span>
+          </label>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="flex justify-between mt-6">
+      <%= render(Core::LinkComponent.new(
+        name: back_label,
+        url: back_url,
+        style: :as_button,
+        theme: :secondary,
+        html_options: { data: { turbo_frame: back_turbo_frame } }
+      )) %>
+      <%= f.button submit_label, type: :submit, class: "btn btn-primary" %>
+    </div>
+  <% end %>
+</div>

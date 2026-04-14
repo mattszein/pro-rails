@@ -1,5 +1,5 @@
 <%= render Settings::LayoutComponent.new(active_section: :profile) do %>
-  <%= render Core::CardComponent.new(classes: "space-y-2")do %>
+  <%= render Core::CardComponent.new(classes: "space-y-2") do %>
     <h1><%= t("settings.profile_title") %></h1>
     <p><%= t("settings.profile_subtitle") %></p>
 
@@ -13,13 +13,32 @@
       </div>
     <% end %>
 
-    <%= form_with model: @profile, url: settings_profile_path, method: :patch, class: "mx-auto space-y-4" do |f| %>
-      <%= render Core::BoxComponent.new(variant: :primary, classes: "text-center") do %>
-        <div data-controller="click-forwarder" class="flex flex-col items-center gap-4">
-          <%= render Core::AvatarComponent.new(profile: @profile, size: :xl, editable: true) %>
-          <%= f.file_field :avatar, label: t("settings.choose_profile_photo"), data: {click_forwarder_target: "receiver"} %>
+    <%= render Core::BoxComponent.new(variant: :primary, classes: "text-center") do %>
+      <div class="flex flex-col items-center gap-4">
+        <%= render Core::AvatarComponent.new(profile: @profile, size: :xl) %>
+
+        <%= form_with url: settings_avatars_path, method: :post,
+            data: { controller: "click-forwarder" },
+            class: "inline-block" do |f| %>
+          <%= f.file_field :image, name: "avatar[image]",
+              accept: "image/jpeg,image/png,image/gif,image/webp",
+              data: { click_forwarder_target: "receiver" },
+              class: "hidden" %>
+          <button type="button"
+              data-action="click->click-forwarder#forward"
+              class="btn btn-secondary btn-sm text-xs">
+            <%= t("settings.choose_profile_photo") %>
+          </button>
+        <% end %>
+
+        <div class="flex gap-4 flex-wrap justify-center">
+          <%= render(Core::LinkComponent.new(name: t("avatars.profile.generate_with_ai"), url: new_settings_avatar_path, style: :link)) %>
+          <%= render(Core::LinkComponent.new(name: t("avatars.profile.gallery"), url: settings_avatars_path, style: :link)) %>
         </div>
-      <% end %>
+      </div>
+    <% end %>
+
+    <%= form_with model: @profile, url: settings_profile_path, method: :patch, class: "mx-auto space-y-4" do |f| %>
       <%= f.label :username, t("settings.profile_username") %>
       <%= f.text_field :username, placeholder: t("shared.placeholders.username") %>
       <%= f.label :bio, t("settings.profile_bio") %>

@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
 module Settings
   class ProfilesController < BaseController
+    before_action :require_account
     before_action :set_profile
     verify_authorized
 
@@ -24,7 +27,7 @@ module Settings
     end
 
     def profile_params
-      params.require(:profile).permit(:username, :bio, :avatar)
+      params.require(:profile).permit(:username, :bio)
     end
   end
 end

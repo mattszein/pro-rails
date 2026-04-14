@@ -1,0 +1,21 @@
+<div id="<%= dom_id(avatar, "result") %>" class="text-center py-8 space-y-4">
+  <div class="text-4xl">😔</div>
+  <h3 class="text-lg font-semibold text-red-500"><%= t("avatars.generation.failed") %></h3>
+  <p class="text-sm text-gray-500"><%= error %></p>
+
+  <div class="flex gap-3 justify-center">
+    <%= render(Core::LinkComponent.new(
+      name: t("avatars.generation.try_again"),
+      url: generate_settings_avatar_path(avatar),
+      style: :as_button,
+      theme: :primary,
+      html_options: { data: { turbo_method: :post } }
+    )) %>
+    <%= render(Core::LinkComponent.new(
+      name: t("avatars.gallery.back"),
+      url: settings_avatars_path,
+      style: :as_button,
+      theme: :secondary
+    )) %>
+  </div>
+</div>

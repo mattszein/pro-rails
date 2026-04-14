@@ -3,7 +3,8 @@ require "rails_helper"
 RSpec.describe Profile, type: :model do
   describe "associations" do
     it { is_expected.to belong_to(:account) }
-    it { is_expected.to have_one_attached(:avatar) }
+    it { is_expected.to belong_to(:avatar).optional }
+    it { is_expected.to have_many(:avatars).dependent(:destroy) }
   end
 
   describe "validations" do
@@ -28,29 +29,6 @@ RSpec.describe Profile, type: :model do
       it "allows blank usernames" do
         new_profile = build(:profile, account: create(:account), username: "")
         expect(new_profile).to be_valid
-      end
-    end
-
-    describe "avatar validation" do
-      let(:profile) { create(:account).profile }
-
-      it "rejects invalid content types" do
-        profile.avatar.attach(
-          io: StringIO.new("fake pdf"),
-          filename: "document.pdf",
-          content_type: "application/pdf"
-        )
-        expect(profile).not_to be_valid
-        expect(profile.errors[:avatar]).to be_present
-      end
-
-      it "accepts valid image content types" do
-        profile.avatar.attach(
-          io: Rails.root.join("spec/fixtures/files/avatar.png").open,
-          filename: "avatar.png",
-          content_type: "image/png"
-        )
-        expect(profile).to be_valid
       end
     end
   end

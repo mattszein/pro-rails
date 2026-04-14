@@ -91,6 +91,8 @@ group :test do
   gem "test-prof"
 end
 
+gem "ruby_llm"
+
 gem "rodauth-rails", "~> 2.1"
 # Enables Sequel to use Active Record's database connection
 gem "sequel-activerecord_connection", "~> 2.0", require: false

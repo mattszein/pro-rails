@@ -27,6 +27,9 @@ services:
       IRB_HISTFILE: /usr/local/hist/.irb_history
       PSQL_HISTFILE: /usr/local/hist/.psql_history
       EDITOR: vi
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      DASHSCOPE_API_KEY: ${DASHSCOPE_API_KEY}
     volumes:
       - .:/pro-rails
       - pro-rails-cache:/pro-rails/tmp/cache

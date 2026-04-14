@@ -1,0 +1,296 @@
+es:
+  avatars:
+    profile:
+      generate_with_ai: "Generar con IA"
+      gallery: "Mis Avatares"
+
+    gallery:
+      title: "Galería de Avatares"
+      subtitle: "Todos tus avatares — elige tu apariencia activa"
+      new_avatar: "Nuevo Avatar"
+      empty: "Aún no hay avatares"
+      create_first: "Crea tu primer avatar"
+      item_alt: "Avatar"
+      active: "Activo"
+      use: "Usar"
+      evolve: "Evolucionar"
+      hide: "Ocultar de la galería"
+      show: "Mostrar en galería"
+      back: "Volver a la galería"
+
+    new:
+      title: "Crear Avatar"
+      subtitle: "Elige cómo quieres crear tu avatar"
+      guided:
+        title: "Camino Guiado"
+        description: "Responde algunas preguntas creativas y generaremos un avatar único adaptado a tu estilo."
+        steps: "6 pasos · ~3 minutos"
+      freeform:
+        title: "Camino Libre"
+        description: "Describe tu visión con tus propias palabras, luego explora un moodboard para refinarlo."
+        steps: "5 pasos · ~5 minutos"
+      or_upload: "O sube una foto"
+      upload_photo: "Subir foto"
+
+    upload:
+      success: "Avatar subido y establecido como activo."
+
+    select:
+      success: "Avatar establecido como activo."
+
+    evolve:
+      success: "Avatar clonado — personaliza y regenera."
+
+    wizard:
+      review: "Revisar y Forjar"
+      review_title: "¿Listo para Forjar?"
+      review_subtitle: "Tus elecciones creativas se ensamblarán en un prompt y se enviarán a la IA"
+      back_to_edit: "Volver a editar"
+      forge_avatar: "Forjar Avatar"
+      forge_confirm: "Esto usará uno de tus créditos de generación diarios. ¿Continuar?"
+      model_label: "Modelo de Generación"
+      select_one: "Por favor selecciona una opción antes de continuar."
+
+    in_progress:
+      title: "En Progreso"
+      subtitle: "Avatares que se están creando o que necesitan atención"
+      path_label: "Camino %{path} · %{date}"
+      path:
+        guided: "Guiado"
+        freeform: "Libre"
+      status:
+        generating: "Generando"
+        failed: "Fallido"
+        draft: "Borrador"
+      action:
+        view: "Ver"
+        retry: "Reintentar"
+        continue: "Continuar"
+
+    generation:
+      forging: "Forjando tu avatar..."
+      forging_subtitle: "La IA está creando tu avatar único. Esto puede tomar un momento."
+      failed: "Generación fallida"
+      try_again: "Intentar de nuevo"
+
+    result:
+      title: "¡Tu Avatar está Listo!"
+      subtitle: "Acéptalo como tu avatar activo o explora otras opciones"
+      preview_alt: "Avatar generado"
+      use_this: "Usar Este Avatar"
+      evolve: "Evolucionar Este"
+      show_dna: "¿Cómo se hizo esto?"
+
+    dna:
+      style: "Estilo"
+      archetype: "Arquetipo"
+      color_mood: "Estado de color"
+      elements: "Elementos"
+      mood: "Ambiente"
+      background: "Fondo"
+      spark_text: "Tu idea"
+
+    errors:
+      invalid_content_type: "debe ser una imagen JPEG, PNG, GIF o WebP"
+      file_too_large: "debe ser menor de 10MB"
+      rate_limit_exceeded: "Has alcanzado tu límite diario de generación. Inténtalo de nuevo mañana."
+      not_selectable: "Este avatar no se puede seleccionar — primero debe estar completado."
+      not_evolvable: "Solo los avatares generados completados se pueden evolucionar."
+      invalid_method: "Método de creación inválido. Elige guiado o libre."
+
+    styles:
+      pixel_art: "Arte Pixel"
+      watercolor: "Acuarela"
+      geometric: "Geométrico"
+      anime: "Anime / Manga"
+      3d_clay: "Arcilla 3D"
+      line_art: "Arte Lineal"
+      collage: "Collage"
+      surrealist: "Surrealista"
+      retro_sci_fi: "Retro Sci-Fi"
+      vaporwave: "Vaporwave"
+      impressionist: "Impresionista"
+      gothic: "Gótico"
+      cyberpunk: "Cyberpunk"
+      fantasy: "Fantasía"
+
+    guided:
+      step1:
+        title: "Elige tu Universo de Estilo"
+        subtitle: "¿Qué estética te habla?"
+        options:
+          pixel_art:
+            label: "Arte Pixel / Retro"
+            description: "Nostalgia 8-bit"
+          watercolor:
+            label: "Acuarela / Pictórico"
+            description: "Suave y soñador"
+          geometric:
+            label: "Geométrico / Abstracto"
+            description: "Formas atrevidas"
+          anime:
+            label: "Anime / Manga"
+            description: "Inspirado en Japón"
+          3d_clay:
+            label: "Render 3D / Arcilla"
+            description: "Suave y táctil"
+          line_art:
+            label: "Arte Lineal / Minimalista"
+            description: "Limpio y elegante"
+          collage:
+            label: "Collage / Mixed Media"
+            description: "Texturas en capas"
+          surrealist:
+            label: "Surrealista / Onírico"
+            description: "Fantástico"
+
+      step2:
+        title: "Tu Arquetipo"
+        subtitle: "¿Qué energía proyecta este avatar?"
+        options:
+          explorer:
+            label: "El Explorador"
+            description: "Curioso y aventurero"
+          builder:
+            label: "El Constructor"
+            description: "Creativo y determinado"
+          guardian:
+            label: "El Guardián"
+            description: "Fuerte y confiable"
+          trickster:
+            label: "El Embaucador"
+            description: "Inteligente y juguetón"
+          sage:
+            label: "El Sabio"
+            description: "Sabio y misterioso"
+          spark:
+            label: "La Chispa"
+            description: "Enérgico e inspirador"
+
+      step3:
+        title: "Estado de Color"
+        subtitle: "Elige una paleta que se sienta bien"
+        options:
+          warm_sunset:
+            label: "Atardecer Cálido"
+            colors: ["#FF6B35", "#F7931E", "#FFD700"]
+          deep_ocean:
+            label: "Océano Profundo"
+            colors: ["#003366", "#006994", "#40E0D0"]
+          neon_night:
+            label: "Noche Neón"
+            colors: ["#FF007F", "#7F00FF", "#00FFFF"]
+          earth_moss:
+            label: "Tierra y Musgo"
+            colors: ["#4A5240", "#8B7355", "#D4C5A9"]
+          monochrome:
+            label: "Monocromo"
+            colors: ["#000000", "#808080", "#FFFFFF"]
+          candy_pop:
+            label: "Candy Pop"
+            colors: ["#FFB3C6", "#A8DADC", "#FFD166"]
+
+      step4:
+        title: "Elementos y Símbolos"
+        subtitle: "¿Qué debe aparecer? Elige 2-3"
+        options:
+          fox: { label: "Zorro" }
+          wolf: { label: "Lobo" }
+          cat: { label: "Gato" }
+          owl: { label: "Búho" }
+          dragon: { label: "Dragón" }
+          phoenix: { label: "Fénix" }
+          flowers: { label: "Flores" }
+          mountains: { label: "Montañas" }
+          ocean: { label: "Océano" }
+          crystals: { label: "Cristales" }
+          lightning: { label: "Rayo" }
+          stars: { label: "Estrellas" }
+          gears: { label: "Engranajes" }
+          books: { label: "Libros" }
+          music: { label: "Música" }
+          compass: { label: "Brújula" }
+          spirals: { label: "Espirales" }
+          triangles: { label: "Triángulos" }
+
+      step5:
+        title: "Ambiente y Atmósfera"
+        subtitle: "El sentimiento que quieres evocar"
+        options:
+          calm:
+            label: "Calmado y Sereno"
+            description: "Energía pacífica"
+          bold:
+            label: "Audaz y Poderoso"
+            description: "Presencia imponente"
+          mysterious:
+            label: "Misterioso y Oscuro"
+            description: "Atractivo enigmático"
+          whimsical:
+            label: "Caprichoso y Divertido"
+            description: "Espíritu lúdico"
+          futuristic:
+            label: "Futurista y Tech"
+            description: "Frontera digital"
+          nostalgic:
+            label: "Nostálgico y Vintage"
+            description: "Calidez atemporal"
+
+      step6:
+        title: "Fondo"
+        subtitle: "Establece la escena"
+        options:
+          transparent:
+            label: "Ninguno / Transparente"
+            description: "Recorte limpio"
+          gradient:
+            label: "Degradado"
+            description: "Mezcla suave"
+          scene:
+            label: "Escena"
+            description: "Entorno completo"
+          pattern:
+            label: "Patrón"
+            description: "Motivo repetitivo"
+
+    freeform:
+      text_model_label: "Modelo IA"
+      step1:
+        title: "La Chispa"
+        subtitle: "Describe tu avatar ideal en pocas palabras"
+        placeholder: "ej. un gato cósmico flotando en el espacio..."
+        hint: "Sé tan específico o abstracto como quieras (máx. 200 caracteres)"
+        examples_label: "¿Necesitas inspiración?"
+        examples:
+          - "un gato cósmico flotando en el espacio"
+          - "algo oscuro y geométrico"
+          - "un espíritu del bosque hecho de luz"
+          - "un robot con alma cálida"
+          - "caos y orden en equilibrio"
+
+      step2:
+        title: "Moodboard"
+        subtitle: "Toca los conceptos que resuenen contigo"
+        generating: "Generando tu moodboard..."
+        select_hint: "Selecciona 2-4 que se sientan correctos"
+
+      step3:
+        title: "Estilo Matching"
+        subtitle: "Basado en tus selecciones, elige un estilo artístico"
+
+      step4:
+        title: "Ronda de Remix"
+        subtitle: "Elige la interpretación del concepto que más resuene"
+        generating: "Generando descripciones de conceptos..."
+
+      step5:
+        title: "Color y Acabado"
+        subtitle: "Toques finales antes de forjar"
+        color_label: "Preferencia de color"
+        background_label: "Fondo"
+        colors:
+          warm: "Cálido"
+          cool: "Frío"
+          vibrant: "Vibrante"
+          muted: "Suave"
+          auto: "Auto"

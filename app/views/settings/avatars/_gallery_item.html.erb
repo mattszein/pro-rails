@@ -1,0 +1,55 @@
+<div id="<%= ActionView::RecordIdentifier.dom_id(avatar) %>"
+     class="relative group">
+  <div class="aspect-square rounded-2xl overflow-hidden
+              <%= avatar.visible? ? "" : "opacity-50" %>
+              <%= current_account.profile.avatar_id == avatar.id ? "ring-4 ring-primary-500" : "ring-2 ring-transparent" %>
+              hover:ring-primary-300 transition-all">
+    <% if avatar.image.attached? %>
+      <%= image_tag avatar.image.variant(:medium),
+          alt: t("avatars.gallery.item_alt"),
+          class: "w-full h-full object-cover" %>
+    <% elsif avatar.generating? %>
+      <div class="w-full h-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center animate-pulse">
+        <span class="text-2xl">⚡</span>
+      </div>
+    <% else %>
+      <div class="w-full h-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+        <span class="text-2xl">🖼</span>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Active badge %>
+  <% if current_account.profile.avatar_id == avatar.id %>
+    <div class="absolute -top-1 -right-1 bg-primary-500 text-white text-xs px-2 py-0.5 rounded-full">
+      <%= t("avatars.gallery.active") %>
+    </div>
+  <% end %>
+
+  <%# Actions overlay %>
+  <div class="absolute inset-0 rounded-2xl bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+    <% if avatar.selectable? && current_account.profile.avatar_id != avatar.id %>
+      <%= render(Core::LinkComponent.new(
+        name: t("avatars.gallery.use"),
+        url: select_settings_avatar_path(avatar),
+        style: :no_style,
+        html_options: {
+          class: "text-xs text-white bg-primary-500 hover:bg-primary-600 px-3 py-1 rounded-full transition-colors",
+          data: { turbo_method: :post }
+        }
+      )) %>
+    <% end %>
+
+    <% if avatar.evolvable? %>
+      <%= render(Core::LinkComponent.new(
+        name: t("avatars.gallery.evolve"),
+        url: evolve_settings_avatar_path(avatar),
+        style: :no_style,
+        html_options: {
+          class: "text-xs text-white bg-indigo-500 hover:bg-indigo-600 px-3 py-1 rounded-full transition-colors",
+          data: { turbo_method: :post }
+        }
+      )) %>
+    <% end %>
+  </div>
+</div>

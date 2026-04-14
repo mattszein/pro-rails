@@ -1,0 +1,72 @@
+<div class="space-y-6">
+  <div>
+    <h2 class="text-xl font-semibold"><%= t("avatars.wizard.review_title") %></h2>
+    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1"><%= t("avatars.wizard.review_subtitle") %></p>
+  </div>
+
+  <% if avatar.generated? %>
+    <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 space-y-2">
+      <% if last_step == "6" %>
+        <% [["style", avatar.dna["style"]], ["archetype", avatar.dna["archetype"]],
+            ["color_mood", avatar.dna["color_mood"]], ["mood", avatar.dna["mood"]],
+            ["background", avatar.dna["background"]]].each do |key, value| %>
+          <% if value.present? %>
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-500"><%= t("avatars.dna.#{key}") %></span>
+              <span class="font-medium"><%= value.humanize %></span>
+            </div>
+          <% end %>
+        <% end %>
+        <% if avatar.dna["elements"]&.any? %>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-500"><%= t("avatars.dna.elements") %></span>
+            <span class="font-medium"><%= avatar.dna["elements"].join(", ") %></span>
+          </div>
+        <% end %>
+      <% else %>
+        <% if avatar.dna["spark_text"].present? %>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-500"><%= t("avatars.dna.spark_text") %></span>
+            <span class="font-medium"><%= avatar.dna["spark_text"] %></span>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <%= form_with url: generate_settings_avatar_path(avatar),
+      method: :post,
+      data: { turbo_confirm: t("avatars.wizard.forge_confirm") } do |f| %>
+
+    <div class="space-y-2">
+      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+        <%= t("avatars.wizard.model_label") %>
+      </label>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <% AvatarAi::ImageGenerator::MODELS.each do |model| %>
+          <label class="flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all
+                         border-gray-200 dark:border-gray-700 hover:border-primary-300
+                         has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50 dark:has-[:checked]:bg-primary-900/20">
+            <%= radio_button_tag :image_model, model[:id],
+                model[:id] == (avatar.image_model.presence || AvatarAi::ImageGenerator::DEFAULT_MODEL),
+                class: "text-primary-500 sr-only" %>
+            <div>
+              <span class="font-medium text-sm"><%= model[:label] %></span>
+            </div>
+          </label>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="flex gap-3 mt-4">
+      <%= render(Core::LinkComponent.new(
+        name: t("avatars.wizard.back_to_edit"),
+        url: settings_avatar_path(avatar, step: last_step),
+        style: :as_button,
+        theme: :secondary,
+        html_options: { data: { turbo_frame: "avatar_wizard_step" } }
+      )) %>
+      <%= f.button t("avatars.wizard.forge_avatar"), type: :submit, class: "btn btn-primary" %>
+    </div>
+  <% end %>
+</div>

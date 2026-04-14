@@ -37,7 +37,7 @@ module ProRails
       g.javascripts false
       g.test_framework nil
     end
-    config.autoload_paths += %W[#{config.root}/app/components]
+    config.autoload_paths += %W[#{config.root}/app/components #{config.root}/app/configs]
     config.assets.paths << Rails.root.join("app/components")
 
     # I18n configuration
