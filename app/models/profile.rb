@@ -5,6 +5,8 @@ class Profile < ApplicationRecord
   belongs_to :avatar, optional: true
   has_many :avatars, dependent: :destroy
 
+  before_destroy :nullify_active_avatar
+
   validates :bio, length: {maximum: 500}
   validates :username,
     uniqueness: {allow_blank: true},
@@ -13,4 +15,10 @@ class Profile < ApplicationRecord
       message: :invalid_format,
       allow_blank: true
     }
+
+  private
+
+  def nullify_active_avatar
+    update_column(:avatar_id, nil)
+  end
 end

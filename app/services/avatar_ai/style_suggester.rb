@@ -1,25 +1,16 @@
 # frozen_string_literal: true
 
 module AvatarAi
-  class StyleSuggester
-    class SuggestionError < StandardError; end
-
+  class StyleSuggester < BaseGenerator
     STYLES = %w[
       pixel_art watercolor geometric anime 3d_clay
       line_art collage surrealist retro_sci_fi vaporwave
       impressionist gothic cyberpunk fantasy
     ].freeze
 
-    def initialize(model: nil)
-      @model = model || AvatarAiConfig.text_model || "gpt-4o-mini"
-    end
-
-    # Returns array of style suggestions (up to 4) with labels
     def suggest(spark_text:, mood_board_selected:)
-      response = RubyLLM.chat(model: @model).ask(build_prompt(spark_text, mood_board_selected))
+      response = ask(build_prompt(spark_text, mood_board_selected))
       parse_suggestions(response.content)
-    rescue RubyLLM::Error => e
-      raise SuggestionError, "Style suggestion failed: #{e.message}"
     end
 
     private

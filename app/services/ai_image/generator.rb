@@ -1,27 +1,23 @@
 # frozen_string_literal: true
 
-module AvatarAi
-  class ImageGenerator
+module AiImage
+  class Generator
     class GenerationError < StandardError; end
 
-    MODELS = [
-      {id: "nano_banana", label: "Nano Banana (Gemini 2.5 Flash)"},
-      {id: "qwen", label: "Qwen Image 2.0 Pro"}
-    ].freeze
-
-    DEFAULT_MODEL = "nano_banana"
+    PROVIDERS = {
+      "nano_banana" => -> { AiImage::Providers::NanaBanana.new },
+      "qwen" => -> { AiImage::Providers::Qwen.new }
+    }.freeze
 
     def initialize(model: nil)
-      @model = model.presence || DEFAULT_MODEL
+      @model = model.presence || AvatarAiConfig.default_image_model
     end
 
     # Returns {io: <StringIO or IO>, content_type: String}
     def generate(prompt)
-      case @model
-      when "nano_banana"
-        AvatarAi::NanaBananaService.new.generate(prompt)
-      when "qwen"
-        AvatarAi::QwenService.new.generate(prompt)
+      provider = PROVIDERS[@model]
+      if provider
+        provider.call.generate(prompt)
       else
         url_based_generate(prompt)
       end

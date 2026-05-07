@@ -1,0 +1,17 @@
+<div class="space-y-2 border-t border-gray-100 dark:border-gray-800 pt-4">
+  <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+    <%= label %>
+  </label>
+  <div class="flex flex-wrap gap-2">
+    <% models.each do |model| %>
+      <label class="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border cursor-pointer transition-all
+                     border-gray-200 dark:border-gray-700 hover:border-primary-300
+                     has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50 dark:has-[:checked]:bg-primary-900/20">
+        <%= radio_button_tag field_name, model[:id],
+            model[:id] == current_model,
+            class: "sr-only" %>
+        <%= model[:label] %>
+      </label>
+    <% end %>
+  </div>
+</div>

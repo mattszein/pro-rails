@@ -4,9 +4,9 @@
     data-theme-target="button"
     data-theme-id="<%= theme_id %>"
     data-action="click->theme#selectTheme"
-    class="relative group peer transition-all duration-300 hover:scale-105 selected:scale-110 <%= "selected" if selected? %> theme-<%= theme_id %>">
+    class="relative group peer hover:scale-101 selected:scale-101 <%= "selected" if selected? %> theme-<%= theme_id %>">
     <!-- Outer Ring -->
-    <div class="h-32 w-32 rounded-full p-1 transition-all duration-300 bg-slate-700/50 shadow-lg group-hover:bg-slate-600/50 group-[.selected]:bg-white group-[.selected]:shadow-2xl">
+    <div class="h-32 w-32 rounded-full p-1 bg-slate-700/50 shadow-lg group-hover:bg-primary-400 group-[.selected]:bg-white group-[.selected]:shadow-2xl ">
       <!-- Inner Circle with Split Gradient -->
       <div class="relative w-full h-full rounded-full overflow-hidden">
         <!-- Left Half - Primary -->

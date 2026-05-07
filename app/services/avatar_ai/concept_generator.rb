@@ -1,19 +1,10 @@
 # frozen_string_literal: true
 
 module AvatarAi
-  class ConceptGenerator
-    class GenerationError < StandardError; end
-
-    def initialize(model: nil)
-      @model = model || AvatarAiConfig.text_model || "gpt-4o-mini"
-    end
-
-    # Returns an array of 3 concept descriptions (1-2 sentences each)
+  class ConceptGenerator < BaseGenerator
     def generate(spark_text:, style:, color_preference: nil)
-      response = RubyLLM.chat(model: @model).ask(build_prompt(spark_text, style, color_preference))
-      parse_concepts(response.content)
-    rescue RubyLLM::Error => e
-      raise GenerationError, "Concept generation failed: #{e.message}"
+      response = ask(build_prompt(spark_text, style, color_preference))
+      parse_json_array(response.content, limit: 3)
     end
 
     private
@@ -31,14 +22,6 @@ module AvatarAi
         Return ONLY a JSON array of 3 strings:
         ["concept 1", "concept 2", "concept 3"]
       PROMPT
-    end
-
-    def parse_concepts(content)
-      concepts = JSON.parse(content.strip)
-      raise GenerationError, "Expected array" unless concepts.is_a?(Array)
-      concepts.first(3)
-    rescue JSON::ParserError
-      content.scan(/"([^"]+)"/).flatten.first(3)
     end
   end
 end

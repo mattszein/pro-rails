@@ -9,7 +9,9 @@ module Settings
 
     def index
       authorize! Avatar, with: Settings::AvatarPolicy
-      @avatars = current_account.profile.avatars.for_gallery
+      @avatars = current_account.profile.avatars
+        .includes(image_attachment: :blob)
+        .for_gallery
       @in_progress_avatars = current_account.profile.avatars
         .where(status: [:draft, :generating, :failed])
         .order(created_at: :desc)
@@ -32,8 +34,8 @@ module Settings
     def show
       authorize! @avatar, with: Settings::AvatarPolicy
       if @avatar.draft? && @avatar.generated?
-        method_name = (@avatar.read_attribute(:method) == 0) ? "guided" : "freeform"
-        max_step = (method_name == "guided") ? 6 : 5
+        @avatar.generation_method
+        max_step = @avatar.max_wizard_step
         step = params[:step].to_i
         @wizard_step = (1..max_step).cover?(step) ? step.to_s : nil
       end
@@ -42,32 +44,43 @@ module Settings
     def update
       authorize! @avatar, with: Settings::AvatarPolicy
 
-      dna_update = params.require(:avatar).permit(dna: {}).fetch(:dna, {})
-
-      # permit(dna: {}) only allows scalar values; explicitly capture array params
-      if (raw = params.dig(:avatar, :dna, :mood_board_selected))
-        dna_update["mood_board_selected"] = Array(raw).map(&:to_i)
+      unless @avatar.draft?
+        render turbo_stream: turbo_stream.update(
+          "avatar_wizard_step",
+          html: helpers.content_tag(:p, t("avatars.errors.not_editable"), class: "text-red-500")
+        ), status: :unprocessable_content
+        return
       end
 
+      dna_update = normalize_dna_params
       next_step = params[:next_step]
 
-      @avatar.update!(dna: @avatar.dna.merge(dna_update))
+      new_dna = if freeform_spark_changed?(dna_update)
+        downstream = %w[mood_board_prompts mood_board_selected style_suggestions
+          style_choice concepts concept_choice]
+        @avatar.dna.except(*downstream).merge(dna_update)
+      else
+        @avatar.dna.merge(dna_update)
+      end
 
-      method_name = (@avatar.read_attribute(:method) == 0) ? "guided" : "freeform"
+      @avatar.update!(dna: new_dna)
 
-      enqueue_freeform_content_generation(next_step) if method_name == "freeform" && next_step.present?
+      if @avatar.generation_method == "freeform" && next_step.present?
+        enqueue_freeform_content_generation(next_step)
+        @avatar.reload
+      end
 
       html = if next_step.present?
-        view_context.render(wizard_step_component(method_name, next_step))
+        render_to_string(wizard_step_component(@avatar.generation_method, next_step))
       else
-        view_context.render(Settings::AvatarWizard::StepReviewComponent.new(avatar: @avatar))
+        render_to_string(Settings::AvatarWizard::StepReviewComponent.new(avatar: @avatar))
       end
 
       render turbo_stream: turbo_stream.update("avatar_wizard_step", html: html)
     rescue ActiveRecord::RecordInvalid => e
       render turbo_stream: turbo_stream.update(
         "avatar_wizard_step",
-        html: "<p class='text-red-500'>#{e.message}</p>"
+        html: helpers.content_tag(:p, e.message, class: "text-red-500")
       ), status: :unprocessable_content
     end
 
@@ -82,15 +95,13 @@ module Settings
       )
 
       if result.success?
-        generating_html = view_context.render(Settings::AvatarWizard::GeneratingComponent.new(avatar: @avatar))
+        generating_html = render_to_string(Settings::AvatarWizard::GeneratingComponent.new(avatar: @avatar))
         if was_failed
-          # Retry from error state — replace the error div (id: avatar_result_<id>)
           render turbo_stream: turbo_stream.replace(
             ActionView::RecordIdentifier.dom_id(@avatar, "result"),
             html: generating_html
           )
         else
-          # Normal generation from review step — update the wizard turbo frame
           render turbo_stream: turbo_stream.update("avatar_wizard_step", html: generating_html)
         end
       elsif result.rate_limited
@@ -151,6 +162,14 @@ module Settings
       @avatar = current_account.profile.avatars.find(params[:id])
     end
 
+    def normalize_dna_params
+      params.require(:avatar).permit(
+        dna: [:style, :archetype, :color_mood, :mood, :background,
+          :spark_text, :text_model, :style_choice, :concept_choice, :color_preference,
+          elements: [], custom_colors: [], mood_board_selected: []]
+      ).fetch(:dna, {})
+    end
+
     def handle_manual_upload
       result = Avatars::Upload.call(
         profile: current_account.profile,
@@ -165,8 +184,12 @@ module Settings
       end
     end
 
-    # Enqueues a background job to generate AI content for the given freeform step.
-    # The job broadcasts the updated step partial when done.
+    def freeform_spark_changed?(dna_update)
+      @avatar.generation_method == "freeform" &&
+        dna_update["spark_text"].present? &&
+        dna_update["spark_text"] != @avatar.dna["spark_text"]
+    end
+
     def enqueue_freeform_content_generation(next_step)
       return unless %w[2 3 4].include?(next_step)
       Avatars::GenerateFreeformContentJob.perform_later(@avatar.id, next_step)
@@ -179,7 +202,7 @@ module Settings
         return
       end
 
-      method_int = (generation_method == "guided") ? 0 : 1
+      method_int = Avatar::Generatable::METHODS[generation_method]
       avatar = current_account.profile.avatars.create!(
         kind: :generated,
         status: :draft,

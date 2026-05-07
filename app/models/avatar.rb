@@ -3,6 +3,8 @@
 class Avatar < ApplicationRecord
   class InvalidTransition < StandardError; end
 
+  include Avatar::Generatable
+
   # Associations
   belongs_to :profile
 
@@ -16,11 +18,8 @@ class Avatar < ApplicationRecord
   enum :status, {draft: 0, generating: 1, completed: 2, failed: 3}, prefix: false
 
   # Validations
-  validates :profile_id, presence: true
   validates :kind, presence: true
   validates :status, presence: true
-  validate :generation_method_present, if: :generated?
-  validates :dna_version, presence: true, if: :generated?
   validate :image_attached_when_completed
 
   # Scopes
@@ -63,10 +62,6 @@ class Avatar < ApplicationRecord
   end
 
   private
-
-  def generation_method_present
-    errors.add(:method, :blank) if read_attribute(:method).nil?
-  end
 
   def image_attached_when_completed
     return unless completed?

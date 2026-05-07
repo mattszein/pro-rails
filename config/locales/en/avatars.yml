@@ -50,6 +50,7 @@ en:
       forge_confirm: "This will use one of your daily generation credits. Continue?"
       model_label: "Generation Model"
       select_one: "Please select an option before continuing."
+      generating: "Generating..."
 
     in_progress:
       title: "In Progress"
@@ -89,6 +90,10 @@ en:
       mood: "Mood"
       background: "Background"
       spark_text: "Your idea"
+      mood_board_selected: "Vibes"
+      style_choice: "Art style"
+      concept_choice: "Concept"
+      color_preference: "Color preference"
 
     errors:
       invalid_content_type: "must be a JPEG, PNG, GIF, or WebP image"
@@ -97,6 +102,7 @@ en:
       not_selectable: "This avatar cannot be selected — it must be completed first."
       not_evolvable: "Only completed generated avatars can be evolved."
       invalid_method: "Invalid creation method. Please choose guided or freeform."
+      not_editable: "This avatar can no longer be edited."
 
     styles:
       pixel_art: "Pixel Art"
@@ -115,7 +121,7 @@ en:
       fantasy: "Fantasy"
 
     guided:
-      step1:
+      style:
         title: "Choose Your Style Universe"
         subtitle: "What aesthetic speaks to you?"
         options:
@@ -144,7 +150,7 @@ en:
             label: "Surrealist / Dreamlike"
             description: "Fantastical"
 
-      step2:
+      archetype:
         title: "Your Archetype"
         subtitle: "What energy does this avatar project?"
         options:
@@ -167,7 +173,7 @@ en:
             label: "The Spark"
             description: "Energetic and inspiring"
 
-      step3:
+      color_mood:
         title: "Color Mood"
         subtitle: "Pick a palette that feels right"
         options:
@@ -190,7 +196,7 @@ en:
             label: "Candy Pop"
             colors: ["#FFB3C6", "#A8DADC", "#FFD166"]
 
-      step4:
+      elements:
         title: "Elements & Symbols"
         subtitle: "What should appear? Pick 2-3"
         options:
@@ -213,7 +219,7 @@ en:
           spirals: { label: "Spirals" }
           triangles: { label: "Triangles" }
 
-      step5:
+      mood:
         title: "Mood & Atmosphere"
         subtitle: "The feeling you want to evoke"
         options:
@@ -236,7 +242,7 @@ en:
             label: "Nostalgic & Vintage"
             description: "Timeless warmth"
 
-      step6:
+      background:
         title: "Background"
         subtitle: "Set the scene"
         options:
@@ -255,7 +261,7 @@ en:
 
     freeform:
       text_model_label: "AI Model"
-      step1:
+      spark:
         title: "The Spark"
         subtitle: "Describe your ideal avatar in a few words"
         placeholder: "e.g. a cosmic cat floating in space..."
@@ -268,22 +274,22 @@ en:
           - "a robot with a warm soul"
           - "chaos and order in balance"
 
-      step2:
+      mood_board:
         title: "Mood Board"
         subtitle: "Tap the concepts that resonate with you"
         generating: "Generating your mood board..."
         select_hint: "Select 2-4 that feel right"
 
-      step3:
+      style_match:
         title: "Style Match"
         subtitle: "Based on your selections, choose an art style"
 
-      step4:
+      remix:
         title: "Remix Round"
         subtitle: "Pick the concept interpretation that resonates most"
         generating: "Generating concept descriptions..."
 
-      step5:
+      finish:
         title: "Color & Polish"
         subtitle: "Final touches before forging"
         color_label: "Color preference"

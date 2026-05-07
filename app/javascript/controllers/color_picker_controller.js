@@ -1,5 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
 
+// Manages the multi-color swatch picker: syncs up to 3 chosen hex values
+// into hidden inputs (avatar[dna][custom_colors][]) because <input type="color">
+// can't be used directly in an array field without JS.
 export default class extends Controller {
   static targets = ["input", "preview"]
   static values = { colors: Array }

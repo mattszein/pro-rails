@@ -7,10 +7,13 @@
           <% method_name = @avatar.read_attribute(:method) == 0 ? "guided" : "freeform" %>
           <% if @wizard_step.present? %>
             <%= render wizard_step_component(method_name, @wizard_step) %>
-          <% elsif @avatar.dna.empty? %>
-            <%= render wizard_step_component(method_name, "1") %>
           <% else %>
-            <%= render Settings::AvatarWizard::StepReviewComponent.new(avatar: @avatar) %>
+            <% resume = @avatar.wizard_resume_step %>
+            <% if resume %>
+              <%= render wizard_step_component(method_name, resume) %>
+            <% else %>
+              <%= render Settings::AvatarWizard::StepReviewComponent.new(avatar: @avatar) %>
+            <% end %>
           <% end %>
         </turbo-frame>
       </div>

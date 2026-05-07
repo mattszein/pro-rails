@@ -12,12 +12,12 @@ module Avatars
       check_rate_limit!(avatar.profile)
 
       prompt = AvatarAi::PromptAssembler.new.assemble(avatar)
-      selected_model = image_model.presence || AvatarAiConfig.default_image_model || AvatarAi::ImageGenerator::DEFAULT_MODEL
+      selected_model = image_model.presence || AvatarAiConfig.default_image_model
 
       avatar.update!(assembled_prompt: prompt, image_model: selected_model)
       avatar.start_generating!
 
-      GenerateAvatarImageJob.perform_later(avatar.id)
+      Avatars::GenerateImageJob.perform_later(avatar.id)
 
       context.avatar = avatar
     rescue RateLimitExceeded => e

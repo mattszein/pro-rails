@@ -2,17 +2,14 @@
 
 module AvatarAi
   class PromptAssembler
-    GUIDED = 0
-    FREEFORM = 1
-
     def assemble(avatar)
-      case [avatar.read_attribute(:method), avatar.dna_version]
-      when [GUIDED, 1]
+      case [avatar.generation_method, avatar.dna_version]
+      when ["guided", 1]
         assemble_guided_v1(avatar.dna)
-      when [FREEFORM, 1]
+      when ["freeform", 1]
         assemble_freeform_v1(avatar.dna)
       else
-        raise ArgumentError, "Unknown method/dna_version combination: #{avatar.read_attribute(:method)}/#{avatar.dna_version}"
+        raise ArgumentError, "Unknown method/dna_version: #{avatar.generation_method}/#{avatar.dna_version}"
       end
     end
 

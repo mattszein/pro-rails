@@ -50,6 +50,7 @@ es:
       forge_confirm: "Esto usará uno de tus créditos de generación diarios. ¿Continuar?"
       model_label: "Modelo de Generación"
       select_one: "Por favor selecciona una opción antes de continuar."
+      generating: "Generando..."
 
     in_progress:
       title: "En Progreso"
@@ -89,6 +90,10 @@ es:
       mood: "Ambiente"
       background: "Fondo"
       spark_text: "Tu idea"
+      mood_board_selected: "Vibras"
+      style_choice: "Estilo artístico"
+      concept_choice: "Concepto"
+      color_preference: "Preferencia de color"
 
     errors:
       invalid_content_type: "debe ser una imagen JPEG, PNG, GIF o WebP"
@@ -96,6 +101,7 @@ es:
       rate_limit_exceeded: "Has alcanzado tu límite diario de generación. Inténtalo de nuevo mañana."
       not_selectable: "Este avatar no se puede seleccionar — primero debe estar completado."
       not_evolvable: "Solo los avatares generados completados se pueden evolucionar."
+      not_editable: "Este avatar ya no puede ser editado."
       invalid_method: "Método de creación inválido. Elige guiado o libre."
 
     styles:
@@ -115,7 +121,7 @@ es:
       fantasy: "Fantasía"
 
     guided:
-      step1:
+      style:
         title: "Elige tu Universo de Estilo"
         subtitle: "¿Qué estética te habla?"
         options:
@@ -144,7 +150,7 @@ es:
             label: "Surrealista / Onírico"
             description: "Fantástico"
 
-      step2:
+      archetype:
         title: "Tu Arquetipo"
         subtitle: "¿Qué energía proyecta este avatar?"
         options:
@@ -167,7 +173,7 @@ es:
             label: "La Chispa"
             description: "Enérgico e inspirador"
 
-      step3:
+      color_mood:
         title: "Estado de Color"
         subtitle: "Elige una paleta que se sienta bien"
         options:
@@ -190,7 +196,7 @@ es:
             label: "Candy Pop"
             colors: ["#FFB3C6", "#A8DADC", "#FFD166"]
 
-      step4:
+      elements:
         title: "Elementos y Símbolos"
         subtitle: "¿Qué debe aparecer? Elige 2-3"
         options:
@@ -213,7 +219,7 @@ es:
           spirals: { label: "Espirales" }
           triangles: { label: "Triángulos" }
 
-      step5:
+      mood:
         title: "Ambiente y Atmósfera"
         subtitle: "El sentimiento que quieres evocar"
         options:
@@ -236,7 +242,7 @@ es:
             label: "Nostálgico y Vintage"
             description: "Calidez atemporal"
 
-      step6:
+      background:
         title: "Fondo"
         subtitle: "Establece la escena"
         options:
@@ -255,7 +261,7 @@ es:
 
     freeform:
       text_model_label: "Modelo IA"
-      step1:
+      spark:
         title: "La Chispa"
         subtitle: "Describe tu avatar ideal en pocas palabras"
         placeholder: "ej. un gato cósmico flotando en el espacio..."
@@ -268,22 +274,22 @@ es:
           - "un robot con alma cálida"
           - "caos y orden en equilibrio"
 
-      step2:
+      mood_board:
         title: "Moodboard"
         subtitle: "Toca los conceptos que resuenen contigo"
         generating: "Generando tu moodboard..."
         select_hint: "Selecciona 2-4 que se sientan correctos"
 
-      step3:
+      style_match:
         title: "Estilo Matching"
         subtitle: "Basado en tus selecciones, elige un estilo artístico"
 
-      step4:
+      remix:
         title: "Ronda de Remix"
         subtitle: "Elige la interpretación del concepto que más resuene"
         generating: "Generando descripciones de conceptos..."
 
-      step5:
+      finish:
         title: "Color y Acabado"
         subtitle: "Toques finales antes de forjar"
         color_label: "Preferencia de color"

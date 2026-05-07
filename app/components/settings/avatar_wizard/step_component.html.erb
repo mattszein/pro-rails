@@ -1,20 +1,15 @@
 <div class="space-y-3">
-  <%# Progress bar %>
   <div class="flex items-center gap-3">
-    <div class="flex-1 h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-      <div class="h-full bg-primary-500 rounded-full transition-all duration-500"
-           style="width: <%= progress_percent %>%"></div>
-    </div>
-    <span class="tabular-nums whitespace-nowrap">
+    <progress class="flex-1 h-1.5 rounded-full accent-primary-500"
+              value="<%= step %>"
+              max="<%= total %>"></progress>
+    <span class="tabular-nums whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
       <%= step %> / <%= total %>
     </span>
   </div>
 
-  <%# Title %>
-  <div>
-    <h2 class="text-xl font-semibold"><%= title %></h2>
-    <% if subtitle %>
-      <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5"><%= subtitle %></p>
-    <% end %>
-  </div>
+  <h2 class="text-xl font-semibold"><%= title %></h2>
+  <% if subtitle %>
+    <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5"><%= subtitle %></p>
+  <% end %>
 </div>

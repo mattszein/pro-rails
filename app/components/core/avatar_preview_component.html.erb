@@ -1,0 +1,15 @@
+<div class="<%= size_class %> w-full h-full rounded-full overflow-hidden flex-shrink-0 ring-4 ring-transparent transition-all duration-200 group-hover:ring-secondary-500 group-[.selected]:ring-secondary-500 ">
+  <% if avatar.image.attached? %>
+    <%= image_tag avatar.image.variant(image_variant),
+        alt: t("avatars.gallery.item_alt"),
+        class: "w-full h-full object-cover" %>
+  <% elsif avatar.generating? %>
+    <div class="w-full h-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center animate-pulse">
+      <span class="text-xl">⚡</span>
+    </div>
+  <% else %>
+    <div class="w-full h-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+      <span class="text-xl">🖼</span>
+    </div>
+  <% end %>
+</div>

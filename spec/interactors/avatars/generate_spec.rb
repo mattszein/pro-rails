@@ -29,7 +29,7 @@ RSpec.describe Avatars::Generate, type: :interactor do
       it "enqueues the image generation job" do
         expect {
           described_class.call(avatar: avatar)
-        }.to have_enqueued_job(GenerateAvatarImageJob).with(avatar.id)
+        }.to have_enqueued_job(Avatars::GenerateImageJob).with(avatar.id)
       end
     end
 

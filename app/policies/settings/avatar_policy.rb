@@ -2,37 +2,17 @@
 
 module Settings
   class AvatarPolicy < ApplicationPolicy
-    def index?
-      true
-    end
+    default_rule :manage?
 
-    def create?
-      true
-    end
-
-    def show?
-      own_record?
-    end
-
-    def update?
-      own_record?
-    end
-
-    def generate?
-      own_record?
-    end
-
-    def select?
-      own_record?
-    end
-
-    def evolve?
-      own_record?
-    end
-
-    def toggle_visibility?
-      own_record?
-    end
+    def index? = true
+    def create? = true
+    def manage? = own_record?
+    def show? = manage?
+    def update? = manage?
+    def generate? = manage?
+    def select? = manage?
+    def evolve? = manage?
+    def toggle_visibility? = manage?
 
     private
 

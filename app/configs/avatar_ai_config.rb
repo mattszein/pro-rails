@@ -7,6 +7,11 @@ class AvatarAiConfig < ApplicationConfig
     {id: "google/gemma-4-31b-it:free", label: "Gemma 4 31B"}
   ].freeze
 
+  IMAGE_MODELS = [
+    {id: "nano_banana", label: "Nano Banana (Gemini 2.5 Flash)"},
+    {id: "qwen", label: "Qwen Image 2.0 Pro"}
+  ].freeze
+
   config_name :avatar_ai
 
   attr_config :text_model,

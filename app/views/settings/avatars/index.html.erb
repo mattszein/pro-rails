@@ -69,7 +69,10 @@
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
            data-controller="avatar-gallery">
         <% @avatars.each do |avatar| %>
-          <%= render partial: "settings/avatars/gallery_item", locals: { avatar: avatar } %>
+          <%= render Settings::AvatarWizard::GalleryItemComponent.new(
+                avatar: avatar,
+                active_avatar_id: current_account.profile.avatar_id
+              ) %>
         <% end %>
       </div>
     <% end %>

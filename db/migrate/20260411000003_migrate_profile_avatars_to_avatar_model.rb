@@ -13,7 +13,7 @@ class MigrateProfileAvatarsToAvatarModel < ActiveRecord::Migration[8.1]
       avatar = Avatar.create!(
         profile_id: profile.id,
         kind: 0, # manual
-        status: 2, # completed
+        status: 0, # draft — image validation requires attachment before completing
         dna: {}
       )
 
@@ -23,6 +23,8 @@ class MigrateProfileAvatarsToAvatarModel < ActiveRecord::Migration[8.1]
         record_id: avatar.id,
         blob_id: attachment.blob_id
       )
+
+      avatar.update_columns(status: 2) # completed — skip validations after image is attached
 
       profile.update_column(:avatar_id, avatar.id)
     end

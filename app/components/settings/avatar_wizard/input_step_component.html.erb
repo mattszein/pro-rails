@@ -1,28 +1,30 @@
 <div class="space-y-6">
   <%= render Settings::AvatarWizard::StepComponent.new(
-    step: config[:step], total: config[:total],
-    title: t("#{config[:i18n_key]}.title"),
-    subtitle: t("#{config[:i18n_key]}.subtitle", default: nil)
+    step: config.step_number, total: config.total,
+    title: t("#{config.i18n_key}.title"),
+    subtitle: t("#{config.i18n_key}.subtitle", default: nil)
   ) %>
 
   <%= form_with url: settings_avatar_path(avatar),
       method: :patch,
+      builder: CustomFormBuilder,
       data: { turbo_frame: "avatar_wizard_step" } do |f| %>
-    <%= f.hidden_field :next_step, value: config[:next_step], name: "next_step" %>
+    <%= f.hidden_field :next_step, value: config.next_step, name: "next_step" %>
 
     <div>
-      <textarea name="avatar[dna][spark_text]"
-          placeholder="<%= t("#{config[:i18n_key]}.placeholder") %>"
-          class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-transparent focus:ring-2 focus:ring-primary-400 focus:border-transparent outline-none resize-none text-base text-gray-500 dark:text-gray-200"
-          rows="3"
-          maxlength="200"><%= avatar.dna["spark_text"] %></textarea>
-      <p class="text-xs mt-1"><%= t("#{config[:i18n_key]}.hint") %></p>
+      <%= text_area_tag "avatar[dna][spark_text]",
+          avatar.dna["spark_text"],
+          placeholder: t("#{config.i18n_key}.placeholder"),
+          class: "w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-transparent focus:ring-2 focus:ring-primary-400 focus:border-transparent outline-none resize-none text-base text-gray-500 dark:text-gray-200",
+          rows: 3,
+          maxlength: 200 %>
+      <p class="text-xs mt-1"><%= t("#{config.i18n_key}.hint") %></p>
     </div>
 
     <div class="space-y-2">
-      <p class="text-xs font-medium uppercase tracking-wide"><%= t("#{config[:i18n_key]}.examples_label") %></p>
+      <p class="text-xs font-medium uppercase tracking-wide"><%= t("#{config.i18n_key}.examples_label") %></p>
       <div class="flex flex-wrap gap-2">
-        <% t("#{config[:i18n_key]}.examples").each do |example| %>
+        <% t("#{config.i18n_key}.examples").each do |example| %>
           <button type="button"
               class="px-3 py-1 text-gray-500 dark:text-gray-200 text-sm rounded-full border border-gray-200 dark:border-gray-600 hover:border-primary-400 hover:text-primary-500 transition-all"
               data-action="click->avatar-wizard#fillExample"
@@ -33,27 +35,21 @@
       </div>
     </div>
 
-    <div class="space-y-2 border-t border-gray-100 dark:border-gray-800 pt-4">
-      <p class="text-xs font-medium uppercase tracking-wide">
-        <%= t("avatars.freeform.text_model_label") %>
-      </p>
-      <div class="flex flex-wrap gap-2">
-        <% AvatarAiConfig::TEXT_MODELS.each do |model| %>
-          <label class="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border cursor-pointer transition-all
-                         border-gray-200 dark:border-gray-700 hover:border-primary-300
-                         has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50 dark:has-[:checked]:bg-primary-900/20">
-            <%= radio_button_tag "avatar[dna][text_model]", model[:id],
-                (avatar.dna["text_model"] || AvatarAiConfig.text_model) == model[:id],
-                class: "sr-only" %>
-            <%= model[:label] %>
-          </label>
-        <% end %>
-      </div>
-    </div>
+    <%= render Core::AiModelSelectorComponent.new(
+      kind: :text,
+      current_model: avatar.dna["text_model"] || AvatarAiConfig.text_model,
+      field_name: "avatar[dna][text_model]"
+    ) %>
 
     <div class="flex justify-between mt-4">
-      <%= render(Core::LinkComponent.new(name: t("shared.common.cancel"), url: edit_settings_profile_path, style: :as_button, theme: :primary, html_options: { data: { turbo_frame: "_top" } })) %>
-      <%= f.button t("shared.common.next"), theme: :primary %>
+      <%= render(Core::LinkComponent.new(
+        name: t("shared.common.cancel"),
+        url: edit_settings_profile_path,
+        style: :as_button,
+        theme: :secondary,
+        html_options: { data: { turbo_frame: "_top" } }
+      )) %>
+      <%= f.button t("shared.common.next"), {theme: :primary, type: :submit} %>
     </div>
   <% end %>
 </div>

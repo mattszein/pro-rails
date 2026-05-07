@@ -7,7 +7,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <%# Guided path %>
-      <%= form_with url: settings_avatars_path, method: :post, class: "block" do |f| %>
+      <%= form_with url: settings_avatars_path, method: :post, builder: CustomFormBuilder, class: "block" do |f| %>
         <%= f.hidden_field :method, value: "guided", name: "avatar[method]" %>
         <button type="submit"
             class="w-full p-6 rounded-2xl border-2 border-gray-200 dark:border-gray-700 hover:border-primary-400 dark:hover:border-primary-400 transition-all text-left group">
@@ -29,7 +29,7 @@
       <% end %>
 
       <%# Freeform path %>
-      <%= form_with url: settings_avatars_path, method: :post, class: "block" do |f| %>
+      <%= form_with url: settings_avatars_path, method: :post, builder: CustomFormBuilder, class: "block" do |f| %>
         <%= f.hidden_field :method, value: "freeform", name: "avatar[method]" %>
         <button type="submit"
             class="w-full p-6 rounded-2xl border-2 border-gray-200 dark:border-gray-700 hover:border-primary-400 dark:hover:border-primary-400 transition-all text-left group">
