@@ -86,8 +86,8 @@ RSpec.describe AvatarAi::PromptAssembler do
         avatar.dna_version = 99
       end
 
-      it "raises ArgumentError" do
-        expect { assembler.assemble(avatar) }.to raise_error(ArgumentError)
+      it "raises UnknownStrategy" do
+        expect { assembler.assemble(avatar) }.to raise_error(AvatarAi::PromptAssembler::UnknownStrategy)
       end
     end
   end

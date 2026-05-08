@@ -6,6 +6,7 @@
 class Core::AvatarPreviewComponent < ApplicationViewComponent
   option :avatar
   option :size, default: -> { :md }
+  option :ring_class, default: -> { "ring-transparent transition-all duration-200 group-hover:ring-secondary-500 group-[.selected]:ring-secondary-500" }
 
   SIZE_CLASSES = {
     sm: "w-10 h-10",

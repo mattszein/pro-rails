@@ -5,7 +5,7 @@ class Profile < ApplicationRecord
   belongs_to :avatar, optional: true
   has_many :avatars, dependent: :destroy
 
-  before_destroy :nullify_active_avatar
+  before_destroy :nullify_active_avatar, prepend: true
 
   validates :bio, length: {maximum: 500}
   validates :username,

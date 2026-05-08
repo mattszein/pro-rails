@@ -25,6 +25,13 @@ module Avatar::Generatable
     METHODS.key(self[:method])
   end
 
+  def state_for_view
+    return :wizard if draft? && generated?
+    return :generating if generating?
+    return :completed if completed?
+    :failed
+  end
+
   def max_wizard_step
     GENERATION_STEPS[generation_method]
   end
@@ -38,6 +45,10 @@ module Avatar::Generatable
   private
 
   def generation_method_present
-    errors.add(:method, :blank) if self[:method].nil?
+    if self[:method].nil?
+      errors.add(:method, :blank)
+    elsif !METHODS.value?(self[:method])
+      errors.add(:method, :invalid)
+    end
   end
 end

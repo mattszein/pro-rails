@@ -1,31 +1,5 @@
 <%= render Settings::LayoutComponent.new(active_section: :profile) do %>
   <%= render Core::CardComponent.new do %>
-    <% if @avatar.draft? && @avatar.generated? %>
-      <%# Wizard view %>
-      <div data-controller="avatar-wizard">
-        <turbo-frame id="avatar_wizard_step">
-          <% method_name = @avatar.read_attribute(:method) == 0 ? "guided" : "freeform" %>
-          <% if @wizard_step.present? %>
-            <%= render wizard_step_component(method_name, @wizard_step) %>
-          <% else %>
-            <% resume = @avatar.wizard_resume_step %>
-            <% if resume %>
-              <%= render wizard_step_component(method_name, resume) %>
-            <% else %>
-              <%= render Settings::AvatarWizard::StepReviewComponent.new(avatar: @avatar) %>
-            <% end %>
-          <% end %>
-        </turbo-frame>
-      </div>
-
-    <% elsif @avatar.generating? %>
-      <%= render Settings::AvatarWizard::GeneratingComponent.new(avatar: @avatar) %>
-
-    <% elsif @avatar.completed? %>
-      <%= render Settings::AvatarWizard::ResultComponent.new(avatar: @avatar) %>
-
-    <% elsif @avatar.failed? %>
-      <%= render Settings::AvatarWizard::GenerationErrorComponent.new(avatar: @avatar, error: t("avatars.generation.failed")) %>
-    <% end %>
+    <%= avatar_state_component(@avatar, wizard_step: @wizard_step) %>
   <% end %>
 <% end %>

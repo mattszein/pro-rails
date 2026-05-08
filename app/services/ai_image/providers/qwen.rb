@@ -58,9 +58,17 @@ module AiImage
 
       def download_image(url)
         require "open-uri"
-        io = URI.parse(url).open
+        uri = URI.parse(url)
+        unless %w[http https].include?(uri.scheme)
+          raise AiImage::Generator::GenerationError, "Only HTTP(S) URLs are allowed"
+        end
+        io = uri.open
         content_type = io.content_type.presence || "image/jpeg"
         {io: StringIO.new(io.read), content_type: content_type}
+      rescue URI::InvalidURIError
+        raise AiImage::Generator::GenerationError, "Invalid URL returned from Qwen provider"
+      rescue AiImage::Generator::GenerationError
+        raise
       rescue => e
         raise AiImage::Generator::GenerationError, "Failed to download Qwen image: #{e.message}"
       end

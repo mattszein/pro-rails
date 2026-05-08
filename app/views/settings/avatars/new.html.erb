@@ -2,53 +2,12 @@
   <%= render Core::CardComponent.new(classes: "space-y-6") do %>
     <div>
       <h1><%= t("avatars.new.title") %></h1>
-      <p class="text-sm text-gray-500 dark:text-gray-400"><%= t("avatars.new.subtitle") %></p>
+      <p><%= t("avatars.new.subtitle") %></p>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <%# Guided path %>
-      <%= form_with url: settings_avatars_path, method: :post, builder: CustomFormBuilder, class: "block" do |f| %>
-        <%= f.hidden_field :method, value: "guided", name: "avatar[method]" %>
-        <button type="submit"
-            class="w-full p-6 rounded-2xl border-2 border-gray-200 dark:border-gray-700 hover:border-primary-400 dark:hover:border-primary-400 transition-all text-left group">
-          <div class="flex items-start gap-4">
-            <div class="text-4xl">🎨</div>
-            <div>
-              <h3 class="font-semibold text-lg group-hover:text-primary-500 transition-colors">
-                <%= t("avatars.new.guided.title") %>
-              </h3>
-              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                <%= t("avatars.new.guided.description") %>
-              </p>
-              <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">
-                <%= t("avatars.new.guided.steps") %>
-              </p>
-            </div>
-          </div>
-        </button>
-      <% end %>
-
-      <%# Freeform path %>
-      <%= form_with url: settings_avatars_path, method: :post, builder: CustomFormBuilder, class: "block" do |f| %>
-        <%= f.hidden_field :method, value: "freeform", name: "avatar[method]" %>
-        <button type="submit"
-            class="w-full p-6 rounded-2xl border-2 border-gray-200 dark:border-gray-700 hover:border-primary-400 dark:hover:border-primary-400 transition-all text-left group">
-          <div class="flex items-start gap-4">
-            <div class="text-4xl">✨</div>
-            <div>
-              <h3 class="font-semibold text-lg group-hover:text-primary-500 transition-colors">
-                <%= t("avatars.new.freeform.title") %>
-              </h3>
-              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                <%= t("avatars.new.freeform.description") %>
-              </p>
-              <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">
-                <%= t("avatars.new.freeform.steps") %>
-              </p>
-            </div>
-          </div>
-        </button>
-      <% end %>
+      <%= render "settings/avatars/method_option", method_value: "guided", emoji: "🎨" %>
+      <%= render "settings/avatars/method_option", method_value: "freeform", emoji: "✨" %>
     </div>
 
   <% end %>

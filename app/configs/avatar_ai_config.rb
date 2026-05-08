@@ -8,7 +8,6 @@ class AvatarAiConfig < ApplicationConfig
   ].freeze
 
   IMAGE_MODELS = [
-    {id: "nano_banana", label: "Nano Banana (Gemini 2.5 Flash)"},
     {id: "qwen", label: "Qwen Image 2.0 Pro"}
   ].freeze
 
@@ -18,8 +17,8 @@ class AvatarAiConfig < ApplicationConfig
     :default_image_model,
     :max_generations_per_day,
     :mood_board_thumbnail_count,
-    default_image_model: "nano_banana",
+    default_image_model: "qwen",
     max_generations_per_day: 2,
     mood_board_thumbnail_count: 9,
-    text_model: "minimax/minimax-m2.5:free"
+    text_model: "openai/gpt-oss-120b:free"
 end

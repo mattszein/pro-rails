@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class Settings::AvatarWizard::StepComponent < ApplicationViewComponent
   option :step
   option :total

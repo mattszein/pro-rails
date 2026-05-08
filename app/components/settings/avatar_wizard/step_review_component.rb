@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class Settings::AvatarWizard::StepReviewComponent < ApplicationViewComponent
   option :avatar
 

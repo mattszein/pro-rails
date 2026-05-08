@@ -35,7 +35,8 @@ module AiImage
       raise GenerationError, "No image URL returned from provider" unless url
 
       require "open-uri"
-      io = URI.parse(url).open
+      uri = validate_url!(url)
+      io = uri.open
       content_type = io.content_type.presence || "image/png"
       {io: StringIO.new(io.read), content_type: content_type}
     rescue RubyLLM::Error => e
@@ -46,6 +47,16 @@ module AiImage
       return result.url if result.respond_to?(:url)
       return result["url"] if result.respond_to?(:[])
       nil
+    end
+
+    def validate_url!(url)
+      uri = URI.parse(url)
+      unless %w[http https].include?(uri.scheme)
+        raise GenerationError, "Only HTTP(S) URLs are allowed"
+      end
+      uri
+    rescue URI::InvalidURIError
+      raise GenerationError, "Invalid URL returned from provider"
     end
   end
 end

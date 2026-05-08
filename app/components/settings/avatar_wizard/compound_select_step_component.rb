@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class Settings::AvatarWizard::CompoundSelectStepComponent < ApplicationViewComponent
   option :avatar
   option :config  # NavigableStep

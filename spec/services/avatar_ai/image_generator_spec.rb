@@ -6,13 +6,15 @@ RSpec.describe AiImage::Generator do
   describe "#generate" do
     context "when successful (url-based provider)" do
       let(:mock_result) { double("result", url: "https://example.com/image.png") }
-      let(:image_data) { File.binread(Rails.root.join("spec/fixtures/files/avatar.png")) }
+      let(:image_data) { Rails.root.join("spec/fixtures/files/avatar.png").binread }
       let(:mock_io) { double("io", read: image_data, content_type: "image/png") }
+
+      let(:mock_uri) { double("uri", scheme: "https", open: mock_io) }
 
       before do
         allow(RubyLLM).to receive(:paint).and_return(mock_result)
         allow_any_instance_of(described_class).to receive(:url_based_generate).and_call_original
-        allow(URI).to receive_message_chain(:parse, :open).and_return(mock_io)
+        allow(URI).to receive(:parse).and_return(mock_uri)
       end
 
       it "returns a hash with io and content_type" do

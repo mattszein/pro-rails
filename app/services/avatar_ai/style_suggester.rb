@@ -29,10 +29,7 @@ module AvatarAi
     end
 
     def parse_suggestions(content)
-      styles = JSON.parse(content.strip)
-      styles.select { |s| STYLES.include?(s) }.first(4)
-    rescue JSON::ParserError
-      STYLES.first(4)
+      parse_json_array(content).select { |s| STYLES.include?(s) }.first(4)
     end
   end
 end

@@ -1,26 +1,29 @@
 <div class="space-y-6" data-controller="avatar-selection">
   <div class="text-center">
-    <h2 class="text-xl font-semibold"><%= t("avatars.result.title") %></h2>
-    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1"><%= t("avatars.result.subtitle") %></p>
+    <h2><%= t("avatars.result.title") %></h2>
+    <p class="mt-1"><%= t("avatars.result.subtitle") %></p>
   </div>
 
   <div class="flex justify-center">
-    <% if avatar.image.attached? %>
-      <%= image_tag rails_representation_path(avatar.image.variant(:medium)),
-          alt: t("avatars.result.preview_alt"),
-          class: "w-48 h-48 rounded-full object-cover ring-4 ring-primary-200 dark:ring-primary-800" %>
-    <% end %>
+    <div class="w-48 h-48">
+      <%= render Core::AvatarPreviewComponent.new(
+        avatar: avatar,
+        size: :full,
+        ring_class: "ring-primary-200 dark:ring-primary-800"
+      ) %>
+    </div>
   </div>
 
   <% if avatar.generated? && avatar.dna.present? %>
-    <details class="text-sm">
-      <summary class="cursor-pointer text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+    <details>
+      <summary class="cursor-pointer">
         <%= t("avatars.result.show_dna") %>
       </summary>
-      <div class="mt-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg text-xs text-gray-600 dark:text-gray-400 space-y-1">
+      <div class="mt-2 p-3 bg-default rounded-lg space-y-1">
         <% avatar.dna.each do |key, value| %>
           <% if value.present? %>
-            <div><span class="font-medium"><%= key.humanize %>:</span> <%= Array(value).join(", ") %></div>
+            <p><span class="font-bold italic"><%= key.humanize %>:</span> <%= Array(value).join(", ") %></p>
+            <hr />
           <% end %>
         <% end %>
       </div>

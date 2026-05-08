@@ -18,6 +18,7 @@
         <%= render Core::AvatarComponent.new(profile: @profile, size: :xl) %>
 
         <%= form_with url: settings_avatars_path, method: :post,
+            multipart: true,
             data: { controller: "click-forwarder" },
             class: "inline-block" do |f| %>
           <%= f.file_field :image, name: "avatar[image]",

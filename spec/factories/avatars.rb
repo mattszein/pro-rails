@@ -52,7 +52,7 @@ FactoryBot.define do
     trait :with_image do
       after(:build) do |avatar|
         avatar.image.attach(
-          io: File.open(Rails.root.join("spec/fixtures/files/avatar.png")),
+          io: StringIO.new(Rails.root.join("spec/fixtures/files/avatar.png").binread),
           filename: "avatar.png",
           content_type: "image/png"
         )

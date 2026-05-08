@@ -95,7 +95,7 @@ module Settings
       )
 
       if result.success?
-        generating_html = render_to_string(Settings::AvatarWizard::GeneratingComponent.new(avatar: @avatar))
+        generating_html = view_context.render(Settings::AvatarWizard::GeneratingComponent.new(avatar: @avatar))
         if was_failed
           render turbo_stream: turbo_stream.replace(
             ActionView::RecordIdentifier.dom_id(@avatar, "result"),

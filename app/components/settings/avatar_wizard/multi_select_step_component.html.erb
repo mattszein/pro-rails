@@ -21,23 +21,19 @@
     <% elsif mood_board? %>
       <div class="space-y-2">
         <% mood_board_prompts.each_with_index do |prompt, idx| %>
-          <label class="flex items-start gap-3 p-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 cursor-pointer hover:border-primary-400 transition-all has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50 dark:has-[:checked]:bg-primary-900/20">
-            <%= check_box_tag "avatar[dna][#{config.dna_field}][]", idx,
-                selected_values.include?(idx.to_s),
-                class: "mt-0.5 flex-shrink-0 rounded text-primary-500" %>
-            <span class="text-sm leading-relaxed"><%= prompt %></span>
-          </label>
+          <%= render Settings::AvatarWizard::CheckboxOptionComponent.new(
+            dna_field: config.dna_field, value: idx, label: prompt,
+            selected: selected_values.include?(idx.to_s), align: :start
+          ) %>
         <% end %>
       </div>
     <% else %>
       <div class="grid grid-cols-2 sm:grid-cols-<%= config.columns || 3 %> gap-3">
         <% options.each do |key, option| %>
-          <label class="flex items-center gap-3 p-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 cursor-pointer hover:border-primary-400 transition-all has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50 dark:has-[:checked]:bg-primary-900/20">
-            <%= check_box_tag "avatar[dna][#{config.dna_field}][]", key,
-                selected_values.include?(key.to_s),
-                class: "rounded text-primary-500" %>
-            <span class="text-sm font-medium"><%= option[:label] %></span>
-          </label>
+          <%= render Settings::AvatarWizard::CheckboxOptionComponent.new(
+            dna_field: config.dna_field, value: key, label: option[:label],
+            selected: selected_values.include?(key.to_s)
+          ) %>
         <% end %>
       </div>
     <% end %>
