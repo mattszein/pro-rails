@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 
 class Core::AiModelSelectorComponent < ApplicationViewComponent
   option :kind           # :text | :image

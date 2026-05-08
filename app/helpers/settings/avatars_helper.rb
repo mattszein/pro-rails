@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 
 module Settings::AvatarsHelper
   def avatar_status_badge(avatar)

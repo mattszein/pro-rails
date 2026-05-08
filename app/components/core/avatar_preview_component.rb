@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 
 # Renders any Avatar's image (draft, in-progress, completed, or manual).
 # Used by gallery items and the profile display (replacing Core::AvatarComponent

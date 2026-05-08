@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 
 class Avatar < ApplicationRecord
   class InvalidTransition < StandardError; end

@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 
 class MigrateProfileAvatarsToAvatarModel < ActiveRecord::Migration[8.1]
   def up
