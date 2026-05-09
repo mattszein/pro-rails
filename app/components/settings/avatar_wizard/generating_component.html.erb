@@ -1,0 +1,6 @@
+<div id="<%= dom_id(avatar, "result") %>"
+     data-controller="auto-refresh"
+     data-auto-refresh-interval-value="8000">
+  <%= helpers.turbo_stream_from "avatar_#{avatar.id}" %>
+  <%= render Settings::AvatarWizard::GenerationLoadingComponent.new(avatar: avatar) %>
+</div>

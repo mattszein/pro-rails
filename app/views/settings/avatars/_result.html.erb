@@ -1,0 +1,61 @@
+<div class="space-y-6" data-controller="avatar-selection">
+  <div class="text-center">
+    <h2><%= t("avatars.result.title") %></h2>
+    <p class="mt-1"><%= t("avatars.result.subtitle") %></p>
+  </div>
+
+  <div class="flex justify-center">
+    <div class="w-48 h-48">
+      <%= render Core::AvatarPreviewComponent.new(
+        avatar: avatar,
+        size: :full,
+        ring_class: "ring-primary-200 dark:ring-primary-800"
+      ) %>
+    </div>
+  </div>
+
+  <% if avatar.generated? && avatar.dna.present? %>
+    <details>
+      <summary class="cursor-pointer">
+        <%= t("avatars.result.show_dna") %>
+      </summary>
+      <div class="mt-2 p-3 bg-default rounded-lg space-y-1">
+        <% avatar.dna.each do |key, value| %>
+          <% if value.present? %>
+            <p><span class="font-bold italic"><%= key.humanize %>:</span> <%= Array(value).join(", ") %></p>
+            <hr />
+          <% end %>
+        <% end %>
+      </div>
+    </details>
+  <% end %>
+
+  <div class="flex flex-col sm:flex-row gap-3 justify-center">
+    <%= render(Core::LinkComponent.new(
+      name: t("avatars.result.use_this"),
+      url: select_settings_avatar_path(avatar),
+      style: :as_button,
+      theme: :primary,
+      html_options: { data: { turbo_method: :post, turbo_frame: "_top" } }
+    )) %>
+
+
+    <% if avatar.generated? && avatar.evolvable? %>
+      <%= render(Core::LinkComponent.new(
+        name: t("avatars.result.evolve"),
+        url: evolve_settings_avatar_path(avatar),
+        style: :as_button,
+        theme: :secondary,
+        html_options: { data: { turbo_method: :post } }
+      )) %>
+    <% end %>
+
+    <%= render(Core::LinkComponent.new(
+      name: t("avatars.gallery.title"),
+      url: settings_avatars_path,
+      style: :as_button,
+      theme: :secondary,
+      html_options: { data: { turbo_frame: "_top" } }
+    )) %>
+  </div>
+</div>

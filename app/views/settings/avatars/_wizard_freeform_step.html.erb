@@ -1,0 +1,2 @@
+<% config = Settings::AvatarWizard::StepConfig.for("freeform", step) %>
+<%= render Settings::AvatarWizard::StepConfig.component_class(config).new(avatar: avatar, config: config) %>

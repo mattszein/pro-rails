@@ -126,8 +126,30 @@
     line-height: var(--lh-p, 1.625);
     color: var(--color-text-body);
   }
+  
+  span {
+    font-size: var(--size-p, 1rem);
+    line-height: var(--lh-p, 1.625);
+    color: var(--color-text-body);
+  }
+
+  details {
+    font-size: var(--size-p, 1rem);
+    line-height: var(--lh-p, 1.625);
+    color: var(--color-text-body);
+  }
+
+  summary {
+    font-size: var(--size-p, 1rem);
+    line-height: var(--lh-p, 1.625);
+    color: var(--color-text-body);
+  }
 
   td {
+    color: var(--color-text-body);
+  }
+
+  button {
     color: var(--color-text-body);
   }
 

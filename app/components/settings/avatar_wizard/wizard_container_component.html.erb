@@ -1,0 +1,9 @@
+<div data-controller="avatar-wizard">
+  <turbo-frame id="avatar_wizard_step">
+    <% if (component = step_component) %>
+      <%= render component %>
+    <% else %>
+      <%= render Settings::AvatarWizard::StepReviewComponent.new(avatar: avatar) %>
+    <% end %>
+  </turbo-frame>
+</div>

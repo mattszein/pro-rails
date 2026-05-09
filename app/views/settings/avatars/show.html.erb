@@ -1,0 +1,5 @@
+<%= render Settings::LayoutComponent.new(active_section: :profile) do %>
+  <%= render Core::CardComponent.new do %>
+    <%= avatar_state_component(@avatar, wizard_step: @wizard_step) %>
+  <% end %>
+<% end %>

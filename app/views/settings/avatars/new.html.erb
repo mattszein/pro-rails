@@ -1,0 +1,14 @@
+<%= render Settings::LayoutComponent.new(active_section: :profile) do %>
+  <%= render Core::CardComponent.new(classes: "space-y-6") do %>
+    <div>
+      <h1><%= t("avatars.new.title") %></h1>
+      <p><%= t("avatars.new.subtitle") %></p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <%= render "settings/avatars/method_option", method_value: "guided", emoji: "🎨" %>
+      <%= render "settings/avatars/method_option", method_value: "freeform", emoji: "✨" %>
+    </div>
+
+  <% end %>
+<% end %>

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Core::AvatarComponent < ApplicationViewComponent
   option :profile
   option :size, default: -> { :md }
@@ -24,5 +26,13 @@ class Core::AvatarComponent < ApplicationViewComponent
 
   def hover_ring_classes
     "ring-2 ring-transparent group-hover:ring-primary-400 transition-all"
+  end
+
+  def avatar_image_attached?
+    profile.avatar&.image&.attached?
+  end
+
+  def avatar_image_variant
+    profile.avatar.image.variant(avatar_variant)
   end
 end

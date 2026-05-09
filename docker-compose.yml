@@ -27,11 +27,13 @@ services:
       IRB_HISTFILE: /usr/local/hist/.irb_history
       PSQL_HISTFILE: /usr/local/hist/.psql_history
       EDITOR: vi
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      DASHSCOPE_API_KEY: ${DASHSCOPE_API_KEY}
     volumes:
       - .:/pro-rails
       - pro-rails-cache:/pro-rails/tmp/cache
       - pro-rails-bundle:/usr/local/bundle
-      - pro-rails-builds:/pro-rails/app/assets/builds
       - pro-rails-assets:/app/public/assets
       - pro-rails-storage:/pro-rails/storage
       - pro-rails-history:/usr/local/hist
@@ -189,7 +191,6 @@ volumes:
   pro-rails-postgres-db:
   pro-rails-bundle:
   pro-rails-cache:
-  pro-rails-builds:
   pro-rails-assets:
   pro-rails-storage:
   pro-rails-history:

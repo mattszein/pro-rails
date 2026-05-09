@@ -1,0 +1,56 @@
+<div class="space-y-6">
+  <%= render Settings::AvatarWizard::StepComponent.new(
+    step: config.step_number, total: config.total,
+    title: t("#{config.i18n_key}.title"),
+    subtitle: t("#{config.i18n_key}.subtitle", default: nil)
+  ) %>
+
+  <%= form_with url: settings_avatar_path(avatar),
+      method: :patch,
+      builder: CustomFormBuilder,
+      data: { turbo_frame: "avatar_wizard_step" } do |f| %>
+    <%= f.hidden_field :next_step, value: config.next_step, name: "next_step" %>
+
+    <div>
+      <%= f.text_area :spark_text,
+          name: "avatar[dna][spark_text]",
+          value: avatar.dna["spark_text"],
+          placeholder: t("#{config.i18n_key}.placeholder"),
+          class: "w-full resize-none",
+          rows: 3,
+          maxlength: 200 %>
+      <p class="mt-1"><%= t("#{config.i18n_key}.hint") %></p>
+    </div>
+
+    <div class="space-y-2">
+      <p><%= t("#{config.i18n_key}.examples_label") %></p>
+      <div class="flex flex-wrap gap-2">
+        <% t("#{config.i18n_key}.examples").each do |example| %>
+          <button type="button"
+              class="px-3 py-1 rounded-full border border-gray-200 dark:border-gray-600 hover:border-primary-400 hover:text-primary-500 transition-all"
+              data-action="click->avatar-wizard#fillExample"
+              data-avatar-wizard-example-param="<%= example %>">
+            <%= example %>
+          </button>
+        <% end %>
+      </div>
+    </div>
+
+    <%= render Core::AiModelSelectorComponent.new(
+      kind: :text,
+      current_model: avatar.dna["text_model"] || AvatarAiConfig.text_model,
+      field_name: "avatar[dna][text_model]"
+    ) %>
+
+    <div class="flex justify-between mt-4">
+      <%= render(Core::LinkComponent.new(
+        name: t("shared.common.cancel"),
+        url: edit_settings_profile_path,
+        style: :as_button,
+        theme: :secondary,
+        html_options: { data: { turbo_frame: "_top" } }
+      )) %>
+      <%= f.button t("shared.common.next"), {theme: :primary, type: :submit} %>
+    </div>
+  <% end %>
+</div>

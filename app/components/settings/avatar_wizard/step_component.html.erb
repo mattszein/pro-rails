@@ -1,0 +1,15 @@
+<div class="space-y-3">
+  <div class="flex items-center gap-3">
+    <progress class="flex-1 h-1.5 rounded-full accent-primary-500"
+              value="<%= step %>"
+              max="<%= total %>"></progress>
+    <span class="tabular-nums whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+      <%= step %> / <%= total %>
+    </span>
+  </div>
+
+  <h2 class="text-xl font-semibold"><%= title %></h2>
+  <% if subtitle %>
+    <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5"><%= subtitle %></p>
+  <% end %>
+</div>
