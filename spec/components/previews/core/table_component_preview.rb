@@ -15,7 +15,7 @@ class Core::TableComponentPreview < ViewComponent::Preview
 
   # @label With pagination
   def with_pagination
-    pagy = Pagy.new(count: 100, page: 1)
+    pagy = build_preview_pagy(count: 100)
     render(Core::TableComponent.new(
       rows: collection,
       columns: plain_columns,
@@ -28,7 +28,7 @@ class Core::TableComponentPreview < ViewComponent::Preview
 
   # @label Full featured (sort + filter + pagination + frame)
   def full_featured
-    pagy = Pagy.new(count: 100, page: 1)
+    pagy = build_preview_pagy(count: 100)
     render(Core::TableComponent.new(
       rows: collection,
       columns: sortable_columns,
@@ -47,6 +47,14 @@ class Core::TableComponentPreview < ViewComponent::Preview
   end
 
   private
+
+  # Pagy::Offset requires a request object to compose page URLs.
+  # We supply a minimal struct that satisfies compose_page_url's interface.
+  def build_preview_pagy(count: 100, page: 1)
+    request_stub = Struct.new(:base_url, :path, :params, :cookie)
+      .new("http://localhost:3000", "/", {}, nil)
+    Pagy::Offset.new(count: count, page: page, limit: 20, request: request_stub)
+  end
 
   def plain_columns
     [

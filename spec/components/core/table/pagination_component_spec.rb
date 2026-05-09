@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe Core::Table::PaginationComponent, type: :component do
   def build_pagy(pages:, page: 1)
-    instance_double(Pagy, pages: pages, page: page)
+    instance_double(Pagy::Offset, pages: pages, page: page)
   end
 
   describe "#render?" do
