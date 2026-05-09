@@ -1,4 +1,3 @@
-
 module AvatarAi
   class PromptAssembler
     class UnknownStrategy < StandardError; end

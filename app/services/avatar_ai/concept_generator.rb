@@ -1,4 +1,3 @@
-
 module AvatarAi
   class ConceptGenerator < BaseGenerator
     def generate(spark_text:, style:, color_preference: nil)

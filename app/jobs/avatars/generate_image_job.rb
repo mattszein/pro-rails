@@ -1,4 +1,3 @@
-
 module Avatars
   class GenerateImageJob < ApplicationJob
     queue_as :default

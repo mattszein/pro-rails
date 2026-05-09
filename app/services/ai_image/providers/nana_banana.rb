@@ -1,4 +1,3 @@
-
 module AiImage
   module Providers
     class NanaBanana

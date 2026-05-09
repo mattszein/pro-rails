@@ -1,4 +1,3 @@
-
 class Core::AiModelSelectorComponent < ApplicationViewComponent
   option :kind           # :text | :image
   option :current_model  # String — currently selected model id

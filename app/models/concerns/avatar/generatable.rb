@@ -1,4 +1,3 @@
-
 module Avatar::Generatable
   extend ActiveSupport::Concern
 

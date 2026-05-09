@@ -1,4 +1,3 @@
-
 class Settings::AvatarWizard::WizardContainerComponent < ApplicationViewComponent
   option :avatar
   option :wizard_step, default: -> {}

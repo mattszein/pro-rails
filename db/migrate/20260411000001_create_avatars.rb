@@ -1,4 +1,3 @@
-
 class CreateAvatars < ActiveRecord::Migration[8.1]
   def change
     create_table :avatars do |t|

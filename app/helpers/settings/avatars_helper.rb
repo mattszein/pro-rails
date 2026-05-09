@@ -1,4 +1,3 @@
-
 module Settings::AvatarsHelper
   def avatar_status_badge(avatar)
     if avatar.generating?

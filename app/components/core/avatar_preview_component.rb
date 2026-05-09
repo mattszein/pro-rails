@@ -1,4 +1,3 @@
-
 # Renders any Avatar's image (draft, in-progress, completed, or manual).
 # Used by gallery items and the profile display (replacing Core::AvatarComponent
 # when a full Avatar record is available).

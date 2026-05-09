@@ -1,4 +1,3 @@
-
 module Avatars
   class GenerateFreeformContent
     include Interactor

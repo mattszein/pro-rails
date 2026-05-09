@@ -1,4 +1,3 @@
-
 module AiImage
   class Generator
     class GenerationError < StandardError; end

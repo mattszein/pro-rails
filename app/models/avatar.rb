@@ -1,4 +1,3 @@
-
 class Avatar < ApplicationRecord
   class InvalidTransition < StandardError; end
 

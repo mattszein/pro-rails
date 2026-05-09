@@ -1,4 +1,3 @@
-
 module AvatarAi
   module Prompts
     module Vocabulary

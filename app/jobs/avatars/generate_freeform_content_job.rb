@@ -1,4 +1,3 @@
-
 module Avatars
   class GenerateFreeformContentJob < ApplicationJob
     queue_as :default

@@ -2,18 +2,18 @@ require "rails_helper"
 
 RSpec.describe Avatar, type: :model do
   describe "associations" do
-    it { should belong_to(:profile) }
-    it { should have_one_attached(:image) }
+    it { is_expected.to belong_to(:profile) }
+    it { is_expected.to have_one_attached(:image) }
   end
 
   describe "enums" do
-    it { should define_enum_for(:kind).with_values(manual: 0, generated: 1) }
-    it { should define_enum_for(:status).with_values(draft: 0, generating: 1, completed: 2, failed: 3) }
+    it { is_expected.to define_enum_for(:kind).with_values(manual: 0, generated: 1) }
+    it { is_expected.to define_enum_for(:status).with_values(draft: 0, generating: 1, completed: 2, failed: 3) }
   end
 
   describe "validations" do
-    it { should validate_presence_of(:kind) }
-    it { should validate_presence_of(:status) }
+    it { is_expected.to validate_presence_of(:kind) }
+    it { is_expected.to validate_presence_of(:status) }
 
     context "when generated" do
       subject { build(:avatar, :generated) }
@@ -119,7 +119,7 @@ RSpec.describe Avatar, type: :model do
         it "transitions to completed" do
           # Must attach image first for the state to be valid
           avatar.image.attach(
-            io: File.open(Rails.root.join("spec/fixtures/files/avatar.png")),
+            io: Rails.root.join("spec/fixtures/files/avatar.png").open,
             filename: "avatar.png",
             content_type: "image/png"
           )

@@ -1,4 +1,3 @@
-
 module AvatarAi
   class MoodBoardGenerator < BaseGenerator
     def initialize(model: nil)

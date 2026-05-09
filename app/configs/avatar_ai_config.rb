@@ -1,4 +1,3 @@
-
 class AvatarAiConfig < ApplicationConfig
   TEXT_MODELS = [
     {id: "minimax/minimax-m2.5:free", label: "MiniMax M2.5"},

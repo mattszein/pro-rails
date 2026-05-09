@@ -1,4 +1,3 @@
-
 module AvatarAi
   class BaseGenerator
     class GenerationError < StandardError; end

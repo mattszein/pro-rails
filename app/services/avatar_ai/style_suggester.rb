@@ -1,4 +1,3 @@
-
 module AvatarAi
   class StyleSuggester < BaseGenerator
     STYLES = %w[

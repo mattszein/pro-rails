@@ -1,4 +1,3 @@
-
 module Avatars
   class Upload
     include Interactor

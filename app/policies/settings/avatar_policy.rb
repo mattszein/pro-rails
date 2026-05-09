@@ -1,4 +1,3 @@
-
 module Settings
   class AvatarPolicy < ApplicationPolicy
     default_rule :manage?

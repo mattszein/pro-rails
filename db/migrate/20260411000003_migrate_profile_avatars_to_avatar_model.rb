@@ -1,4 +1,3 @@
-
 class MigrateProfileAvatarsToAvatarModel < ActiveRecord::Migration[8.1]
   def up
     Profile.find_each do |profile|

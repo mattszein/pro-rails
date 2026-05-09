@@ -1,4 +1,3 @@
-
 module Settings
   class AvatarsController < BaseController
     before_action :require_account

@@ -1,4 +1,3 @@
-
 class Settings::AvatarWizard::CheckboxOptionComponent < ApplicationViewComponent
   option :dna_field
   option :value
