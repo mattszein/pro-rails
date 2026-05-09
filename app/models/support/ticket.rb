@@ -26,6 +26,11 @@ module Support
       other: 4
     }, default: :account_access, validate: {allow_nil: false}
     default_scope { order(priority: :desc, created_at: :desc) }
+
+    scope :by_status, ->(s) { where(status: s) }
+    scope :by_category, ->(c) { where(category: c) }
+    scope :search, ->(q) { where("title ILIKE ?", "%#{sanitize_sql_like(q)}%") }
+
     validates :title, :description, :status, :category, :created_id, presence: true
     validate :validate_attachments
     after_create :create_conversation

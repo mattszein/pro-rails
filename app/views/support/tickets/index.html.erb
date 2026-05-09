@@ -7,17 +7,23 @@
   <% end %>
   <%= turbo_stream_from "tickets" %>
   <%= render Core::CardComponent.new(padding: :none) do %>
-    <div class="flex p-4 gap-4">
+    <div class="w-full overflow-x-auto p-4">
       <%= render Core::TableComponent.new(
             rows: @tickets,
             columns: [
-              {label: t("shared.labels.title")},
-              {label: t("shared.labels.category")},
+              {label: t("shared.labels.title"), sort_key: :title, filter: {type: :text, param: :search}},
+              {label: t("shared.labels.category"), filter: {type: :select, param: :category, options: -> { Support::Ticket.categories.keys.map { |c| [I18n.t("enums.ticket.category.#{c}"), c] } }}},
               {label: t("shared.labels.description")},
-              {label: t("shared.labels.status")},
+              {label: t("shared.labels.status"), sort_key: :status, filter: {type: :select, param: :status, options: -> { Support::Ticket.statuses.keys.map { |s| [I18n.t("enums.ticket.status.#{s}"), s] } }}},
               {label: t("shared.common.actions")}
             ],
-            options: {ids: {tbody: "tickets"}}
+            options: {
+              ids: {tbody: "tickets"},
+              frame_id: "support_tickets_table",
+              pagy: @pagy,
+              sortable: true,
+              filterable: true
+            }
           ) do %>
         <% @tickets.each_with_index do |ticket, index| %>
           <%= render "ticket_table", ticket: ticket, index: index %>

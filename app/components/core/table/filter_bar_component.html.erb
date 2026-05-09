@@ -1,0 +1,28 @@
+<div class="py-3 border-b border-gray-200 dark:border-gray-700">
+  <%= form_with url: helpers.request.path, method: :get, html: {class: "flex flex-wrap items-end gap-3"} do |f| %>
+    <%= hidden_field_tag :sort, current_sort if current_sort.present? %>
+    <%= hidden_field_tag :direction, current_direction if current_direction.present? %>
+    <% filterable_columns.each do |col| %>
+      <% filter = col[:filter] %>
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase"><%= col[:label] %></label>
+        <% if filter[:type] == :text %>
+          <%= text_field_tag "filter[#{filter[:param]}]",
+                current_filters[filter[:param].to_s],
+                class: "rounded border border-gray-300 dark:border-gray-600 px-2 py-1 text-sm bg-white dark:bg-gray-800 dark:text-gray-100",
+                placeholder: t("shared.table.search_placeholder") %>
+        <% elsif filter[:type] == :select %>
+          <%= select_tag "filter[#{filter[:param]}]",
+                options_for_select([["—", ""]] + filter[:options].call, current_filters[filter[:param].to_s]),
+                class: "rounded border border-gray-300 dark:border-gray-600 px-2 py-1 text-sm bg-white dark:bg-gray-800 dark:text-gray-100" %>
+        <% end %>
+      </div>
+    <% end %>
+    <div class="flex items-end gap-2">
+      <%= f.submit t("shared.table.apply"),
+            class: "rounded bg-primary-600 hover:bg-primary-700 px-3 py-1 text-sm text-white cursor-pointer" %>
+      <%= link_to t("shared.table.clear_filters"), helpers.request.path,
+            class: "rounded px-3 py-1 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" %>
+    </div>
+  <% end %>
+</div>

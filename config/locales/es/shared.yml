@@ -72,6 +72,14 @@ es:
     dashboard:
       title: "Super Rails App"
       signed_in_as: "Has iniciado sesión como %{email}"
+    table:
+      sort_asc: "Ordenar ascendente"
+      sort_desc: "Ordenar descendente"
+      empty: "No se encontraron registros"
+      filter: "Filtrar"
+      search_placeholder: "Buscar..."
+      clear_filters: "Limpiar"
+      apply: "Aplicar"
     components:
       form:
         toggle: "Activar/Desactivar"

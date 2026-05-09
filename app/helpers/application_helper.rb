@@ -73,22 +73,35 @@ module ApplicationHelper
     [
       {
         label: I18n.t("shared.labels.email"),
-        renderer: ->(account) { account.email }
+        renderer: ->(account) { account.email },
+        sort_key: :email,
+        filter: {type: :text, param: :search}
       },
       {
         label: I18n.t("shared.labels.status"),
         renderer: ->(account) {
           render(Core::BadgeComponent.new(label: I18n.t("enums.account.status.#{account.status}"), theme: account_status_theme(account.status)))
+        },
+        sort_key: :status,
+        filter: {
+          type: :select,
+          param: :status,
+          options: -> { Account.statuses.keys.map { |s| [I18n.t("enums.account.status.#{s}"), s] } }
         }
       },
       {
         label: I18n.t("shared.labels.role"),
-        renderer: ->(account) { account.role&.name || "-" }
+        renderer: ->(account) { account.role&.name || "-" },
+        filter: {
+          type: :select,
+          param: :role_id,
+          options: -> { Role.order(:name).map { |r| [r.name, r.id] } }
+        }
       },
       {
         label: I18n.t("shared.common.actions"),
         renderer: ->(account) {
-          render(Core::LinkComponent.new(name: I18n.t("shared.common.show"), url: adminit_account_path(account), style: :as_button, theme: :show, size: :xs, html_options: {data: {turbo_prefetch: false}}))
+          render(Core::LinkComponent.new(name: I18n.t("shared.common.show"), url: adminit_account_path(account), style: :as_button, theme: :show, size: :xs, html_options: {data: {turbo_prefetch: false, turbo_frame: "_top"}}))
         }
       }
     ]
@@ -124,7 +137,7 @@ module ApplicationHelper
       {
         label: I18n.t("shared.common.actions"),
         renderer: ->(role) {
-          render(Core::LinkComponent.new(name: I18n.t("shared.common.show"), url: adminit_role_path(role), style: :as_button, theme: :show, size: :xs, html_options: {data: {turbo_prefetch: false}}))
+          render(Core::LinkComponent.new(name: I18n.t("shared.common.show"), url: adminit_role_path(role), style: :as_button, theme: :show, size: :xs, html_options: {data: {turbo_prefetch: false, turbo_frame: "_top"}}))
         }
       }
     ]
@@ -139,14 +152,21 @@ module ApplicationHelper
     [
       {
         label: I18n.t("shared.labels.reference"),
-        renderer: ->(announcement) { announcement.reference }
+        renderer: ->(announcement) { announcement.reference },
+        sort_key: :reference
       },
       {
         label: I18n.t("shared.labels.status"),
         renderer: ->(announcement) do
           render(Core::BadgeComponent.new(label: I18n.t("enums.announcement.status.#{announcement.status}"),
             theme: announcement_status_theme(announcement.status)))
-        end
+        end,
+        sort_key: :status,
+        filter: {
+          type: :select,
+          param: :status,
+          options: -> { Announcement.statuses.keys.map { |s| [I18n.t("enums.announcement.status.#{s}"), s] } }
+        }
       },
       {
         label: I18n.t("shared.labels.author"),
@@ -154,13 +174,14 @@ module ApplicationHelper
       },
       {
         label: I18n.t("shared.labels.scheduled_at"),
-        renderer: ->(announcement) { announcement.scheduled_at&.strftime("%Y-%m-%d %H:%M") || "-" }
+        renderer: ->(announcement) { announcement.scheduled_at&.strftime("%Y-%m-%d %H:%M") || "-" },
+        sort_key: :scheduled_at
       },
       {
         label: I18n.t("shared.common.actions"),
         renderer: ->(announcement) {
           render(Core::LinkComponent.new(name: I18n.t("shared.common.show"), url: adminit_announcement_path(announcement),
-            style: :as_button, theme: :show, size: :xs, html_options: {data: {turbo_prefetch: false}}))
+            style: :as_button, theme: :show, size: :xs, html_options: {data: {turbo_prefetch: false, turbo_frame: "_top"}}))
         }
       }
     ]

@@ -72,6 +72,14 @@ en:
     dashboard:
       title: "Super Rails App"
       signed_in_as: "You are signed in as %{email}"
+    table:
+      sort_asc: "Sort ascending"
+      sort_desc: "Sort descending"
+      empty: "No records found"
+      filter: "Filter"
+      search_placeholder: "Search..."
+      clear_filters: "Clear"
+      apply: "Apply"
     components:
       form:
         toggle: "Toggle me"

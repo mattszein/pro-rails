@@ -1,10 +1,16 @@
 class Adminit::AnnouncementsController < Adminit::ApplicationController
+  include Tableable
+
   before_action :set_announcement, only: %i[show edit update destroy schedule unschedule]
   verify_authorized
 
   def index
     authorize!
-    @announcements = Announcement.all
+    @pagy, @announcements = apply_table_params(
+      Announcement.includes(:author).order(created_at: :desc),
+      allowed_sorts: %i[reference status created_at scheduled_at],
+      allowed_filters: {status: :by_status}
+    )
   end
 
   def show

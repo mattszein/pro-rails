@@ -24,6 +24,7 @@ class Announcement < ApplicationRecord
   scope :ready_to_publish, -> { where(status: :scheduled).where("scheduled_at <= ?", Time.current) }
   scope :overdue, -> { scheduled.where("scheduled_at <= ?", 5.minutes.ago) }
   scope :ordered, -> { order(created_at: :desc) }
+  scope :by_status, ->(s) { where(status: s) }
 
   # query methods for states
   def schedulable?
