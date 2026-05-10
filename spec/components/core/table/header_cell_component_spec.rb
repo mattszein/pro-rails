@@ -3,8 +3,8 @@
 require "rails_helper"
 
 RSpec.describe Core::Table::HeaderCellComponent, type: :component do
-  let(:plain_column) { {label: "Name"} }
-  let(:sortable_column) { {label: "Status", sort_key: :status} }
+  let(:plain_column) { Core::Table::Column.new(label: "Name", renderer: ->(r) { r }) }
+  let(:sortable_column) { Core::Table::Column.new(label: "Status", renderer: ->(r) { r }, sort_key: :status) }
 
   before do
     allow_any_instance_of(described_class).to receive_message_chain(:helpers, :request, :query_parameters).and_return({})

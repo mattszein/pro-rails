@@ -11,9 +11,8 @@ module Support
     def index
       authorize! :ticket, with: Support::TicketPolicy
       @pagy, @tickets = apply_table_params(
-        Support::Ticket.where(created_id: current_account.id),
-        allowed_sorts: %i[title status created_at],
-        allowed_filters: {status: :by_status, category: :by_category, search: :search}
+        Support::Ticket.where(created_id: current_account.id).prioritized,
+        query: Support::TicketQuery
       )
     end
 

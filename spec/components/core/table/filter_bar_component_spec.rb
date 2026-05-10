@@ -5,9 +5,9 @@ require "rails_helper"
 RSpec.describe Core::Table::FilterBarComponent, type: :component do
   let(:columns) do
     [
-      {label: "Title", filter: {type: :text, param: :search}},
-      {label: "Status", filter: {type: :select, param: :status, options: -> { [["Open", "open"], ["Closed", "closed"]] }}},
-      {label: "Actions"}
+      Core::Table::Column.new(label: "Title", renderer: ->(r) { r }, filter: Core::Table::Filter.new(type: :text, param: :search)),
+      Core::Table::Column.new(label: "Status", renderer: ->(r) { r }, filter: Core::Table::Filter.new(type: :select, param: :status, options: -> { [["Open", "open"], ["Closed", "closed"]] })),
+      Core::Table::Column.new(label: "Actions", renderer: ->(r) { r })
     ]
   end
 

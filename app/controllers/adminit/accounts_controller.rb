@@ -8,8 +8,7 @@ class Adminit::AccountsController < Adminit::ApplicationController
     authorize!
     @pagy, @accounts = apply_table_params(
       Account.includes(:role).order(created_at: :desc),
-      allowed_sorts: %i[email created_at],
-      allowed_filters: {status: :by_status, role_id: :by_role_id, search: :search}
+      query: Adminit::AccountQuery
     )
   end
 

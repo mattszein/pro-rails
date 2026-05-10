@@ -7,9 +7,8 @@ class Adminit::TicketsController < Adminit::ApplicationController
   def index
     authorize! Support::Ticket, with: Adminit::TicketPolicy
     @pagy, @tickets = apply_table_params(
-      Support::Ticket.includes(:created, :assigned),
-      allowed_sorts: %i[title status priority created_at],
-      allowed_filters: {status: :by_status, search: :search}
+      Support::Ticket.includes(:created, :assigned).prioritized,
+      query: Adminit::TicketQuery
     )
   end
 

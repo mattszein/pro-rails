@@ -4,11 +4,11 @@ class Core::Table::HeaderCellComponent < ApplicationViewComponent
   option :current_direction, default: -> { "desc" }
 
   def sortable?
-    column[:sort_key].present?
+    column.sortable?
   end
 
   def active?
-    current_sort.to_s == column[:sort_key].to_s
+    current_sort.to_s == column.sort_key.to_s
   end
 
   def sort_indicator
@@ -19,7 +19,7 @@ class Core::Table::HeaderCellComponent < ApplicationViewComponent
   def sort_url
     new_direction = (active? && current_direction == "asc") ? "desc" : "asc"
     query = helpers.request.query_parameters
-      .merge("sort" => column[:sort_key].to_s, "direction" => new_direction)
+      .merge("sort" => column.sort_key.to_s, "direction" => new_direction)
       .except("page")
     helpers.request.path + (query.any? ? "?#{query.to_query}" : "")
   end

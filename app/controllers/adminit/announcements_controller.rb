@@ -8,8 +8,7 @@ class Adminit::AnnouncementsController < Adminit::ApplicationController
     authorize!
     @pagy, @announcements = apply_table_params(
       Announcement.includes(:author).order(created_at: :desc),
-      allowed_sorts: %i[reference status created_at scheduled_at],
-      allowed_filters: {status: :by_status}
+      query: Adminit::AnnouncementQuery
     )
   end
 

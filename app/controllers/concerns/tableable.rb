@@ -3,9 +3,13 @@ module Tableable
 
   private
 
-  def apply_table_params(scope, allowed_sorts:, allowed_filters: {}, default_sort: nil, default_direction: :desc)
+  def apply_table_params(scope, allowed_sorts: nil, allowed_filters: {}, query: nil, default_sort: nil, default_direction: :desc)
+    if query
+      allowed_sorts = query.sorts
+      allowed_filters = query.filters
+    end
     scope = apply_filters(scope, allowed_filters)
-    scope = apply_sort(scope, allowed_sorts, default_sort, default_direction)
+    scope = apply_sort(scope, Array(allowed_sorts), default_sort, default_direction)
     pagy(scope)
   end
 
@@ -21,10 +25,14 @@ module Tableable
   end
 
   def apply_filters(scope, allowed)
-    allowed.each do |param_key, scope_method|
+    allowed.each do |param_key, filter_or_scope|
       value = params.dig(:filter, param_key)
       next if value.blank?
-      scope = scope.public_send(scope_method, value)
+      scope = if filter_or_scope.respond_to?(:call)
+        filter_or_scope.call(scope, value)
+      else
+        scope.public_send(filter_or_scope, value)
+      end
     end
     scope
   end

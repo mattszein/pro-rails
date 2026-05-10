@@ -5,6 +5,6 @@ class Core::Table::FilterBarComponent < ApplicationViewComponent
   option :current_direction, default: -> {}
 
   def filterable_columns
-    columns.select { |col| col[:filter].present? }
+    columns.select(&:filterable?)
   end
 end

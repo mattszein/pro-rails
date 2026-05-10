@@ -25,11 +25,7 @@ module Support
       feature_request: 3,
       other: 4
     }, default: :account_access, validate: {allow_nil: false}
-    default_scope { order(priority: :desc, created_at: :desc) }
-
-    scope :by_status, ->(s) { where(status: s) }
-    scope :by_category, ->(c) { where(category: c) }
-    scope :search, ->(q) { where("title ILIKE ?", "%#{sanitize_sql_like(q)}%") }
+    scope :prioritized, -> { order(priority: :desc, created_at: :desc) }
 
     validates :title, :description, :status, :category, :created_id, presence: true
     validate :validate_attachments
