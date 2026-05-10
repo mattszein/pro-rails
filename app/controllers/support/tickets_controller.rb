@@ -1,15 +1,19 @@
 module Support
   class TicketsController < DashboardController
+    include Tableable
+
     before_action :require_account
     verify_authorized
 
     before_action :set_ticket, only: %i[show edit update attach_files request_reopen]
     before_action :ensure_frame_response, only: %i[new edit]
 
-    # GET /support/tickets or /support/tickets.json
     def index
       authorize! :ticket, with: Support::TicketPolicy
-      @tickets = Support::Ticket.where(created_id: current_account.id)
+      @pagy, @tickets = apply_table_params(
+        Support::Ticket.where(created_id: current_account.id).prioritized,
+        query: Support::TicketQuery
+      )
     end
 
     # GET /support/tickets/1 or /support/tickets/1.json

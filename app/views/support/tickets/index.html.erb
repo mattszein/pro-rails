@@ -7,17 +7,17 @@
   <% end %>
   <%= turbo_stream_from "tickets" %>
   <%= render Core::CardComponent.new(padding: :none) do %>
-    <div class="flex p-4 gap-4">
+    <div class="w-full overflow-x-auto p-4">
       <%= render Core::TableComponent.new(
             rows: @tickets,
-            columns: [
-              {label: t("shared.labels.title")},
-              {label: t("shared.labels.category")},
-              {label: t("shared.labels.description")},
-              {label: t("shared.labels.status")},
-              {label: t("shared.common.actions")}
-            ],
-            options: {ids: {tbody: "tickets"}}
+            columns: support_ticket_columns,
+            options: {
+              ids: {tbody: "tickets"},
+              frame_id: "support_tickets_table",
+              pagy: @pagy,
+              sortable: true,
+              filterable: true
+            }
           ) do %>
         <% @tickets.each_with_index do |ticket, index| %>
           <%= render "ticket_table", ticket: ticket, index: index %>

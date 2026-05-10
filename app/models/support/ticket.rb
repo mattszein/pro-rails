@@ -25,7 +25,8 @@ module Support
       feature_request: 3,
       other: 4
     }, default: :account_access, validate: {allow_nil: false}
-    default_scope { order(priority: :desc, created_at: :desc) }
+    scope :prioritized, -> { order(priority: :desc, created_at: :desc) }
+
     validates :title, :description, :status, :category, :created_id, presence: true
     validate :validate_attachments
     after_create :create_conversation

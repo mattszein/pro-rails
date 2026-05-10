@@ -1,3 +1,2 @@
-require "pagy/extras/countless"
-
-Pagy::DEFAULT[:limit] = 20
+Pagy::OPTIONS[:limit] = 20
+Pagy::OPTIONS.freeze

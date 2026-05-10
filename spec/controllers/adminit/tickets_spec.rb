@@ -26,6 +26,55 @@ describe Adminit::TicketsController, type: :controller do
         end
 
         it_behaves_like "respond to success"
+
+        it "paginates results" do
+          subject
+          expect(controller.instance_variable_get(:@pagy)).to be_a(Pagy)
+        end
+
+        context "with sort params" do
+          let(:ticket_a) { create(:ticket, title: "Alpha", created: creator_account) }
+          let(:ticket_b) { create(:ticket, title: "Beta", created: creator_account) }
+
+          before do
+            ticket_a
+            ticket_b
+          end
+
+          it "sorts by title asc" do
+            get :index, params: {sort: "title", direction: "asc"}
+            tickets = controller.instance_variable_get(:@tickets)
+            expect(tickets.first.title).to eq("Alpha")
+          end
+
+          it "sorts by title desc" do
+            get :index, params: {sort: "title", direction: "desc"}
+            tickets = controller.instance_variable_get(:@tickets)
+            expect(tickets.first.title).to eq("Beta")
+          end
+
+          it "ignores invalid sort params" do
+            expect { get :index, params: {sort: "malicious_column", direction: "asc"} }.not_to raise_error
+          end
+        end
+
+        context "with filter params" do
+          let!(:open_ticket) { create(:ticket, status: :open, created: creator_account) }
+          let!(:closed_ticket) { create(:ticket, status: :closed, created: creator_account) }
+
+          it "filters by status" do
+            get :index, params: {filter: {status: "open"}}
+            tickets = controller.instance_variable_get(:@tickets)
+            expect(tickets).to all(have_attributes(status: "open"))
+          end
+        end
+
+        context "with out-of-range page" do
+          it "returns last page instead of error" do
+            expect { get :index, params: {page: 99999} }.not_to raise_error
+            expect(response).to have_http_status(200)
+          end
+        end
       end
     end
   end

@@ -50,6 +50,9 @@ RSpec.configure do |config|
 
   config.include Rodauth::Rails::Test::Request, type: :request
   config.include LoginHelpers::Request, type: :request
+
+  config.include ViewComponent::TestHelpers, type: :component
+  config.include ActionView::TestCase::Behavior, type: :component
 end
 
 Shoulda::Matchers.configure do |config|

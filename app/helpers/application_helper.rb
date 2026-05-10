@@ -1,6 +1,4 @@
 module ApplicationHelper
-  include Pagy::Frontend
-
   def sidebar_links
     [
       {
@@ -69,100 +67,8 @@ module ApplicationHelper
     ACCOUNT_STATUS_THEME[status.to_sym]
   end
 
-  def accounts_columns
-    [
-      {
-        label: I18n.t("shared.labels.email"),
-        renderer: ->(account) { account.email }
-      },
-      {
-        label: I18n.t("shared.labels.status"),
-        renderer: ->(account) {
-          render(Core::BadgeComponent.new(label: I18n.t("enums.account.status.#{account.status}"), theme: account_status_theme(account.status)))
-        }
-      },
-      {
-        label: I18n.t("shared.labels.role"),
-        renderer: ->(account) { account.role&.name || "-" }
-      },
-      {
-        label: I18n.t("shared.common.actions"),
-        renderer: ->(account) {
-          render(Core::LinkComponent.new(name: I18n.t("shared.common.show"), url: adminit_account_path(account), style: :as_button, theme: :show, size: :xs, html_options: {data: {turbo_prefetch: false}}))
-        }
-      }
-    ]
-  end
-
-  def role_member_columns(role)
-    [
-      {
-        label: I18n.t("shared.labels.email"),
-        renderer: ->(account) { account.email }
-      },
-      {
-        label: I18n.t("shared.labels.status"),
-        renderer: ->(account) {
-          render(Core::BadgeComponent.new(label: I18n.t("enums.account.status.#{account.status}"), theme: account_status_theme(account.status)))
-        }
-      },
-      {
-        label: I18n.t("shared.common.actions"),
-        renderer: ->(account) {
-          render(Core::LinkComponent.new(name: I18n.t("adminit.roles.remove_member"), url: account_adminit_role_path(role, account_id: account.id), style: :as_button, theme: :delete, size: :xs, html_options: {data: {turbo_method: :delete, turbo_confirm: I18n.t("shared.common.are_you_sure")}}))
-        }
-      }
-    ]
-  end
-
-  def roles_columns
-    [
-      {
-        label: I18n.t("shared.labels.name"),
-        renderer: ->(role) { role.name }
-      },
-      {
-        label: I18n.t("shared.common.actions"),
-        renderer: ->(role) {
-          render(Core::LinkComponent.new(name: I18n.t("shared.common.show"), url: adminit_role_path(role), style: :as_button, theme: :show, size: :xs, html_options: {data: {turbo_prefetch: false}}))
-        }
-      }
-    ]
-  end
-
   ANNOUNCEMENT_STATUS_THEME = {draft: :yellow, scheduled: :orange, published: :green}
   def announcement_status_theme(status)
     ANNOUNCEMENT_STATUS_THEME[status.to_sym]
-  end
-
-  def announcement_columns
-    [
-      {
-        label: I18n.t("shared.labels.reference"),
-        renderer: ->(announcement) { announcement.reference }
-      },
-      {
-        label: I18n.t("shared.labels.status"),
-        renderer: ->(announcement) do
-          render(Core::BadgeComponent.new(label: I18n.t("enums.announcement.status.#{announcement.status}"),
-            theme: announcement_status_theme(announcement.status)))
-        end
-      },
-      {
-        label: I18n.t("shared.labels.author"),
-        renderer: ->(announcement) { announcement.author.email }
-      },
-      {
-        label: I18n.t("shared.labels.scheduled_at"),
-        renderer: ->(announcement) { announcement.scheduled_at&.strftime("%Y-%m-%d %H:%M") || "-" }
-      },
-      {
-        label: I18n.t("shared.common.actions"),
-        renderer: ->(announcement) {
-          render(Core::LinkComponent.new(name: I18n.t("shared.common.show"), url: adminit_announcement_path(announcement),
-            style: :as_button, theme: :show, size: :xs, html_options: {data: {turbo_prefetch: false}}))
-        }
-      }
-    ]
   end
 end
