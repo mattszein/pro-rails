@@ -12,7 +12,7 @@ module Core
     end
 
     Column = Data.define(:label, :renderer, :sort_key, :filter) do
-      def initialize(label:, renderer:, sort_key: nil, filter: nil)
+      def initialize(label:, renderer: nil, sort_key: nil, filter: nil)
         super
       end
 

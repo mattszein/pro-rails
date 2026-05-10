@@ -34,7 +34,6 @@ services:
       - .:/pro-rails
       - pro-rails-cache:/pro-rails/tmp/cache
       - pro-rails-bundle:/usr/local/bundle
-      - pro-rails-assets:/app/public/assets
       - pro-rails-storage:/pro-rails/storage
       - pro-rails-history:/usr/local/hist
     tmpfs:
@@ -191,7 +190,6 @@ volumes:
   pro-rails-postgres-db:
   pro-rails-bundle:
   pro-rails-cache:
-  pro-rails-assets:
   pro-rails-storage:
   pro-rails-history:
   pro-rails-mc-data:

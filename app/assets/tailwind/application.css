@@ -156,6 +156,38 @@
   label {
     color: var(--color-text-body);
   }
+
+  .pagy {
+    @apply inline-flex items-stretch -space-x-px;
+
+    > *:first-child {
+      @apply rounded-l-lg;
+    }
+
+    > *:last-child {
+      @apply rounded-r-lg;
+    }
+  }
+
+  .pagy a:not(.gap) {
+    @apply flex items-center justify-center text-sm py-2 px-3 leading-tight text-primary-500 dark:text-primary-100 bg-highlight border border-secondary-300;
+
+    &:hover {
+      @apply bg-secondary-50 dark:bg-secondary-800 text-primary-700 dark:text-primary-50;
+    }
+
+    &:not([href]) {
+      @apply text-primary-700 dark:text-primary-50 bg-highlight cursor-default;
+    }
+
+    &.current {
+      @apply flex items-center justify-center text-sm z-10 py-2 px-3 leading-tight text-primary-600 bg-primary-50 dark:bg-primary-50 border border-primary-300;
+    }
+  }
+
+  span.pagy.info {
+    @apply text-sm font-normal text-secondary-500;
+  }
 }
 
 @import "./themes/default.css";
