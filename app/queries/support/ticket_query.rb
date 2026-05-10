@@ -6,5 +6,4 @@ class Support::TicketQuery < BaseTableQuery
   }.freeze
 
   SORTS = %i[title status created_at].freeze
-
 end

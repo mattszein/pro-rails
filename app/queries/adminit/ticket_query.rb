@@ -5,5 +5,4 @@ class Adminit::TicketQuery < BaseTableQuery
   }.freeze
 
   SORTS = %i[title status priority created_at].freeze
-
 end

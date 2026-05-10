@@ -6,5 +6,4 @@ class Adminit::AccountQuery < BaseTableQuery
   }.freeze
 
   SORTS = %i[email created_at status].freeze
-
 end

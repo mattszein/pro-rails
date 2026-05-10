@@ -4,5 +4,4 @@ class Adminit::AnnouncementQuery < BaseTableQuery
   }.freeze
 
   SORTS = %i[reference status created_at scheduled_at].freeze
-
 end
