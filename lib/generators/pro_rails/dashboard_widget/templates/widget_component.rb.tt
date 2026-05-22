@@ -1,0 +1,17 @@
+module Adminit
+  module Dashboard
+    module <%= class_name.pluralize %>
+      class <%= kind.camelize %>WidgetComponent < ApplicationViewComponent
+        SPAN_CLASS = "col-span-1"
+
+        def initialize(account:)
+          @account = account
+        end
+
+        def title
+          I18n.t("adminit.dashboard_widgets.<%= file_name %>.<%= kind %>.title")
+        end
+      end
+    end
+  end
+end

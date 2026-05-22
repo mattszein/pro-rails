@@ -1,0 +1,12 @@
+<%= render Adminit::Dashboard::BaseWidgetComponent.new(title: title) do %>
+  <div class="grid grid-cols-2 gap-4">
+    <div class="text-center">
+      <span class="block text-2xl font-bold"><%= stats[:total_roles] %></span>
+      <span class="block text-xs uppercase tracking-wide"><%= I18n.t("adminit.roles.superadmin") %></span>
+    </div>
+    <div class="text-center">
+      <span class="block text-2xl font-bold"><%= stats[:total_accounts] %></span>
+      <span class="block text-xs uppercase tracking-wide"><%= I18n.t("shared.labels.accounts") %></span>
+    </div>
+  </div>
+<% end %>

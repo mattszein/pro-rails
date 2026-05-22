@@ -1,6 +1,6 @@
 # Below are the routes for madmin
 namespace :adminit do
-  root to: "application#index"
+  root to: "dashboards#index"
   resources :accounts
   resources :tickets do
     member do
@@ -27,5 +27,11 @@ namespace :adminit do
   end
   resources :permissions, only: [:index] do
     put "/", to: "permissions#update", on: :member
+  end
+
+  namespace :dashboard do
+    get "widgets/:resource/:kind",
+      to: "/adminit/dashboard_widgets#show",
+      as: :widget
   end
 end

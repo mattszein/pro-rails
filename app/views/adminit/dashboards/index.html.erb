@@ -1,0 +1,26 @@
+<%= render(Core::CardComponent.new(classes: "text-center")) do %>
+  <h1 class="font-black"><%= t("adminit.dashboard.title") %></h1>
+  <p class="py-3">
+    <%= t("adminit.dashboard.welcome", email: current_account.email) %>
+  </p>
+<% end %>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+  <% if @widgets.empty? %>
+    <%= render Adminit::Dashboard::EmptyStateComponent.new %>
+  <% else %>
+    <% @widgets.each do |widget| %>
+      <% component_class = widget.component_class.constantize %>
+      <%= turbo_frame_tag widget.turbo_frame_id,
+                          src: adminit_dashboard_widget_path(
+                                 resource: widget.resource,
+                                 kind: widget.kind
+                               ),
+                          loading: :lazy,
+                          class: component_class::SPAN_CLASS,
+                          data: auto_refresh_data(widget) do %>
+        <%= render Adminit::Dashboard::SkeletonWidgetComponent.new(kind: widget.kind) %>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>

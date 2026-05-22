@@ -1,0 +1,14 @@
+<%= render Adminit::Dashboard::BaseWidgetComponent.new(title: title, view_all_path: view_all_path, view_all_label: view_all_label) do %>
+  <% if tickets.any? %>
+    <ul class="space-y-2">
+      <% tickets.each do |ticket| %>
+        <li class="flex justify-between items-center text-sm">
+          <%= render(Core::LinkComponent.new(name: ticket.title, url: helpers.adminit_ticket_path(ticket), style: :link, html_options: {class: "truncate max-w-[70%]"}, data: { turbo_prefetch: false })) %>
+          <%= render(Core::BadgeComponent.new(label: I18n.t("enums.ticket.status.#{ticket.status}"), theme: helpers.ticket_status_theme(ticket.status), size: :xs)) %>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="text-sm"><%= I18n.t("adminit.dashboard_widgets.tickets.no_tickets") %></p>
+  <% end %>
+<% end %>

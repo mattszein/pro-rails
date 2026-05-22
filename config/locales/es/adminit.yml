@@ -22,6 +22,7 @@ es:
       note_form_placeholder: "Agregar una nota interna..."
       add_note: "Agregar Nota"
     announcements:
+      no_announcements: "No hay anuncios para mostrar."
       cannot_edit: "No se puede editar este anuncio."
       scheduled: "Anuncio programado para %{time}."
       unscheduled: "El anuncio fue desprogramado."
@@ -49,6 +50,7 @@ es:
       updated: "El rol fue actualizado exitosamente."
       not_updated: "El rol no fue actualizado."
       invalid_roles: "El rol no fue actualizado. Rol(es) seleccionado(s) no válido(s)."
+      widgets_label: "Widgets"
     accounts:
       destroyed: "La cuenta fue eliminada exitosamente."
       back_to_accounts: "Volver a Cuentas"
@@ -61,6 +63,33 @@ es:
     dashboard:
       title: "Adminit Rails App"
       welcome: "Hola, bienvenido de nuevo admin %{email}"
+      empty_state: "No hay widgets de dashboard configurados para tu rol."
+      kinds:
+        personal: "Personal"
+        general: "General"
+        analytics: "Analíticas"
+    dashboard_widgets:
+      tickets:
+        no_tickets: "No hay tickets para mostrar."
+        personal:
+          title: "Mis Tickets"
+          view_all: "Ver todos mis tickets"
+        general:
+          title: "Todos los Tickets"
+          view_all: "Ver todos los tickets"
+        analytics:
+          title: "Analíticas de Tickets"
+          avg_resolution: "Resolución Prom."
+          other: "Otros"
+      announcements:
+        general:
+          title: "Todos los Anuncios"
+          view_all: "Ver todos"
+        analytics:
+          title: "Analíticas de Anuncios"
+      permissions:
+        overview:
+          title: "Resumen de Permisos"
     navigation:
       dash: "Inicio"
       accounts: "Cuentas"

@@ -1,0 +1,20 @@
+<%= render Adminit::Dashboard::BaseWidgetComponent.new(title: title) do %>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="text-center">
+      <span class="block text-2xl font-bold"><%= stats[:total] %></span>
+      <span class="block text-xs uppercase tracking-wide"><%= I18n.t("shared.labels.total") %></span>
+    </div>
+    <div class="text-center">
+      <span class="block text-2xl font-bold"><%= stats[:open] %></span>
+      <span class="block text-xs uppercase tracking-wide"><%= I18n.t("enums.ticket.status.open") %></span>
+    </div>
+    <div class="text-center">
+      <span class="block text-2xl font-bold"><%= number_with_precision(stats[:avg_resolution_hours], precision: 1) || "—" %></span>
+      <span class="block text-xs uppercase tracking-wide"><%= I18n.t("adminit.dashboard_widgets.tickets.analytics.avg_resolution") %></span>
+    </div>
+    <div class="text-center">
+      <span class="block text-2xl font-bold"><%= stats[:by_status].values.sum - stats[:open] %></span>
+      <span class="block text-xs uppercase tracking-wide"><%= I18n.t("adminit.dashboard_widgets.tickets.analytics.other") %></span>
+    </div>
+  </div>
+<% end %>

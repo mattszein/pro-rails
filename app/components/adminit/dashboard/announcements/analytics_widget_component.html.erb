@@ -1,0 +1,20 @@
+<%= render Adminit::Dashboard::BaseWidgetComponent.new(title: title) do %>
+  <div class="grid grid-cols-2 gap-4">
+    <div class="text-center">
+      <span class="block text-2xl font-bold"><%= stats[:total] %></span>
+      <span class="block text-xs uppercase tracking-wide"><%= I18n.t("shared.labels.total") %></span>
+    </div>
+    <div class="text-center">
+      <span class="block text-2xl font-bold"><%= stats[:published] %></span>
+      <span class="block text-xs uppercase tracking-wide"><%= I18n.t("enums.announcement.status.published") %></span>
+    </div>
+    <div class="text-center">
+      <span class="block text-2xl font-bold"><%= stats[:scheduled] %></span>
+      <span class="block text-xs uppercase tracking-wide"><%= I18n.t("enums.announcement.status.scheduled") %></span>
+    </div>
+    <div class="text-center">
+      <span class="block text-2xl font-bold"><%= stats[:draft] %></span>
+      <span class="block text-xs uppercase tracking-wide"><%= I18n.t("enums.announcement.status.draft") %></span>
+    </div>
+  </div>
+<% end %>

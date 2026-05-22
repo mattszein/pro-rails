@@ -14,6 +14,7 @@ class Adminit::PermissionsController < Adminit::ApplicationController
     begin
       @permission.role_ids = permission_params[:role_ids]
       if @permission.save
+        update_dashboard_widget_keys
         flash[:notice] = I18n.t("adminit.permissions.updated")
       else
         flash[:alert] = I18n.t("adminit.permissions.not_updated")
@@ -32,6 +33,18 @@ class Adminit::PermissionsController < Adminit::ApplicationController
 
   # Only allow a list of trusted parameters through.
   def permission_params
-    params.require(:permission).permit(:permission_id, role_ids: [])
+    params.require(:permission).permit(:permission_id, role_ids: [], dashboard_widget_keys: {})
+  end
+
+  def update_dashboard_widget_keys
+    return unless permission_params[:dashboard_widget_keys]
+
+    permission_params[:role_ids]&.each do |role_id|
+      next if role_id.blank?
+
+      widget_keys = permission_params[:dashboard_widget_keys][role_id] || []
+      PermissionRole.where(permission_id: @permission.id, role_id: role_id)
+        .update_all(dashboard_widget_keys: widget_keys)
+    end
   end
 end

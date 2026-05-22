@@ -8,8 +8,8 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 #
-role_superadmin = Role.create(name: "superadmin")
-role_support = Role.create(name: "support")
+role_superadmin = Role.find_or_create_by!(name: "superadmin")
+role_support = Role.find_or_create_by!(name: "support")
 
 # Create accounts
 Account.find_or_create_by!(email: "matt@matt.com") do |account|
@@ -30,27 +30,39 @@ Account.find_or_create_by!(email: "user@user.com") do |account|
   account.status = "verified"
 end
 
-# Create permissions with roles assigned from the start
-Permission.find_or_create_by!(resource: :application) do |permission|
-  permission.roles = [role_superadmin, role_support]
+# Create permissions and ensure roles are assigned idempotently
+{
+  application: [role_superadmin, role_support],
+  account: [role_superadmin, role_support],
+  ticket: [role_superadmin, role_support],
+  role: [role_superadmin],
+  announcement: [role_superadmin],
+  permission: [role_superadmin]
+}.each do |resource, roles|
+  permission = Permission.find_or_create_by!(resource: resource) do |p|
+    p.roles = roles
+  end
+  permission.roles = roles
 end
 
-Permission.find_or_create_by!(resource: :account) do |permission|
-  permission.roles = [role_superadmin, role_support]
-end
+# Configure dashboard widgets per role/permission
+# Superadmin gets all widgets for all resources
+superadmin_widgets = {
+  ticket: ["tickets_personal", "tickets_general", "tickets_analytics"],
+  announcement: ["announcements_general", "announcements_analytics"],
+  permission: ["permissions_overview"]
+}
 
-Permission.find_or_create_by!(resource: :ticket) do |permission|
-  permission.roles = [role_superadmin, role_support]
-end
+support_widgets = {
+  ticket: ["tickets_personal", "tickets_general", "tickets_analytics"]
+}
 
-Permission.find_or_create_by!(resource: :role) do |permission|
-  permission.roles = [role_superadmin]
-end
+[role_superadmin, role_support].each do |role|
+  widgets_for_role = (role == role_superadmin) ? superadmin_widgets : support_widgets
 
-Permission.find_or_create_by!(resource: :announcement) do |permission|
-  permission.roles = [role_superadmin]
-end
-
-Permission.find_or_create_by!(resource: :permission) do |permission|
-  permission.roles = [role_superadmin]
+  widgets_for_role.each do |resource, widget_keys|
+    permission = Permission.find_by!(resource: resource)
+    PermissionRole.where(permission_id: permission.id, role_id: role.id)
+      .update_all(dashboard_widget_keys: widget_keys)
+  end
 end

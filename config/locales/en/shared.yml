@@ -47,6 +47,8 @@ en:
       tickets_assigned: "Tickets Assigned"
       username: "Username"
       bio: "Bio"
+      total: "Total"
+      accounts: "Accounts"
     placeholders:
       title: "Enter a title"
       reference: "Enter a reference"

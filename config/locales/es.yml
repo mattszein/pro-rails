@@ -22,6 +22,11 @@ es:
             base:
               cannot_update_published: "No se puede actualizar un anuncio publicado"
               only_draft_deletable: "Solo se pueden eliminar anuncios en borrador"
+        permission_role:
+          attributes:
+            dashboard_widget_keys:
+              unknown: "contiene claves de widget desconocidas: %{keys}"
+              resource_mismatch: "contiene claves de widget que no coinciden con el recurso del permiso: %{keys}"
         support/ticket:
           attributes:
             attachments:

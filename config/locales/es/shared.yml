@@ -47,6 +47,8 @@ es:
       tickets_assigned: "Tickets Asignados"
       username: "Nombre de usuario"
       bio: "Biografía"
+      total: "Total"
+      accounts: "Cuentas"
     placeholders:
       title: "Ingresá un título"
       reference: "Ingresá una referencia"

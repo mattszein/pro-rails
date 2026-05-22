@@ -1,0 +1,9 @@
+<%= render(Core::CardComponent.new(classes: "h-full")) do %>
+  <div class="flex justify-between items-center mb-4">
+    <h3><%= @title %></h3>
+    <% if @view_all_path %>
+      <%= render(Core::LinkComponent.new(name: @view_all_label, url: @view_all_path, style: :link, size: :sm)) %>
+    <% end %>
+  </div>
+  <%= content %>
+<% end %>

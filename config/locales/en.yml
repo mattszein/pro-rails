@@ -22,6 +22,11 @@ en:
             base:
               cannot_update_published: "Cannot update a published announcement"
               only_draft_deletable: "Only draft announcements can be deleted"
+        permission_role:
+          attributes:
+            dashboard_widget_keys:
+              unknown: "contains unknown widget keys: %{keys}"
+              resource_mismatch: "contains widget keys not matching the permission's resource: %{keys}"
         support/ticket:
           attributes:
             attachments:

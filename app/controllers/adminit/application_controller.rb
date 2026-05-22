@@ -1,9 +1,7 @@
 module Adminit
   class ApplicationController < SharedBaseController
     before_action :authorize_adminit_access
-
-    def index
-    end
+    verify_authorized
 
     private
 
