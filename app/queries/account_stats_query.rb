@@ -11,7 +11,7 @@ class AccountStatsQuery
   end
 
   def self.by_month
-    months = MONTHS.times.map { |i| Time.zone.today.beginning_of_month - i.months }.reverse
+    months = MONTHS.times.map { |i| Time.zone.now.beginning_of_month - i.months }.reverse
     months.index_with { |month| Account.where(created_at: month.all_month).count }
   end
 end
