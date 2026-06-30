@@ -1,9 +1,7 @@
 module Adminit
   module Dashboard
     class SkeletonWidgetComponent < ApplicationViewComponent
-      def initialize(kind:)
-        @kind = kind
-      end
+      option :kind
     end
   end
 end

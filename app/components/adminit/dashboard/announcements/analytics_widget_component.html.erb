@@ -1,20 +1,13 @@
 <%= render Adminit::Dashboard::BaseWidgetComponent.new(title: title) do %>
-  <div class="grid grid-cols-2 gap-4">
-    <div class="text-center">
-      <span class="block text-2xl font-bold"><%= stats[:total] %></span>
-      <span class="block text-xs uppercase tracking-wide"><%= I18n.t("shared.labels.total") %></span>
-    </div>
-    <div class="text-center">
-      <span class="block text-2xl font-bold"><%= stats[:published] %></span>
-      <span class="block text-xs uppercase tracking-wide"><%= I18n.t("enums.announcement.status.published") %></span>
-    </div>
-    <div class="text-center">
-      <span class="block text-2xl font-bold"><%= stats[:scheduled] %></span>
-      <span class="block text-xs uppercase tracking-wide"><%= I18n.t("enums.announcement.status.scheduled") %></span>
-    </div>
-    <div class="text-center">
-      <span class="block text-2xl font-bold"><%= stats[:draft] %></span>
-      <span class="block text-xs uppercase tracking-wide"><%= I18n.t("enums.announcement.status.draft") %></span>
+  <div class="max-w-md mx-auto">
+    <div class="rounded-lg border border-transparent dark:bg-[rgb(28_29_34_/_0.5)] dark:border-white/10 p-2 overflow-hidden">
+    <%= tag.div data: {
+          controller: "chart",
+          chart_options_value: chart_options,
+          chart_height_value: chart_height
+        } do %>
+        <div data-chart-target="canvas"></div>
+      <% end %>
     </div>
   </div>
 <% end %>

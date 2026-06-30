@@ -1,5 +1,17 @@
 <%= render Adminit::Dashboard::BaseWidgetComponent.new(title: title) do %>
+<% if kind == "analytics" %>
+  <div class="rounded-lg border border-transparent dark:bg-[rgb(28_29_34_/_0.5)] dark:border-white/10 p-2">
+    <%= tag.div data: {
+      controller: "chart",
+      chart_options_value: chart_options,
+      chart_height_value: chart_height
+    } do %>
+      <div data-chart-target="canvas"></div>
+    <% end %>
+  </div>
+<% else %>
   <p class="text-sm text-gray-500 dark:text-gray-400">
     <%= file_name %> <%= kind %> widget content goes here.
   </p>
+<% end %>
 <% end %>

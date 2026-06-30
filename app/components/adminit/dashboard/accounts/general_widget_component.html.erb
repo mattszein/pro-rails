@@ -1,0 +1,15 @@
+<%= render Adminit::Dashboard::BaseWidgetComponent.new(title: title) do %>
+    <%= select_tag "account_lookup",
+          options_for_select([]),
+          class: "w-full py-4",
+          data: {
+            controller: "account-lookup",
+            account_lookup_search_url_value: search_url,
+            placeholder: t("adminit.dashboard_widgets.accounts.general.placeholder")
+          } %>
+    <div data-account-lookup-info hidden></div>
+    <template data-account-lookup-template>
+      <%= render Adminit::Accounts::SummaryComponent.new() %>
+      <%= render(Core::LinkComponent.new(name: t("adminit.dashboard_widgets.accounts.general.view_full"), url: "#", style: :link, html_options: {class: "pt-2", data: {turbo_prefetch: false, account_lookup_link: "", turbo_frame: "_top"}})) %>
+    </template>
+<% end %>

@@ -1,0 +1,27 @@
+<% one_widget = (widgets.size > 1) %>
+<%= render(Core::CardComponent.new(padding: :sm, classes: "h-full overflow-hidden #{container_height_class} flex flex-col #{one_widget ? "inset-shadow-[6px_0_4px_-2px_var(--color-primary-500)]" : "inset-shadow-[6px_0_4px_-2px_var(--color-secondary-500)]"}")) do %>
+  <h4><%= I18n.t("adminit.navigation.#{@resource.to_s.pluralize}")%></h4>
+  <% if widgets.size > 1 %>
+    <div class="flex flex-col h-full" data-controller="tabs"
+         data-tabs-active-classes-value="<%= Core::SubmenuStyles::ACTIVE_CLASSES %>"
+         data-tabs-inactive-classes-value="<%= Core::SubmenuStyles::INACTIVE_CLASSES %>">
+      <%= render Core::TabsComponent.new(
+            sections: submenu_sections,
+            current_section: widgets.first.kind
+          ) %>
+
+      <div class="flex-1 overflow-auto min-h-0">
+        <% widgets.each_with_index do |widget, index| %>
+          <div data-tabs-target="panel" data-index="<%= index %>" role="tabpanel"
+               class="<%= "hidden" unless index.zero? %> h-full">
+            <%= widget_frame(widget) %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% else %>
+    <div class="flex-1 overflow-auto min-h-0 h-full">
+      <%= widget_frame(widgets.first) %>
+    </div>
+  <% end %>
+<% end %>

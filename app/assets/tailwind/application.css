@@ -76,7 +76,7 @@
 
   .dark {
     --color-default: var(--color-zinc-950);
-    --color-highlight: var(--color-zinc-900);
+    --color-highlight: rgb(28 29 34);
   }
 
   h1 {

@@ -1,9 +1,10 @@
-<%= render(Core::CardComponent.new(classes: "h-full")) do %>
-  <div class="flex justify-between items-center mb-4">
-    <h3><%= @title %></h3>
+<div class="flex flex-col h-full">
+  <div class="flex-1 overflow-auto min-h-64">
+    <%= content %>
+  </div>
+  <div class="flex justify-between items-center">
     <% if @view_all_path %>
-      <%= render(Core::LinkComponent.new(name: @view_all_label, url: @view_all_path, style: :link, size: :sm)) %>
+      <%= render(Core::LinkComponent.new(name: @view_all_label, url: @view_all_path, style: :link, html_options: {data: {turbo_prefetch: false, turbo_frame: "_top"}})) %>
     <% end %>
   </div>
-  <%= content %>
-<% end %>
+</div>

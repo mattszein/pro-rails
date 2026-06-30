@@ -1,20 +1,20 @@
 <%= render Adminit::Dashboard::BaseWidgetComponent.new(title: title) do %>
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-    <div class="text-center">
-      <span class="block text-2xl font-bold"><%= stats[:total] %></span>
-      <span class="block text-xs uppercase tracking-wide"><%= I18n.t("shared.labels.total") %></span>
+  <div class="flex flex-col md:flex-row p-2 gap-2">
+    <div class="w-full md:flex-1 md:min-w-0">
+    <div class="grow basis-2/3 shrink-0">
+        <%= tag.div data: {
+              controller: "chart",
+              chart_options_value: chart_options,
+              chart_height_value: chart_height
+            } do %>
+          <div data-chart-target="canvas"></div>
+        <% end %>
     </div>
-    <div class="text-center">
-      <span class="block text-2xl font-bold"><%= stats[:open] %></span>
-      <span class="block text-xs uppercase tracking-wide"><%= I18n.t("enums.ticket.status.open") %></span>
-    </div>
-    <div class="text-center">
-      <span class="block text-2xl font-bold"><%= number_with_precision(stats[:avg_resolution_hours], precision: 1) || "—" %></span>
-      <span class="block text-xs uppercase tracking-wide"><%= I18n.t("adminit.dashboard_widgets.tickets.analytics.avg_resolution") %></span>
-    </div>
-    <div class="text-center">
-      <span class="block text-2xl font-bold"><%= stats[:by_status].values.sum - stats[:open] %></span>
-      <span class="block text-xs uppercase tracking-wide"><%= I18n.t("adminit.dashboard_widgets.tickets.analytics.other") %></span>
+    <div class="grow basis-1/3 grid grid-cols-2 gap-4 content-center shrink-0">
+      <%= render Adminit::Dashboard::BaseAnalyticComponent.new(title: I18n.t("shared.labels.total"), content: stats[:total]) %>
+      <%= render Adminit::Dashboard::BaseAnalyticComponent.new(title: I18n.t("enums.ticket.status.open"), content: stats[:open]) %>
+      <%= render Adminit::Dashboard::BaseAnalyticComponent.new(title: I18n.t("enums.ticket.status.in_progress"), content: stats[:in_progress]) %>
+      <%= render Adminit::Dashboard::BaseAnalyticComponent.new(title: I18n.t("adminit.dashboard_widgets.tickets.analytics.resolved"), content: stats[:resolved]) %>
     </div>
   </div>
 <% end %>

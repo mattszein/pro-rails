@@ -4,16 +4,14 @@ module Adminit
       class PersonalWidgetComponent < ApplicationViewComponent
         SPAN_CLASS = "col-span-1"
 
-        def initialize(account:)
-          @account = account
-        end
+        option :account
 
         def title
           I18n.t("adminit.dashboard_widgets.tickets.personal.title")
         end
 
         def tickets
-          @tickets ||= ::TicketsForAccountQuery.call(account: @account, limit: 10)
+          @tickets ||= ::TicketsForAccountQuery.call(account: account, limit: 10)
         end
 
         def view_all_path

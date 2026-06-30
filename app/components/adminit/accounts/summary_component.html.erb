@@ -1,0 +1,27 @@
+<%= render Core::BoxComponent.new do %>
+  <%= render Core::DefinitionListComponent.new(gap: :sm) do |dl| %>
+    <% dl.with_item(term: t("shared.labels.id")) do %>
+      <span data-account-field="id"><%= account&.id %></span>
+    <% end %>
+    <% dl.with_item(term: t("shared.labels.email")) do %>
+      <span data-account-field="email"><%= account&.email %></span>
+    <% end %>
+    <% dl.with_item(term: t("shared.labels.role")) do %>
+      <span data-account-field="role"><%= account ? (account.role&.name || "-") : "" %></span>
+    <% end %>
+    <% dl.with_item(term: t("shared.labels.status")) do %>
+      <% if template_mode? %>
+        <% statuses.each do |status| %>
+          <span data-account-status="<%= status %>" hidden>
+            <%= render Core::BadgeComponent.new(label: t("enums.account.status.#{status}"), theme: status_theme(status)) %>
+          </span>
+        <% end %>
+      <% else %>
+        <%= render Core::BadgeComponent.new(label: t("enums.account.status.#{account.status}"), theme: status_theme(account.status)) %>
+      <% end %>
+    <% end %>
+    <% dl.with_item(term: t("shared.labels.created_on")) do %>
+      <span data-account-field="created_at"><%= account && l(account.created_at.to_date, format: :long) %></span>
+    <% end %>
+  <% end %>
+<% end %>

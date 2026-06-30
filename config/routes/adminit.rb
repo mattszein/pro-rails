@@ -33,5 +33,8 @@ namespace :adminit do
     get "widgets/:resource/:kind",
       to: "/adminit/dashboard_widgets#show",
       as: :widget
+    get "accounts/search",
+      to: "/adminit/dashboard/accounts#search",
+      as: :accounts_search
   end
 end

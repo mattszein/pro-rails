@@ -3,7 +3,7 @@
     <ul class="space-y-2">
       <% announcements.each do |announcement| %>
         <li class="flex justify-between items-center text-sm">
-          <%= render(Core::LinkComponent.new(name: announcement.title, url: helpers.adminit_announcement_path(announcement), style: :link, html_options: {class: "truncate max-w-[70%]"}, data: { turbo_prefetch: false })) %>
+          <%= render(Core::LinkComponent.new(name: announcement.title, url: helpers.adminit_announcement_path(announcement), style: :link, html_options: {class: "truncate max-w-[70%]", data: {turbo_prefetch: false, turbo_frame: "_top"}} )) %>
           <%= render(Core::BadgeComponent.new(label: I18n.t("enums.announcement.status.#{announcement.status}"), theme: helpers.announcement_status_theme(announcement.status), size: :xs)) %>
         </li>
       <% end %>

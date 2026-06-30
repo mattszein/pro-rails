@@ -25,4 +25,5 @@ pin "@rails/request.js", to: "@rails--request.js.js" # @0.0.13
 pin "lexxy", to: "lexxy.js"
 pin "@rails/activestorage", to: "activestorage.esm.js"
 pin "motion/dom", to: "https://cdn.jsdelivr.net/npm/motion@12.7.3/+esm"
+pin "apexcharts", to: "https://cdn.jsdelivr.net/npm/apexcharts@4.7.0/+esm"
 pin_all_from "app/javascript/icons", under: "icons"

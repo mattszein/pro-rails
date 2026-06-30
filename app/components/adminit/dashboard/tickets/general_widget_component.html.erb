@@ -3,8 +3,8 @@
     <ul class="space-y-2">
       <% tickets.each do |ticket| %>
         <li class="flex justify-between items-center text-sm">
-          <%= render(Core::LinkComponent.new(name: ticket.title, url: helpers.adminit_ticket_path(ticket), style: :link, html_options: {class: "truncate max-w-[70%]"}, data: { turbo_prefetch: false })) %>
-          <%= render(Core::BadgeComponent.new(label: I18n.t("enums.ticket.status.#{ticket.status}"), theme: helpers.ticket_status_theme(ticket.status), size: :xs)) %>
+          <%= render(Core::LinkComponent.new(name: ticket.title, url: helpers.adminit_ticket_path(ticket), style: :link, html_options: {data: {turbo_prefetch: false, turbo_frame: "_top"}})) %>
+          <%= render(Core::BadgeComponent.new(label: I18n.t("enums.ticket.status.#{ticket.status}"), theme: helpers.ticket_status_theme(ticket.status), size: :md)) %>
         </li>
       <% end %>
     </ul>

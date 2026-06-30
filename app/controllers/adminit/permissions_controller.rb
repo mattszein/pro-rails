@@ -4,7 +4,7 @@ class Adminit::PermissionsController < Adminit::ApplicationController
   # GET /adminit/permissions
   def index
     authorize!
-    @roles = Role.all.collect { |p| [p.name, p.id] }
+    @roles = Role.all.to_a
     @permissions = Permission.all
   end
 

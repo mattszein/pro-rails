@@ -4,9 +4,7 @@ module Adminit
       class GeneralWidgetComponent < ApplicationViewComponent
         SPAN_CLASS = "col-span-1"
 
-        def initialize(account:)
-          @account = account
-        end
+        option :account
 
         def title
           I18n.t("adminit.dashboard_widgets.tickets.general.title")

@@ -3,10 +3,9 @@ class TicketStatsQuery
     {
       total: scope.count,
       open: scope.open.count,
-      by_status: scope.reorder(nil).group(:status).count,
-      avg_resolution_hours: scope.where(status: [:finished, :closed]).average(
-        "EXTRACT(EPOCH FROM (updated_at - created_at)) / 3600"
-      )
+      in_progress: scope.in_progress.count,
+      resolved: scope.where(status: [:finished, :closed]).count,
+      by_status: scope.reorder(nil).group(:status).count
     }
   end
 end

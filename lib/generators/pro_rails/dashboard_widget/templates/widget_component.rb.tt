@@ -4,13 +4,28 @@ module Adminit
       class <%= kind.camelize %>WidgetComponent < ApplicationViewComponent
         SPAN_CLASS = "col-span-1"
 
-        def initialize(account:)
-          @account = account
-        end
+        option :account
 
         def title
           I18n.t("adminit.dashboard_widgets.<%= file_name %>.<%= kind %>.title")
         end
+<% if kind == "analytics" %>
+        def chart_height
+          Adminit::DashboardHelper::CHART_HEIGHT_SMALL
+        end
+
+        def stats
+          @stats ||= ::<%= class_name %>StatsQuery.call
+        end
+
+        def chart_options
+          ::Dashboard::ChartOptions.donut(
+            labels: [],
+            series: [],
+            semantic_colors: []
+          )
+        end
+<% end %>
       end
     end
   end

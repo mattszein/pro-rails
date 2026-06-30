@@ -68,7 +68,14 @@ en:
         personal: "Personal"
         general: "General"
         analytics: "Analytics"
+      resources:
+        ticket: "Tickets"
+        announcement: "Announcements"
+        permission: "Permissions"
+        account: "Accounts"
     dashboard_widgets:
+      chart:
+        no_data: "No data available"
       tickets:
         no_tickets: "No tickets to display."
         personal:
@@ -79,8 +86,8 @@ en:
           view_all: "View all tickets"
         analytics:
           title: "Ticket Analytics"
-          avg_resolution: "Avg. Resolution"
-          other: "Other"
+          resolved: "Resolved"
+          series_name: "Tickets"
       announcements:
         general:
           title: "All Announcements"
@@ -90,6 +97,21 @@ en:
       permissions:
         overview:
           title: "Permissions Overview"
+      roles:
+        general:
+          title: "Roles"
+        no_roles: "No roles to display."
+      accounts:
+        general:
+          title: "Account Lookup"
+          placeholder: "Search by email..."
+          view_full: "View full profile"
+          no_role: "No role"
+        analytics:
+          title: "Account Analytics"
+          series_name: "Accounts"
+          registered: "Registered"
+          active_sessions: "Active Sessions"
     navigation:
       dash: "Dash"
       accounts: "Accounts"

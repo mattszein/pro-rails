@@ -7,7 +7,8 @@ module Dashboard
       :policy_class,
       :component_class,
       :turbo_frame_id,
-      :refresh_interval
+      :refresh_interval,
+      :lazy
     )
 
     @widgets = {}
@@ -15,6 +16,7 @@ module Dashboard
     class << self
       def register(**attrs)
         attrs[:refresh_interval] ||= nil
+        attrs[:lazy] = true unless attrs.key?(:lazy)
         widget = Widget.new(**attrs)
 
         raise ArgumentError, "duplicate widget key: #{widget.key}" if @widgets.key?(widget.key)
@@ -28,7 +30,12 @@ module Dashboard
       def all = @widgets.values
       def all_keys = @widgets.keys
       def find(key) = @widgets[key.to_sym]
-      def for_keys(ks) = ks.filter_map { |k| @widgets[k.to_sym] }
+
+      def for_keys(ks)
+        keys = ks.map(&:to_sym).to_set
+        all.select { |w| keys.include?(w.key) }
+      end
+
       def for_resource(resource) = all.select { |w| w.resource == resource.to_sym }
       def clear = @widgets.clear
     end

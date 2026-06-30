@@ -16,5 +16,13 @@ RSpec.describe Role, type: :model do
       widgets = role.dashboard_widgets
       expect(widgets.map(&:key)).to contain_exactly(:tickets_personal, :tickets_general)
     end
+
+    it "returns widgets in registry order regardless of database key order" do
+      PermissionRole.where(permission_id: ticket_permission.id, role_id: role.id)
+        .update_all(dashboard_widget_keys: ["tickets_general", "tickets_personal"])
+
+      widgets = role.dashboard_widgets
+      expect(widgets.map(&:key)).to eq([:tickets_personal, :tickets_general])
+    end
   end
 end

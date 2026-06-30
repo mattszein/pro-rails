@@ -68,7 +68,14 @@ es:
         personal: "Personal"
         general: "General"
         analytics: "Analíticas"
+      resources:
+        ticket: "Tickets"
+        announcement: "Anuncios"
+        permission: "Permisos"
+        account: "Cuentas"
     dashboard_widgets:
+      chart:
+        no_data: "No hay datos disponibles"
       tickets:
         no_tickets: "No hay tickets para mostrar."
         personal:
@@ -79,8 +86,8 @@ es:
           view_all: "Ver todos los tickets"
         analytics:
           title: "Analíticas de Tickets"
-          avg_resolution: "Resolución Prom."
-          other: "Otros"
+          resolved: "Resueltos"
+          series_name: "Tickets"
       announcements:
         general:
           title: "Todos los Anuncios"
@@ -90,6 +97,21 @@ es:
       permissions:
         overview:
           title: "Resumen de Permisos"
+      roles:
+        general:
+          title: "Roles"
+        no_roles: "No hay roles para mostrar."
+      accounts:
+        general:
+          title: "Búsqueda de Cuenta"
+          placeholder: "Buscar por email..."
+          view_full: "Ver perfil completo"
+          no_role: "Sin rol"
+        analytics:
+          title: "Analíticas de Cuentas"
+          series_name: "Cuentas"
+          registered: "Registradas"
+          active_sessions: "Sesiones Activas"
     navigation:
       dash: "Inicio"
       accounts: "Cuentas"

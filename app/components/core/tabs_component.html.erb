@@ -1,0 +1,13 @@
+<div class="flex border-b border-primary-300" role="tablist">
+  <% @sections.each do |section| %>
+    <button type="button" role="tab"
+            data-tabs-target="tab"
+            data-action="click->tabs#select"
+      data-index="<%= section.panel_id %>"
+      aria-selected="<%= active?(section) %>"
+      class="<%= tab_classes(section) %> group/tab">
+      <%= section.name %>
+      <span class="<%= Core::SubmenuStyles::UNDERLINE_BASE %> opacity-0 group-aria-selected/tab:opacity-100"></span>
+    </button>
+  <% end %>
+</div>
