@@ -11,19 +11,33 @@ RSpec.describe Dashboard::WidgetRegistry do
       described_class.instance_variable_get(:@widgets).delete(:test_widget)
     end
 
-    it "registers a widget" do
-      described_class.register(
+    def base_attrs
+      {
         key: :test_widget,
         resource: :ticket,
         kind: :personal,
         policy_class: "Adminit::TicketPolicy",
         component_class: "Adminit::Dashboard::Tickets::PersonalWidgetComponent",
         turbo_frame_id: "dashboard_test_widget"
-      )
+      }
+    end
+
+    it "registers a widget" do
+      described_class.register(**base_attrs)
 
       widget = described_class.find(:test_widget)
       expect(widget).to be_present
       expect(widget.resource).to eq(:ticket)
+    end
+
+    it "defaults span to :full" do
+      described_class.register(**base_attrs)
+      expect(described_class.find(:test_widget).span).to eq(:full)
+    end
+
+    it "accepts an explicit span" do
+      described_class.register(**base_attrs, span: :half)
+      expect(described_class.find(:test_widget).span).to eq(:half)
     end
 
     it "raises on duplicate key" do

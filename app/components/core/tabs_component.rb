@@ -1,21 +1,21 @@
 class Core::TabsComponent < ApplicationViewComponent
   include Core::SubmenuStyles
 
-  Section = Data.define(:key, :name, :panel_id)
+  # Each tab carries its trigger label (`name`) and its panel body (the block
+  # content). The component renders both the tablist and the tabpanels, and owns
+  # the `tabs` Stimulus controller that toggles them client-side.
+  renders_many :tabs, "TabComponent"
 
-  option :sections, default: -> { [] }
-  option :current_section, default: -> { :none }
+  option :active_classes, default: -> { Core::SubmenuStyles::ACTIVE_CLASSES }
+  option :inactive_classes, default: -> { Core::SubmenuStyles::INACTIVE_CLASSES }
 
-  def before_render
-    @sections = sections.map { |s| s.is_a?(Section) ? s : Section.new(**s) }
-    @current_section = current_section.to_sym
+  def tab_classes(active)
+    section_classes(active)
   end
 
-  def active?(section)
-    section.key == @current_section
-  end
+  class TabComponent < ApplicationViewComponent
+    option :name
 
-  def tab_classes(section)
-    section_classes(active?(section))
+    def call = content
   end
 end

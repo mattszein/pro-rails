@@ -5,7 +5,7 @@ module Adminit
       option :widgets, default: -> { [] }
 
       def container_span_class
-        (@widgets.size > 1) ? "col-span-1 md:col-span-2" : "col-span-1"
+        (widgets.first&.span == :full) ? "col-span-2" : "col-span-1"
       end
 
       def container_height_class
@@ -14,12 +14,6 @@ module Adminit
 
       def tab_label(widget)
         I18n.t("adminit.dashboard.kinds.#{widget.kind}", default: widget.kind.to_s.humanize)
-      end
-
-      def submenu_sections
-        widgets.each_with_index.map do |widget, i|
-          Core::TabsComponent::Section.new(key: widget.kind, name: tab_label(widget), panel_id: i)
-        end
       end
 
       attr_reader :widgets, :resource

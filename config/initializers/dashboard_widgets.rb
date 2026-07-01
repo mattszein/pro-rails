@@ -22,14 +22,14 @@ Rails.application.config.to_prepare do
   )
 
   Dashboard::WidgetRegistry.register(
-    key: :permissions_overview, resource: :permission, kind: :general,
+    key: :permissions_overview, resource: :permission, kind: :general, span: :half,
     policy_class: "Adminit::PermissionPolicy",
     component_class: "Adminit::Dashboard::Permissions::OverviewWidgetComponent",
     turbo_frame_id: "dashboard_permissions_overview"
   )
 
   Dashboard::WidgetRegistry.register(
-    key: :roles_general, resource: :role, kind: :general,
+    key: :roles_general, resource: :role, kind: :general, span: :half,
     policy_class: "Adminit::RolePolicy",
     component_class: "Adminit::Dashboard::Roles::GeneralWidgetComponent",
     turbo_frame_id: "dashboard_roles_general"

@@ -4,6 +4,7 @@ module Dashboard
       :key,
       :resource,
       :kind,
+      :span,
       :policy_class,
       :component_class,
       :turbo_frame_id,
@@ -17,6 +18,7 @@ module Dashboard
       def register(**attrs)
         attrs[:refresh_interval] ||= nil
         attrs[:lazy] = true unless attrs.key?(:lazy)
+        attrs[:span] ||= :full
         widget = Widget.new(**attrs)
 
         raise ArgumentError, "duplicate widget key: #{widget.key}" if @widgets.key?(widget.key)

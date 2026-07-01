@@ -1,53 +1,52 @@
 require "rails_helper"
 
 RSpec.describe Core::TabsComponent, type: :component do
-  it "renders tab buttons with the expected data attributes" do
-    sections = [
-      Core::TabsComponent::Section.new(key: :personal, name: "Personal", panel_id: 0),
-      Core::TabsComponent::Section.new(key: :general, name: "General", panel_id: 1),
-      Core::TabsComponent::Section.new(key: :analytics, name: "Analytics", panel_id: 2)
-    ]
-
-    render_inline(described_class.new(sections: sections, current_section: :personal))
-
-    buttons = page.all("[role='tab']")
-    expect(buttons.size).to eq(3)
-
-    sections.each do |section|
-      button = page.find("button[data-index='#{section.panel_id}']")
-      expect(button).to have_text(section.name)
-      expect(button["data-tabs-target"]).to eq("tab")
+  def render_tabs(names)
+    render_inline(described_class.new) do |tabs|
+      names.each_with_index do |name, i|
+        tabs.with_tab(name: name) { "Panel #{i}" }
+      end
     end
   end
 
-  it "marks the current section as selected" do
-    sections = [
-      Core::TabsComponent::Section.new(key: :personal, name: "Personal", panel_id: 0),
-      Core::TabsComponent::Section.new(key: :general, name: "General", panel_id: 1)
-    ]
+  it "renders a button and a panel for every tab" do
+    render_tabs(%w[Personal General Analytics])
 
-    render_inline(described_class.new(sections: sections, current_section: :general))
+    expect(page.all("[role='tab']").size).to eq(3)
+    expect(page.all("[role='tabpanel']").size).to eq(3)
 
-    expect(page.find("button[data-index='0']")["aria-selected"]).to eq("false")
-    expect(page.find("button[data-index='1']")["aria-selected"]).to eq("true")
+    button = page.find("button[data-index='1']")
+    expect(button).to have_text("General")
+    expect(button["data-tabs-target"]).to eq("tab")
+  end
+
+  it "activates the first tab and panel, hiding the rest" do
+    render_tabs(%w[Personal General])
+
+    expect(page.find("button[data-index='0']")["aria-selected"]).to eq("true")
+    expect(page.find("button[data-index='1']")["aria-selected"]).to eq("false")
+
+    expect(page.find("[role='tabpanel'][data-index='0']")[:class]).not_to include("hidden")
+    expect(page.find("[role='tabpanel'][data-index='1']")[:class]).to include("hidden")
+  end
+
+  it "renders each tab's panel body" do
+    render_tabs(%w[Personal General])
+
+    expect(page.find("[role='tabpanel'][data-index='1']")).to have_text("Panel 1")
   end
 
   it "renders the underline span on every tab" do
-    sections = [
-      Core::TabsComponent::Section.new(key: :personal, name: "Personal", panel_id: 0),
-      Core::TabsComponent::Section.new(key: :general, name: "General", panel_id: 1)
-    ]
-
-    render_inline(described_class.new(sections: sections, current_section: :personal))
+    render_tabs(%w[Personal General])
 
     expect(page).to have_css("button span", count: 2)
   end
 
-  it "raises when a section is missing the required panel_id" do
-    sections = [{key: :personal, name: "Personal"}]
+  it "wires the tabs stimulus controller with the submenu class values" do
+    render_tabs(%w[Personal])
 
-    expect {
-      render_inline(described_class.new(sections: sections, current_section: :personal))
-    }.to raise_error(ArgumentError)
+    root = page.find("[data-controller='tabs']")
+    expect(root["data-tabs-active-classes-value"]).to eq(Core::SubmenuStyles::ACTIVE_CLASSES)
+    expect(root["data-tabs-inactive-classes-value"]).to eq(Core::SubmenuStyles::INACTIVE_CLASSES)
   end
 end
