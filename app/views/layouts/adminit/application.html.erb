@@ -40,6 +40,7 @@
       <% end %>
       <main class="grow pt-16 px-8 overflow-x-scroll" role="main">
         <%= turbo_frame_tag "modal", target: "_top" %>
+        <%= render Adminit::BreadcrumbComponent.new(trail: adminit_breadcrumb_trail) %>
         <%= yield %>
       </main>
       <%= render "shared/flashes" %>

@@ -13,6 +13,8 @@ class Role < ApplicationRecord
     name == SUPERADMIN
   end
 
+  def breadcrumb_title = name
+
   def permitted_resources
     @permitted_resources ||= permissions.pluck(:resource).to_set
   end

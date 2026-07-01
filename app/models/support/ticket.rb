@@ -56,6 +56,8 @@ module Support
         partial: "support/conversations/message_form_status"
     end
 
+    def breadcrumb_title = "##{id} #{title}"
+
     def messageable?
       in_progress? || reopened?
     end

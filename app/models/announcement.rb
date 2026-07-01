@@ -25,6 +25,8 @@ class Announcement < ApplicationRecord
   scope :overdue, -> { scheduled.where("scheduled_at <= ?", 5.minutes.ago) }
   scope :ordered, -> { order(created_at: :desc) }
 
+  def breadcrumb_title = title
+
   # query methods for states
   def schedulable?
     draft? && scheduled_at.present?

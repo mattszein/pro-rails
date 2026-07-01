@@ -15,6 +15,8 @@ class Account < ApplicationRecord
     role.present?
   end
 
+  def breadcrumb_title = profile&.username || email
+
   private
 
   def create_default_profile
