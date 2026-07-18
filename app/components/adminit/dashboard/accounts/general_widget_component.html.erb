@@ -1,4 +1,4 @@
-<%= render Adminit::Dashboard::BaseWidgetComponent.new(title: title) do %>
+<%= render Adminit::Dashboard::BaseWidgetComponent.new do %>
     <%= select_tag "account_lookup",
           options_for_select([]),
           class: "w-full py-4",

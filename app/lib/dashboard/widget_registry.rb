@@ -7,10 +7,11 @@ module Dashboard
       :span,
       :policy_class,
       :component_class,
-      :turbo_frame_id,
       :refresh_interval,
       :lazy
-    )
+    ) do
+      def turbo_frame_id = "dashboard_#{key}"
+    end
 
     @widgets = {}
 

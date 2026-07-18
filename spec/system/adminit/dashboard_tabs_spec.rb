@@ -29,7 +29,7 @@ RSpec.describe "Adminit dashboard tabs", type: :system do
   it "preserves lazy turbo frames with auto-refresh data" do
     frame = page.find("turbo-frame#dashboard_tickets_personal")
 
-    expect(frame["src"]).to eq(adminit_dashboard_widget_path(resource: "ticket", kind: "personal"))
+    expect(frame["src"]).to eq(adminit_dashboard_widget_path(key: "tickets_personal"))
     expect(frame["data-controller"]).to eq("auto-refresh")
     expect(frame["data-auto-refresh-interval-value"]).to eq("30")
   end

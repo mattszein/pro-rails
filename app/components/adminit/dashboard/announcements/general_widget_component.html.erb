@@ -1,14 +1,29 @@
-<%= render Adminit::Dashboard::BaseWidgetComponent.new(title: title, view_all_path: view_all_path, view_all_label: view_all_label) do %>
-  <% if announcements.any? %>
-    <ul class="space-y-2">
-      <% announcements.each do |announcement| %>
-        <li class="flex justify-between items-center text-sm">
-          <%= render(Core::LinkComponent.new(name: announcement.title, url: helpers.adminit_announcement_path(announcement), style: :link, html_options: {class: "truncate max-w-[70%]", data: {turbo_prefetch: false, turbo_frame: "_top"}} )) %>
-          <%= render(Core::BadgeComponent.new(label: I18n.t("enums.announcement.status.#{announcement.status}"), theme: helpers.announcement_status_theme(announcement.status), size: :xs)) %>
-        </li>
+<%= render Adminit::Dashboard::BaseWidgetComponent.new(view_all_path: view_all_path, view_all_label: view_all_label) do %>
+  <div class="flex flex-col md:flex-row gap-4 h-full">
+    <div class="md:flex-1 min-w-0">
+      <h5 class="pt-1 mb-1 text-sm font-semibold text-gray-700 dark:text-gray-300"><%= list_title %></h5>
+      <% if announcements.any? %>
+        <ul class="space-y-2">
+          <% announcements.each do |announcement| %>
+            <li class="flex justify-between items-center gap-2 text-sm">
+              <%= render(Core::LinkComponent.new(name: announcement.title, url: helpers.adminit_announcement_path(announcement),
+                    style: :link, html_options: {class: "truncate", data: {turbo_prefetch: false, turbo_frame: "_top"}})) %>
+              <span class="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap"><%= announcement.scheduled_at.strftime("%b %d, %Y %H:%M") %></span>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="text-sm text-gray-500 dark:text-gray-400"><%= I18n.t("adminit.dashboard_widgets.announcements.general.empty") %></p>
       <% end %>
-    </ul>
-  <% else %>
-    <p class="text-sm"><%= I18n.t("adminit.announcements.no_announcements") %></p>
-  <% end %>
+    </div>
+    <div class="md:flex-1 min-w-0">
+      <%= tag.div data: {
+            controller: "chart",
+            chart_options_value: chart_options,
+            chart_height_value: chart_height
+          } do %>
+        <div data-chart-target="canvas"></div>
+      <% end %>
+    </div>
+  </div>
 <% end %>

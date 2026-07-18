@@ -6,10 +6,6 @@ module Adminit
 
         option :account
 
-        def title
-          I18n.t("adminit.dashboard_widgets.tickets.analytics.title")
-        end
-
         def stats
           @stats ||= ::TicketStatsQuery.call
         end

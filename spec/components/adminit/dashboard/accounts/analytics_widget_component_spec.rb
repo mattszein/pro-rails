@@ -8,11 +8,6 @@ RSpec.describe Adminit::Dashboard::Accounts::AnalyticsWidgetComponent, type: :co
     create(:account)
   end
 
-  it "renders the widget title" do
-    render_inline(described_class.new(account: account))
-    expect(page).to have_text(I18n.t("adminit.dashboard_widgets.accounts.analytics.title"))
-  end
-
   it "returns chart options with area type and monthly data" do
     component = described_class.new(account: account)
     options = component.chart_options

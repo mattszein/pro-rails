@@ -30,7 +30,7 @@ namespace :adminit do
   end
 
   namespace :dashboard do
-    get "widgets/:resource/:kind",
+    get "widgets/:key",
       to: "/adminit/dashboard_widgets#show",
       as: :widget
     get "accounts/search",

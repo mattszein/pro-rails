@@ -8,11 +8,6 @@ RSpec.describe Adminit::Dashboard::Tickets::AnalyticsWidgetComponent, type: :com
     create(:ticket, :closed)
   end
 
-  it "renders the widget title" do
-    render_inline(described_class.new(account: account))
-    expect(page).to have_text(I18n.t("adminit.dashboard_widgets.tickets.analytics.title"))
-  end
-
   it "returns chart options with column type and status data" do
     component = described_class.new(account: account)
     options = component.chart_options

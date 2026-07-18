@@ -79,36 +79,26 @@ en:
       tickets:
         no_tickets: "No tickets to display."
         personal:
-          title: "My Tickets"
           view_all: "View all my tickets"
         general:
-          title: "All Tickets"
           view_all: "View all tickets"
         analytics:
-          title: "Ticket Analytics"
           resolved: "Resolved"
           series_name: "Tickets"
       announcements:
         general:
-          title: "All Announcements"
+          list_title: "Upcoming"
           view_all: "View all"
-        analytics:
-          title: "Announcement Analytics"
-      permissions:
-        overview:
-          title: "Permissions Overview"
+          empty: "No scheduled announcements."
       roles:
-        general:
-          title: "Roles"
         no_roles: "No roles to display."
+        no_permissions: "—"
       accounts:
         general:
-          title: "Account Lookup"
           placeholder: "Search by email..."
           view_full: "View full profile"
           no_role: "No role"
         analytics:
-          title: "Account Analytics"
           series_name: "Accounts"
           registered: "Registered"
           active_sessions: "Active Sessions"

@@ -1,7 +1,6 @@
 module Adminit
   module Dashboard
     class BaseWidgetComponent < ApplicationViewComponent
-      option :title
       option :view_all_path, default: -> {}
       option :view_all_label, default: -> {}
     end

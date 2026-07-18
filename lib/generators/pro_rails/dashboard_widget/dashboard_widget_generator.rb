@@ -9,10 +9,11 @@ module ProRails
 
       def create_component_files
         kinds.each do |kind|
+          @kind = kind
           template "widget_component.rb.tt",
-            "app/components/adminit/dashboard/#{file_name}/#{kind}_widget_component.rb"
+            "app/components/adminit/dashboard/#{file_name.pluralize}/#{kind}_widget_component.rb"
           template "widget_component.html.erb.tt",
-            "app/components/adminit/dashboard/#{file_name}/#{kind}_widget_component.html.erb"
+            "app/components/adminit/dashboard/#{file_name.pluralize}/#{kind}_widget_component.html.erb"
         end
       end
 
@@ -20,18 +21,20 @@ module ProRails
         template "query_object.rb.tt", "app/queries/#{file_name}_stats_query.rb"
       end
 
+      REGISTRY_FILE = "app/lib/dashboard/widgets.rb"
+      REGISTRY_MARKER = /^ *# pro_rails:dashboard_widget_generator/
+
       def append_registry_entries
         kinds.each do |kind|
-          registry_entry = <<~RUBY
+          registry_entry = <<-RUBY
+      WidgetRegistry.register(
+        key: :#{file_name}_#{kind}, resource: :#{file_name.singularize}, kind: :#{kind},
+        policy_class: "Adminit::#{class_name.singularize}Policy",
+        component_class: "Adminit::Dashboard::#{class_name.pluralize}::#{kind.camelize}WidgetComponent"
+      )
 
-            Dashboard::WidgetRegistry.register(
-              key: :#{file_name}_#{kind}, resource: :#{file_name.singularize}, kind: :#{kind},
-              policy_class: "Adminit::#{class_name.singularize}Policy",
-              component_class: "Adminit::Dashboard::#{class_name.pluralize}::#{kind.camelize}WidgetComponent",
-              turbo_frame_id: "dashboard_#{file_name}_#{kind}"
-            )
           RUBY
-          append_to_file "config/initializers/dashboard_widgets.rb", registry_entry
+          inject_into_file REGISTRY_FILE, registry_entry, before: REGISTRY_MARKER
         end
       end
 
@@ -50,20 +53,21 @@ module ProRails
 
       def create_specs
         kinds.each do |kind|
+          @kind = kind
           template "widget_component_spec.rb.tt",
-            "spec/components/adminit/dashboard/#{file_name}/#{kind}_widget_component_spec.rb"
+            "spec/components/adminit/dashboard/#{file_name.pluralize}/#{kind}_widget_component_spec.rb"
         end
       end
 
       private
 
-      def build_i18n_entry(locale)
-        titles = kinds.map do |kind|
-          title = (kind == "general") ? "All #{class_name.pluralize.titleize}" : "#{class_name.pluralize.titleize} #{kind.titleize}"
-          "        #{kind}:\n          title: \"#{title}\""
-        end.join("\n")
+      # template() evaluates .tt files against this instance's own binding, not the caller's block-local scope.
+      attr_reader :kind
 
-        "      #{file_name}:\n#{titles}\n"
+      def build_i18n_entry(locale)
+        stubs = kinds.map { |kind| "        #{kind}: {}" }.join("\n")
+
+        "      #{file_name.pluralize}:\n#{stubs}\n"
       end
     end
   end

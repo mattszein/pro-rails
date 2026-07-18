@@ -4,9 +4,7 @@ module Adminit
     before_action :ensure_frame_response
 
     def show
-      @widget = ::Dashboard::WidgetRegistry.all.find do |w|
-        w.resource.to_s == params[:resource] && w.kind.to_s == params[:kind]
-      end
+      @widget = ::Dashboard::WidgetRegistry.find(params[:key])
 
       if @widget
         authorize! @widget.resource, with: @widget.policy_class.constantize

@@ -5,13 +5,10 @@ module Adminit
         SPAN_CLASS = "col-span-1"
 
         option :account
+<% if kind == "analytics" -%>
 
-        def title
-          I18n.t("adminit.dashboard_widgets.<%= file_name %>.<%= kind %>.title")
-        end
-<% if kind == "analytics" %>
         def chart_height
-          Adminit::DashboardHelper::CHART_HEIGHT_SMALL
+          Adminit::DashboardHelper::CHART_HEIGHT
         end
 
         def stats
@@ -25,7 +22,7 @@ module Adminit
             semantic_colors: []
           )
         end
-<% end %>
+<% end -%>
       end
     end
   end

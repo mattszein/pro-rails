@@ -4,17 +4,17 @@
   <% end %>
   <%= render Core::TableCellComponent.new do %>
     <%= form_with(url: adminit_permission_path(id: permission.id), scope: "permission", data: {turbo: true, controller: "autosubmit"}, method: :put) do |f| %>
-      <%= render Core::LoaderComponent.new do %>
+      <%= render Core::LoaderComponent.new(id: "permission_#{permission.id}_role_ids_loader") do %>
         <%= f.multi_select :role_ids, options_for_select(roles.map { |r| [r.name, r.id] }, permission.role_ids), {include_blank: false, include_hidden: false, required: true}, {class: "h-10 group-[.is-loading]:hidden", multiple: true, "data-controller": "core--form--select-component", "data-core--form--select-component-submit-value": "true", "data-core--form--select-component-allow-empty-value": "false", "data-action": "core--form--select-component:loaded->core--loader-component#loaded"} %>
       <% end %>
 
       <% available_widgets = Dashboard::WidgetRegistry.for_resource(permission.resource) %>
       <% if available_widgets.any? %>
         <div class="mt-3 border-t border-gray-200 dark:border-gray-700 pt-2">
-          <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2"><%= I18n.t("adminit.permissions.widgets_label") %></p>
+          <p class="font-semibold mb-2"><%= I18n.t("adminit.permissions.widgets_label") %></p>
           <div class="space-y-2">
             <% roles.each do |role| %>
-              <% role_widgets = PermissionRole.find_by(permission_id: permission.id, role_id: role.id)&.dashboard_widget_keys || [] %>
+              <% role_widgets = permission_roles[[permission.id, role.id]]&.dashboard_widget_keys || [] %>
               <div class="flex flex-wrap gap-2 items-center">
                 <span class="text-xs text-gray-600 dark:text-gray-300 w-24 truncate"><%= role.name %></span>
                 <% available_widgets.each do |widget| %>

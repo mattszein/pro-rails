@@ -6,10 +6,6 @@ module Adminit
 
         option :account
 
-        def title
-          I18n.t("adminit.dashboard_widgets.tickets.personal.title")
-        end
-
         def tickets
           @tickets ||= ::TicketsForAccountQuery.call(account: account, limit: 10)
         end

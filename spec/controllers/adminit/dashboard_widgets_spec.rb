@@ -7,7 +7,7 @@ describe Adminit::DashboardWidgetsController, type: :controller do
   include_context "user and permissions adminit"
 
   describe "GET #show" do
-    let(:widget_params) { {resource: "ticket", kind: "personal"} }
+    let(:widget_params) { {key: "tickets_personal"} }
 
     subject { get :show, params: widget_params }
 
@@ -56,11 +56,11 @@ describe Adminit::DashboardWidgetsController, type: :controller do
       end
 
       context "with unknown widget" do
-        let(:widget_params) { {resource: "unknown", kind: "unknown"} }
+        let(:widget_params) { {key: "unknown"} }
 
         before do
           login_user(user)
-          @request.headers["Turbo-Frame"] = "dashboard_unknown_unknown"
+          @request.headers["Turbo-Frame"] = "dashboard_unknown"
         end
 
         it "returns not found" do

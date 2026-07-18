@@ -79,36 +79,26 @@ es:
       tickets:
         no_tickets: "No hay tickets para mostrar."
         personal:
-          title: "Mis Tickets"
           view_all: "Ver todos mis tickets"
         general:
-          title: "Todos los Tickets"
           view_all: "Ver todos los tickets"
         analytics:
-          title: "Analíticas de Tickets"
           resolved: "Resueltos"
           series_name: "Tickets"
       announcements:
         general:
-          title: "Todos los Anuncios"
+          list_title: "Próximos"
           view_all: "Ver todos"
-        analytics:
-          title: "Analíticas de Anuncios"
-      permissions:
-        overview:
-          title: "Resumen de Permisos"
+          empty: "No hay anuncios programados."
       roles:
-        general:
-          title: "Roles"
         no_roles: "No hay roles para mostrar."
+        no_permissions: "—"
       accounts:
         general:
-          title: "Búsqueda de Cuenta"
           placeholder: "Buscar por email..."
           view_full: "Ver perfil completo"
           no_role: "Sin rol"
         analytics:
-          title: "Analíticas de Cuentas"
           series_name: "Cuentas"
           registered: "Registradas"
           active_sessions: "Sesiones Activas"

@@ -6,10 +6,6 @@ module Adminit
 
         option :account
 
-        def title
-          I18n.t("adminit.dashboard_widgets.accounts.general.title")
-        end
-
         def search_url
           helpers.adminit_dashboard_accounts_search_path
         end

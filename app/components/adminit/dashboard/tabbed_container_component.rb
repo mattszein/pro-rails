@@ -27,7 +27,7 @@ module Adminit
       def widget_frame(widget)
         if widget.lazy
           helpers.turbo_frame_tag widget.turbo_frame_id,
-            src: helpers.adminit_dashboard_widget_path(resource: widget.resource, kind: widget.kind),
+            src: helpers.adminit_dashboard_widget_path(key: widget.key),
             loading: :lazy,
             data: helpers.auto_refresh_data(widget) do
               render Adminit::Dashboard::SkeletonWidgetComponent.new(kind: widget.kind)

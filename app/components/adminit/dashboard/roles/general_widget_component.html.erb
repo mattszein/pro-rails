@@ -1,13 +1,7 @@
-<%= render Adminit::Dashboard::BaseWidgetComponent.new(title: title) do %>
+<%= render Adminit::Dashboard::BaseWidgetComponent.new do %>
   <% if roles.any? %>
-    <ul class="space-y-2">
-      <% roles.each do |role| %>
-        <li class="text-sm">
-          <%= render(Core::LinkComponent.new(name: role.name, url: helpers.adminit_role_path(role), style: :link, html_options: {data: {turbo_frame: "_top", turbo_prefetch: false}})) %>
-        </li>
-      <% end %>
-    </ul>
+    <%= render Core::TableComponent.new(rows: roles, columns: columns) %>
   <% else %>
-    <p class="text-sm"><%= I18n.t("adminit.dashboard_widgets.roles.no_roles") %></p>
+    <p class="text-sm text-gray-500 dark:text-gray-400"><%= I18n.t("adminit.dashboard_widgets.roles.no_roles") %></p>
   <% end %>
 <% end %>

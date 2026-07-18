@@ -44,7 +44,7 @@ end
 # Configure dashboard widgets per role/permission
 superadmin_widgets = {
   ticket: ["tickets_analytics"],
-  announcement: ["announcements_analytics"],
+  announcement: ["announcements_general"],
   account: ["accounts_general", "accounts_analytics"],
   role: ["roles_general"]
 }
@@ -58,8 +58,8 @@ support_widgets = {
 
   widgets_for_role.each do |resource, widget_keys|
     permission = Permission.find_by!(resource: resource)
-    PermissionRole.where(permission_id: permission.id, role_id: role.id)
-      .update_all(dashboard_widget_keys: widget_keys)
+    PermissionRole.find_by!(permission_id: permission.id, role_id: role.id)
+      .update!(dashboard_widget_keys: widget_keys)
   end
 end
 

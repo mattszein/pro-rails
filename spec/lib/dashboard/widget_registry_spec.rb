@@ -17,8 +17,7 @@ RSpec.describe Dashboard::WidgetRegistry do
         resource: :ticket,
         kind: :personal,
         policy_class: "Adminit::TicketPolicy",
-        component_class: "Adminit::Dashboard::Tickets::PersonalWidgetComponent",
-        turbo_frame_id: "dashboard_test_widget"
+        component_class: "Adminit::Dashboard::Tickets::PersonalWidgetComponent"
       }
     end
 
@@ -40,39 +39,22 @@ RSpec.describe Dashboard::WidgetRegistry do
       expect(described_class.find(:test_widget).span).to eq(:half)
     end
 
+    it "derives turbo_frame_id from the key" do
+      described_class.register(**base_attrs)
+      expect(described_class.find(:test_widget).turbo_frame_id).to eq("dashboard_test_widget")
+    end
+
     it "raises on duplicate key" do
-      described_class.register(
-        key: :test_widget,
-        resource: :ticket,
-        kind: :personal,
-        policy_class: "Adminit::TicketPolicy",
-        component_class: "Adminit::Dashboard::Tickets::PersonalWidgetComponent",
-        turbo_frame_id: "dashboard_test_widget"
-      )
+      described_class.register(**base_attrs)
 
       expect {
-        described_class.register(
-          key: :test_widget,
-          resource: :ticket,
-          kind: :personal,
-          policy_class: "Adminit::TicketPolicy",
-          component_class: "Adminit::Dashboard::Tickets::PersonalWidgetComponent",
-          turbo_frame_id: "dashboard_test_widget2"
-        )
+        described_class.register(**base_attrs)
       }.to raise_error(ArgumentError, /duplicate widget key/)
     end
 
     it "raises on refresh_interval below 15 seconds" do
       expect {
-        described_class.register(
-          key: :test_widget,
-          resource: :ticket,
-          kind: :personal,
-          policy_class: "Adminit::TicketPolicy",
-          component_class: "Adminit::Dashboard::Tickets::PersonalWidgetComponent",
-          turbo_frame_id: "dashboard_test_widget",
-          refresh_interval: 10
-        )
+        described_class.register(**base_attrs, refresh_interval: 10)
       }.to raise_error(ArgumentError, /refresh_interval must be at least 15 seconds/)
     end
   end

@@ -6,10 +6,6 @@ module Adminit
 
         option :account
 
-        def title
-          I18n.t("adminit.dashboard_widgets.tickets.general.title")
-        end
-
         def tickets
           @tickets ||= Support::Ticket.open.order(updated_at: :desc).limit(10)
         end
