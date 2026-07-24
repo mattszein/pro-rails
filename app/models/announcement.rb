@@ -28,11 +28,13 @@ class Announcement < ApplicationRecord
 
   # Stats for the adminit dashboard announcements widget.
   def self.dashboard_stats
+    counts = group(:status).count
+
     {
-      total: count,
-      draft: draft.count,
-      scheduled: scheduled.count,
-      published: published.count
+      total: counts.values.sum,
+      draft: counts["draft"] || 0,
+      scheduled: counts["scheduled"] || 0,
+      published: counts["published"] || 0
     }
   end
 

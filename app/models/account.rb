@@ -8,7 +8,7 @@ class Account < ApplicationRecord
 
   after_create :create_default_profile
 
-  scope :search_by_email, ->(query) { where("email ILIKE ?", "%#{query}%") }
+  scope :search_by_email, ->(query) { where("email ILIKE ?", "%#{sanitize_sql_like(query)}%") }
   scope :not_in_role, ->(role) { where.not(role_id: role.id).or(where(role_id: nil)) }
 
   DASHBOARD_STATS_MONTHS = 6
@@ -16,12 +16,16 @@ class Account < ApplicationRecord
   # Stats for the adminit dashboard accounts analytics widget.
   def self.dashboard_stats
     months = DASHBOARD_STATS_MONTHS.times.map { |i| Time.zone.now.beginning_of_month - i.months }.reverse
-    by_month = months.index_with { |month| where(created_at: month.all_month).count }
+    counts_by_month = where(created_at: months.first..)
+      .group("date_trunc('month', created_at)")
+      .count
+      .transform_keys { |key| key.to_date.beginning_of_month }
+    by_month = months.index_with { |month| counts_by_month[month.to_date] || 0 }
 
     {
       total: count,
       verified: verified.count,
-      active_sessions: AccountRememberKey.count,
+      active_sessions: AccountRememberKey.where(deadline: Time.current..).count,
       registered_this_month: by_month.values.last,
       by_month: by_month
     }

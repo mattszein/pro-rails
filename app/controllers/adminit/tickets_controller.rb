@@ -5,7 +5,7 @@ class Adminit::TicketsController < Adminit::ApplicationController
   # GET /tickets or /tickets.json
   def index
     authorize! Support::Ticket, with: Adminit::TicketPolicy
-    @tickets = Support::Ticket.all
+    @tickets = (params[:assignee] == "me") ? Support::Ticket.where(assigned: current_account) : Support::Ticket.all
   end
 
   # GET /tickets/1 or /tickets/1.json

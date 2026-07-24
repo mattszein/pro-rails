@@ -1,7 +1,3 @@
-<%= render Adminit::Dashboard::BaseWidgetComponent.new do %>
-  <% if tickets.any? %>
-    <%= render Core::TableComponent.new(rows: tickets, columns: columns) %>
-  <% else %>
-    <p class="text-sm"><%= I18n.t("shared.empty") %></p>
-  <% end %>
+<%= render Adminit::Dashboard::BaseWidgetComponent.new(empty: tickets.none?) do %>
+  <%= render Core::TableComponent.new(rows: tickets, columns: columns) %>
 <% end %>

@@ -16,15 +16,19 @@ module Adminit
         I18n.t("adminit.dashboard.kinds.#{widget.kind}", default: widget.kind.to_s.humanize)
       end
 
-      # One "view all" link per card, derived from the resource's adminit index
-      # route. A widget may carry extra query params (e.g. tickets_personal
-      # points to the current admin's assigned tickets).
-      def view_all_path
-        params = widgets.filter_map(&:view_all_params).first || {}
-        helpers.public_send("adminit_#{resource.to_s.pluralize}_path", **params)
+      # ARIA ids stable across renders (see Core::TabsComponent#id_prefix).
+      def tab_id_prefix
+        "dashboard-#{resource}-tabs"
       end
 
-      attr_reader :widgets, :resource
+      # Per-widget "view all" link, derived from the resource's adminit index
+      # route. A widget may carry extra query params (e.g. tickets_personal
+      # points to the current admin's assigned tickets). Rendered inside each
+      # tab's own panel so it always reflects the visible tab, not just the
+      # first widget registered for the resource.
+      def view_all_path(widget)
+        helpers.public_send("adminit_#{resource.to_s.pluralize}_path", **(widget.view_all_params || {}))
+      end
 
       private
 

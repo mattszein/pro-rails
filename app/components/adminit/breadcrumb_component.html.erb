@@ -9,12 +9,12 @@
         <% if crumb.icon %><%= helpers.icon crumb.icon, {classes: "h-4 w-4"} %><% end %>
         <%= crumb.label %>
       </span>
-    <% else %>
-      <%= link_to crumb.path,
-            class: "inline-flex items-center gap-1 hover:text-primary-600 dark:hover:text-primary-300" do %>
-        <% if crumb.icon %><%= helpers.icon crumb.icon, {classes: "h-4 w-4"} %><% end %>
-        <%= crumb.label %>
+      <% else %>
+        <%= link_to crumb.path,
+              class: "inline-flex items-center gap-1 hover:text-primary-600 dark:hover:text-primary-300" do %>
+          <% if crumb.icon %><%= helpers.icon crumb.icon, {classes: "h-4 w-4"} %><% end %>
+          <%= crumb.label %>
+        <% end %>
       <% end %>
     <% end %>
-  <% end %>
-</nav>
+  </nav>

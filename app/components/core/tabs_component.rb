@@ -8,22 +8,18 @@ class Core::TabsComponent < ApplicationViewComponent
 
   option :active_classes, default: -> { Core::SubmenuStyles::ACTIVE_CLASSES }
   option :inactive_classes, default: -> { Core::SubmenuStyles::INACTIVE_CLASSES }
+  # Caller-supplied prefix so ARIA ids stay stable across Turbo morph
+  # refreshes (morph matches nodes by `id`; a per-render value like
+  # `object_id` would get a new id every refresh and reset the active tab).
+  option :id_prefix, default: -> { "tabs" }
 
   def tab_classes(active)
     section_classes(active)
   end
 
-  # ARIA ids are prefixed per component instance so multiple tab groups on one
-  # page never collide.
   def tab_id(index) = "#{id_prefix}-tab-#{index}"
 
   def panel_id(index) = "#{id_prefix}-panel-#{index}"
-
-  private
-
-  def id_prefix
-    @id_prefix ||= "tabs-#{object_id}"
-  end
 
   class TabComponent < ApplicationViewComponent
     option :name

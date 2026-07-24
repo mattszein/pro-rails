@@ -1,5 +1,5 @@
 <%= render(Core::CardComponent.new(classes: "text-center")) do %>
-  <div class="flex space-x-4 flex-wrap justify-center pt-4"> 
+  <div class="flex space-x-4 flex-wrap justify-center pt-4">
   <% if allowed_to? :manage?, with: Adminit::AccountPolicy %>
     <%= render(Adminit::Dashboard::CardLinkComponent.new(label: t("adminit.navigation.accounts"), path: adminit_accounts_path, icon_name: "adminit/accounts", animated_type: "accounts")) %>
   <% end %>

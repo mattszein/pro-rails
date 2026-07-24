@@ -8,9 +8,9 @@
               aria-controls="<%= panel_id(i) %>"
               data-tabs-target="tab"
               data-action="click->tabs#select"
-              data-index="<%= i %>"
-              aria-selected="<%= i.zero? %>"
-              class="<%= tab_classes(i.zero?) %> group/tab">
+        data-index="<%= i %>"
+        aria-selected="<%= i.zero? %>"
+        class="<%= tab_classes(i.zero?) %> group/tab">
         <%= tab.name %>
         <span class="<%= Core::SubmenuStyles::UNDERLINE_BASE %> opacity-0 group-aria-selected/tab:opacity-100"></span>
       </button>

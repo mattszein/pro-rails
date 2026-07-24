@@ -69,12 +69,14 @@ module Support
 
     # Stats for the adminit dashboard tickets analytics widget.
     def self.dashboard_stats
+      by_status = reorder(nil).group(:status).count
+
       {
-        total: count,
-        open: open.count,
-        in_progress: in_progress.count,
-        resolved: where(status: [:finished, :closed]).count,
-        by_status: reorder(nil).group(:status).count
+        total: by_status.values.sum,
+        open: by_status["open"] || 0,
+        in_progress: by_status["in_progress"] || 0,
+        resolved: (by_status["finished"] || 0) + (by_status["closed"] || 0),
+        by_status: by_status
       }
     end
 

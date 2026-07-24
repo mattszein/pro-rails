@@ -49,4 +49,25 @@ RSpec.describe Core::TabsComponent, type: :component do
     expect(root["data-tabs-active-classes-value"]).to eq(Core::SubmenuStyles::ACTIVE_CLASSES)
     expect(root["data-tabs-inactive-classes-value"]).to eq(Core::SubmenuStyles::INACTIVE_CLASSES)
   end
+
+  it "links each tab to its panel via aria-controls/aria-labelledby" do
+    render_tabs(%w[Personal General])
+
+    tab = page.find("[role='tab'][data-index='1']")
+    panel = page.find("[role='tabpanel'][data-index='1']")
+
+    expect(tab["aria-controls"]).to eq(panel["id"])
+    expect(panel["aria-labelledby"]).to eq(tab["id"])
+  end
+
+  it "keeps ARIA ids stable across renders when given the same id_prefix" do
+    render_inline(described_class.new(id_prefix: "widget-x")) { |tabs| tabs.with_tab(name: "A") { "a" } }
+    first_id = page.find("[role='tab']")["id"]
+
+    render_inline(described_class.new(id_prefix: "widget-x")) { |tabs| tabs.with_tab(name: "A") { "a" } }
+    second_id = page.find("[role='tab']")["id"]
+
+    expect(first_id).to eq(second_id)
+    expect(first_id).to eq("widget-x-tab-0")
+  end
 end

@@ -11,7 +11,8 @@ export default class extends Controller {
   /**
    * Renders the chart into the canvas target on connect. Skips the render if
    * the canvas already has content (e.g. a restored Turbo cache snapshot) and
-   * hides the canvas when the options are unrenderable.
+   * hides the canvas when the options are unrenderable. Also watches the
+   * `<html class="dark">` toggle so the chart re-themes without a reload.
    */
   connect() {
     try {
@@ -25,6 +26,8 @@ export default class extends Controller {
       this.canvasTarget.style.display = "none"
     }
 
+    this.themeObserver = new MutationObserver(() => this.rebuildChart())
+    this.themeObserver.observe(document.documentElement, {attributes: true, attributeFilter: ["class"]})
   }
 
   /**

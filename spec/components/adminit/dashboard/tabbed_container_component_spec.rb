@@ -33,9 +33,19 @@ RSpec.describe Adminit::Dashboard::TabbedContainerComponent, type: :component do
     expect(page).to have_link(I18n.t("shared.common.view_all"), href: "/adminit/roles")
   end
 
-  it "applies widget view_all_params to the view-all link" do
+  it "gives each tab its own view-all link, from that widget's view_all_params" do
     widgets = %i[tickets_personal tickets_general].map { |k| widget_for(k) }
     render_inline(described_class.new(resource: :ticket, widgets: widgets))
-    expect(page).to have_link(I18n.t("shared.common.view_all"), href: "/adminit/tickets?assignee=me")
+
+    links = page.all("a", text: I18n.t("shared.common.view_all"), visible: :all)
+    hrefs = links.pluck(:href)
+    expect(hrefs).to include("/adminit/tickets?assignee=me", "/adminit/tickets")
+  end
+
+  it "renders stable ARIA ids that don't depend on object identity" do
+    render_inline(described_class.new(resource: :role, widgets: [widget_for(:roles_general)]))
+    render_inline(described_class.new(resource: :role, widgets: [widget_for(:roles_general)]))
+
+    expect(page).to have_css('[role="tab"][id="dashboard-role-tabs-tab-0"]')
   end
 end
