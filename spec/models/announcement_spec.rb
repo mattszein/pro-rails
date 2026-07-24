@@ -118,6 +118,40 @@ RSpec.describe Announcement, type: :model do
         expect(Announcement.ordered).to eq([new_announcement, middle_announcement, old_announcement])
       end
     end
+
+    describe ".upcoming_scheduled" do
+      let!(:sooner) { create(:announcement, :scheduled, scheduled_at: 1.day.from_now) }
+      let!(:later) { create(:announcement, :scheduled, scheduled_at: 2.days.from_now) }
+      let!(:past_due) do
+        announcement = create(:announcement, :scheduled, scheduled_at: 1.hour.from_now)
+        announcement.update_column(:scheduled_at, 1.hour.ago)
+        announcement
+      end
+      let!(:draft) { create(:announcement, :draft) }
+
+      it "returns future scheduled announcements ordered by scheduled_at asc" do
+        expect(Announcement.upcoming_scheduled).to eq([sooner, later])
+      end
+
+      it "honors the limit" do
+        expect(Announcement.upcoming_scheduled(limit: 1)).to eq([sooner])
+      end
+    end
+  end
+
+  describe ".dashboard_stats" do
+    it "returns counts grouped by status" do
+      create_list(:announcement, 2, :published)
+      create(:announcement, :draft)
+      create(:announcement, :scheduled)
+
+      stats = Announcement.dashboard_stats
+
+      expect(stats[:total]).to eq(4)
+      expect(stats[:draft]).to eq(1)
+      expect(stats[:scheduled]).to eq(1)
+      expect(stats[:published]).to eq(2)
+    end
   end
 
   describe "#sync_body_from_rich_body" do

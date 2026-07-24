@@ -16,6 +16,14 @@ module Adminit
         I18n.t("adminit.dashboard.kinds.#{widget.kind}", default: widget.kind.to_s.humanize)
       end
 
+      # One "view all" link per card, derived from the resource's adminit index
+      # route. A widget may carry extra query params (e.g. tickets_personal
+      # points to the current admin's assigned tickets).
+      def view_all_path
+        params = widgets.filter_map(&:view_all_params).first || {}
+        helpers.public_send("adminit_#{resource.to_s.pluralize}_path", **params)
+      end
+
       attr_reader :widgets, :resource
 
       private

@@ -2,29 +2,23 @@ module Adminit
   module Dashboard
     class AccountsController < Adminit::ApplicationController
       before_action :require_account
+      before_action :ensure_frame_response, only: :summary
 
+      # TomSelect options for the account lookup widget: minimal {value, text}
+      # pairs — the selected account's summary is rendered by #summary.
       def search
         authorize! Account, to: :show?, with: Adminit::AccountPolicy
         query = params[:q].to_s.strip
         return render(json: []) if query.length < 2
 
-        accounts = Account.search_by_email(query).includes(:role).limit(10)
-        render json: accounts.map { |a| serialize_account(a) }
+        accounts = Account.search_by_email(query).limit(10)
+        render json: accounts.map { |a| {value: a.id.to_s, text: a.email} }
       end
 
-      private
-
-      def serialize_account(account)
-        {
-          value: account.id.to_s,
-          text: account.email,
-          id: account.id,
-          email: account.email,
-          role: account.role&.name || I18n.t("adminit.dashboard_widgets.accounts.general.no_role"),
-          status_key: account.status,
-          created_at: I18n.l(account.created_at.to_date, format: :long),
-          account_path: adminit_account_path(account)
-        }
+      # Frame-only endpoint: renders the selected account's summary.
+      def summary
+        @account = Account.find(params[:id])
+        authorize! @account, to: :show?, with: Adminit::AccountPolicy
       end
     end
   end

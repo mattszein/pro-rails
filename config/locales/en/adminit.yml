@@ -77,27 +77,18 @@ en:
       chart:
         no_data: "No data available"
       tickets:
-        no_tickets: "No tickets to display."
-        personal:
-          view_all: "View all my tickets"
-        general:
-          view_all: "View all tickets"
         analytics:
           resolved: "Resolved"
           series_name: "Tickets"
       announcements:
         general:
           list_title: "Upcoming"
-          view_all: "View all"
-          empty: "No scheduled announcements."
       roles:
-        no_roles: "No roles to display."
         no_permissions: "—"
       accounts:
         general:
           placeholder: "Search by email..."
           view_full: "View full profile"
-          no_role: "No role"
         analytics:
           series_name: "Accounts"
           registered: "Registered"

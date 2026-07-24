@@ -1,7 +1,0 @@
-class <%= class_name %>StatsQuery
-  def self.call
-    {
-      total: 0 # TODO: implement query
-    }
-  end
-end

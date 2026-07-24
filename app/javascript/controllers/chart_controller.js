@@ -8,6 +8,11 @@ export default class extends Controller {
     height: { type: Number, default: 280 }
   }
 
+  /**
+   * Renders the chart into the canvas target on connect. Skips the render if
+   * the canvas already has content (e.g. a restored Turbo cache snapshot) and
+   * hides the canvas when the options are unrenderable.
+   */
   connect() {
     try {
       if (!this.canvasTarget.hasChildNodes()) {
@@ -22,14 +27,21 @@ export default class extends Controller {
 
   }
 
+  /**
+   * Tears down the ApexCharts instance and empties the canvas so a reconnect
+   * (Turbo frame reload, theme change) renders from a clean slate.
+   */
   disconnect() {
-    console.log("disconnect is executed")
     this.themeObserver?.disconnect()
     this.chart?.destroy()
     this.canvasTarget.replaceChildren();
     this.chart = null
   }
 
+  /**
+   * Destroys and re-renders the chart with fresh options (used when the
+   * options value changes or the theme flips between dark/light).
+   */
   rebuildChart() {
     this.chart?.destroy()
     try {
@@ -41,10 +53,16 @@ export default class extends Controller {
     }
   }
 
+  /** Reads a CSS custom property (theme palette token) from the root element. */
   readCSSVar(name) {
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim()
   }
 
+  /**
+   * Merges the user options hash with the controller defaults: resolves
+   * semantic color tokens to theme CSS variables, expands formatter tokens
+   * into real functions, and applies dark/light aware chrome (grid, tooltip).
+   */
   buildOptions() {
     const isDark = document.documentElement.classList.contains("dark")
     const userOptions = this.optionsValue
@@ -88,6 +106,11 @@ export default class extends Controller {
     }
   }
 
+  /**
+   * Replaces string formatter tokens ("_integer", "_percent", "_sum",
+   * "_static:<value>") on an options node with real formatter functions,
+   * since JSON data attributes cannot carry functions.
+   */
   resolveFormatter(host, key) {
     if (!host) return
     const token = host[key]
@@ -107,6 +130,7 @@ export default class extends Controller {
     }
   }
 
+  /** Hardcoded hex fallbacks used only when a semantic CSS variable is missing. */
   fallbackColor(semanticName) {
     const fallbacks = {
       primary: "#6366f1",

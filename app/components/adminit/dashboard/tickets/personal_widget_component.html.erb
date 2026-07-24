@@ -1,14 +1,7 @@
-<%= render Adminit::Dashboard::BaseWidgetComponent.new(view_all_path: view_all_path, view_all_label: view_all_label) do %>
+<%= render Adminit::Dashboard::BaseWidgetComponent.new do %>
   <% if tickets.any? %>
-    <ul class="space-y-2">
-      <% tickets.each do |ticket| %>
-        <li class="flex justify-between items-center text-sm">
-          <%= render(Core::LinkComponent.new(name: ticket.title, url: helpers.adminit_ticket_path(ticket), style: :link, html_options: {data: {turbo_prefetch: false, turbo_frame: "_top"}})) %>
-          <%= render(Core::BadgeComponent.new(label: I18n.t("enums.ticket.status.#{ticket.status}"), theme: helpers.ticket_status_theme(ticket.status), size: :md)) %>
-        </li>
-      <% end %>
-    </ul>
+    <%= render Core::TableComponent.new(rows: tickets, columns: columns) %>
   <% else %>
-    <p class="text-sm"><%= I18n.t("adminit.dashboard_widgets.tickets.no_tickets") %></p>
+    <p class="text-sm"><%= I18n.t("shared.empty") %></p>
   <% end %>
 <% end %>

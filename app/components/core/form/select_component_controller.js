@@ -30,7 +30,8 @@ export default class extends Controller {
       let el = this.element;
       !(this.allowEmptyValue) && el.setCustomValidity('');
       if (this.submitValue && el.form.reportValidity()) {
-        el.form.submit();
+        // requestSubmit (not submit) so the submit event fires and Turbo intercepts it.
+        el.form.requestSubmit();
       }
     }
 

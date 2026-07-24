@@ -13,7 +13,6 @@ RSpec.describe Adminit::Dashboard::Roles::GeneralWidgetComponent, type: :compone
     render_inline(described_class.new(account: account))
 
     expect(page).to have_link("Support", href: "/adminit/roles/#{role.id}")
-    expect(page).to have_css("a[data-turbo-frame='_top']")
     expect(page).to have_css("tbody td", text: "2")
     expect(page).to have_css("tbody td", text: I18n.t("adminit.navigation.tickets"))
   end
@@ -27,7 +26,7 @@ RSpec.describe Adminit::Dashboard::Roles::GeneralWidgetComponent, type: :compone
   it "renders empty state when there are no roles" do
     Role.destroy_all
     render_inline(described_class.new(account: account))
-    expect(page).to have_text(I18n.t("adminit.dashboard_widgets.roles.no_roles"))
+    expect(page).to have_text(I18n.t("shared.empty"))
     expect(page).not_to have_css("table")
   end
 

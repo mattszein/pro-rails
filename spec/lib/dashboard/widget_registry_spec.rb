@@ -44,6 +44,16 @@ RSpec.describe Dashboard::WidgetRegistry do
       expect(described_class.find(:test_widget).turbo_frame_id).to eq("dashboard_test_widget")
     end
 
+    it "defaults view_all_params to nil" do
+      described_class.register(**base_attrs)
+      expect(described_class.find(:test_widget).view_all_params).to be_nil
+    end
+
+    it "accepts view_all_params" do
+      described_class.register(**base_attrs, view_all_params: {assignee: "me"})
+      expect(described_class.find(:test_widget).view_all_params).to eq({assignee: "me"})
+    end
+
     it "raises on duplicate key" do
       described_class.register(**base_attrs)
 

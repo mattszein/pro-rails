@@ -4,28 +4,12 @@ module Adminit
       class GeneralWidgetComponent < ApplicationViewComponent
         option :account
 
-        def list_title
-          I18n.t("adminit.dashboard_widgets.announcements.general.list_title")
-        end
-
         def announcements
-          @announcements ||= Announcement.scheduled.order(scheduled_at: :asc).limit(5)
-        end
-
-        def view_all_path
-          helpers.adminit_announcements_path
-        end
-
-        def view_all_label
-          I18n.t("adminit.dashboard_widgets.announcements.general.view_all")
+          @announcements ||= Announcement.upcoming_scheduled(limit: 5)
         end
 
         def stats
-          @stats ||= ::AnnouncementStatsQuery.call
-        end
-
-        def chart_height
-          Adminit::DashboardHelper::CHART_HEIGHT
+          @stats ||= Announcement.dashboard_stats
         end
 
         def chart_options

@@ -2,16 +2,10 @@ module Adminit
   module Dashboard
     module Tickets
       class AnalyticsWidgetComponent < ApplicationViewComponent
-        SPAN_CLASS = "col-span-2"
-
         option :account
 
         def stats
-          @stats ||= ::TicketStatsQuery.call
-        end
-
-        def chart_height
-          Adminit::DashboardHelper::CHART_HEIGHT
+          @stats ||= Support::Ticket.dashboard_stats
         end
 
         def chart_options

@@ -1,5 +1,6 @@
 en:
   shared:
+    empty: "Nothing to display."
     common:
       save: "Save"
       show: "Show"
@@ -14,6 +15,7 @@ en:
       close_modal: "Close modal"
       more_notifications: "More notifications"
       select_language: "Select language"
+      view_all: "View all"
     navigation:
       home: "Home"
       admin: "Admin"

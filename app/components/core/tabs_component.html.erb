@@ -4,6 +4,8 @@
   <div class="flex border-b border-primary-300" role="tablist">
     <% tabs.each_with_index do |tab, i| %>
       <button type="button" role="tab"
+              id="<%= tab_id(i) %>"
+              aria-controls="<%= panel_id(i) %>"
               data-tabs-target="tab"
               data-action="click->tabs#select"
               data-index="<%= i %>"
@@ -17,6 +19,8 @@
   <div class="flex-1 overflow-auto min-h-0">
     <% tabs.each_with_index do |tab, i| %>
       <div data-tabs-target="panel" data-index="<%= i %>" role="tabpanel"
+           id="<%= panel_id(i) %>"
+           aria-labelledby="<%= tab_id(i) %>"
            class="<%= "hidden" unless i.zero? %> h-full">
         <%= tab %>
       </div>

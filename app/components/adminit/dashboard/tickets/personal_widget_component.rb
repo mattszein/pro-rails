@@ -2,20 +2,12 @@ module Adminit
   module Dashboard
     module Tickets
       class PersonalWidgetComponent < ApplicationViewComponent
-        SPAN_CLASS = "col-span-1"
+        include TableColumns
 
         option :account
 
         def tickets
-          @tickets ||= ::TicketsForAccountQuery.call(account: account, limit: 10)
-        end
-
-        def view_all_path
-          helpers.adminit_tickets_path(assignee: "me")
-        end
-
-        def view_all_label
-          I18n.t("adminit.dashboard_widgets.tickets.personal.view_all")
+          @tickets ||= Support::Ticket.assigned_open_for(account, limit: 10)
         end
       end
     end

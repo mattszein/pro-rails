@@ -5,6 +5,14 @@ class Role < ApplicationRecord
   has_many :permission_roles
   SUPERADMIN = "superadmin"
 
+  # Roles list for the adminit dashboard widget: alphabetical, permissions
+  # eager-loaded, with an accounts_count sub-select (no extra query per row).
+  scope :with_accounts_count, -> {
+    order(:name)
+      .includes(:permissions)
+      .select("roles.*, (SELECT COUNT(*) FROM accounts WHERE accounts.role_id = roles.id) AS accounts_count")
+  }
+
   def self.superadmin
     Role.find_by(name: SUPERADMIN)
   end

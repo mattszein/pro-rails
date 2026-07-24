@@ -15,39 +15,36 @@ RSpec.describe Adminit::Dashboard::Announcements::GeneralWidgetComponent, type: 
     expect(items.last).to have_text("Later")
   end
 
-  it "does not include draft or published announcements" do
+  it "does not include draft, published, or past-due scheduled announcements" do
     create(:announcement, :scheduled, title: "Scheduled One")
     create(:announcement, title: "Draft One")
+    past_due = create(:announcement, :scheduled, title: "Past Due")
+    past_due.update_column(:scheduled_at, 1.hour.ago)
 
     render_inline(described_class.new(account: account))
 
     expect(page).to have_text("Scheduled One")
     expect(page).not_to have_text("Draft One")
+    expect(page).not_to have_text("Past Due")
   end
 
-  it "renders a link to each announcement that breaks out of the turbo frame" do
+  it "renders a link to each announcement" do
     ann = create(:announcement, :scheduled, title: "My Ann")
     render_inline(described_class.new(account: account))
     expect(page).to have_link("My Ann", href: "/adminit/announcements/#{ann.id}")
-    expect(page).to have_css("a[data-turbo-frame='_top']")
   end
 
   it "renders the scheduled_at date next to each entry" do
-    create(:announcement, :scheduled, scheduled_at: 3.days.from_now, title: "Future")
+    scheduled_at = 3.days.from_now
+    create(:announcement, :scheduled, scheduled_at: scheduled_at, title: "Future")
     render_inline(described_class.new(account: account))
-    expect(page).to have_css("li", text: 3.days.from_now.strftime("%b %d, %Y"))
+    expect(page).to have_css("li", text: I18n.l(scheduled_at, format: :long))
   end
 
   it "renders an empty state when there are no scheduled announcements" do
     render_inline(described_class.new(account: account))
-    expect(page).to have_text(I18n.t("adminit.dashboard_widgets.announcements.general.empty"))
+    expect(page).to have_text(I18n.t("shared.empty"))
     expect(page).not_to have_css("ul li")
-  end
-
-  it "renders the view all link" do
-    render_inline(described_class.new(account: account))
-    expect(page).to have_link(I18n.t("adminit.dashboard_widgets.announcements.general.view_all"),
-      href: "/adminit/announcements")
   end
 
   it "renders a list heading for the scheduled list" do

@@ -13,6 +13,18 @@ class Core::TabsComponent < ApplicationViewComponent
     section_classes(active)
   end
 
+  # ARIA ids are prefixed per component instance so multiple tab groups on one
+  # page never collide.
+  def tab_id(index) = "#{id_prefix}-tab-#{index}"
+
+  def panel_id(index) = "#{id_prefix}-panel-#{index}"
+
+  private
+
+  def id_prefix
+    @id_prefix ||= "tabs-#{object_id}"
+  end
+
   class TabComponent < ApplicationViewComponent
     option :name
 

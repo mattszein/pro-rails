@@ -8,7 +8,8 @@ module Dashboard
       :policy_class,
       :component_class,
       :refresh_interval,
-      :lazy
+      :lazy,
+      :view_all_params
     ) do
       def turbo_frame_id = "dashboard_#{key}"
     end
@@ -20,6 +21,7 @@ module Dashboard
         attrs[:refresh_interval] ||= nil
         attrs[:lazy] = true unless attrs.key?(:lazy)
         attrs[:span] ||= :full
+        attrs[:view_all_params] ||= nil
         widget = Widget.new(**attrs)
 
         raise ArgumentError, "duplicate widget key: #{widget.key}" if @widgets.key?(widget.key)

@@ -36,6 +36,6 @@ When you detect any of these contexts, IMMEDIATELY read the corresponding skill 
 | ------- | ----- |
 | Planning features, scoping ideas, product tradeoffs | `docs/PROJECT.md` |
 | Architecture decisions, pattern selection, file structure | `docs/ARCHITECTURE.md` |
-| Models, controllers, interactors, jobs, services, migrations, I18n | `.claude/skills/backend/SKILL.md` |
-| Views, components, Stimulus, Turbo, CSS, JS | `.claude/skills/frontend/SKILL.md` |
-| Writing tests, specs, factories, fixing test failures | `.claude/skills/tester/SKILL.md` |
+| Models, controllers, interactors, jobs, services, migrations, I18n | `docs/BACKEND.md` |
+| Views, components, Stimulus, Turbo, CSS, JS | `docs/FRONTEND.md` |
+| Writing tests, specs, factories, fixing test failures | `docs/TESTER.md` |

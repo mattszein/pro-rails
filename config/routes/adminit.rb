@@ -31,10 +31,13 @@ namespace :adminit do
 
   namespace :dashboard do
     get "widgets/:key",
-      to: "/adminit/dashboard_widgets#show",
+      to: "/adminit/dashboards#widget",
       as: :widget
     get "accounts/search",
       to: "/adminit/dashboard/accounts#search",
       as: :accounts_search
+    get "accounts/:id/summary",
+      to: "/adminit/dashboard/accounts#summary",
+      as: :account_summary
   end
 end

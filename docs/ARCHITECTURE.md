@@ -40,7 +40,7 @@ HTTP Request
 | State change + side effects | Interactor | Application |
 | Multiple models affected | Interactor | Application |
 | External API call | Service Object | Infrastructure |
-| Complex/reusable query | Query Object or Scope | Domain |
+| Complex/reusable query | Model Scope or class method | Domain |
 | Authorization rules | Policy (ActionPolicy) | Application |
 | Notifications | Notifier (Noticed) via Interactor | Application |
 | Background processing | Job (Solid Queue) | Infrastructure |
@@ -234,6 +234,7 @@ Cursor pagination uses the PK index directly — O(1) regardless of depth. `OFFS
 ## ViewComponent Rules
 
 - Components live in `app/components/core/`
+- Components never write ActiveRecord queries — data comes from model scopes/class methods
 - `CustomFormBuilder` is the default form builder (set in `ApplicationController`)
 - Lookbook previews at `/lookbook` in development
 
@@ -265,6 +266,7 @@ Cursor pagination uses the PK index directly — O(1) regardless of depth. `OFFS
 | Services | `app/services/external_services/` |
 | Pipelines | `app/services/` |
 | Notifiers | `app/notifiers/` |
+| Queries | Model scopes/class methods (`app/queries/` is not used — query objects only when genuinely reusable across domains) |
 | Components | `app/components/core/` |
 | Config | `config/configs/` |
 | JS Controllers | `app/javascript/controllers/` |

@@ -28,6 +28,11 @@ module Support
     default_scope { order(priority: :desc, created_at: :desc) }
     validates :title, :description, :status, :category, :created_id, presence: true
     validate :validate_attachments
+
+    # Dashboard widget reads. `reorder` overrides the default_scope ordering.
+    scope :recent_open, ->(limit: 10) { open.reorder(updated_at: :desc).limit(limit) }
+    scope :assigned_open_for, ->(account, limit: 10) { where(assigned: account).open.reorder(updated_at: :desc).limit(limit) }
+
     after_create :create_conversation
 
     broadcasts_to ->(ticket) { "tickets" },
@@ -60,6 +65,17 @@ module Support
 
     def messageable?
       in_progress? || reopened?
+    end
+
+    # Stats for the adminit dashboard tickets analytics widget.
+    def self.dashboard_stats
+      {
+        total: count,
+        open: open.count,
+        in_progress: in_progress.count,
+        resolved: where(status: [:finished, :closed]).count,
+        by_status: reorder(nil).group(:status).count
+      }
     end
 
     def finish!

@@ -17,10 +17,6 @@ module ProRails
         end
       end
 
-      def create_query_objects
-        template "query_object.rb.tt", "app/queries/#{file_name}_stats_query.rb"
-      end
-
       REGISTRY_FILE = "app/lib/dashboard/widgets.rb"
       REGISTRY_MARKER = /^ *# pro_rails:dashboard_widget_generator/
 

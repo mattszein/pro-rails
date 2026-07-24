@@ -62,4 +62,22 @@ RSpec.describe Account, type: :model do
       end
     end
   end
+
+  describe ".dashboard_stats" do
+    it "returns account stats" do
+      create_list(:account, 2, :verified)
+      create(:account)
+      verified_account = Account.verified.first
+      AccountRememberKey.create!(id: verified_account.id, key: "secret", deadline: 1.week.from_now)
+
+      stats = Account.dashboard_stats
+
+      expect(stats[:total]).to eq(3)
+      expect(stats[:verified]).to eq(2)
+      expect(stats[:active_sessions]).to eq(1)
+      expect(stats[:registered_this_month]).to eq(3)
+      expect(stats[:by_month]).to be_a(Hash)
+      expect(stats[:by_month].values).to include(3)
+    end
+  end
 end

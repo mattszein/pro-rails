@@ -1,11 +1,13 @@
 module Adminit::BreadcrumbsHelper
-  # controller_name => [navigation i18n key, path helper]
+  # controller_name => index path helper. The whitelist doubles as the source
+  # of the path; the crumb label key matches the controller name
+  # (adminit.navigation.<controller_name>).
   RESOURCE_MAP = {
-    "accounts" => [:accounts, :adminit_accounts_path],
-    "announcements" => [:announcements, :adminit_announcements_path],
-    "tickets" => [:tickets, :adminit_tickets_path],
-    "roles" => [:roles, :adminit_roles_path],
-    "permissions" => [:permissions, :adminit_permissions_path]
+    "accounts" => :adminit_accounts_path,
+    "announcements" => :adminit_announcements_path,
+    "tickets" => :adminit_tickets_path,
+    "roles" => :adminit_roles_path,
+    "permissions" => :adminit_permissions_path
   }.freeze
 
   # Only read views get a trail. Everything else (mutations, modal/frame
@@ -17,12 +19,11 @@ module Adminit::BreadcrumbsHelper
     trail = [crumb.new(label: t("adminit.navigation.dash"), path: adminit_root_path, icon: "home")]
 
     controller = controller_name # already the last segment, e.g. "tickets"
-    resource = RESOURCE_MAP[controller]
-    return trail unless resource
+    path_helper = RESOURCE_MAP[controller]
+    return trail unless path_helper
     return trail unless BREADCRUMB_ACTIONS.include?(action_name)
 
-    nav_key, path_helper = resource
-    trail << crumb.new(label: t("adminit.navigation.#{nav_key}"), path: public_send(path_helper))
+    trail << crumb.new(label: t("adminit.navigation.#{controller}"), path: public_send(path_helper))
 
     if action_name == "show"
       record = instance_variable_get("@#{controller.singularize}")

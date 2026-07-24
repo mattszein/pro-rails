@@ -5,9 +5,7 @@ module Adminit
         option :account
 
         def roles
-          @roles ||= Role.order(:name)
-            .includes(:permissions)
-            .select("roles.*, (SELECT COUNT(*) FROM accounts WHERE accounts.role_id = roles.id) AS accounts_count")
+          @roles ||= Role.with_accounts_count
         end
 
         def columns

@@ -2,17 +2,14 @@ module Adminit
   module Dashboard
     module <%= class_name.pluralize %>
       class <%= kind.camelize %>WidgetComponent < ApplicationViewComponent
-        SPAN_CLASS = "col-span-1"
-
         option :account
 <% if kind == "analytics" -%>
 
-        def chart_height
-          Adminit::DashboardHelper::CHART_HEIGHT
-        end
-
+        # Widget data comes from model scopes/class methods (e.g.
+        # <%= class_name %>.dashboard_stats) — never query ActiveRecord from
+        # the component, and do not create query objects under app/queries.
         def stats
-          @stats ||= ::<%= class_name %>StatsQuery.call
+          @stats ||= {total: 0} # TODO: read from the model
         end
 
         def chart_options

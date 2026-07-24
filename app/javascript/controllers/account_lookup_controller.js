@@ -2,21 +2,12 @@ import { Controller } from "@hotwired/stimulus"
 import TomSelect from "tom-select"
 
 // Mounted directly on the <select> (same as role-account-search), so TomSelect
-// initializes reliably. The selected account's summary is rendered by cloning a
-// server-rendered <template> sibling (see Adminit::Accounts::SummaryComponent)
-// and filling its [data-account-field] / [data-account-status] slots.
+// initializes reliably. Selecting an account points the "account_summary"
+// turbo frame at the server-rendered summary endpoint; clearing empties it.
 export default class extends Controller {
-  static values = { searchUrl: String };
+  static values = { searchUrl: String, summaryUrl: String };
 
   connect() {
-    console.log('is connected the search');
-
-    this._accounts = {};
-    // Capture sibling elements before TomSelect rewraps the select's DOM.
-    const root = this.element.parentElement;
-    this.infoEl = root.querySelector("[data-account-lookup-info]");
-    this.templateEl = root.querySelector("[data-account-lookup-template]");
-
     this._beforeCache = () => this.select?.destroy();
     document.addEventListener("turbo:before-cache", this._beforeCache);
 
@@ -31,17 +22,13 @@ export default class extends Controller {
         if (query.length < 2) return callback()
         fetch(`${this.searchUrlValue}?q=${encodeURIComponent(query)}`)
           .then(r => r.json())
-          .then(data => {
-            data.forEach(a => { this._accounts[a.value] = a })
-            callback(data)
-          })
+          .then(data => callback(data))
           .catch(() => callback())
       },
       onChange: (value) => {
-        const account = value && this._accounts[value]
-        account ? this.renderInfo(account) : this.clearInfo()
+        value ? this.loadSummary(value) : this.clearSummary()
       },
-      onClear: () => this.clearInfo()
+      onClear: () => this.clearSummary()
     });
   }
 
@@ -50,24 +37,17 @@ export default class extends Controller {
     this.select?.destroy();
   }
 
-  renderInfo(account) {
-    if (!this.infoEl || !this.templateEl) return;
-    const fragment = this.templateEl.content.cloneNode(true);
-    fragment.querySelectorAll("[data-account-field]").forEach((el) => {
-      el.textContent = account[el.dataset.accountField] ?? "-";
-    })
-    fragment.querySelectorAll("[data-account-status]").forEach((el) => {
-      el.hidden = el.dataset.accountStatus !== account.status_key;
-    })
-    const link = fragment.querySelector("[data-account-lookup-link]");
-    if (link) link.href = account.account_path;
-    this.infoEl.replaceChildren(fragment);
-    this.infoEl.hidden = false;
+  loadSummary(value) {
+    const frame = document.getElementById("account_summary");
+    if (!frame) return;
+    // Setting src makes the frame fetch the server-rendered summary.
+    frame.src = this.summaryUrlValue.replace("__id__", value);
   }
 
-  clearInfo() {
-    if (!this.infoEl) return;
-    this.infoEl.replaceChildren();
-    this.infoEl.hidden = true;
+  clearSummary() {
+    const frame = document.getElementById("account_summary");
+    if (!frame) return;
+    frame.removeAttribute("src");
+    frame.replaceChildren();
   }
 }

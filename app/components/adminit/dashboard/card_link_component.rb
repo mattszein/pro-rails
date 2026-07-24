@@ -34,8 +34,6 @@ module Adminit
       def join_tokens(existing, added)
         [existing, added].compact.reject(&:empty?).join(" ")
       end
-
-
     end
   end
 end

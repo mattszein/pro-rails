@@ -11,6 +11,22 @@ class Account < ApplicationRecord
   scope :search_by_email, ->(query) { where("email ILIKE ?", "%#{query}%") }
   scope :not_in_role, ->(role) { where.not(role_id: role.id).or(where(role_id: nil)) }
 
+  DASHBOARD_STATS_MONTHS = 6
+
+  # Stats for the adminit dashboard accounts analytics widget.
+  def self.dashboard_stats
+    months = DASHBOARD_STATS_MONTHS.times.map { |i| Time.zone.now.beginning_of_month - i.months }.reverse
+    by_month = months.index_with { |month| where(created_at: month.all_month).count }
+
+    {
+      total: count,
+      verified: verified.count,
+      active_sessions: AccountRememberKey.count,
+      registered_this_month: by_month.values.last,
+      by_month: by_month
+    }
+  end
+
   def adminit_access?
     role.present?
   end
