@@ -39,14 +39,11 @@ module Dashboard
         component_class: "Adminit::Dashboard::Announcements::GeneralWidgetComponent"
       )
 
-      # view_all_params customizes the container's "view all" link: the ticket
-      # card points to the current admin's assigned tickets.
       WidgetRegistry.register(
         key: :tickets_personal, resource: :ticket, kind: :personal,
         policy_class: "Adminit::TicketPolicy",
         component_class: "Adminit::Dashboard::Tickets::PersonalWidgetComponent",
-        refresh_interval: 30,
-        view_all_params: {assignee: "me"}
+        refresh_interval: 30
       )
 
       WidgetRegistry.register(

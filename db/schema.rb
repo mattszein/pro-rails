@@ -113,6 +113,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_11_120000) do
     t.index ["status"], name: "index_announcements_on_status"
   end
 
+  create_table "avatars", force: :cascade do |t|
+    t.text "assembled_prompt"
+    t.datetime "created_at", null: false
+    t.jsonb "dna", default: {}, null: false
+    t.integer "dna_version"
+    t.string "image_model"
+    t.integer "kind", null: false
+    t.integer "method"
+    t.bigint "profile_id", null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.boolean "visible", default: true, null: false
+    t.index ["profile_id", "kind"], name: "index_avatars_on_profile_id_and_kind"
+    t.index ["profile_id", "status"], name: "index_avatars_on_profile_id_and_status"
+    t.index ["profile_id", "visible"], name: "index_avatars_on_profile_id_and_visible"
+    t.index ["profile_id"], name: "index_avatars_on_profile_id"
+  end
+
   create_table "conversations", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "ticket_id", null: false
@@ -175,11 +193,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_11_120000) do
 
   create_table "profiles", force: :cascade do |t|
     t.bigint "account_id", null: false
+    t.bigint "avatar_id"
     t.text "bio"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "username"
     t.index ["account_id"], name: "index_profiles_on_account_id", unique: true
+    t.index ["avatar_id"], name: "index_profiles_on_avatar_id"
     t.index ["username"], name: "index_profiles_on_username", unique: true, where: "((username IS NOT NULL) AND ((username)::text <> ''::text))"
   end
 
@@ -223,10 +243,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_11_120000) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "announcements", "accounts", column: "author_id"
+  add_foreign_key "avatars", "profiles"
   add_foreign_key "conversations", "tickets"
   add_foreign_key "messages", "accounts"
   add_foreign_key "messages", "conversations"
   add_foreign_key "profiles", "accounts"
+  add_foreign_key "profiles", "avatars"
   add_foreign_key "support_notes", "accounts"
   add_foreign_key "support_notes", "tickets"
   add_foreign_key "tickets", "accounts", column: "assigned_id"

@@ -69,6 +69,31 @@ RSpec.describe Support::Ticket, type: :model do
   end
 
   describe "scopes" do
+    describe ".search_title" do
+      it "matches a case-insensitive partial title" do
+        matching = create(:ticket, title: "Cannot log in")
+        create(:ticket, title: "Billing question")
+
+        expect(Support::Ticket.search_title("log in")).to contain_exactly(matching)
+      end
+
+      it "is case-insensitive" do
+        matching = create(:ticket, title: "Cannot Log In")
+        expect(Support::Ticket.search_title("log in")).to contain_exactly(matching)
+      end
+    end
+
+    describe ".assigned_to" do
+      it "returns tickets assigned to the given account id" do
+        account = create(:account, :verified)
+        other_account = create(:account, :verified)
+        ticket = create(:ticket, assigned: account)
+        create(:ticket, assigned: other_account)
+
+        expect(Support::Ticket.assigned_to(account.id)).to contain_exactly(ticket)
+      end
+    end
+
     describe ".recent_open" do
       it "returns open tickets ordered by updated_at desc" do
         old_ticket = create(:ticket)

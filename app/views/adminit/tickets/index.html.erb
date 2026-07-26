@@ -4,8 +4,16 @@
   </div>
   <%= turbo_stream_from "admin_tickets" %>
   <%= render Core::CardComponent.new(padding: :md) do %>
-    <div class="flex gap-4">
-      <%= render Core::TableComponent.new(rows: @tickets, columns: ticket_columns, options: {ids: {tbody: "admin_tickets", col_prefix: "admin"}}) %>
-    </div>
+    <%= render Core::TableComponent.new(
+          rows: @tickets,
+          columns: @columns,
+          options: {
+            ids: {tbody: "admin_tickets", col_prefix: "admin"},
+            frame_id: "admin_tickets_table",
+            pagy: @pagy,
+            sortable: true,
+            filterable: true
+          }
+        ) %>
   <% end %>
 </div>

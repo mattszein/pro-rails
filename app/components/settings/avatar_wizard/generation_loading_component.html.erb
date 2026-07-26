@@ -1,0 +1,24 @@
+<div class="text-center py-12 space-y-6">
+  <div class="flex justify-center">
+    <div class="relative w-32 h-32">
+      <div class="absolute inset-0 rounded-full bg-primary-100 dark:bg-primary-900/30 animate-ping opacity-30"></div>
+      <div class="relative w-32 h-32 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+        <span class="text-5xl animate-bounce">🔨</span>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <h3 class="text-xl font-semibold"><%= t("avatars.generation.forging") %></h3>
+    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 max-w-xs mx-auto">
+      <%= t("avatars.generation.forging_subtitle") %>
+    </p>
+  </div>
+
+  <div class="flex justify-center gap-2">
+    <% 3.times do |i| %>
+      <div class="w-2.5 h-2.5 rounded-full bg-primary-500 animate-bounce"
+           style="animation-delay: <%= i * 0.15 %>s"></div>
+    <% end %>
+  </div>
+</div>

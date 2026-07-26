@@ -1,7 +1,7 @@
 <% if editable %>
   <button type="button" class="relative inline-block group bg-transparent border-0 p-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 rounded-full" data-action="click->click-forwarder#forward">
-    <% if profile.avatar.attached? %>
-      <%= image_tag profile.avatar.variant(avatar_variant), alt: profile.username.to_s, class: "#{size_class} rounded-full object-cover #{hover_ring_classes}" %>
+    <% if avatar_image_attached? %>
+      <%= image_tag avatar_image_variant, alt: profile.username.to_s, class: "#{size_class} rounded-full object-cover #{hover_ring_classes}" %>
     <% else %>
       <div class="<%= size_class %> rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center font-bold text-gray-500 dark:text-gray-300 <%= hover_ring_classes %>">
         <%= fallback_initial %>
@@ -12,8 +12,8 @@
     </div>
   </button>
 <% else %>
-  <% if profile.avatar.attached? %>
-    <%= image_tag profile.avatar.variant(avatar_variant), alt: profile.username.to_s, class: "#{size_class} rounded-full object-cover" %>
+  <% if avatar_image_attached? %>
+    <%= image_tag avatar_image_variant, alt: profile.username.to_s, class: "#{size_class} rounded-full object-cover" %>
   <% else %>
     <div class="<%= size_class %> rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center font-bold text-gray-500 dark:text-gray-300">
       <%= fallback_initial %>

@@ -1,0 +1,20 @@
+<%= form_with url: settings_avatars_path, method: :post, builder: CustomFormBuilder, class: "block" do |f| %>
+  <%= f.hidden_field :method, value: method_value, name: "avatar[method]" %>
+  <button type="submit"
+      class="w-full p-6 rounded-2xl border-2 border-gray-200 dark:border-gray-700 hover:border-primary-400 dark:hover:border-primary-400 transition-all text-left group">
+    <div class="flex items-start gap-4">
+      <div class="text-4xl"><span><%= emoji %></span></div>
+      <div>
+        <h3 class="group-hover:text-primary-500 transition-colors">
+          <%= t("avatars.new.#{method_value}.title") %>
+        </h3>
+        <p class="mt-1">
+          <%= t("avatars.new.#{method_value}.description") %>
+        </p>
+        <p class="mt-2">
+          <%= t("avatars.new.#{method_value}.steps") %>
+        </p>
+      </div>
+    </div>
+  </button>
+<% end %>

@@ -37,6 +37,34 @@ RSpec.describe Support::TicketsController, type: :controller do
 
         expect(controller.instance_variable_get(:@tickets)).to contain_exactly(ticket)
       end
+
+      it "paginates results" do
+        subject
+        expect(controller.instance_variable_get(:@pagy)).to be_a(Pagy)
+      end
+
+      context "with a filter applied" do
+        it "narrows within the owner's tickets but never returns another account's ticket" do
+          own_open = create(:ticket, status: :open, created: creator_account)
+          create(:ticket, status: :closed, created: creator_account)
+          create(:ticket, status: :open, created: other_account)
+
+          get :index, params: {filter: {status: "open"}}
+
+          expect(controller.instance_variable_get(:@tickets)).to contain_exactly(own_open)
+        end
+      end
+
+      context "with created_at sort" do
+        it "sorts by created_at asc" do
+          old_ticket = create(:ticket, created: creator_account, created_at: 2.days.ago)
+          create(:ticket, created: creator_account, created_at: 1.hour.ago)
+
+          get :index, params: {sort: "created_at", direction: "asc"}
+
+          expect(controller.instance_variable_get(:@tickets).first).to eq(old_ticket)
+        end
+      end
     end
   end
 

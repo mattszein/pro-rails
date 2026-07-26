@@ -10,6 +10,7 @@ class Account < ApplicationRecord
 
   scope :search_by_email, ->(query) { where("email ILIKE ?", "%#{sanitize_sql_like(query)}%") }
   scope :not_in_role, ->(role) { where.not(role_id: role.id).or(where(role_id: nil)) }
+  scope :assignable, -> { where.not(role_id: nil).order(:email) }
 
   DASHBOARD_STATS_MONTHS = 6
 

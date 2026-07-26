@@ -4,7 +4,7 @@ class Adminit::RolesController < Adminit::ApplicationController
 
   def index
     authorize!
-    @roles = Role.all
+    @pagy, @roles = pagy(Role.all)
   end
 
   def show

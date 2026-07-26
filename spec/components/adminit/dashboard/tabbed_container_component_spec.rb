@@ -34,12 +34,22 @@ RSpec.describe Adminit::Dashboard::TabbedContainerComponent, type: :component do
   end
 
   it "gives each tab its own view-all link, from that widget's view_all_params" do
-    widgets = %i[tickets_personal tickets_general].map { |k| widget_for(k) }
-    render_inline(described_class.new(resource: :ticket, widgets: widgets))
+    # No shipped widget carries view_all_params (removed from tickets_personal
+    # once the assignee=me shortcut was dropped) — build fixtures directly so
+    # this stays a regression guard for the per-tab-link mechanism itself.
+    with_params = Dashboard::WidgetRegistry::Widget.new(
+      key: :fixture_tickets_personal, resource: :ticket, kind: :personal, span: :full,
+      policy_class: "Adminit::TicketPolicy",
+      component_class: "Adminit::Dashboard::Tickets::PersonalWidgetComponent",
+      refresh_interval: nil, lazy: true, view_all_params: {filter: {status: "open"}}
+    )
+    without_params = widget_for(:tickets_general)
+
+    render_inline(described_class.new(resource: :ticket, widgets: [with_params, without_params]))
 
     links = page.all("a", text: I18n.t("shared.common.view_all"), visible: :all)
     hrefs = links.pluck(:href)
-    expect(hrefs).to include("/adminit/tickets?assignee=me", "/adminit/tickets")
+    expect(hrefs).to include("/adminit/tickets?filter%5Bstatus%5D=open", "/adminit/tickets")
   end
 
   it "renders stable ARIA ids that don't depend on object identity" do

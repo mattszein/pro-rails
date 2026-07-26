@@ -1,10 +1,16 @@
 class Adminit::AccountsController < Adminit::ApplicationController
+  include Tableable
+
   before_action :set_account, only: %i[show edit destroy]
   verify_authorized
 
   def index
     authorize!
-    @accounts = Account.includes(:role).all
+    @columns = helpers.accounts_columns
+    @pagy, @accounts = apply_table_params(
+      Account.includes(:role).order(created_at: :desc),
+      columns: @columns
+    )
   end
 
   def show

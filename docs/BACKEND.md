@@ -203,6 +203,81 @@ For workflow/conditional broadcasts, use `Turbo::StreamsChannel.broadcast_*` in 
 
 ---
 
+## Table Filters & Sorting
+
+Recipe for an indexed, sortable, filterable table (see `docs/ARCHITECTURE.md` → Table Queries for the
+rule this implements):
+
+**1. SQL is a model scope:**
+
+```ruby
+# app/models/support/ticket.rb
+scope :search_title, ->(query) { where("title ILIKE ?", "%#{sanitize_sql_like(query)}%") }
+scope :assigned_to,  ->(account_id) { where(assigned_id: account_id) }
+```
+
+**2. The whitelist is declared once, on the column that renders the field** (helper the view already
+calls — `app/helpers/{namespace}/{resource}_helper.rb`):
+
+```ruby
+Core::Table::Column.new(
+  label: I18n.t("shared.labels.title"),
+  renderer: ->(ticket) { ticket.title },
+  sort_key: :title,
+  filter: Core::Table::Filter.new(type: :text, param: :search, scope: :search_title)
+)
+```
+
+`scope:` omitted → `Tableable` applies exact match `where(param => value)`, and raises in dev/test if
+`param` isn't a real column (catches typos instead of silently no-opping the control). `scope:`
+present → `relation.public_send(scope, value)`.
+
+**3. The controller assigns the column set once and passes it to both the query and the view:**
+
+```ruby
+def index
+  authorize! Support::Ticket, with: Adminit::TicketPolicy
+  @columns = helpers.ticket_columns
+  @pagy, @tickets = apply_table_params(
+    Support::Ticket.includes(:created, :assigned).prioritized,  # row-level access lives here
+    columns: @columns
+  )
+end
+```
+
+```erb
+<%= render Core::TableComponent.new(rows: @tickets, columns: @columns, options: { sortable: true, filterable: true, pagy: @pagy }) %>
+```
+
+Passing `@columns` to both means the whitelist and the rendered header set are the same object at
+runtime — they cannot drift apart.
+
+**4. Context filters (need `current_account`, "now", tenant) are not built yet** — no caller needs one.
+When one appears, it is an explicit lambda the controller merges in over the column-derived filters,
+not a macro on the model. The model stays free of request state.
+
+**5. Association-backed filter options go through an audience-named scope**, not a raw query in the
+helper:
+
+```ruby
+# app/models/account.rb
+scope :assignable, -> { where.not(role_id: nil).order(:email) }
+```
+
+```ruby
+filter: Core::Table::Filter.new(type: :select, param: :assignee, scope: :assigned_to,
+  options: -> { Account.assignable.pluck(:email, :id) })
+```
+
+Rendering an option list publishes its contents to anyone who can see the filter bar — treat that as
+a disclosure decision, not a convenience query.
+
+**One model, two contexts, two column sets.** `Support::Ticket` is exposed at `/support/tickets`
+(owner-scoped, `category` filterable) and `/adminit/tickets` (all rows, `priority` sortable). Each
+namespace's helper declares its own column set — that split is intentional, not duplication.
+
+---
+
 ## Controller Patterns
 
 ### Standard Structure

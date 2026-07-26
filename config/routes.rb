@@ -40,6 +40,14 @@ Rails.application.routes.draw do
     namespace :settings do
       resources :appearance, only: [:index]
       resource :profile, only: [:edit, :update]
+      resources :avatars, only: [:index, :new, :create, :show, :update] do
+        member do
+          post :generate
+          post :select
+          post :evolve
+          patch :toggle_visibility
+        end
+      end
     end
   end
 

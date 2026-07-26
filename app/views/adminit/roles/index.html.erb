@@ -4,6 +4,13 @@
   </div>
 
   <%= render Core::CardComponent.new do %>
-      <%= render Core::TableComponent.new(rows: @roles, columns: roles_columns) %>
+    <%= render Core::TableComponent.new(
+          rows: @roles,
+          columns: roles_columns,
+          options: {
+            frame_id: "admin_roles_table",
+            pagy: @pagy
+          }
+        ) %>
   <% end %>
 </div>

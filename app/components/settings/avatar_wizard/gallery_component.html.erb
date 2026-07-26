@@ -1,0 +1,15 @@
+<% if avatars.empty? %>
+  <div class="text-center py-12 text-gray-400 dark:text-gray-500">
+    <p><%= t("avatars.gallery.empty") %></p>
+  </div>
+<% else %>
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
+       data-controller="avatar-gallery">
+    <% avatars.each do |avatar| %>
+      <%= render Settings::AvatarWizard::GalleryItemComponent.new(
+            avatar: avatar,
+            active_avatar_id: active_avatar_id
+          ) %>
+    <% end %>
+  </div>
+<% end %>

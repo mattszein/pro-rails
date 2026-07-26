@@ -58,7 +58,7 @@ gem "interactor", "~> 3.0"
 gem "mission_control-jobs"
 gem "local_time"
 gem "noticed", "~> 3.0"
-gem "pagy", "~> 9.0"
+gem "pagy", "~> 43.0"
 gem "rails-i18n", "~> 8.0"
 
 group :development, :test do
@@ -90,6 +90,8 @@ group :test do
   gem "cuprite", "= 0.16"
   gem "test-prof"
 end
+
+gem "ruby_llm"
 
 gem "rodauth-rails", "~> 2.1"
 # Enables Sequel to use Active Record's database connection

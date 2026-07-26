@@ -22,6 +22,49 @@ describe Adminit::AnnouncementsController, type: :controller do
       end
 
       it_behaves_like "respond to success"
+
+      it "paginates results" do
+        subject
+        expect(controller.instance_variable_get(:@pagy)).to be_a(Pagy)
+      end
+
+      context "with sort params" do
+        let!(:old_announcement) { create(:announcement, created_at: 2.days.ago) }
+        let!(:new_announcement) { create(:announcement, created_at: 1.hour.ago) }
+
+        it "sorts by created_at asc" do
+          get :index, params: {sort: "created_at", direction: "asc"}
+          announcements = controller.instance_variable_get(:@announcements)
+          expect(announcements.first).to eq(old_announcement)
+        end
+
+        it "sorts by created_at desc" do
+          get :index, params: {sort: "created_at", direction: "desc"}
+          announcements = controller.instance_variable_get(:@announcements)
+          expect(announcements.first).to eq(new_announcement)
+        end
+
+        it "ignores invalid sort params" do
+          expect { get :index, params: {sort: "malicious_column", direction: "asc"} }.not_to raise_error
+        end
+      end
+
+      context "with filter params" do
+        let!(:draft_announcement) { create(:announcement, :draft) }
+        let!(:published_announcement) { create(:announcement, :published) }
+
+        it "filters by status" do
+          get :index, params: {filter: {status: "draft"}}
+          announcements = controller.instance_variable_get(:@announcements)
+          expect(announcements).to all(have_attributes(status: "draft"))
+        end
+
+        it "ignores filter params that aren't declared on any column" do
+          get :index, params: {filter: {body: "anything"}}
+          announcements = controller.instance_variable_get(:@announcements)
+          expect(announcements).to contain_exactly(draft_announcement, published_announcement)
+        end
+      end
     end
   end
 

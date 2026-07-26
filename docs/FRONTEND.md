@@ -93,6 +93,45 @@ app/components/core/
 
 ---
 
+## Core::Table::Column / Filter
+
+`Core::TableComponent` (`app/components/core/table_component.rb`) renders rows against an array of
+`Core::Table::Column` (`app/components/core/table/column.rb`):
+
+```ruby
+Core::Table::Column.new(
+  label: I18n.t("shared.labels.title"),   # header text
+  renderer: ->(record) { record.title },  # cell content; omit for a custom row partial (`content.present?` path)
+  sort_key: :title,                        # omit → column isn't sortable
+  filter: Core::Table::Filter.new(
+    type: :text,                           # :text or :select
+    param: :search,                        # request param name (`?filter[search]=`)
+    scope: :search_title,                  # model scope; omitted → exact match `where(param => value)`
+    options: -> { ... }                    # required for :select — array of [label, value]
+  )
+)
+```
+
+Column sets are built in a helper (`app/helpers/{namespace}/{resource}_helper.rb`) and passed to
+both the query (via `Tableable#apply_table_params`, see `docs/BACKEND.md` → Table Filters & Sorting)
+and the view — `columns:` is the same array both times, so what a request can touch and what the
+table renders can never drift apart.
+
+**One model can have two column sets.** `ticket_columns` (adminit) and `support_ticket_columns`
+(support) both back `Support::Ticket` but expose different sortable/filterable fields — that is
+correct, not something to unify. Widget tables (dashboard cards) build read-only `Column`s with no
+`sort_key`/`filter` and render through `Core::TableComponent` with `options: {}` (no filter bar, no
+sort links).
+
+**Never pass a plain Hash where a `Column` is expected** — `TableComponent`/`FilterBarComponent`
+call `.label`, `.renderer`, `.sortable?`, `.filterable?` on it.
+
+**Filter `options:` that hit an association must call a model scope named for its audience**
+(`Role.selectable`, `Account.assignable`), not raw `Model.where(...)` inline in the helper — see
+`docs/ARCHITECTURE.md` → Table Queries. Rendering an option list is disclosure, not decoration.
+
+---
+
 ## Turbo Frames
 
 ### Modal Pattern (existing)

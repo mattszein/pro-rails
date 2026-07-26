@@ -1,0 +1,8 @@
+<div id="<%= dom_id(avatar, :visibility) %>">
+  <%= button_to toggle_visibility_settings_avatar_path(avatar),
+      method: :patch,
+      class: "absolute bottom-2 right-2 p-1.5 rounded-full #{avatar.visible? ? "bg-white/80 text-gray-700" : "bg-gray-800/80 text-gray-300"} hover:scale-110 transition-all text-xs",
+      title: avatar.visible? ? t("avatars.gallery.hide") : t("avatars.gallery.show") do %>
+    <%= avatar.visible? ? "👁" : "🔒" %>
+  <% end %>
+</div>

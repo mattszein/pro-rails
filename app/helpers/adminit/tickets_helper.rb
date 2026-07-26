@@ -1,40 +1,59 @@
 module Adminit::TicketsHelper
-  # Returns an array of column definitions for the ticket table
   def ticket_columns
     [
-      {
+      Core::Table::Column.new(
         label: I18n.t("shared.labels.title"),
-        renderer: ->(ticket) { ticket.title }
-      },
-      {
+        renderer: ->(ticket) { ticket.title },
+        sort_key: :title,
+        filter: Core::Table::Filter.new(type: :text, param: :search, scope: :search_title)
+      ),
+      Core::Table::Column.new(
         label: I18n.t("shared.labels.category"),
         renderer: ->(ticket) { I18n.t("enums.ticket.category.#{ticket.category}") }
-      },
-      {
+      ),
+      Core::Table::Column.new(
         label: I18n.t("shared.labels.status"),
-        renderer: ->(ticket) do
+        renderer: ->(ticket) {
           render(Core::BadgeComponent.new(label: I18n.t("enums.ticket.status.#{ticket.status}"),
             theme: ticket_status_theme(ticket.status)))
-        end
-      },
-      {
+        },
+        sort_key: :status,
+        filter: Core::Table::Filter.new(
+          type: :select,
+          param: :status,
+          options: -> { Support::Ticket.statuses.keys.map { |s| [I18n.t("enums.ticket.status.#{s}"), s] } }
+        )
+      ),
+      Core::Table::Column.new(
         label: I18n.t("shared.labels.priority"),
-        renderer: ->(ticket) { ticket.priority }
-      },
-      {
+        renderer: ->(ticket) { ticket.priority },
+        sort_key: :priority
+      ),
+      Core::Table::Column.new(
         label: I18n.t("shared.labels.created"),
         renderer: ->(ticket) { ticket.created&.email }
-      },
-      {
+      ),
+      Core::Table::Column.new(
         label: I18n.t("shared.labels.assigned"),
-        renderer: ->(ticket) { ticket.assigned&.email || "-" }
-      },
-      {
+        renderer: ->(ticket) { ticket.assigned&.email || "-" },
+        filter: Core::Table::Filter.new(
+          type: :select,
+          param: :assignee,
+          scope: :assigned_to,
+          options: -> { Account.assignable.pluck(:email, :id) }
+        )
+      ),
+      Core::Table::Column.new(
+        label: I18n.t("shared.labels.created_on"),
+        renderer: ->(ticket) { l(ticket.created_at, format: :short) },
+        sort_key: :created_at
+      ),
+      Core::Table::Column.new(
         label: I18n.t("shared.common.actions"),
         renderer: ->(ticket) {
-          render(Core::LinkComponent.new(name: I18n.t("shared.common.show"), url: adminit_ticket_path(ticket), style: :as_button, theme: :show, size: :xs, html_options: {data: {turbo_prefetch: false}}))
+          render(Core::LinkComponent.new(name: I18n.t("shared.common.show"), url: adminit_ticket_path(ticket), style: :as_button, theme: :show, size: :xs, html_options: {data: {turbo_prefetch: false, turbo_frame: "_top"}}))
         }
-      }
+      )
     ]
   end
 end

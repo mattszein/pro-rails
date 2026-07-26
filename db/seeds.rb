@@ -26,6 +26,14 @@ Account.find_or_create_by!(email: "user@user.com") do |account|
   account.status = "verified"
 end
 
+30.times do |i|
+  Account.find_or_create_by!(email: "user#{i + 1}@user.com") do |account|
+    account.role = nil
+    account.password_hash = RodauthApp.rodauth.allocate.password_hash("password")
+    account.status = "verified"
+  end
+end
+
 # Create permissions and ensure roles are assigned idempotently
 {
   application: [role_superadmin, role_support],

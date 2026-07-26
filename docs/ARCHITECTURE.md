@@ -41,6 +41,7 @@ HTTP Request
 | Multiple models affected | Interactor | Application |
 | External API call | Service Object | Infrastructure |
 | Complex/reusable query | Model Scope or class method | Domain |
+| Table sort/filter whitelist (what a request may touch) | `Core::Table::Column`/`Filter` on the controller's column set | Presentation |
 | Authorization rules | Policy (ActionPolicy) | Application |
 | Notifications | Notifier (Noticed) via Interactor | Application |
 | Background processing | Job (Solid Queue) | Infrastructure |
@@ -48,6 +49,11 @@ HTTP Request
 | Bidirectional real-time | Custom ActionCable Channel | Presentation |
 | Multi-step content processing | Pipeline (Chain of Responsibility) | Infrastructure |
 | Typed configuration | Config class (Anyway Config) | Infrastructure |
+
+**`app/queries/` is not part of this template.** A standalone query object is justified only when a
+read has no owning model *and* is reused across domains — that case hasn't appeared. If it does, it
+goes in `app/services/` as a reporting object, not a new top-level layer. See "Table Queries" below
+for where table SQL and whitelists actually live.
 
 ---
 
@@ -144,6 +150,55 @@ Cross-cutting concerns (used by 2+ models) → flat in `app/models/concerns/`. M
 | Subtypes have different behavior (callbacks, validations, scopes) | Variants differ in label but follow same workflow |
 | Conditional logic around type in 3+ places | Number of variants might grow beyond 4-5 |
 | Each variant has a meaningful name | No behavioral difference between types |
+
+---
+
+## Table Queries (sort/filter)
+
+**Queries belong to the model.** Anything that builds SQL is a scope or a class method on the model
+that owns the data — including filter and search predicates. When a model accumulates several such
+clusters, extract a model-specific concern (`app/models/concerns/{model}/{aspect}.rb`), per the
+concern rule above.
+
+**What a request is allowed to filter and sort is declared once, on the table's column set**
+(`Core::Table::Column#sort_key` / `#filter`, `app/components/core/table/column.rb`). The controller
+derives the whitelist from the same array it hands to the view (`Tableable#apply_table_params`,
+`app/controllers/concerns/tableable.rb`) — one object, used twice, so it cannot drift. A sort or
+filter cannot reach a field the table doesn't render, because the capability is declared on the
+column that renders it.
+
+**Sort/filter capability is per context, not per model.** One model exposed by two namespaces (e.g.
+`Support::Ticket` via `/support/tickets` and `/adminit/tickets`) legitimately has two different
+column sets, with different sortable/filterable fields and different row scopes. That is the
+mechanism, not duplication to eliminate — a single whitelist keyed off the model can't express it.
+
+**Row-level access is not a filter.** Which rows an index action may see belongs in the controller's
+base relation, before `apply_table_params` runs. Filters `AND` onto that relation, so they can only
+narrow — they can never be used to escape a scope like `where(created_id: current_account.id)`.
+
+**Filter option lists that query an association go through a model scope named for their audience**
+(`Role.selectable`, `Account.assignable`), not raw `Model.where(...)` in the helper. Rendering an
+option list publishes its contents to anyone who can see the filter bar — that is a disclosure
+decision, and it deserves a reviewable, named home.
+
+**Role-conditional capability** (a column only some roles may sort/filter by) is a policy check
+(`allowed_to?`) in the column-building helper, which removes the header, cell, sort link and filter
+control together. Not built speculatively — `Permission::RESOURCE_REGISTRY` is resource-level only
+today, so per-field capability isn't expressible yet. Escalate to it when a real requirement appears.
+
+The escalation ladder for "where does this query go":
+
+| Situation | Home |
+|---|---|
+| One-off lookup used by a single action | `where(...)` in the controller — fine, don't ceremony it |
+| Reused or non-trivial predicate | Named scope on the model |
+| Returns an aggregate/hash, not a relation | Class method on the model (`dashboard_stats`) |
+| Model has 2+ query clusters and is getting long | Model concern (`Support::Ticket::Filterable`, `Account::Statistics`) |
+| Needs `current_account` / request state | One-line lambda passed by the controller, over a model scope |
+| No owning model at all, reused across domains | Reporting object in `app/services/` (not yet needed) |
+
+This is the same ladder used for callbacks and interactors above: escalate on evidence, not in
+advance.
 
 ---
 
@@ -266,7 +321,6 @@ Cursor pagination uses the PK index directly — O(1) regardless of depth. `OFFS
 | Services | `app/services/external_services/` |
 | Pipelines | `app/services/` |
 | Notifiers | `app/notifiers/` |
-| Queries | Model scopes/class methods (`app/queries/` is not used — query objects only when genuinely reusable across domains) |
 | Components | `app/components/core/` |
 | Config | `config/configs/` |
 | JS Controllers | `app/javascript/controllers/` |
@@ -285,6 +339,10 @@ Cursor pagination uses the PK index directly — O(1) regardless of depth. `OFFS
 | State queries for UI | Model (query methods) |
 | Destroy protection | Model (before_destroy callback) |
 | Simple CRUD broadcasts | Model (`broadcasts_to`) |
+| Table filter/search SQL | Model scope (`search_title`, `assigned_to`, …) |
+| Table sort/filter whitelist | `Core::Table::Column`/`Filter` on the column set (per context, not per model) |
+| Table row-level access | Controller base relation, before filters apply |
+| Filter option-list disclosure | Model scope named for its audience (`Role.selectable`) |
 | Authorization (WHO) | Policy |
 | Workflow orchestration | Interactor |
 | Side effects (jobs, emails) | Interactor |

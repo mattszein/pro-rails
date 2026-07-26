@@ -10,7 +10,7 @@ module Adminit
 
         def columns
           [
-            {
+            Core::Table::Column.new(
               label: I18n.t("shared.labels.name"),
               renderer: ->(role) {
                 render Core::LinkComponent.new(
@@ -20,15 +20,15 @@ module Adminit
                   html_options: {data: {turbo_frame: "_top", turbo_prefetch: false}}
                 )
               }
-            },
-            {
+            ),
+            Core::Table::Column.new(
               label: I18n.t("shared.labels.accounts"),
               renderer: ->(role) { role.accounts_count }
-            },
-            {
+            ),
+            Core::Table::Column.new(
               label: I18n.t("adminit.navigation.permissions"),
               renderer: ->(role) { permission_labels(role) }
-            }
+            )
           ]
         end
 

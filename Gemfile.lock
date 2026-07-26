@@ -154,11 +154,22 @@ GEM
     erubi (1.13.1)
     et-orbi (1.4.0)
       tzinfo
+    event_stream_parser (1.0.0)
     factory_bot (6.5.6)
       activesupport (>= 6.1.0)
     factory_bot_rails (6.5.1)
       factory_bot (~> 6.5)
       railties (>= 6.1.0)
+    faraday (2.14.1)
+      faraday-net_http (>= 2.0, < 3.5)
+      json
+      logger
+    faraday-multipart (1.2.0)
+      multipart-post (~> 2.0)
+    faraday-net_http (3.4.2)
+      net-http (~> 0.5)
+    faraday-retry (2.4.0)
+      faraday (~> 2.0)
     ferrum (0.16)
       addressable (~> 2.5)
       base64 (~> 0.2)
@@ -297,6 +308,9 @@ GEM
       stimulus-rails
       turbo-rails
     msgpack (1.8.0)
+    multipart-post (2.4.1)
+    net-http (0.9.1)
+      uri (>= 0.11.1)
     net-imap (0.6.3)
       date
       net-protocol
@@ -327,7 +341,10 @@ GEM
     noticed (3.0.0)
       rails (>= 6.1.0)
     ostruct (0.6.3)
-    pagy (9.4.0)
+    pagy (43.5.3)
+      json
+      uri
+      yaml
     parallel (1.27.0)
     parser (3.3.10.2)
       ast (~> 2.4.1)
@@ -474,6 +491,17 @@ GEM
     ruby-vips (2.3.0)
       ffi (~> 1.12)
       logger
+    ruby_llm (1.14.1)
+      base64
+      event_stream_parser (~> 1)
+      faraday (>= 1.10.0)
+      faraday-multipart (>= 1)
+      faraday-net_http (>= 1)
+      faraday-retry (>= 1)
+      marcel (~> 1)
+      ruby_llm-schema (~> 0)
+      zeitwerk (~> 2)
+    ruby_llm-schema (0.3.0)
     securerandom (0.4.1)
     sequel (5.101.0)
       bigdecimal
@@ -556,6 +584,7 @@ GEM
     websocket-extensions (0.1.5)
     xpath (3.2.0)
       nokogiri (~> 1.8)
+    yaml (0.4.0)
     yard (0.9.38)
     zeitwerk (2.7.5)
 
@@ -596,7 +625,7 @@ DEPENDENCIES
   lookbook (>= 2.3.11)
   mission_control-jobs
   noticed (~> 3.0)
-  pagy (~> 9.0)
+  pagy (~> 43.0)
   pg (~> 1.5)
   propshaft
   puma (>= 5.0)
@@ -606,6 +635,7 @@ DEPENDENCIES
   rodauth-rails (~> 2.1)
   rspec-rails
   rubocop-rspec
+  ruby_llm
   sequel-activerecord_connection (~> 2.0)
   shoulda-matchers
   solid_queue

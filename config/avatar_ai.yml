@@ -1,0 +1,11 @@
+default:
+  default_image_model: "qwen"
+  max_generations_per_day: 2
+  mood_board_thumbnail_count: 9
+  text_model: "openai/gpt-oss-120b:free"
+
+development:
+  max_generations_per_day: 20
+
+production:
+  max_generations_per_day: 2

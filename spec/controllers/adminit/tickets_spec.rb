@@ -26,6 +26,87 @@ describe Adminit::TicketsController, type: :controller do
         end
 
         it_behaves_like "respond to success"
+
+        it "paginates results" do
+          subject
+          expect(controller.instance_variable_get(:@pagy)).to be_a(Pagy)
+        end
+
+        context "with sort params" do
+          let(:ticket_a) { create(:ticket, title: "Alpha", created: creator_account) }
+          let(:ticket_b) { create(:ticket, title: "Beta", created: creator_account) }
+
+          before do
+            ticket_a
+            ticket_b
+          end
+
+          it "sorts by title asc" do
+            get :index, params: {sort: "title", direction: "asc"}
+            tickets = controller.instance_variable_get(:@tickets)
+            expect(tickets.first.title).to eq("Alpha")
+          end
+
+          it "sorts by title desc" do
+            get :index, params: {sort: "title", direction: "desc"}
+            tickets = controller.instance_variable_get(:@tickets)
+            expect(tickets.first.title).to eq("Beta")
+          end
+
+          it "ignores invalid sort params" do
+            expect { get :index, params: {sort: "malicious_column", direction: "asc"} }.not_to raise_error
+          end
+        end
+
+        context "with filter params" do
+          let!(:open_ticket) { create(:ticket, status: :open, created: creator_account) }
+          let!(:closed_ticket) { create(:ticket, status: :closed, created: creator_account) }
+
+          it "filters by status" do
+            get :index, params: {filter: {status: "open"}}
+            tickets = controller.instance_variable_get(:@tickets)
+            expect(tickets).to all(have_attributes(status: "open"))
+          end
+
+          it "filters by assignee" do
+            assignee = create(:account, :with_role, :verified)
+            assigned_ticket = create(:ticket, created: creator_account, assigned: assignee)
+
+            get :index, params: {filter: {assignee: assignee.id}}
+            tickets = controller.instance_variable_get(:@tickets)
+            expect(tickets).to contain_exactly(assigned_ticket)
+          end
+
+          it "ignores filter params that aren't declared on any column" do
+            get :index, params: {filter: {priority: "5"}}
+            tickets = controller.instance_variable_get(:@tickets)
+            expect(tickets).to contain_exactly(open_ticket, closed_ticket)
+          end
+        end
+
+        context "with created_at sort" do
+          let!(:old_ticket) { create(:ticket, created: creator_account, created_at: 2.days.ago) }
+          let!(:new_ticket) { create(:ticket, created: creator_account, created_at: 1.hour.ago) }
+
+          it "sorts by created_at asc" do
+            get :index, params: {sort: "created_at", direction: "asc"}
+            tickets = controller.instance_variable_get(:@tickets)
+            expect(tickets.first).to eq(old_ticket)
+          end
+
+          it "sorts by created_at desc" do
+            get :index, params: {sort: "created_at", direction: "desc"}
+            tickets = controller.instance_variable_get(:@tickets)
+            expect(tickets.first).to eq(new_ticket)
+          end
+        end
+
+        context "with out-of-range page" do
+          it "returns last page instead of error" do
+            expect { get :index, params: {page: 99999} }.not_to raise_error
+            expect(response).to have_http_status(200)
+          end
+        end
       end
     end
   end

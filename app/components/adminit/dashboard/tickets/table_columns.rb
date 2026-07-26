@@ -6,7 +6,7 @@ module Adminit
       module TableColumns
         def columns
           [
-            {
+            Core::Table::Column.new(
               label: I18n.t("shared.labels.title"),
               renderer: ->(ticket) {
                 render Core::LinkComponent.new(
@@ -16,8 +16,8 @@ module Adminit
                   html_options: {data: {turbo_prefetch: false, turbo_frame: "_top"}}
                 )
               }
-            },
-            {
+            ),
+            Core::Table::Column.new(
               label: I18n.t("shared.labels.status"),
               renderer: ->(ticket) {
                 render Core::BadgeComponent.new(
@@ -26,7 +26,7 @@ module Adminit
                   size: :md
                 )
               }
-            }
+            )
           ]
         end
       end

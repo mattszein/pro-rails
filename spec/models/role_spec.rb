@@ -22,6 +22,15 @@ RSpec.describe Role, type: :model do
     end
   end
 
+  describe ".selectable" do
+    it "returns roles ordered by name" do
+      zeta = create(:role, name: "Zeta")
+      alpha = create(:role, name: "Alpha")
+
+      expect(Role.selectable).to eq([alpha, zeta])
+    end
+  end
+
   describe ".with_accounts_count" do
     it "returns roles ordered by name with an accounts_count attribute" do
       zeta = create(:role, name: "Zeta")

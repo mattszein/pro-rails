@@ -12,6 +12,7 @@ class Role < ApplicationRecord
       .includes(:permissions)
       .select("roles.*, (SELECT COUNT(*) FROM accounts WHERE accounts.role_id = roles.id) AS accounts_count")
   }
+  scope :selectable, -> { order(:name) }
 
   def self.superadmin
     Role.find_by(name: SUPERADMIN)

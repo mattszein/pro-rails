@@ -25,13 +25,16 @@ module Support
       feature_request: 3,
       other: 4
     }, default: :account_access, validate: {allow_nil: false}
-    default_scope { order(priority: :desc, created_at: :desc) }
+    scope :prioritized, -> { order(priority: :desc, created_at: :desc) }
+    scope :search_title, ->(query) { where("title ILIKE ?", "%#{sanitize_sql_like(query)}%") }
+    scope :assigned_to, ->(account_id) { where(assigned_id: account_id) }
+
     validates :title, :description, :status, :category, :created_id, presence: true
     validate :validate_attachments
 
     # Dashboard widget reads. `reorder` overrides the default_scope ordering.
     scope :recent_open, ->(limit: 10) { open.reorder(updated_at: :desc).limit(limit) }
-    scope :assigned_open_for, ->(account, limit: 10) { where(assigned: account).open.reorder(updated_at: :desc).limit(limit) }
+    scope :assigned_open_for, ->(account, limit: 10) { assigned_to(account.id).open.reorder(updated_at: :desc).limit(limit) }
 
     after_create :create_conversation
 

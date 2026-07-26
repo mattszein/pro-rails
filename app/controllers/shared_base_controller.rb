@@ -1,5 +1,5 @@
 class SharedBaseController < ApplicationController
-  include Pagy::Backend
+  include Pagy::Method
   include ActionPolicyHandler
   include RecordNotFoundHandler
 

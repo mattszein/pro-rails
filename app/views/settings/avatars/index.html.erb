@@ -1,0 +1,65 @@
+<%= render Settings::LayoutComponent.new(active_section: :profile) do %>
+  <% if @in_progress_avatars.any? %>
+    <%# Auto-refresh every 8 s when any avatar is still generating so the list updates without a manual reload %>
+    <div data-controller="auto-refresh"
+         data-auto-refresh-interval-value="<%= @in_progress_avatars.any?(&:generating?) ? 8000 : 0 %>">
+      <%= render Core::CardComponent.new(classes: "space-y-4 mb-4") do %>
+        <div>
+          <h2><%= t("avatars.in_progress.title") %></h2>
+          <p><%= t("avatars.in_progress.subtitle") %></p>
+        </div>
+
+        <div class="space-y-2">
+          <% @in_progress_avatars.each do |avatar| %>
+            <div class="flex items-center justify-between p-3 rounded-xl border border-gray-200 dark:border-gray-700">
+              <div class="flex items-center gap-3">
+                <%= avatar_status_badge(avatar) %>
+
+                <span>
+                  <%= t("avatars.in_progress.path_label", path: t("avatars.in_progress.path.#{avatar.generation_method}"), date: l(avatar.created_at, format: :short)) %>
+                </span>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <% if avatar.generating? %>
+                  <%= render(Core::LinkComponent.new(name: t("avatars.in_progress.action.view"), url: settings_avatar_path(avatar), style: :as_button, theme: :show)) %>
+                <% elsif avatar.failed? %>
+                  <%= render(Core::LinkComponent.new(name: t("avatars.in_progress.action.retry"), url: settings_avatar_path(avatar), style: :as_button, theme: :secondary, size: :sm)) %>
+                <% elsif avatar.draft? && avatar.generated? %>
+                  <%= render(Core::LinkComponent.new(name: t("avatars.in_progress.action.continue"), url: settings_avatar_path(avatar), style: :as_button, theme: :primary, size: :sm)) %>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <%= render Core::CardComponent.new(classes: "space-y-4") do %>
+    <div class="flex items-center justify-between">
+      <div>
+        <h1><%= t("avatars.gallery.title") %></h1>
+        <p><%= t("avatars.gallery.subtitle") %></p>
+      </div>
+      <%= render(Core::LinkComponent.new(name: t("avatars.gallery.new_avatar"), url: new_settings_avatar_path, style: :as_button, theme: :primary)) %>
+    </div>
+
+    <% if @avatars.empty? %>
+      <div class="text-center py-12">
+        <p><%= t("avatars.gallery.empty") %></p>
+        <%= render(Core::LinkComponent.new(name: t("avatars.gallery.create_first"), url: new_settings_avatar_path, style: :link)) %>
+      </div>
+    <% else %>
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
+           data-controller="avatar-gallery">
+        <% @avatars.each do |avatar| %>
+          <%= render Settings::AvatarWizard::GalleryItemComponent.new(
+                avatar: avatar,
+                active_avatar_id: current_account.profile.avatar_id
+              ) %>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>

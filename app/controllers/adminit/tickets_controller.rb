@@ -1,11 +1,16 @@
 class Adminit::TicketsController < Adminit::ApplicationController
+  include Tableable
+
   before_action :set_ticket, only: %i[show edit update destroy take leave finish reopen accept_reopen new_reject_reopen reject_reopen]
   before_action :ensure_frame_response, only: %i[edit new_reject_reopen]
 
-  # GET /tickets or /tickets.json
   def index
     authorize! Support::Ticket, with: Adminit::TicketPolicy
-    @tickets = (params[:assignee] == "me") ? Support::Ticket.where(assigned: current_account) : Support::Ticket.all
+    @columns = helpers.ticket_columns
+    @pagy, @tickets = apply_table_params(
+      Support::Ticket.includes(:created, :assigned).prioritized,
+      columns: @columns
+    )
   end
 
   # GET /tickets/1 or /tickets/1.json
