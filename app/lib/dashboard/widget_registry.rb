@@ -44,6 +44,16 @@ module Dashboard
           raise ArgumentError, "refresh_interval must be at least 15 seconds (got #{widget.refresh_interval})"
         end
 
+        # TabbedContainerComponent reads widgets.first.span for the whole card
+        # (app/components/adminit/dashboard/tabbed_container_component.rb) —
+        # a mismatched span within a resource would make the layout depend on
+        # registration order.
+        sibling = for_resource(widget.resource).first
+        if sibling && sibling.span != widget.span
+          raise ArgumentError, "widget :#{widget.key} has span #{widget.span.inspect}, but " \
+                                "resource :#{widget.resource} is already registered with span #{sibling.span.inspect}"
+        end
+
         @widgets[widget.key] = widget
       end
 

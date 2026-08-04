@@ -8,7 +8,10 @@ export default class extends Controller {
   static values = { searchUrl: String, summaryUrl: String };
 
   connect() {
-    this._beforeCache = () => this.select?.destroy();
+    this._beforeCache = () => {
+      this.select?.destroy();
+      this.select = null;
+    };
     document.addEventListener("turbo:before-cache", this._beforeCache);
 
     this.select = new TomSelect(this.element, {
@@ -35,6 +38,7 @@ export default class extends Controller {
   disconnect() {
     document.removeEventListener("turbo:before-cache", this._beforeCache);
     this.select?.destroy();
+    this.select = null;
   }
 
   loadSummary(value) {

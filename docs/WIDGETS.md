@@ -23,7 +23,7 @@ grouped by resource on the page.
 |---|---|---|
 | `key` | — | Unique symbol identifier, e.g. `:tickets_personal`. Also the route param (`widgets/:key`) and the source of `turbo_frame_id` (`"dashboard_#{key}"`, derived — not a config field). |
 | `resource` | — | Resource group symbol, e.g. `:ticket`. Groups widgets into one container card. |
-| `kind` | — | Slot within a resource: `:general`, `:personal`, `:analytics`, `:overview`. Drives tab label and card height. |
+| `kind` | — | Slot within a resource: `:general`, `:personal`, `:analytics`. Drives tab label and card height. |
 | `span` | `:full` | Grid column span for the container. `:full` → `col-span-2` (full row), `:half` → `col-span-1`. Set per resource — all widgets in a resource share the same value. |
 | `policy_class` | — | Governs visibility check. |
 | `component_class` | — | ViewComponent class name (string, constantized at render time). |
@@ -61,7 +61,7 @@ A widget with `refresh_interval` gets `data-controller="auto-refresh"` on its tu
 
 ## Charts
 
-Analytics widgets build an options hash with `Dashboard::ChartOptions` (`donut`, `bar`, `column`) and render `Adminit::Dashboard::ChartComponent` with it — never hand-roll a `tag.div` with chart data attributes. `_semanticColors` maps status names to the theme palette (`CHART_STATUS_COLORS`).
+Analytics widgets build an options hash with `Dashboard::ChartOptions` (`area`, `column`, `radial_bar_multiple`; `donut` and `bar` are also available but currently unused by any widget) and render `Adminit::Dashboard::ChartComponent` with it — never hand-roll a `tag.div` with chart data attributes. `_semanticColors` maps status names to the theme palette (`CHART_STATUS_COLORS`).
 
 ## Widget data — the query rule
 
@@ -78,7 +78,7 @@ reusable across domains. Coverage for these scopes lives in the model specs.
 | `accounts_analytics` | account | analytics | full | Area chart — accounts over time. Data: `Account.dashboard_stats`. Refreshes every 120 s. |
 | `roles_general` | role | general | half | Roles table: name (link), account count, comma-separated permissions. Data: `Role.with_accounts_count`. |
 | `announcements_general` | announcement | general | full | Split widget: left half is a list of the next 5 upcoming scheduled announcements (title link + scheduled date), right half is the same status radial chart. Data: `Announcement.upcoming_scheduled` / `Announcement.dashboard_stats`. |
-| `tickets_personal` | ticket | personal | full | Open tickets assigned to current account (`Support::Ticket.assigned_open_for`). Refreshes every 30 s. Its "view all" link points to `?assignee=me`, filtered by `Adminit::TicketsController#index`. |
+| `tickets_personal` | ticket | personal | full | Open tickets assigned to current account (`Support::Ticket.assigned_open_for`). Refreshes every 30 s. No `view_all_params` set, so its "view all" link goes to the plain ticket index — pass `view_all_params: {filter: {assignee: current_account_id}}` to scope it, matching the `assignee` select filter on `Adminit::TicketsController#index`. |
 | `tickets_general` | ticket | general | full | All open tickets (`Support::Ticket.recent_open`). Refreshes every 30 s. |
 | `tickets_analytics` | ticket | analytics | full | Column chart — tickets by status (`Support::Ticket.dashboard_stats`). Refreshes every 60 s. |
 

@@ -22,7 +22,6 @@ es:
       note_form_placeholder: "Agregar una nota interna..."
       add_note: "Agregar Nota"
     announcements:
-      no_announcements: "No hay anuncios para mostrar."
       cannot_edit: "No se puede editar este anuncio."
       scheduled: "Anuncio programado para %{time}."
       unscheduled: "El anuncio fue desprogramado."
@@ -49,7 +48,6 @@ es:
     permissions:
       updated: "El rol fue actualizado exitosamente."
       not_updated: "El rol no fue actualizado."
-      invalid_roles: "El rol no fue actualizado. Rol(es) seleccionado(s) no válido(s)."
       widgets_label: "Widgets"
     accounts:
       destroyed: "La cuenta fue eliminada exitosamente."
@@ -68,11 +66,6 @@ es:
         personal: "Personal"
         general: "General"
         analytics: "Analíticas"
-      resources:
-        ticket: "Tickets"
-        announcement: "Anuncios"
-        permission: "Permisos"
-        account: "Cuentas"
     dashboard_widgets:
       chart:
         no_data: "No hay datos disponibles"

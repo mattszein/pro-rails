@@ -69,7 +69,9 @@ module Dashboard
           radialBar: {
             offsetY: 0,
             hollow: {size: "38%"},
-            track: {background: "#e5e7eb", strokeWidth: "100%", margin: 4},
+            # background is left unset here: chart_controller.js sets it per
+            # dark/light theme (same pair of hex values grid.borderColor uses).
+            track: {strokeWidth: "100%", margin: 4},
             dataLabels: {
               name: {fontSize: "13px", offsetY: -2},
               value: {fontSize: "16px", fontWeight: 700, offsetY: 4, formatter: "_percent"},
@@ -91,7 +93,7 @@ module Dashboard
 
     def area(categories:, series:, semantic_colors:, no_data_text: nil)
       {
-        chart: {type: "area", height: 350},
+        chart: {type: "area"},
         plotOptions: {
           bar: {
             columnWidth: "10%"

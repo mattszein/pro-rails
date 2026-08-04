@@ -33,7 +33,6 @@ RSpec.describe Adminit::Dashboard::Tickets::GeneralWidgetComponent, type: :compo
 
   it "renders empty state when there are no open tickets" do
     render_inline(described_class.new(account: account))
-    expect(page).to have_text(I18n.t("shared.empty"))
-    expect(page).not_to have_css("table")
+    expect(page).to have_text(I18n.t("shared.table.empty"))
   end
 end

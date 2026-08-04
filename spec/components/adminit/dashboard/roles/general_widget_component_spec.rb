@@ -26,8 +26,7 @@ RSpec.describe Adminit::Dashboard::Roles::GeneralWidgetComponent, type: :compone
   it "renders empty state when there are no roles" do
     Role.destroy_all
     render_inline(described_class.new(account: account))
-    expect(page).to have_text(I18n.t("shared.empty"))
-    expect(page).not_to have_css("table")
+    expect(page).to have_text(I18n.t("shared.table.empty"))
   end
 
   it "renders roles ordered alphabetically" do

@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static values = { interval: Number, default: 8000}
+  static values = { interval: { type: Number, default: 8000 } }
 
   connect() {
     if (!this.intervalValue || this.intervalValue <= 0) return

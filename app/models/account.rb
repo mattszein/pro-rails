@@ -15,6 +15,11 @@ class Account < ApplicationRecord
   DASHBOARD_STATS_MONTHS = 6
 
   # Stats for the adminit dashboard accounts analytics widget.
+  #
+  # Buckets months with Time.zone (app-configured) but groups rows with
+  # date_trunc, which runs in the DB session's timezone. These agree today
+  # because config.time_zone is unset (both UTC) — if a fork sets
+  # config.time_zone, records near a month boundary can land one bucket off.
   def self.dashboard_stats
     months = DASHBOARD_STATS_MONTHS.times.map { |i| Time.zone.now.beginning_of_month - i.months }.reverse
     counts_by_month = where(created_at: months.first..)

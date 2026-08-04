@@ -35,7 +35,8 @@ RSpec.describe Dashboard::WidgetRegistry do
     end
 
     it "accepts an explicit span" do
-      described_class.register(**base_attrs, span: :half)
+      # :permission has no real registered widgets, so there's no sibling span to conflict with.
+      described_class.register(**base_attrs, resource: :permission, span: :half)
       expect(described_class.find(:test_widget).span).to eq(:half)
     end
 
@@ -66,6 +67,16 @@ RSpec.describe Dashboard::WidgetRegistry do
       expect {
         described_class.register(**base_attrs, refresh_interval: 10)
       }.to raise_error(ArgumentError, /refresh_interval must be at least 15 seconds/)
+    end
+
+    it "raises when span disagrees with an already-registered widget for the same resource" do
+      described_class.register(**base_attrs, resource: :permission, span: :half)
+
+      expect {
+        described_class.register(**base_attrs.merge(key: :test_widget_2), resource: :permission, span: :full)
+      }.to raise_error(ArgumentError, /has span :full.*already registered.*span :half/)
+
+      described_class.instance_variable_get(:@widgets).delete(:test_widget_2)
     end
   end
 

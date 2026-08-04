@@ -185,7 +185,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_11_120000) do
     t.jsonb "dashboard_widget_keys", default: [], null: false
     t.bigint "permission_id", null: false
     t.bigint "role_id", null: false
-    t.index ["dashboard_widget_keys"], name: "index_permissions_roles_on_dashboard_widget_keys", using: :gin
     t.index ["permission_id", "role_id"], name: "index_permissions_roles_on_permission_id_and_role_id", unique: true
     t.index ["permission_id"], name: "index_permissions_roles_on_permission_id"
     t.index ["role_id"], name: "index_permissions_roles_on_role_id"

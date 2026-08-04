@@ -47,6 +47,11 @@ export default class extends Controller {
    */
   rebuildChart() {
     this.chart?.destroy()
+    // Also clears markup left by a Turbo-cache-restored snapshot that connect()
+    // never rendered into (this.chart is null there, so destroy() above is a
+    // no-op) — without this a theme toggle after a bfcache restore stacks a
+    // second chart on top of the restored markup.
+    this.canvasTarget.replaceChildren()
     try {
       const merged = this.buildOptions()
       this.chart = new ApexCharts(this.canvasTarget, merged)
@@ -89,6 +94,10 @@ export default class extends Controller {
     this.resolveFormatter(userOptions.plotOptions?.radialBar?.dataLabels?.value, "formatter")
     this.resolveFormatter(userOptions.plotOptions?.radialBar?.dataLabels?.total, "formatter")
     this.resolveFormatter(userOptions.tooltip?.y, "formatter")
+
+    if (userOptions.plotOptions?.radialBar?.track) {
+      userOptions.plotOptions.radialBar.track.background = isDark ? "#374151" : "#e5e7eb"
+    }
 
     const { chart: userChart, ...restOptions } = userOptions
 

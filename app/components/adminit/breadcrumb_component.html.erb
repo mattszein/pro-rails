@@ -4,17 +4,17 @@
       <span aria-hidden="true" class="text-gray-300 dark:text-gray-600">/</span>
     <% end %>
     <% if last?(i) || crumb.path.nil? %>
-      <span class="inline-flex items-center gap-1 font-medium text-gray-700 dark:text-gray-200"
-            <%= "aria-current=page".html_safe if last?(i) %>>
+      <%= tag.span class: "inline-flex items-center gap-1 font-medium text-gray-700 dark:text-gray-200",
+            aria: {current: (last?(i) ? "page" : nil)} do %>
         <% if crumb.icon %><%= helpers.icon crumb.icon, {classes: "h-4 w-4"} %><% end %>
         <%= crumb.label %>
-      </span>
-      <% else %>
-        <%= link_to crumb.path,
-              class: "inline-flex items-center gap-1 hover:text-primary-600 dark:hover:text-primary-300" do %>
-          <% if crumb.icon %><%= helpers.icon crumb.icon, {classes: "h-4 w-4"} %><% end %>
-          <%= crumb.label %>
-        <% end %>
+      <% end %>
+    <% else %>
+      <%= link_to crumb.path,
+            class: "inline-flex items-center gap-1 hover:text-primary-600 dark:hover:text-primary-300" do %>
+        <% if crumb.icon %><%= helpers.icon crumb.icon, {classes: "h-4 w-4"} %><% end %>
+        <%= crumb.label %>
       <% end %>
     <% end %>
-  </nav>
+  <% end %>
+</nav>

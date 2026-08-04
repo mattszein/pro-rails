@@ -22,7 +22,6 @@ en:
       note_form_placeholder: "Add an internal note..."
       add_note: "Add Note"
     announcements:
-      no_announcements: "No announcements to display."
       cannot_edit: "Cannot edit this announcement."
       scheduled: "Announcement scheduled for %{time}."
       unscheduled: "Announcement was unscheduled."
@@ -49,7 +48,6 @@ en:
     permissions:
       updated: "Role was successfully updated."
       not_updated: "Role wasn't updated."
-      invalid_roles: "Role wasn't updated. Invalid role(s) selected."
       widgets_label: "Widgets"
     accounts:
       destroyed: "Account was successfully destroyed."
@@ -68,11 +66,6 @@ en:
         personal: "Personal"
         general: "General"
         analytics: "Analytics"
-      resources:
-        ticket: "Tickets"
-        announcement: "Announcements"
-        permission: "Permissions"
-        account: "Accounts"
     dashboard_widgets:
       chart:
         no_data: "No data available"

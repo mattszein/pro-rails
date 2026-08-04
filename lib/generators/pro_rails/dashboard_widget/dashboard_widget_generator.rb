@@ -35,15 +35,12 @@ module ProRails
       end
 
       def append_i18n_keys
-        i18n_entry_en = build_i18n_entry("en")
-        i18n_entry_es = build_i18n_entry("es")
-
         inject_into_file "config/locales/en/adminit.yml", after: "    dashboard_widgets:\n" do
-          i18n_entry_en
+          i18n_entry
         end
 
         inject_into_file "config/locales/es/adminit.yml", after: "    dashboard_widgets:\n" do
-          i18n_entry_es
+          i18n_entry
         end
       end
 
@@ -60,7 +57,7 @@ module ProRails
       # template() evaluates .tt files against this instance's own binding, not the caller's block-local scope.
       attr_reader :kind
 
-      def build_i18n_entry(locale)
+      def i18n_entry
         stubs = kinds.map { |kind| "        #{kind}: {}" }.join("\n")
 
         "      #{file_name.pluralize}:\n#{stubs}\n"

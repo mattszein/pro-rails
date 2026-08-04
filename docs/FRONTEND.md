@@ -384,6 +384,33 @@ Use breakpoint prefixes: `sm:`, `md:`, `lg:`, `xl:`, `2xl:`.
 
 ---
 
+## Assets — NEVER precompile in development or test
+
+**Do not run `assets:precompile` in dev or test. Ever.** It is a production/deploy step only.
+
+Propshaft resolves assets from source in dev/test. As soon as `public/assets/` holds a precompiled
+build, Propshaft serves those fingerprinted files instead, and **every later edit to JS, CSS or a
+Stimulus controller is silently ignored in the browser.** Nothing errors — the stale build just keeps
+being served, so you end up debugging code that isn't running.
+
+This is the single most expensive failure mode in this codebase's frontend, because it looks exactly
+like a real bug: a fix "doesn't work", a controller seems to initialize twice (stale + fresh copies
+both registered), or behaviour changes between page loads. `/public/assets` is gitignored, so it
+never appears in `git status`.
+
+**If a frontend change appears to have no effect, or behaviour looks impossible, check this before
+debugging anything else:**
+
+```bash
+ls public/assets                                     # should be absent/empty in dev
+docker compose exec rails bin/rails assets:clobber   # or: rm -rf public/assets
+```
+
+Then hard-reload the browser. Only once you've confirmed the browser is running your actual source
+should you start diagnosing the code.
+
+---
+
 ## I18n in Views
 
 ```erb
@@ -414,6 +441,8 @@ end
 
 ## Rules
 
+- NEVER run `assets:precompile` in dev or test — it makes Propshaft serve a stale build and silently
+  ignore every later JS/CSS edit. Suspect it first when a frontend change "has no effect"
 - NEVER write model business logic, interactors, or jobs — that's backend's job
 - NEVER hardcode user-facing strings — always use `t()` helper
 - ALWAYS pass explicit `label: t(...)` to form fields
