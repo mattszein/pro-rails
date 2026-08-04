@@ -18,13 +18,13 @@
         <%= render Core::AvatarComponent.new(profile: @profile, size: :xl) %>
 
         <%= form_with url: settings_avatars_path, method: :post,
-            multipart: true,
-            data: { controller: "click-forwarder" },
-            class: "inline-block" do |f| %>
+              multipart: true,
+              data: {controller: "click-forwarder"},
+              class: "inline-block" do |f| %>
           <%= f.file_field :image, name: "avatar[image]",
-              accept: "image/jpeg,image/png,image/gif,image/webp",
-              data: { click_forwarder_target: "receiver" },
-              class: "hidden" %>
+                accept: "image/jpeg,image/png,image/gif,image/webp",
+                data: {click_forwarder_target: "receiver"},
+                class: "hidden" %>
           <button type="button"
               data-action="click->click-forwarder#forward"
               class="btn btn-secondary btn-sm text-xs">

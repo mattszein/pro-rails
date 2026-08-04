@@ -13,26 +13,26 @@
   <div class="absolute inset-0 rounded-2xl bg-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
     <% if avatar.selectable? && !active? %>
       <%= render(Core::LinkComponent.new(
-        name: t("avatars.gallery.use"),
-        url: select_settings_avatar_path(avatar),
-        style: :no_style,
-        html_options: {
-          class: "text-xs text-white bg-primary-500 hover:bg-primary-600 px-3 py-1 rounded-full transition-colors",
-          data: { turbo_method: :post }
-        }
-      )) %>
+            name: t("avatars.gallery.use"),
+            url: select_settings_avatar_path(avatar),
+            style: :no_style,
+            html_options: {
+              class: "text-xs text-white bg-primary-500 hover:bg-primary-600 px-3 py-1 rounded-full transition-colors",
+              data: {turbo_method: :post}
+            }
+          )) %>
     <% end %>
 
     <% if avatar.evolvable? %>
       <%= render(Core::LinkComponent.new(
-        name: t("avatars.gallery.evolve"),
-        url: evolve_settings_avatar_path(avatar),
-        style: :no_style,
-        html_options: {
-          class: "text-xs text-white bg-indigo-500 hover:bg-indigo-600 px-3 py-1 rounded-full transition-colors",
-          data: { turbo_method: :post }
-        }
-      )) %>
+            name: t("avatars.gallery.evolve"),
+            url: evolve_settings_avatar_path(avatar),
+            style: :no_style,
+            html_options: {
+              class: "text-xs text-white bg-indigo-500 hover:bg-indigo-600 px-3 py-1 rounded-full transition-colors",
+              data: {turbo_method: :post}
+            }
+          )) %>
     <% end %>
   </div>
 </div>

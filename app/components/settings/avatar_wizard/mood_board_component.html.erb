@@ -3,9 +3,9 @@
     <label class="relative aspect-square rounded-xl border-2 overflow-hidden cursor-pointer transition-all
                   <%= selected_indices.include?(index) ? "border-primary-500" : "border-gray-200 dark:border-gray-700 hover:border-primary-300" %>">
       <%= check_box_tag "avatar[dna][mood_board_selected][]", index,
-          selected_indices.include?(index),
-          class: "sr-only peer",
-          data: { mood_board_target: "checkbox" } %>
+            selected_indices.include?(index),
+            class: "sr-only peer",
+            data: {mood_board_target: "checkbox"} %>
 
       <div class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center p-2">
         <p class="text-xs text-gray-500 dark:text-gray-400 text-center leading-tight line-clamp-3">

@@ -1,14 +1,14 @@
 <div class="space-y-6">
   <%= render Settings::AvatarWizard::StepComponent.new(
-    step: config.step_number, total: config.total,
-    title: t("#{config.i18n_key}.title"),
-    subtitle: t("#{config.i18n_key}.subtitle", default: nil)
-  ) %>
+        step: config.step_number, total: config.total,
+        title: t("#{config.i18n_key}.title"),
+        subtitle: t("#{config.i18n_key}.subtitle", default: nil)
+      ) %>
 
   <%= form_with url: settings_avatar_path(avatar),
-      method: :patch,
-      builder: CustomFormBuilder,
-      data: { turbo_frame: "avatar_wizard_step" } do |f| %>
+        method: :patch,
+        builder: CustomFormBuilder,
+        data: {turbo_frame: "avatar_wizard_step"} do |f| %>
     <% if config.next_step %>
       <%= f.hidden_field :next_step, value: config.next_step, name: "next_step" %>
     <% end %>
@@ -22,37 +22,37 @@
       <div class="space-y-2">
         <% mood_board_prompts.each_with_index do |prompt, idx| %>
           <%= render Settings::AvatarWizard::CheckboxOptionComponent.new(
-            dna_field: config.dna_field, value: idx, label: prompt,
-            selected: selected_values.include?(idx.to_s), align: :start
-          ) %>
+                dna_field: config.dna_field, value: idx, label: prompt,
+                selected: selected_values.include?(idx.to_s), align: :start
+              ) %>
         <% end %>
       </div>
     <% else %>
       <div class="grid grid-cols-2 sm:grid-cols-<%= config.columns || 3 %> gap-3">
         <% options.each do |key, option| %>
           <%= render Settings::AvatarWizard::CheckboxOptionComponent.new(
-            dna_field: config.dna_field, value: key, label: option[:label],
-            selected: selected_values.include?(key.to_s)
-          ) %>
+                dna_field: config.dna_field, value: key, label: option[:label],
+                selected: selected_values.include?(key.to_s)
+              ) %>
         <% end %>
       </div>
     <% end %>
 
     <div class="flex justify-between mt-6">
       <%= render(Core::LinkComponent.new(
-        name: back_label,
-        url: back_url,
-        style: :as_button,
-        theme: :secondary,
-        html_options: { data: { turbo_frame: back_turbo_frame } }
-      )) %>
+            name: back_label,
+            url: back_url,
+            style: :as_button,
+            theme: :secondary,
+            html_options: {data: {turbo_frame: back_turbo_frame}}
+          )) %>
       <%= render(Core::LinkComponent.new(
-        name: t("shared.common.cancel"),
-        url: cancel_url,
-        style: :as_button,
-        theme: :secondary,
-        html_options: { data: { turbo_frame: "_top" } }
-      )) %>
+            name: t("shared.common.cancel"),
+            url: cancel_url,
+            style: :as_button,
+            theme: :secondary,
+            html_options: {data: {turbo_frame: "_top"}}
+          )) %>
       <%= f.button submit_label, {theme: :create, type: :submit} %>
     </div>
   <% end %>

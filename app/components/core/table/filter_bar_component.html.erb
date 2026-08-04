@@ -10,7 +10,8 @@
           <%= text_field_tag "filter[#{filter.param}]",
                 current_filters[filter.param.to_s],
                 class: "rounded border border-gray-300 dark:border-gray-600 px-2 py-1 text-sm bg-white dark:bg-gray-800 dark:text-gray-100",
-                placeholder: t("shared.table.search_placeholder") %>
+                placeholder: t("shared.table.search_placeholder"),
+                autocomplete: "off" %>
         <% elsif filter.select? %>
           <%= select_tag "filter[#{filter.param}]",
                 options_for_select([["—", ""]] + filter.options.call, current_filters[filter.param.to_s]),

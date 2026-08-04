@@ -1,9 +1,5 @@
-<div class="flex flex-col h-full p-2">
-  <div class="flex-1 overflow-auto min-h-64">
-    <% if empty %>
-      <p class="text-sm"><%= t("shared.empty") %></p>
-    <% else %>
-      <%= content %>
-    <% end %>
-  </div>
-</div>
+  <% if empty %>
+    <p class="text-sm"><%= t("shared.empty") %></p>
+  <% else %>
+    <%= content %>
+  <% end %>

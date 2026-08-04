@@ -79,6 +79,8 @@
     --color-highlight: rgb(28 29 34);
   }
 
+  turbo-frame { display: block; }
+
   h1 {
     font-size: 2.5rem;
     font-weight: 700;
