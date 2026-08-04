@@ -1,7 +1,6 @@
 /* Category: Tech Edge */
 @layer utilities {
   .theme-aurora {
-    /* PRIMARY (Hue: 250, Chroma: 0.18) */
     --color-primary-50: oklch(0.99 0.018 250);
     --color-primary-100: oklch(0.96 0.036 250);
     --color-primary-200: oklch(0.9 0.18 250);
@@ -13,7 +12,6 @@
     --color-primary-800: oklch(0.32 0.18 250);
     --color-primary-900: oklch(0.22 0.108 250);
     --color-primary-950: oklch(0.16 0.072 250);
-    /* SECONDARY (Hue: 25, Chroma: 0.22) */
     --color-secondary-50: oklch(0.99 0.022 25);
     --color-secondary-100: oklch(0.96 0.044 25);
     --color-secondary-200: oklch(0.9 0.22 25);
@@ -26,7 +24,6 @@
     --color-secondary-900: oklch(0.22 0.132 25);
     --color-secondary-950: oklch(0.16 0.088 25);
 
-    /* SEMANTIC TEXT MAPPING */
     --color-text-heading-strong: var(--color-primary-900);
     --color-text-heading-soft:   var(--color-primary-800);
     --color-text-body-strong:    var(--color-primary-700);

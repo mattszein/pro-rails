@@ -3,14 +3,25 @@ module Tableable
 
   private
 
-  def apply_table_params(scope, allowed_sorts: nil, allowed_filters: {}, query: nil, default_sort: nil, default_direction: :desc)
-    if query
-      allowed_sorts = query.sorts
-      allowed_filters = query.filters
-    end
-    scope = apply_filters(scope, allowed_filters)
-    scope = apply_sort(scope, Array(allowed_sorts), default_sort, default_direction)
+  # `columns` is the same array handed to Core::TableComponent — it is the single
+  # declaration of what this table exposes to the request.
+  def apply_table_params(scope, columns:, default_sort: nil, default_direction: :desc)
+    scope = apply_filters(scope, column_filters(scope.model, columns))
+    scope = apply_sort(scope, columns.filter_map(&:sort_key), default_sort, default_direction)
     pagy(scope)
+  end
+
+  def column_filters(model, columns)
+    columns.filter_map(&:filter).to_h do |filter|
+      [filter.param, filter.scope || equality_filter(model, filter.param)]
+    end
+  end
+
+  def equality_filter(model, param)
+    unless model.column_names.include?(param.to_s)
+      raise ArgumentError, "filter :#{param} on #{model} needs a scope: (no such column)"
+    end
+    ->(rel, value) { rel.where(param => value) }
   end
 
   def apply_sort(scope, allowed, default, default_direction)

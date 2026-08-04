@@ -1,53 +1,49 @@
 <% if frame_id %><turbo-frame id="<%= frame_id %>"><% end %>
-
-<% if filterable? %>
-  <%= render Core::Table::FilterBarComponent.new(
-        columns: @columns,
-        current_filters: current_filters,
-        current_sort: current_sort,
-        current_direction: current_direction
-      ) %>
-<% end %>
-
-<table class="min-w-full divide-y divide-gray-300 dark:divide-gray-200 text-left">
-  <thead>
-    <tr class="border-b border-secondary-400 dark:border-secondary-300">
-      <% @columns.each do |col| %>
-        <% if sortable? %>
-          <%= render Core::Table::HeaderCellComponent.new(
-                column: col,
-                current_sort: current_sort,
-                current_direction: current_direction
-              ) %>
-        <% else %>
-          <th class="py-2 px-4 text-left font-bold text-gray-500 dark:text-gray-200 uppercase whitespace-nowrap">
-            <%= col.label %>
-          </th>
+  <% if filterable? %>
+    <%= render Core::Table::FilterBarComponent.new(
+          columns: @columns,
+          current_filters: current_filters,
+          current_sort: current_sort,
+          current_direction: current_direction
+        ) %>
+  <% end %>
+  <table class="min-w-full divide-y divide-gray-300 dark:divide-gray-200 text-left">
+    <thead>
+      <tr class="border-b border-secondary-400 dark:border-secondary-300">
+        <% @columns.each do |col| %>
+          <% if sortable? %>
+            <%= render Core::Table::HeaderCellComponent.new(
+                  column: col,
+                  current_sort: current_sort,
+                  current_direction: current_direction
+                ) %>
+          <% else %>
+            <th class="py-2 px-4 text-left font-bold text-gray-500 dark:text-gray-200 uppercase whitespace-nowrap">
+              <%= col.label %>
+            </th>
+          <% end %>
         <% end %>
-      <% end %>
-    </tr>
-  </thead>
-  <tbody id="<%= tbody_id %>" class="divide-y divide-primary-400 dark:divide-primary-200">
-    <% if @rows.empty? %>
-      <tr>
-        <td colspan="<%= @columns.size %>" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
-          <%= t("shared.table.empty") %>
-        </td>
       </tr>
-    <% elsif custom_row_renderer? %>
-      <%= content %>
-    <% else %>
-      <%= render Core::TableRowComponent.with_collection(
-            @rows,
-            columns: @columns,
-            broadcast_id: broadcast_id
-          ) %>
-    <% end %>
-  </tbody>
-</table>
-
-<% if pagy %>
-  <%= render Core::Table::PaginationComponent.new(pagy: pagy) %>
-<% end %>
-
-<% if frame_id %></turbo-frame><% end %>
+    </thead>
+    <tbody id="<%= tbody_id %>" class="divide-y divide-primary-400 dark:divide-primary-200">
+      <% if @rows.empty? %>
+        <tr>
+          <td colspan="<%= @columns.size %>" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+            <%= t("shared.table.empty") %>
+          </td>
+        </tr>
+      <% elsif custom_row_renderer? %>
+        <%= content %>
+      <% else %>
+        <%= render Core::TableRowComponent.with_collection(
+              @rows,
+              columns: @columns,
+              broadcast_id: broadcast_id
+            ) %>
+      <% end %>
+    </tbody>
+  </table>
+  <% if pagy %>
+    <%= render Core::Table::PaginationComponent.new(pagy: pagy) %>
+  <% end %>
+  <% if frame_id %></turbo-frame><% end %>

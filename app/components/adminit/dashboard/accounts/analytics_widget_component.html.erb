@@ -1,0 +1,13 @@
+<%= render Adminit::Dashboard::BaseWidgetComponent.new do %>
+  <div class="flex flex-col md:flex-row p-2 gap-2">
+    <div class="grow basis-2/3 shrink-0">
+      <%= render Adminit::Dashboard::ChartComponent.new(options: chart_options) %>
+    </div>
+    <div class="grow basis-1/3 grid grid-cols-1 gap-2 content-center shrink-0">
+      <%= render Adminit::Dashboard::BaseAnalyticComponent.new(title: I18n.t("shared.labels.total"), content: stats[:total]) %>
+      <%= render Adminit::Dashboard::BaseAnalyticComponent.new(title: I18n.t("enums.account.status.verified"), content: stats[:verified]) %>
+      <%= render Adminit::Dashboard::BaseAnalyticComponent.new(title: I18n.t("adminit.dashboard_widgets.accounts.analytics.active_sessions"), content: stats[:active_sessions]) %>
+      <%= render Adminit::Dashboard::BaseAnalyticComponent.new(title: I18n.t("adminit.dashboard_widgets.accounts.analytics.registered"), content: stats[:registered_this_month]) %>
+    </div>
+  </div>
+<% end %>

@@ -1,7 +1,7 @@
 module Core
   module Table
-    Filter = Data.define(:type, :param, :options) do
-      def initialize(type:, param:, options: nil)
+    Filter = Data.define(:type, :param, :options, :scope) do
+      def initialize(type:, param:, options: nil, scope: nil)
         raise ArgumentError, "unknown filter type: #{type}" unless %i[text select].include?(type)
         raise ArgumentError, "select filter requires :options" if type == :select && options.nil?
         super

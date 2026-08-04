@@ -6,7 +6,7 @@
     <div class="flex">
       <%= render Core::TableComponent.new(rows: @permissions, columns: [Core::Table::Column.new(label: "Policy"), Core::Table::Column.new(label: "Roles")]) do |table| %>
         <% @permissions.each_with_index do |permission, index| %>
-          <%= render "permission_row", permission: permission, roles: @roles, index: index %>
+          <%= render "permission_row", permission: permission, roles: @roles, index: index, permission_roles: @permission_roles %>
         <% end %>
       <% end %>
     </div>

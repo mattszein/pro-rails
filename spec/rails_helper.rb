@@ -14,6 +14,8 @@ end
 
 require "rspec/rails"
 require "action_policy/rspec"
+require "view_component/test_helpers"
+require "capybara/rspec"
 
 Rails.root.glob("spec/support/**/*.rb").each { |f| require f }
 require Rails.root.join("spec/support/constants_helper")
@@ -44,6 +46,8 @@ RSpec.configure do |config|
     end
   end
   config.include FactoryBot::Syntax::Methods
+  config.include ViewComponent::TestHelpers, type: :component
+  config.include Capybara::RSpecMatchers, type: :component
 
   config.include LoginHelpers::Controller, type: :controller
   config.include Rodauth::Rails::Test::Controller, type: :controller

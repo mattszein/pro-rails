@@ -4,7 +4,7 @@ module Support::TicketsHelper
       Core::Table::Column.new(
         label: I18n.t("shared.labels.title"),
         sort_key: :title,
-        filter: Core::Table::Filter.new(type: :text, param: :search)
+        filter: Core::Table::Filter.new(type: :text, param: :search, scope: :search_title)
       ),
       Core::Table::Column.new(
         label: I18n.t("shared.labels.category"),
@@ -23,6 +23,10 @@ module Support::TicketsHelper
           param: :status,
           options: -> { Support::Ticket.statuses.keys.map { |s| [I18n.t("enums.ticket.status.#{s}"), s] } }
         )
+      ),
+      Core::Table::Column.new(
+        label: I18n.t("shared.labels.created_on"),
+        sort_key: :created_at
       ),
       Core::Table::Column.new(label: I18n.t("shared.common.actions"))
     ]

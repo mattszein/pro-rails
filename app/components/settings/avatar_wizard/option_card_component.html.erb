@@ -3,9 +3,9 @@
             has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50 dark:has-[:checked]:bg-primary-900/20"
      data-option-group-target="card">
   <%= radio_button_tag name, value, selected,
-      id: input_id,
-      class: "sr-only",
-      data: { action: "change->option-group#refresh" } %>
+        id: input_id,
+        class: "sr-only",
+        data: {action: "change->option-group#refresh"} %>
   <label for="<%= input_id %>" class="cursor-pointer select-none flex flex-col gap-1">
     <% if colors.any? %>
       <div class="flex gap-1 mb-1">

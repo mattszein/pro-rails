@@ -5,17 +5,17 @@
 
   <div class="flex gap-3 justify-center">
     <%= render(Core::LinkComponent.new(
-      name: t("avatars.generation.try_again"),
-      url: generate_settings_avatar_path(avatar),
-      style: :as_button,
-      theme: :primary,
-      html_options: { data: { turbo_method: :post } }
-    )) %>
+          name: t("avatars.generation.try_again"),
+          url: generate_settings_avatar_path(avatar),
+          style: :as_button,
+          theme: :primary,
+          html_options: {data: {turbo_method: :post}}
+        )) %>
     <%= render(Core::LinkComponent.new(
-      name: t("avatars.gallery.back"),
-      url: settings_avatars_path,
-      style: :as_button,
-      theme: :secondary
-    )) %>
+          name: t("avatars.gallery.back"),
+          url: settings_avatars_path,
+          style: :as_button,
+          theme: :secondary
+        )) %>
   </div>
 </div>

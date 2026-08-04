@@ -9,24 +9,24 @@
   <% end %>
 
   <%= form_with url: generate_settings_avatar_path(avatar),
-      method: :post,
-      builder: CustomFormBuilder,
-      data: { turbo_confirm: t("avatars.wizard.forge_confirm") } do |f| %>
+        method: :post,
+        builder: CustomFormBuilder,
+        data: {turbo_confirm: t("avatars.wizard.forge_confirm")} do |f| %>
 
     <%= render Core::AiModelSelectorComponent.new(
-      kind: :image,
-      current_model: avatar.image_model.presence || AvatarAiConfig.default_image_model,
-      field_name: :image_model
-    ) %>
+          kind: :image,
+          current_model: avatar.image_model.presence || AvatarAiConfig.default_image_model,
+          field_name: :image_model
+        ) %>
 
     <div class="flex gap-3 mt-4">
       <%= render(Core::LinkComponent.new(
-        name: t("avatars.wizard.back_to_edit"),
-        url: settings_avatar_path(avatar, step: review_back_step),
-        style: :as_button,
-        theme: :secondary,
-        html_options: { data: { turbo_frame: "avatar_wizard_step" } }
-      )) %>
+            name: t("avatars.wizard.back_to_edit"),
+            url: settings_avatar_path(avatar, step: review_back_step),
+            style: :as_button,
+            theme: :secondary,
+            html_options: {data: {turbo_frame: "avatar_wizard_step"}}
+          )) %>
       <%= f.button t("avatars.wizard.forge_avatar"), {theme: :create, type: :submit} %>
     </div>
   <% end %>

@@ -6,9 +6,10 @@ class Adminit::TicketsController < Adminit::ApplicationController
 
   def index
     authorize! Support::Ticket, with: Adminit::TicketPolicy
+    @columns = helpers.ticket_columns
     @pagy, @tickets = apply_table_params(
       Support::Ticket.includes(:created, :assigned).prioritized,
-      query: Adminit::TicketQuery
+      columns: @columns
     )
   end
 

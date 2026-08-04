@@ -65,6 +65,32 @@ describe Adminit::AccountsController, type: :controller do
             accounts = controller.instance_variable_get(:@accounts)
             expect(accounts.map(&:email)).to include(verified_account.email)
           end
+
+          it "ignores filter params that aren't declared on any column" do
+            get :index, params: {filter: {unverified_at: "anything"}}
+            accounts = controller.instance_variable_get(:@accounts)
+            expect(accounts.map(&:email)).to include(verified_account.email, unverified_account.email)
+          end
+        end
+
+        context "with created_at sort" do
+          # `user` (logged-in admin) also exists in the unfiltered relation, so
+          # assert relative order between the two fixtures rather than assuming
+          # either lands first overall.
+          let!(:old_account) { create(:account, :verified, created_at: 3.days.ago) }
+          let!(:new_account) { create(:account, :verified, created_at: 2.days.ago) }
+
+          it "sorts by created_at asc" do
+            get :index, params: {sort: "created_at", direction: "asc"}
+            accounts = controller.instance_variable_get(:@accounts).to_a
+            expect(accounts.index(old_account)).to be < accounts.index(new_account)
+          end
+
+          it "sorts by created_at desc" do
+            get :index, params: {sort: "created_at", direction: "desc"}
+            accounts = controller.instance_variable_get(:@accounts).to_a
+            expect(accounts.index(new_account)).to be < accounts.index(old_account)
+          end
         end
 
         context "with out-of-range page" do

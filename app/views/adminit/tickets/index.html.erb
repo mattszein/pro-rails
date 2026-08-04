@@ -6,7 +6,7 @@
   <%= render Core::CardComponent.new(padding: :md) do %>
     <%= render Core::TableComponent.new(
           rows: @tickets,
-          columns: ticket_columns,
+          columns: @columns,
           options: {
             ids: {tbody: "admin_tickets", col_prefix: "admin"},
             frame_id: "admin_tickets_table",

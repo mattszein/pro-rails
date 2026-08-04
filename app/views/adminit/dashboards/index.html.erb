@@ -1,0 +1,36 @@
+<%= render(Core::CardComponent.new(classes: "text-center")) do %>
+  <div class="flex space-x-4 flex-wrap justify-center pt-4">
+  <% if allowed_to? :manage?, with: Adminit::AccountPolicy %>
+    <%= render(Adminit::Dashboard::CardLinkComponent.new(label: t("adminit.navigation.accounts"), path: adminit_accounts_path, icon_name: "adminit/accounts", animated_type: "accounts")) %>
+  <% end %>
+
+  <% if allowed_to? :manage?, with: Adminit::AnnouncementPolicy %>
+    <%= render(Adminit::Dashboard::CardLinkComponent.new(label: t("adminit.navigation.announcements"), path: adminit_announcements_path, icon_name: "adminit/announcement", animated_type: "book-text")) %>
+  <% end %>
+
+  <% if allowed_to? :manage?, with: Adminit::PermissionPolicy %>
+    <%= render(Adminit::Dashboard::CardLinkComponent.new(label: t("adminit.navigation.permissions"), path: adminit_permissions_path, icon_name: "adminit/permissions", animated_type: "gavel")) %>
+  <% end %>
+
+  <% if allowed_to? :manage?, with: Adminit::RolePolicy %>
+    <%= render(Adminit::Dashboard::CardLinkComponent.new(label: t("adminit.navigation.roles"), path: adminit_roles_path, icon_name: "adminit/roles", animated_type: "id-card")) %>
+  <% end %>
+
+  <% if allowed_to? :manage?, with: Adminit::TicketPolicy %>
+    <%= render(Adminit::Dashboard::CardLinkComponent.new(label: t("adminit.navigation.tickets"), path: adminit_tickets_path, icon_name: "adminit/tickets", animated_type: "support")) %>
+  <% end %>
+  </div>
+<% end %>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+  <% if @widgets.empty? %>
+    <%= render Adminit::Dashboard::EmptyStateComponent.new %>
+  <% else %>
+    <% @widgets.group_by(&:resource).each do |resource, widgets| %>
+      <% container = Adminit::Dashboard::TabbedContainerComponent.new(resource: resource, widgets: widgets) %>
+      <div class="<%= container.container_span_class %>">
+        <%= render container %>
+      </div>
+    <% end %>
+  <% end %>
+</div>

@@ -1,0 +1,4 @@
+<%= turbo_frame_tag "account_summary" do %>
+  <%= render Adminit::Accounts::SummaryComponent.new(account: @account) %>
+  <%= render(Core::LinkComponent.new(name: t("adminit.dashboard_widgets.accounts.general.view_full"), url: adminit_account_path(@account), style: :link, html_options: {class: "pt-2", data: {turbo_prefetch: false, turbo_frame: "_top"}})) %>
+<% end %>

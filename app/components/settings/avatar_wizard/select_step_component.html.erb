@@ -1,16 +1,16 @@
 <div class="space-y-6">
   <%= render Settings::AvatarWizard::StepComponent.new(
-    step: config.step_number, total: config.total,
-    title: t("#{config.i18n_key}.title"),
-    subtitle: t("#{config.i18n_key}.subtitle", default: nil)
-  ) %>
+        step: config.step_number, total: config.total,
+        title: t("#{config.i18n_key}.title"),
+        subtitle: t("#{config.i18n_key}.subtitle", default: nil)
+      ) %>
 
   <%= form_with url: settings_avatar_path(avatar),
-      method: :patch,
-      builder: CustomFormBuilder,
-      data: { turbo_frame: "avatar_wizard_step",
-              controller: ("option-group" unless stacked_variant?),
-              action: ("submit->option-group#validate" unless stacked_variant?) } do |f| %>
+        method: :patch,
+        builder: CustomFormBuilder,
+        data: {turbo_frame: "avatar_wizard_step",
+               controller: ("option-group" unless stacked_variant?),
+               action: ("submit->option-group#validate" unless stacked_variant?)} do |f| %>
     <% if config.next_step %>
       <%= f.hidden_field :next_step, value: config.next_step, name: "next_step" %>
     <% end %>
@@ -25,8 +25,8 @@
         <% options.each do |key, option| %>
           <label class="flex gap-3 p-4 rounded-xl border-2 border-gray-200 dark:border-gray-700 cursor-pointer hover:border-primary-400 transition-all has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50 dark:has-[:checked]:bg-primary-900/20">
             <%= radio_button_tag "avatar[dna][#{config.dna_field}]", key,
-                selected?(key),
-                class: "mt-1 text-primary-500" %>
+                  selected?(key),
+                  class: "mt-1 text-primary-500" %>
             <span class="text-sm leading-relaxed"><%= option[:label] %></span>
           </label>
         <% end %>
@@ -35,13 +35,13 @@
       <div class="grid grid-cols-2 sm:grid-cols-<%= config.columns || 2 %> gap-3">
         <% options.each do |key, option| %>
           <%= render Settings::AvatarWizard::OptionCardComponent.new(
-            name: "avatar[dna][#{config.dna_field}]",
-            value: key,
-            label: option[:label],
-            description: option[:description],
-            colors: (option[:colors] if config.has_colors) || [],
-            selected: selected?(key)
-          ) %>
+                name: "avatar[dna][#{config.dna_field}]",
+                value: key,
+                label: option[:label],
+                description: option[:description],
+                colors: (option[:colors] if config.has_colors) || [],
+                selected: selected?(key)
+              ) %>
         <% end %>
       </div>
 
@@ -52,12 +52,12 @@
 
     <div class="flex justify-between mt-6">
       <%= render(Core::LinkComponent.new(
-        name: back_label,
-        url: back_url,
-        style: :as_button,
-        theme: :secondary,
-        html_options: { data: { turbo_frame: back_turbo_frame } }
-      )) %>
+            name: back_label,
+            url: back_url,
+            style: :as_button,
+            theme: :secondary,
+            html_options: {data: {turbo_frame: back_turbo_frame}}
+          )) %>
       <%= f.button submit_label, {theme: :primary, type: :submit} %>
     </div>
   <% end %>

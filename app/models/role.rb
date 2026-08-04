@@ -2,7 +2,17 @@ class Role < ApplicationRecord
   validates :name, presence: true
   has_many :accounts
   has_and_belongs_to_many :permissions # rubocop:disable Rails/HasAndBelongsToMany
+  has_many :permission_roles
   SUPERADMIN = "superadmin"
+
+  # Roles list for the adminit dashboard widget: alphabetical, permissions
+  # eager-loaded, with an accounts_count sub-select (no extra query per row).
+  scope :with_accounts_count, -> {
+    order(:name)
+      .includes(:permissions)
+      .select("roles.*, (SELECT COUNT(*) FROM accounts WHERE accounts.role_id = roles.id) AS accounts_count")
+  }
+  scope :selectable, -> { order(:name) }
 
   def self.superadmin
     Role.find_by(name: SUPERADMIN)
@@ -12,11 +22,18 @@ class Role < ApplicationRecord
     name == SUPERADMIN
   end
 
+  def breadcrumb_title = name
+
   def permitted_resources
     @permitted_resources ||= permissions.pluck(:resource).to_set
   end
 
   def permitted?(resource_key)
     permitted_resources.include?(resource_key.to_s)
+  end
+
+  def dashboard_widgets
+    keys = permission_roles.pluck(:dashboard_widget_keys).flatten
+    Dashboard::WidgetRegistry.for_keys(keys)
   end
 end

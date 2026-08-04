@@ -24,6 +24,21 @@ class Announcement < ApplicationRecord
   scope :ready_to_publish, -> { where(status: :scheduled).where("scheduled_at <= ?", Time.current) }
   scope :overdue, -> { scheduled.where("scheduled_at <= ?", 5.minutes.ago) }
   scope :ordered, -> { order(created_at: :desc) }
+  scope :upcoming_scheduled, ->(limit: 5) { scheduled.where("scheduled_at >= ?", Time.current).order(scheduled_at: :asc).limit(limit) }
+
+  # Stats for the adminit dashboard announcements widget.
+  def self.dashboard_stats
+    counts = group(:status).count
+
+    {
+      total: counts.values.sum,
+      draft: counts["draft"] || 0,
+      scheduled: counts["scheduled"] || 0,
+      published: counts["published"] || 0
+    }
+  end
+
+  def breadcrumb_title = title
 
   # query methods for states
   def schedulable?

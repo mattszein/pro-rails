@@ -8,13 +8,13 @@ pin_all_from "app/javascript/library", under: "library"
 pin_all_from "app/components", under: "controllers", to: ""
 pin "local-time" # @3.0.3
 pin "el-transition", to: "https://ga.jspm.io/npm:el-transition@0.0.7/index.js"
-pin "js-cookie", to: "https://ga.jspm.io/npm:js-cookie@3.0.5/dist/js.cookie.mjs"
-pin "tom-select", to: "https://ga.jspm.io/npm:tom-select@2.4.3/dist/js/tom-select.complete.min.js"
+pin "js-cookie", to: "https://ga.jspm.io/npm:js-cookie@3.0.8/dist/js.cookie.mjs"
+pin "tom-select", to: "https://esm.sh/tom-select@2.6.2"
 pin "@anycable/turbo-stream", to: "@anycable--turbo-stream.js" # @0.8.1
-pin "@anycable/web", to: "@anycable--web.js" # @1.1.0
-pin "@anycable/core", to: "@anycable--core.js" # @1.1.4
+pin "@anycable/web", to: "@anycable--web.js" # @1.1.1
+pin "@anycable/core", to: "@anycable--core.js" # @1.1.6
 pin "@hotwired/turbo", to: "@hotwired--turbo.js" # @8.0.23
-pin "nanoevents" # @9.1.0
+pin "nanoevents" # @10.0.0
 
 pin "air-datepicker", to: "https://esm.sh/air-datepicker@3.6.0"
 pin "air-datepicker/locale/en", to: "https://esm.sh/air-datepicker@3.6.0/locale/en"
@@ -24,5 +24,6 @@ pin "cable", to: "cable.js", preload: true
 pin "@rails/request.js", to: "@rails--request.js.js" # @0.0.13
 pin "lexxy", to: "lexxy.js"
 pin "@rails/activestorage", to: "activestorage.esm.js"
-pin "motion/dom", to: "https://cdn.jsdelivr.net/npm/motion@12.7.3/+esm"
+pin "motion/dom", to: "https://cdn.jsdelivr.net/npm/motion@12.43.0/+esm"
+pin "apexcharts", to: "https://cdn.jsdelivr.net/npm/apexcharts@6.7.0/+esm"
 pin_all_from "app/javascript/icons", under: "icons"

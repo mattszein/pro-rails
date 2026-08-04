@@ -7,25 +7,7 @@
     <div class="flex gap-4">
     <%= render(Core::CardComponent.new(classes: "basis-1/2 space-y-4")) do %>
       <h2><%= t("adminit.accounts.account") %></h2>
-      <%= render Core::BoxComponent.new do %>
-        <%= render Core::DefinitionListComponent.new(gap: :sm) do |dl| %>
-          <% dl.with_item(term: t("shared.labels.id")) do %>
-            <%= @account.id %>
-          <% end %>
-          <% dl.with_item(term: t("shared.labels.email")) do %>
-            <%= @account.email %>
-          <% end %>
-          <% dl.with_item(term: t("shared.labels.role")) do %>
-            <%= @account.role&.name || "-" %>
-          <% end %>
-          <% dl.with_item(term: t("shared.labels.status")) do %>
-            <%= render(Core::BadgeComponent.new(label: t("enums.account.status.#{@account.status}"), theme: account_status_theme(@account.status))) %>
-          <% end %>
-          <% dl.with_item(term: t("shared.labels.created_on")) do %>
-            <%= l(@account.created_at.to_date, format: :long) %>
-          <% end %>
-        <% end %>
-      <% end %>
+      <%= render Adminit::Accounts::SummaryComponent.new(account: @account) %>
     <% end %>
     <%= render(Core::CardComponent.new(classes: "basis-1/2 space-y-4")) do %>
         <h2><%= t("adminit.accounts.profile") %></h2>

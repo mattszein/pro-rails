@@ -6,9 +6,10 @@ class Adminit::AnnouncementsController < Adminit::ApplicationController
 
   def index
     authorize!
+    @columns = helpers.announcement_columns
     @pagy, @announcements = apply_table_params(
       Announcement.includes(:author).order(created_at: :desc),
-      query: Adminit::AnnouncementQuery
+      columns: @columns
     )
   end
 

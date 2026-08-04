@@ -26,11 +26,14 @@ export default class extends Controller {
     // Return early if no element is associated with the controller.
     if (!this.element) return;
 
+    this.removeExistingTomSelect();
+
     const handleChange = () => {
       let el = this.element;
       !(this.allowEmptyValue) && el.setCustomValidity('');
       if (this.submitValue && el.form.reportValidity()) {
-        el.form.submit();
+        // requestSubmit (not submit) so the submit event fires and Turbo intercepts it.
+        el.form.requestSubmit();
       }
     }
 
@@ -70,6 +73,40 @@ export default class extends Controller {
   destroyTomSelect() {
     if (this.select) {
       this.select.destroy();
+      this.select = null;
     }
+  }
+
+  // TomSelect is not idempotent: constructing it over already-transformed
+  // markup appends a second .ts-wrapper instead of reusing the first. connect()
+  // can land on already-transformed markup two different ways, and both have to
+  // be handled or the widget stacks one copy per visit:
+  //
+  //   1. A live instance is still attached — Stimulus reconnected without
+  //      disconnect() having run, e.g. because Turbo moved this
+  //      data-turbo-permanent wrapper (Core::LoaderComponent, see
+  //      _permission_row.html.erb) into a freshly rendered body. Here
+  //      element.tomselect is set, so hand it to TomSelect's own destroy().
+  //
+  //   2. The markup came from a Turbo page-cache snapshot. Turbo builds those
+  //      with cloneNode(true) (PageSnapshot#clone), and JS properties do not
+  //      survive cloning — so .ts-wrapper is present as inert markup while
+  //      element.tomselect is undefined. Nothing owns it; strip it by hand and
+  //      undo the classes/attributes TomSelect set on the <select>. Turbo
+  //      renders a cached preview on every revisit to an already-visited page,
+  //      so this is the common path, not an edge case.
+  removeExistingTomSelect() {
+    if (this.element.tomselect) {
+      this.element.tomselect.destroy();
+      return;
+    }
+
+    if (!this.element.classList.contains("tomselected")) return;
+
+    this.element.parentElement
+      ?.querySelectorAll(":scope > .ts-wrapper")
+      .forEach((wrapper) => wrapper.remove());
+    this.element.classList.remove("tomselected", "ts-hidden-accessible");
+    this.element.removeAttribute("tabindex");
   }
 }

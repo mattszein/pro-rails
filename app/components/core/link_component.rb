@@ -18,7 +18,7 @@ class Core::LinkComponent < ApplicationViewComponent
     when :default
       "inline-flex items-center justify-center border border-transparent rounded-md font-medium focus:outline-none dark:text-gray-100 hover:font-bold hover:underline"
     when :link
-      "text-primary-600 hover:text-primary-700 focus:outline-none dark:text-primary-200 dark:hover:text-primary-300 border-b border-b-transparent hover:border-secondary-400 focus:border-secondary-400 transition-all duration-200"
+      "inline-block text-primary-600 hover:text-primary-700 focus:outline-none dark:text-primary-200 dark:hover:text-primary-300 border-b border-b-transparent hover:border-secondary-400 focus:border-secondary-400 transition-all duration-200"
     end
   end
 

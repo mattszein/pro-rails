@@ -1,0 +1,3 @@
+<%= render Adminit::Dashboard::BaseWidgetComponent.new do %>
+  <%= render Core::TableComponent.new(rows: tickets, columns: columns) %>
+<% end %>

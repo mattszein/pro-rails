@@ -1,0 +1,13 @@
+<%= render Adminit::Dashboard::BaseWidgetComponent.new do %>
+  <%= select_tag "account_lookup",
+        options_for_select([]),
+        class: "w-full py-4",
+        "aria-label": t("adminit.dashboard_widgets.accounts.general.placeholder"),
+        data: {
+          controller: "account-lookup",
+          account_lookup_search_url_value: search_url,
+          account_lookup_summary_url_value: summary_url,
+          placeholder: t("adminit.dashboard_widgets.accounts.general.placeholder")
+        } %>
+  <%= helpers.turbo_frame_tag "account_summary", class: "block pt-2" %>
+<% end %>

@@ -6,9 +6,10 @@ class Adminit::AccountsController < Adminit::ApplicationController
 
   def index
     authorize!
+    @columns = helpers.accounts_columns
     @pagy, @accounts = apply_table_params(
       Account.includes(:role).order(created_at: :desc),
-      query: Adminit::AccountQuery
+      columns: @columns
     )
   end
 

@@ -1,0 +1,19 @@
+<%= render(Core::CardComponent.new(padding: :sm, classes: "h-full overflow-hidden #{container_height_class} flex flex-col inset-shadow-[6px_0_4px_-2px_var(--color-primary-500)]")) do %>
+  <div class="flex justify-between items-center shrink-0">
+    <h4><%= I18n.t("adminit.navigation.#{resource.to_s.pluralize}") %></h4>
+  </div>
+  <%= render Core::TabsComponent.new(id_prefix: tab_id_prefix) do |tabs| %>
+    <% widgets.each do |widget| %>
+      <% tabs.with_tab(name: tab_label(widget)) do %>
+      <div class="flex flex-col h-full min-h-0">
+        <div class="flex-1 min-h-0 overflow-auto p-2">
+          <%= widget_frame(widget) %>
+        </div>
+        <div class="shrink-0 flex justify-between items-center px-2 pt-2 border-t border-primary-500/15">
+          <%= render(Core::LinkComponent.new(name: I18n.t("shared.common.view_all"), url: view_all_path(widget), style: :link, html_options: {data: {turbo_prefetch: false}})) %>
+        </div>
+      </div>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

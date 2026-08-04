@@ -26,9 +26,16 @@ module Support
       other: 4
     }, default: :account_access, validate: {allow_nil: false}
     scope :prioritized, -> { order(priority: :desc, created_at: :desc) }
+    scope :search_title, ->(query) { where("title ILIKE ?", "%#{sanitize_sql_like(query)}%") }
+    scope :assigned_to, ->(account_id) { where(assigned_id: account_id) }
 
     validates :title, :description, :status, :category, :created_id, presence: true
     validate :validate_attachments
+
+    # Dashboard widget reads. `reorder` overrides the default_scope ordering.
+    scope :recent_open, ->(limit: 10) { open.reorder(updated_at: :desc).limit(limit) }
+    scope :assigned_open_for, ->(account, limit: 10) { assigned_to(account.id).open.reorder(updated_at: :desc).limit(limit) }
+
     after_create :create_conversation
 
     broadcasts_to ->(ticket) { "tickets" },
@@ -57,8 +64,23 @@ module Support
         partial: "support/conversations/message_form_status"
     end
 
+    def breadcrumb_title = "##{id} #{title}"
+
     def messageable?
       in_progress? || reopened?
+    end
+
+    # Stats for the adminit dashboard tickets analytics widget.
+    def self.dashboard_stats
+      by_status = reorder(nil).group(:status).count
+
+      {
+        total: by_status.values.sum,
+        open: by_status["open"] || 0,
+        in_progress: by_status["in_progress"] || 0,
+        resolved: (by_status["finished"] || 0) + (by_status["closed"] || 0),
+        by_status: by_status
+      }
     end
 
     def finish!

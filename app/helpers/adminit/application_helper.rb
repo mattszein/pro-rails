@@ -5,7 +5,7 @@ module Adminit::ApplicationHelper
         label: I18n.t("shared.labels.email"),
         renderer: ->(account) { account.email },
         sort_key: :email,
-        filter: Core::Table::Filter.new(type: :text, param: :search)
+        filter: Core::Table::Filter.new(type: :text, param: :search, scope: :search_by_email)
       ),
       Core::Table::Column.new(
         label: I18n.t("shared.labels.status"),
@@ -25,8 +25,13 @@ module Adminit::ApplicationHelper
         filter: Core::Table::Filter.new(
           type: :select,
           param: :role_id,
-          options: -> { Role.order(:name).map { |r| [r.name, r.id] } }
+          options: -> { Role.selectable.map { |r| [r.name, r.id] } }
         )
+      ),
+      Core::Table::Column.new(
+        label: I18n.t("shared.labels.created_on"),
+        renderer: ->(account) { l(account.created_at, format: :short) },
+        sort_key: :created_at
       ),
       Core::Table::Column.new(
         label: I18n.t("shared.common.actions"),
@@ -101,6 +106,11 @@ module Adminit::ApplicationHelper
         label: I18n.t("shared.labels.scheduled_at"),
         renderer: ->(announcement) { announcement.scheduled_at&.strftime("%Y-%m-%d %H:%M") || "-" },
         sort_key: :scheduled_at
+      ),
+      Core::Table::Column.new(
+        label: I18n.t("shared.labels.created_on"),
+        renderer: ->(announcement) { l(announcement.created_at, format: :short) },
+        sort_key: :created_at
       ),
       Core::Table::Column.new(
         label: I18n.t("shared.common.actions"),

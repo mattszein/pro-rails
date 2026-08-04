@@ -67,6 +67,38 @@ describe Adminit::TicketsController, type: :controller do
             tickets = controller.instance_variable_get(:@tickets)
             expect(tickets).to all(have_attributes(status: "open"))
           end
+
+          it "filters by assignee" do
+            assignee = create(:account, :with_role, :verified)
+            assigned_ticket = create(:ticket, created: creator_account, assigned: assignee)
+
+            get :index, params: {filter: {assignee: assignee.id}}
+            tickets = controller.instance_variable_get(:@tickets)
+            expect(tickets).to contain_exactly(assigned_ticket)
+          end
+
+          it "ignores filter params that aren't declared on any column" do
+            get :index, params: {filter: {priority: "5"}}
+            tickets = controller.instance_variable_get(:@tickets)
+            expect(tickets).to contain_exactly(open_ticket, closed_ticket)
+          end
+        end
+
+        context "with created_at sort" do
+          let!(:old_ticket) { create(:ticket, created: creator_account, created_at: 2.days.ago) }
+          let!(:new_ticket) { create(:ticket, created: creator_account, created_at: 1.hour.ago) }
+
+          it "sorts by created_at asc" do
+            get :index, params: {sort: "created_at", direction: "asc"}
+            tickets = controller.instance_variable_get(:@tickets)
+            expect(tickets.first).to eq(old_ticket)
+          end
+
+          it "sorts by created_at desc" do
+            get :index, params: {sort: "created_at", direction: "desc"}
+            tickets = controller.instance_variable_get(:@tickets)
+            expect(tickets.first).to eq(new_ticket)
+          end
         end
 
         context "with out-of-range page" do

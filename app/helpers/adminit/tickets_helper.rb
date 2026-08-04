@@ -5,7 +5,7 @@ module Adminit::TicketsHelper
         label: I18n.t("shared.labels.title"),
         renderer: ->(ticket) { ticket.title },
         sort_key: :title,
-        filter: Core::Table::Filter.new(type: :text, param: :search)
+        filter: Core::Table::Filter.new(type: :text, param: :search, scope: :search_title)
       ),
       Core::Table::Column.new(
         label: I18n.t("shared.labels.category"),
@@ -35,7 +35,18 @@ module Adminit::TicketsHelper
       ),
       Core::Table::Column.new(
         label: I18n.t("shared.labels.assigned"),
-        renderer: ->(ticket) { ticket.assigned&.email || "-" }
+        renderer: ->(ticket) { ticket.assigned&.email || "-" },
+        filter: Core::Table::Filter.new(
+          type: :select,
+          param: :assignee,
+          scope: :assigned_to,
+          options: -> { Account.assignable.pluck(:email, :id) }
+        )
+      ),
+      Core::Table::Column.new(
+        label: I18n.t("shared.labels.created_on"),
+        renderer: ->(ticket) { l(ticket.created_at, format: :short) },
+        sort_key: :created_at
       ),
       Core::Table::Column.new(
         label: I18n.t("shared.common.actions"),

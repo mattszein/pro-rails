@@ -67,4 +67,84 @@ RSpec.describe Support::Ticket, type: :model do
       expect(ticket.attachments.count).to eq(3)
     end
   end
+
+  describe "scopes" do
+    describe ".search_title" do
+      it "matches a case-insensitive partial title" do
+        matching = create(:ticket, title: "Cannot log in")
+        create(:ticket, title: "Billing question")
+
+        expect(Support::Ticket.search_title("log in")).to contain_exactly(matching)
+      end
+
+      it "is case-insensitive" do
+        matching = create(:ticket, title: "Cannot Log In")
+        expect(Support::Ticket.search_title("log in")).to contain_exactly(matching)
+      end
+    end
+
+    describe ".assigned_to" do
+      it "returns tickets assigned to the given account id" do
+        account = create(:account, :verified)
+        other_account = create(:account, :verified)
+        ticket = create(:ticket, assigned: account)
+        create(:ticket, assigned: other_account)
+
+        expect(Support::Ticket.assigned_to(account.id)).to contain_exactly(ticket)
+      end
+    end
+
+    describe ".recent_open" do
+      it "returns open tickets ordered by updated_at desc" do
+        old_ticket = create(:ticket)
+        new_ticket = create(:ticket)
+        old_ticket.update_column(:updated_at, 2.days.ago)
+        create(:ticket, :closed)
+
+        expect(Support::Ticket.recent_open).to eq([new_ticket, old_ticket])
+      end
+
+      it "honors the limit" do
+        create_list(:ticket, 3)
+        expect(Support::Ticket.recent_open(limit: 2).count).to eq(2)
+      end
+    end
+
+    describe ".assigned_open_for" do
+      let(:account) { create(:account, :verified) }
+      let(:other_account) { create(:account, :verified) }
+
+      it "returns open tickets assigned to the account" do
+        ticket = create(:ticket, assigned: account)
+        create(:ticket, assigned: other_account)
+        create(:ticket, :closed, assigned: account)
+
+        expect(Support::Ticket.assigned_open_for(account)).to eq([ticket])
+      end
+
+      it "honors the limit" do
+        create_list(:ticket, 5, assigned: account)
+        expect(Support::Ticket.assigned_open_for(account, limit: 3).count).to eq(3)
+      end
+    end
+  end
+
+  describe ".dashboard_stats" do
+    let(:account) { create(:account, :verified) }
+
+    it "returns ticket stats" do
+      create(:ticket, status: :open, created: account)
+      create(:ticket, status: :in_progress, created: account, assigned: account)
+      create(:ticket, status: :finished, created: account, assigned: account)
+      create(:ticket, status: :closed, created: account, assigned: account)
+
+      stats = Support::Ticket.dashboard_stats
+
+      expect(stats[:total]).to eq(4)
+      expect(stats[:open]).to eq(1)
+      expect(stats[:in_progress]).to eq(1)
+      expect(stats[:resolved]).to eq(2)
+      expect(stats[:by_status]).to include("open" => 1, "in_progress" => 1, "finished" => 1, "closed" => 1)
+    end
+  end
 end

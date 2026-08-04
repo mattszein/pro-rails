@@ -1,0 +1,19 @@
+<%= render Core::BoxComponent.new do %>
+  <%= render Core::DefinitionListComponent.new(gap: :sm) do |dl| %>
+    <% dl.with_item(term: t("shared.labels.id")) do %>
+      <span><%= account.id %></span>
+    <% end %>
+    <% dl.with_item(term: t("shared.labels.email")) do %>
+      <span><%= account.email %></span>
+    <% end %>
+    <% dl.with_item(term: t("shared.labels.role")) do %>
+      <span><%= account.role&.name || "-" %></span>
+    <% end %>
+    <% dl.with_item(term: t("shared.labels.status")) do %>
+      <%= render Core::BadgeComponent.new(label: t("enums.account.status.#{account.status}"), theme: status_theme(account.status)) %>
+    <% end %>
+    <% dl.with_item(term: t("shared.labels.created_on")) do %>
+      <span><%= l(account.created_at.to_date, format: :long) %></span>
+    <% end %>
+  <% end %>
+<% end %>

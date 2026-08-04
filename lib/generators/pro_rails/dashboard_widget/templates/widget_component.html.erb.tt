@@ -1,0 +1,11 @@
+<%%= render Adminit::Dashboard::BaseWidgetComponent.new do %>
+<% if kind == "analytics" %>
+  <div class="rounded-lg border border-transparent dark:bg-[rgb(28_29_34_/_0.5)] dark:border-white/10 p-2">
+    <%%= render Adminit::Dashboard::ChartComponent.new(options: chart_options) %>
+  </div>
+<% else %>
+  <p class="text-sm">
+    <%= file_name %> <%= kind %> widget content goes here.
+  </p>
+<% end %>
+<%% end %>

@@ -1,0 +1,26 @@
+module Adminit
+  module Dashboard
+    module <%= class_name.pluralize %>
+      class <%= kind.camelize %>WidgetComponent < ApplicationViewComponent
+        option :account
+<% if kind == "analytics" -%>
+
+        # Widget data comes from model scopes/class methods (e.g.
+        # <%= class_name %>.dashboard_stats) — never query ActiveRecord from
+        # the component, and do not create query objects under app/queries.
+        def stats
+          @stats ||= {total: 0} # TODO: read from the model
+        end
+
+        def chart_options
+          ::Dashboard::ChartOptions.donut(
+            labels: [],
+            series: [],
+            semantic_colors: []
+          )
+        end
+<% end -%>
+      end
+    end
+  end
+end

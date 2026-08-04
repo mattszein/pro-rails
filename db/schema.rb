@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_11_000003) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_11_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -182,6 +182,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_11_000003) do
   end
 
   create_table "permissions_roles", id: false, force: :cascade do |t|
+    t.jsonb "dashboard_widget_keys", default: [], null: false
     t.bigint "permission_id", null: false
     t.bigint "role_id", null: false
     t.index ["permission_id", "role_id"], name: "index_permissions_roles_on_permission_id_and_role_id", unique: true

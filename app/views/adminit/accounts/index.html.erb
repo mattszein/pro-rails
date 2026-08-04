@@ -5,7 +5,7 @@
   <%= render Core::CardComponent.new do %>
     <%= render Core::TableComponent.new(
           rows: @accounts,
-          columns: accounts_columns,
+          columns: @columns,
           options: {
             frame_id: "admin_accounts_table",
             pagy: @pagy,

@@ -10,9 +10,10 @@ module Support
 
     def index
       authorize! :ticket, with: Support::TicketPolicy
+      @columns = helpers.support_ticket_columns
       @pagy, @tickets = apply_table_params(
         Support::Ticket.where(created_id: current_account.id).prioritized,
-        query: Support::TicketQuery
+        columns: @columns
       )
     end
 

@@ -1,0 +1,29 @@
+<div class="flex flex-col flex-1 min-h-0" data-controller="tabs"
+     data-tabs-active-classes-value="<%= active_classes %>"
+     data-tabs-inactive-classes-value="<%= inactive_classes %>">
+  <div class="flex border-b border-primary-300 shrink-0" role="tablist">
+    <% tabs.each_with_index do |tab, i| %>
+      <button type="button" role="tab"
+              id="<%= tab_id(i) %>"
+              aria-controls="<%= panel_id(i) %>"
+              data-tabs-target="tab"
+              data-action="click->tabs#select"
+        data-index="<%= i %>"
+        aria-selected="<%= i.zero? %>"
+        class="<%= tab_classes(i.zero?) %> group/tab">
+        <%= tab.name %>
+        <span class="<%= Core::SubmenuStyles::UNDERLINE_BASE %> opacity-0 group-aria-selected/tab:opacity-100"></span>
+      </button>
+    <% end %>
+  </div>
+  <div class="flex-1 min-h-0">
+    <% tabs.each_with_index do |tab, i| %>
+      <div data-tabs-target="panel" data-index="<%= i %>" role="tabpanel"
+           id="<%= panel_id(i) %>"
+           aria-labelledby="<%= tab_id(i) %>"
+           class="<%= "hidden" unless i.zero? %> h-full min-h-0">
+        <%= tab %>
+      </div>
+    <% end %>
+  </div>
+</div>
