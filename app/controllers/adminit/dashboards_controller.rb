@@ -12,10 +12,10 @@ class Adminit::DashboardsController < Adminit::ApplicationController
     @widget = ::Dashboard::WidgetRegistry.find(params[:key])
 
     if @widget
-      authorize! @widget.resource, with: @widget.policy_class.constantize
+      authorize! @widget.resource, with: @widget.policy
       return head :forbidden unless current_account.role&.dashboard_widgets&.include?(@widget)
 
-      @component = @widget.component_class.constantize.new(account: current_account)
+      @component = @widget.component.new(account: current_account)
     else
       authorize! :dashboard_widget, to: :show?, with: Adminit::DashboardPolicy
       head :not_found

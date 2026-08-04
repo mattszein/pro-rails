@@ -12,6 +12,21 @@ module Dashboard
       :view_all_params
     ) do
       def turbo_frame_id = "dashboard_#{key}"
+
+      # Resolved on each call, never memoized: holding a Class across a dev code
+      # reload pins a stale constant. Resolution lives here (not in callers) so
+      # the allowlist (widgets.rb) and its dereference stay in one file.
+      def policy = resolve(policy_class, ActionPolicy::Base)
+
+      def component = resolve(component_class, ViewComponent::Base)
+
+      private
+
+      def resolve(name, expected_ancestor)
+        klass = name.constantize
+        raise TypeError, "#{name} is not a #{expected_ancestor}" unless klass < expected_ancestor
+        klass
+      end
     end
 
     @widgets = {}

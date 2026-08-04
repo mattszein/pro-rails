@@ -39,7 +39,7 @@ module Adminit
               render Adminit::Dashboard::SkeletonWidgetComponent.new(kind: widget.kind)
             end
         else
-          render widget.component_class.constantize.new(account: helpers.current_account)
+          render widget.component.new(account: helpers.current_account)
         end
       end
     end
