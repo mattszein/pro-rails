@@ -1,0 +1,47 @@
+# docker-compose.traefik.yml
+# Routes by hostname through a Traefik instance that is already running and
+# already owns the `${TRAEFIK_NETWORK}` network. No host ports are published.
+# Selected via COMPOSE_FILE in .env:
+#   COMPOSE_FILE=docker-compose.yml:docker-compose.traefik.yml
+#
+# Router names are prefixed with COMPOSE_PROJECT_NAME because Traefik's router
+# namespace is global — two worktrees with a router called "rails" would fight.
+
+services:
+  rails:
+    networks:
+      - default
+      - traefik
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: "${TRAEFIK_NETWORK:-traefik}"
+      traefik.http.routers.${COMPOSE_PROJECT_NAME}-rails.rule: "Host(`${APP_HOST}`)"
+      traefik.http.routers.${COMPOSE_PROJECT_NAME}-rails.entrypoints: "${TRAEFIK_ENTRYPOINT:-web}"
+      traefik.http.services.${COMPOSE_PROJECT_NAME}-rails.loadbalancer.server.port: "3000"
+
+  ws:
+    networks:
+      - default
+      - traefik
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: "${TRAEFIK_NETWORK:-traefik}"
+      traefik.http.routers.${COMPOSE_PROJECT_NAME}-ws.rule: "Host(`${WS_HOST}`)"
+      traefik.http.routers.${COMPOSE_PROJECT_NAME}-ws.entrypoints: "${TRAEFIK_ENTRYPOINT:-web}"
+      traefik.http.services.${COMPOSE_PROJECT_NAME}-ws.loadbalancer.server.port: "8080"
+
+  maildev:
+    networks:
+      - default
+      - traefik
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: "${TRAEFIK_NETWORK:-traefik}"
+      traefik.http.routers.${COMPOSE_PROJECT_NAME}-mail.rule: "Host(`${MAILDEV_HOST}`)"
+      traefik.http.routers.${COMPOSE_PROJECT_NAME}-mail.entrypoints: "${TRAEFIK_ENTRYPOINT:-web}"
+      traefik.http.services.${COMPOSE_PROJECT_NAME}-mail.loadbalancer.server.port: "8025"
+
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK:-traefik}

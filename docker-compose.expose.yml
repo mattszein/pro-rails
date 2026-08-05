@@ -1,0 +1,47 @@
+# docker-compose.expose.yml
+# Publishes ports to the host for direct local access (no Traefik).
+# Selected via COMPOSE_FILE in .env:
+#   COMPOSE_FILE=docker-compose.yml:docker-compose.expose.yml
+#
+# Every mapping is bound to 127.0.0.1 and the host port defaults to EMPTY,
+# which makes Docker pick an ephemeral one -> collisions are impossible with
+# any number of worktrees running at once. Find where something landed with:
+#   docker compose port rails 3000
+# Pin a port only when you want a stable bookmark, e.g. RAILS_PORT=3000.
+
+services:
+  rails:
+    ports:
+      - "127.0.0.1:${RAILS_PORT:-}:3000"
+
+  ws:
+    ports:
+      - "127.0.0.1:${WS_PORT:-}:8080"
+      - "127.0.0.1:${WS_BROADCAST_PORT:-}:8090"
+
+  maildev:
+    ports:
+      - "127.0.0.1:${MAILDEV_SMTP_PORT:-}:1025"
+      - "127.0.0.1:${MAILDEV_WEB_PORT:-}:8025"
+
+  chrome:
+    ports:
+      - "127.0.0.1:${CHROME_PORT:-}:3333"
+
+  # Embedded infra only (COMPOSE_PROFILES=infra). Pin DB_HOST_PORT when you
+  # want to point TablePlus/psql at this feature's own Postgres.
+  db:
+    ports:
+      - "127.0.0.1:${DB_HOST_PORT:-}:5432"
+
+  redis:
+    ports:
+      - "127.0.0.1:${REDIS_HOST_PORT:-}:6379"
+
+  test_system:
+    ports:
+      - "127.0.0.1:${TEST_PORT:-}:3001"
+
+  ws_test:
+    ports:
+      - "127.0.0.1:${WS_TEST_PORT:-}:8081"
