@@ -4,11 +4,11 @@ RSpec.describe Dashboard::WidgetRegistry do
   describe ".register" do
     before do
       # Clear any previously registered test widgets
-      described_class.instance_variable_get(:@widgets).delete(:test_widget)
+      described_class.registry.delete(:test_widget)
     end
 
     after do
-      described_class.instance_variable_get(:@widgets).delete(:test_widget)
+      described_class.registry.delete(:test_widget)
     end
 
     def base_attrs
@@ -76,7 +76,7 @@ RSpec.describe Dashboard::WidgetRegistry do
         described_class.register(**base_attrs.merge(key: :test_widget_2), resource: :permission, span: :full)
       }.to raise_error(ArgumentError, /has span :full.*already registered.*span :half/)
 
-      described_class.instance_variable_get(:@widgets).delete(:test_widget_2)
+      described_class.registry.delete(:test_widget_2)
     end
   end
 
@@ -96,6 +96,29 @@ RSpec.describe Dashboard::WidgetRegistry do
     it "silently skips unknown keys" do
       widgets = described_class.for_keys([:tickets_personal, :unknown_key])
       expect(widgets.map(&:key)).to contain_exactly(:tickets_personal)
+    end
+  end
+
+  describe ".reset! / .clear" do
+    it "empties the registry (clear is an alias of the shared reset!)" do
+      original = described_class.registry.dup
+
+      begin
+        described_class.reset!
+        expect(described_class.all).to be_empty
+
+        described_class.register(
+          key: :test_widget, resource: :ticket, kind: :personal,
+          policy_class: "Adminit::TicketPolicy",
+          component_class: "Adminit::Dashboard::Tickets::PersonalWidgetComponent"
+        )
+        expect(described_class.all).not_to be_empty
+
+        described_class.clear
+        expect(described_class.all).to be_empty
+      ensure
+        described_class.registry.replace(original)
+      end
     end
   end
 end

@@ -52,7 +52,7 @@ class Core::TableComponentPreview < ViewComponent::Preview
   # We supply a minimal struct that satisfies compose_page_url's interface.
   def build_preview_pagy(count: 100, page: 1)
     request_stub = Struct.new(:base_url, :path, :params, :cookie)
-      .new("http://localhost:3000", "/", {}, nil)
+      .new("http://#{ENV.fetch("APP_HOST", `hostname`.strip&.downcase || "0.0.0.0")}", "/", {}, nil)
     Pagy::Offset.new(count: count, page: page, limit: 20, request: request_stub)
   end
 

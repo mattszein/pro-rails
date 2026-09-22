@@ -115,6 +115,27 @@ Admin-to-all-users communication with scheduled publishing and rich text.
 
 Each announcement has a reference identifier, title, and rich text body.
 
+### Feature Flags
+
+Operator-controlled release gates for user-facing capabilities, administered in Adminit. See
+`docs/BACKEND.md` for how to declare, gate, and retire a flag and register a new audience condition,
+and `docs/ARCHITECTURE.md` for the evaluation rules.
+
+**Flag** — a switch in front of a capability that already exists in the product. Declared in code
+(never created in Adminit); its access list (audiences and/or per-account allow/block entries) is
+managed by admins. No sample flags ship — a flag exists only when a real capability needs one.
+
+**Audience** — a named, reusable group of accounts defined by a fixed vocabulary of conditions
+(Adminit access, role, email verification, account age). Outlives any one flag; archived rather than
+deleted.
+
+**Account entry** — a one-off allow or block for a single account on a single flag, independent of
+any audience.
+
+**Decision rule**: a block always wins; an explicit allow beats any audience; any matching attached
+audience grants; otherwise the capability is absent — including for a flag that was never declared, a
+closed account, or an evaluation that cannot complete.
+
 ### Profiles
 
 Account profiles with editable display information:

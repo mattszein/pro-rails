@@ -19,6 +19,14 @@
   <% if allowed_to? :manage?, with: Adminit::TicketPolicy %>
     <%= render(Adminit::Dashboard::CardLinkComponent.new(label: t("adminit.navigation.tickets"), path: adminit_tickets_path, icon_name: "adminit/tickets", animated_type: "support")) %>
   <% end %>
+
+  <% if allowed_to? :manage?, with: Adminit::FeatureFlagPolicy %>
+    <%= render(Adminit::Dashboard::CardLinkComponent.new(label: t("adminit.navigation.feature_flags"), path: adminit_feature_flags_path, icon_name: "adminit/permissions", animated_type: "gavel")) %>
+  <% end %>
+
+  <% if allowed_to? :manage?, with: Adminit::AudiencePolicy %>
+    <%= render(Adminit::Dashboard::CardLinkComponent.new(label: t("adminit.navigation.audiences"), path: adminit_audiences_path, icon_name: "adminit/roles", animated_type: "id-card")) %>
+  <% end %>
   </div>
 <% end %>
 

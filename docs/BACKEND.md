@@ -278,6 +278,81 @@ namespace's helper declares its own column set — that split is intentional, no
 
 ---
 
+## Feature Flags
+
+Operator-controlled release gates: a flag holds an access list of reusable **audiences** and
+per-account **allow/block** entries, evaluated in-process against committed database state. See
+`docs/ARCHITECTURE.md` → Feature Flags for the entry-point and no-attribution-column rules this
+implements.
+
+**Pieces:**
+
+| Piece | File | Role |
+|---|---|---|
+| Flag / condition registries | `app/lib/feature_flags/registry.rb`, `app/lib/audience_conditions/registry.rb` | In-memory declared sets (`DeclaredRegistry`). |
+| Declarations | `app/lib/feature_flags/flags.rb`, `app/lib/audience_conditions/vocabulary.rb` | One `Registry.register(...)` call per flag/condition. Ships with none — every flag is a team's own addition. |
+| Decision | `app/lib/feature_flags.rb`, `app/lib/feature_flags/account_evaluator.rb` | `FeatureFlags.for(account)` / `.enabled?(key, account)` — the only entry points. |
+| Consumption | `app/controllers/concerns/feature_gated.rb` | `feature_enabled?(key)`, `require_feature!(key)`, included on `SharedBaseController`. |
+| State | `FeatureFlag`, `Audience`, `AudienceCondition`, `FeatureFlagAudience`, `FeatureFlagAccount` | Access-list rows — read directly only to *display*, never to decide. |
+| Admin | `Adminit::{FeatureFlagsController,AudiencesController,FeatureFlags::{AudiencesController,AccountsController}}` | Flag list/detail, audience CRUD + archive, attach/detach/allow/block — single-row writes directly on the two nested controllers, no interactor. |
+
+**Declare a flag:**
+
+```ruby
+# app/lib/feature_flags/flags.rb
+Registry.register(:new_dashboard)
+```
+
+```yaml
+# config/locales/en/feature_flags.yml (and es/)
+en:
+  feature_flags:
+    flags:
+      new_dashboard: {name: "New dashboard", description: "The redesigned account dashboard."}
+```
+
+It appears in Adminit → Feature Flags on the next request (`FeatureFlag.materialize_declared!` runs
+from the index action), off for everyone until an operator attaches an audience or account entry.
+
+**Gate a capability:**
+
+```ruby
+before_action { require_feature!(:new_dashboard) }  # 404s, reusing the app's not-found handling
+```
+
+```erb
+<% if feature_enabled?(:new_dashboard) %><%= render NewDashboardComponent.new(...) %><% end %>
+```
+
+**Register an audience condition:**
+
+```ruby
+# app/lib/audience_conditions/vocabulary.rb
+Registry.register(
+  key: :on_paid_plan,
+  type: :boolean, # :affirmative (off/true only) | :id_list (accepts: names the model) | :duration ({amount:, unit:})
+  accepts: [true, false],
+  predicate: ->(account, value) { account.paid? == value }, # only account + value — no query of its own, and the answer must not move with the clock (a fixed age threshold is the one allowed exception)
+  scope: ->(relation, value) { raise NotImplementedError } # implement only when something needs a member list (e.g. "how many accounts in this audience") — none does yet
+)
+```
+
+Add its label/hint/value vocabulary to both locale files (`config/locales/{en,es}/audience_conditions.yml`).
+Nothing else changes — the audience form renders the partial named by `type`; a new value *type* needs
+one new partial under `app/views/adminit/audiences/conditions/`.
+
+**Retire a flag:** delete its `Registry.register` line. The row and its access-list history stay;
+`FeatureFlag.declared` stops returning it (Adminit no longer lists it, `FeatureFlags.enabled?` returns
+`false`, logged not raised). An audience only attached to that flag is free to reuse elsewhere.
+
+**Attach an audience, or allow/block an account** — both are Adminit actions on a flag's detail page,
+no code change. See `PRODUCT-PLAN.md`'s decision rules for how block/allow/audience-match combine.
+
+**`Audience.prune_role`** skips validation by design — the one write allowed to leave an audience with
+no conditions, because refusing it would let flag data veto a role deletion.
+
+---
+
 ## Controller Patterns
 
 ### Standard Structure

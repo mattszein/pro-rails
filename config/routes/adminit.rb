@@ -29,6 +29,21 @@ namespace :adminit do
     put "/", to: "permissions#update", on: :member
   end
 
+  resources :feature_flags, only: [:index, :show] do
+    resources :audiences, only: [:create, :destroy], controller: "feature_flags/audiences"
+    resources :accounts, only: [:create, :destroy], controller: "feature_flags/accounts" do
+      get :search, on: :collection
+    end
+  end
+
+  # No :destroy — audiences are archived, never deleted, in Adminit.
+  resources :audiences, except: [:destroy] do
+    member do
+      patch :archive
+      patch :unarchive
+    end
+  end
+
   namespace :dashboard do
     get "widgets/:key",
       to: "/adminit/dashboards#widget",

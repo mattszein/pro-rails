@@ -1,0 +1,5 @@
+<% if feature_flag.account_entries.any? %>
+  <%= render Core::TableComponent.new(rows: feature_flag.account_entries, columns: flag_account_entry_columns(feature_flag)) %>
+<% else %>
+  <p class="text-slate-500 italic px-4 pb-4"><%= t("adminit.feature_flags.no_account_entries") %></p>
+<% end %>

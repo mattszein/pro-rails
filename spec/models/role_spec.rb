@@ -44,4 +44,19 @@ RSpec.describe Role, type: :model do
       expect(roles.find { |r| r.id == zeta.id }.accounts_count).to eq(0)
     end
   end
+
+  describe "#destroy" do
+    # S25 — deleting a role is never refused, and it prunes the role from
+    # every audience whose Roles condition selected it.
+    it "prunes the role from every audience holding it in a Roles condition" do
+      role = create(:role)
+      audience = build(:audience, :without_condition)
+      audience.audience_conditions.build(condition_key: "roles", value: [role.id])
+      audience.save!
+
+      expect { role.destroy }.not_to raise_error
+      expect(role).to be_destroyed
+      expect(audience.reload.audience_conditions).to be_empty
+    end
+  end
 end

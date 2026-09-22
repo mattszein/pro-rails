@@ -1,4 +1,6 @@
 class Adminit::RolesController < Adminit::ApplicationController
+  include Adminit::AccountSearchable
+
   before_action :set_role, only: [:remove_account, :add_account, :account_select, :search_accounts]
   verify_authorized
 
@@ -39,11 +41,7 @@ class Adminit::RolesController < Adminit::ApplicationController
 
   def search_accounts
     authorize!
-    query = params[:q].to_s.strip
-    return render(json: []) if query.length < 2
-
-    accounts = Account.search_by_email(query).not_in_role(@role).limit(50)
-    render json: accounts.map { |a| {value: a.email, text: a.email} }
+    search_accounts_json(scope: Account.not_in_role(@role), limit: 50)
   end
 
   private

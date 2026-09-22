@@ -66,7 +66,11 @@ spec/
     adminit/
     settings/
     support/
-  requests/              # Request specs (integration)
+  requests/              # Real login/redirect flows, routing/locale resolution, a
+                         # concern mounted on a synthetic route — NOT rendering or
+                         # HTTP checks for an existing controller (those stay in
+                         # controllers/, with `render_views` scoped to the example
+                         # if the assertion needs real markup)
   system/                # System specs (browser)
     support/             # System test helpers
   support/               # Test helpers
@@ -154,6 +158,14 @@ include_context "user and permissions adminit"
 # Tests both unauthenticated and unauthorized scenarios
 include_context "adminit_auth"
 ```
+
+### Feature-Flag Test Helpers
+
+| Helper | Location | Use |
+|---|---|---|
+| `with_feature_flag(*keys) { ... }` | `spec/support/feature_flags_helper.rb` | Registers flag keys for the block, restores the registry after. Most specs don't need this — `FeatureFlags::Registry` is reset after every example automatically, and the `:feature_flag` factory self-registers whatever key it's given. |
+| `with_audience_condition(key, type:, accepts:, predicate:, scope:) { ... }` | `spec/support/audience_conditions_helper.rb` | Registers a spec-only condition for the block. `AudienceConditions::Registry` is **not** auto-reset — it ships with four real conditions most specs depend on. |
+| `"a registered audience condition"` | `spec/support/shared_examples/audience_condition.rb` | Applied to every entry in `AudienceConditions::Registry.all` by `spec/lib/audience_conditions/vocabulary_spec.rb`. |
 
 ---
 

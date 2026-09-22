@@ -1,0 +1,17 @@
+<div class="w-full">
+  <div class="flex justify-between items-center pb-2">
+    <h1 class="text-xl font-semibold"><%= t("adminit.navigation.feature_flags") %></h1>
+  </div>
+  <%= render Core::CardComponent.new do %>
+    <%= render Core::TableComponent.new(
+          rows: @feature_flags,
+          columns: @columns,
+          options: {
+            frame_id: "admin_feature_flags_table",
+            pagy: @pagy,
+            sortable: true,
+            filterable: true
+          }
+        ) %>
+  <% end %>
+</div>

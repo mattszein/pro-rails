@@ -5,7 +5,9 @@ class Permission < ApplicationRecord
     role: 2,
     permission: 3,
     announcement: 4,
-    ticket: 5
+    ticket: 5,
+    feature_flag: 6,
+    audience: 7
   }.freeze
 
   enum :resource, RESOURCE_REGISTRY, prefix: :resource

@@ -44,6 +44,15 @@ RSpec.configure do |config|
       # Clear deliveries
       ActionMailer::Base.deliveries.clear
     end
+
+    # FeatureFlags::Flags ships with no registrations in this milestone, so
+    # its empty state IS the shipped baseline — resetting it after every
+    # example is what lets the :feature_flag factory self-register without
+    # leaking test-only keys into later specs. AudienceConditions::Registry
+    # is not reset here: it ships with four real conditions that most specs
+    # depend on, and specs needing a spec-only condition use
+    # with_audience_condition instead.
+    FeatureFlags::Registry.reset!
   end
   config.include FactoryBot::Syntax::Methods
   config.include ViewComponent::TestHelpers, type: :component
@@ -57,6 +66,9 @@ RSpec.configure do |config|
 
   config.include ViewComponent::TestHelpers, type: :component
   config.include ActionView::TestCase::Behavior, type: :component
+
+  config.include FeatureFlagsHelper
+  config.include AudienceConditionsHelper
 end
 
 Shoulda::Matchers.configure do |config|

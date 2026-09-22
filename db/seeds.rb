@@ -41,7 +41,9 @@ end
   ticket: [role_superadmin, role_support],
   role: [role_superadmin],
   announcement: [role_superadmin],
-  permission: [role_superadmin]
+  permission: [role_superadmin],
+  feature_flag: [role_superadmin],
+  audience: [role_superadmin]
 }.each do |resource, roles|
   permission = Permission.find_or_create_by!(resource: resource) do |p|
     p.roles = roles

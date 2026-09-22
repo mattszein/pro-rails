@@ -1,0 +1,25 @@
+<% if feature_flag.audiences.any? %>
+  <%= render Core::TableComponent.new(rows: feature_flag.audiences, columns: [
+        Core::Table::Column.new(
+          label: t("shared.labels.name"),
+          renderer: ->(audience) { link_to(audience.name, adminit_audience_path(audience)) }
+        ),
+        Core::Table::Column.new(
+          label: t("adminit.audiences.conditions"),
+          renderer: ->(audience) { audience_condition_summary(audience) }
+        ),
+        Core::Table::Column.new(
+          label: t("shared.common.actions"),
+          renderer: ->(audience) {
+            render(Core::LinkComponent.new(
+              name: t("shared.common.delete"),
+              url: adminit_feature_flag_audience_path(feature_flag, audience),
+              style: :as_button, theme: :delete, size: :xs,
+              html_options: {data: {turbo_method: :delete, turbo_confirm: t("shared.common.are_you_sure")}}
+            ))
+          }
+        )
+      ]) %>
+<% else %>
+  <p class="text-slate-500 italic px-4 pb-4"><%= t("adminit.feature_flags.no_audiences") %></p>
+<% end %>
