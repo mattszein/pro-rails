@@ -99,14 +99,11 @@ RSpec.describe Dashboard::WidgetRegistry do
     end
   end
 
-  describe ".reset! / .clear" do
-    it "empties the registry (clear is an alias of the shared reset!)" do
+  describe ".reset!" do
+    it "empties the registry" do
       original = described_class.registry.dup
 
       begin
-        described_class.reset!
-        expect(described_class.all).to be_empty
-
         described_class.register(
           key: :test_widget, resource: :ticket, kind: :personal,
           policy_class: "Adminit::TicketPolicy",
@@ -114,7 +111,7 @@ RSpec.describe Dashboard::WidgetRegistry do
         )
         expect(described_class.all).not_to be_empty
 
-        described_class.clear
+        described_class.reset!
         expect(described_class.all).to be_empty
       ensure
         described_class.registry.replace(original)

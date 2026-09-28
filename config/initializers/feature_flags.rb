@@ -1,7 +1,5 @@
-# Flag declarations live in app/lib/feature_flags/flags.rb (autoloaded, so
-# edits there hot-reload in development). This hook only re-installs them on
-# each code reload and should never need to change — initializer files are
-# read once at boot and silently ignore edits until a server restart.
+# Re-installs the flag declarations (app/lib/feature_flags/flags.rb) on
+# every code reload, so edits there hot-reload in development.
 Rails.application.config.to_prepare do
   FeatureFlags::Flags.install
 end

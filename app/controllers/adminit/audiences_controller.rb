@@ -16,35 +16,31 @@ class Adminit::AudiencesController < Adminit::ApplicationController
   def new
     authorize!
     @audience = Audience.new
-    seed_condition_rows(@audience)
+    @audience.build_missing_conditions
   end
 
   def edit
-    seed_condition_rows(@audience)
+    @audience.build_missing_conditions
   end
 
   def create
     authorize!
     @audience = Audience.new(audience_params)
     if @audience.save
-      redirect_to adminit_audience_path(@audience), notice: resource_message(:created, @audience)
+      respond_saved(resource_message(:created, @audience))
     else
-      seed_condition_rows(@audience)
-      render :new, status: :unprocessable_content
+      respond_form_error(:new)
     end
   end
 
   def update
     if @audience.update(audience_params)
-      redirect_to adminit_audience_path(@audience), notice: resource_message(:updated, @audience)
+      respond_saved(resource_message(:updated, @audience))
     else
-      seed_condition_rows(@audience)
-      render :edit, status: :unprocessable_content
+      respond_form_error(:edit)
     end
   end
 
-  # Archiving/unarchiving is a single-field update on the model — no
-  # interactor, no touch on the flags that attach this audience (S18, S23).
   def archive
     @audience.archive!
     redirect_to adminit_audience_path(@audience), notice: t("adminit.audiences.archived")
@@ -57,73 +53,73 @@ class Adminit::AudiencesController < Adminit::ApplicationController
 
   private
 
-  def set_audience
-    @audience = Audience.find(params[:id])
-    # `authorize!` with no explicit rule infers it from action_name
-    # (show?/update?/archive?/unarchive?), which resolves through
-    # ActionPolicy's default_rule to manage? the same as every other rule
-    # this policy is asked about.
-    authorize! @audience
+  # New/edit render inside a modal (Turbo Frame), same as announcements: the
+  # turbo_stream branch redirects the frame's contents to the show page on
+  # success, or re-renders the form in place on failure.
+  def respond_saved(message)
+    respond_to do |format|
+      format.html { redirect_to adminit_audience_path(@audience), notice: message }
+      format.turbo_stream do
+        flash[:notice] = message
+        render turbo_stream: turbo_stream.action(:redirect, adminit_audience_path(@audience))
+      end
+    end
   end
 
-  # Every registry entry gets a row on the form, even if this audience does
-  # not hold that condition yet — an on/off toggle needs something to
-  # toggle. Adding a condition to the vocabulary adds no view code: the next
-  # entry just appears here.
-  def seed_condition_rows(audience)
-    existing_keys = audience.audience_conditions.map(&:condition_key)
-    # Not an ActiveRecord relation — Registry.all is an in-memory array.
-    AudienceConditions::Registry.all.each do |condition| # rubocop:disable Rails/FindEach
-      next if existing_keys.include?(condition.key.to_s)
-      audience.audience_conditions.build(condition_key: condition.key.to_s)
+  def respond_form_error(template)
+    @audience.build_missing_conditions
+    respond_to do |format|
+      format.html { render template, status: :unprocessable_content }
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.update(
+          "audience_form",
+          partial: "adminit/audiences/form",
+          locals: {audience: @audience}
+        ), status: :unprocessable_content
+      end
     end
+  end
+
+  def set_audience
+    @audience = Audience.find(params[:id])
+    authorize! @audience
   end
 
   def audience_params
     permitted = params.require(:audience).permit(:name, :description)
-    permitted[:audience_conditions_attributes] = condition_attributes
+    permitted[:audience_conditions_attributes] = audience_conditions_params
     permitted
   end
 
-  # The value column's shape (boolean / id array / {amount, unit} hash)
-  # depends on the condition's declared type, which Rails' strong
-  # parameters cannot express as a single static `permit` shape — TECH-PLAN
-  # §8 unknown #11. Each row is read from the known, registry-declared
-  # condition_key rather than trusted blindly, so this is not a params
-  # blind spot: an unrecognized condition_key is simply dropped, and every
-  # value still passes through AudienceCondition's own vocabulary
-  # validation on save.
-  def condition_attributes
+  # Value shape (boolean / id array / {amount, unit}) depends on the
+  # condition's declared type, so rows are permitted by registered
+  # condition_key rather than a static `permit` shape.
+  def audience_conditions_params
     rows = params[:audience][:audience_conditions_attributes]
     return [] if rows.blank?
 
-    # `to_unsafe_h` is the sanctioned escape hatch here, not a blind mass
-    # assignment: every field below is read by its known name, condition_key
-    # is checked against the registry before anything else is trusted, and
-    # the reconstructed value still passes AudienceCondition's own
-    # vocabulary validation on save.
     rows.to_unsafe_h.values.filter_map do |row|
       condition_key = row[:condition_key].presence
       next unless condition_key && AudienceConditions::Registry.registered?(condition_key)
 
       condition = AudienceConditions::Registry.fetch(condition_key)
 
-      shape_condition_row(condition, row)
+      condition_row_attributes(condition, row)
     end
   end
 
-  def shape_condition_row(condition, row)
+  def condition_row_attributes(condition, row)
     enabled = ActiveModel::Type::Boolean.new.cast(row[:enabled])
     existing_id = row[:id].presence
 
     return existing_id ? {id: existing_id, _destroy: true} : nil unless enabled
 
-    attrs = {condition_key: condition.key.to_s, value: shape_value(condition, row)}
+    attrs = {condition_key: condition.key.to_s, value: cast_value(condition, row)}
     attrs[:id] = existing_id if existing_id
     attrs
   end
 
-  def shape_value(condition, row)
+  def cast_value(condition, row)
     case condition.type
     when :boolean
       ActiveModel::Type::Boolean.new.cast(row[:value])

@@ -1,3 +1,9 @@
+<% if feature_enabled?(:test_feature_flag) %>
+  <%= render(Core::CardComponent.new(classes: "text-center bg-green-50 dark:bg-green-950 mb-4")) do %>
+    <p class="font-medium"><%= t("adminit.dashboard.feature_flag_demo") %></p>
+  <% end %>
+<% end %>
+
 <%= render(Core::CardComponent.new(classes: "text-center")) do %>
   <div class="flex space-x-4 flex-wrap justify-center pt-4">
   <% if allowed_to? :manage?, with: Adminit::AccountPolicy %>

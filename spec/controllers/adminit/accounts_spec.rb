@@ -126,6 +126,95 @@ describe Adminit::AccountsController, type: :controller do
     end
   end
 
+  describe "GET #search" do
+    subject { get :search, params: {q: "user_"} }
+
+    include_context "adminit_auth"
+
+    shared_examples "a permitted searcher" do
+      it "is authorized" do
+        expect { subject }.to be_authorized_to(:search?, Account).with(Adminit::AccountPolicy).with_context(user: user)
+      end
+
+      it "returns matching accounts as {value, text}" do
+        matching = create(:account, email: "user_match@example.com")
+
+        subject
+
+        expect(response.parsed_body).to include("value" => matching.id.to_s, "text" => matching.email)
+      end
+
+      it "short-circuits a too-short query to an empty list" do
+        get :search, params: {q: "a"}
+        expect(response.parsed_body).to eq([])
+      end
+    end
+
+    context "with the account permission" do
+      before do
+        login_user(user)
+        account_permission
+      end
+
+      it_behaves_like "a permitted searcher"
+    end
+
+    context "with the role permission" do
+      before do
+        login_user(user)
+        role_permission
+      end
+
+      it_behaves_like "a permitted searcher"
+    end
+
+    context "with the feature_flag permission" do
+      before do
+        login_user(user)
+        feature_flag_permission
+      end
+
+      it_behaves_like "a permitted searcher"
+    end
+
+    context "with a not_in_role param" do
+      before do
+        login_user(user)
+        account_permission
+      end
+
+      it "excludes accounts already holding that role" do
+        role = create(:role)
+        member = create(:account, email: "user_member@example.com", role: role)
+        other = create(:account, email: "user_other@example.com")
+
+        get :search, params: {q: "user_", not_in_role: role.id}
+
+        values = response.parsed_body.pluck("value")
+        expect(values).to include(other.id.to_s)
+        expect(values).not_to include(member.id.to_s)
+      end
+    end
+
+    context "with an exclude_closed param" do
+      before do
+        login_user(user)
+        account_permission
+      end
+
+      it "excludes closed accounts" do
+        open = create(:account, email: "user_open@example.com")
+        closed = create(:account, :closed, email: "user_closed@example.com")
+
+        get :search, params: {q: "user_", exclude_closed: true}
+
+        values = response.parsed_body.pluck("value")
+        expect(values).to include(open.id.to_s)
+        expect(values).not_to include(closed.id.to_s)
+      end
+    end
+  end
+
   describe "DELETE #destroy" do
     let(:account) { create(:account, :verified) }
 

@@ -1,15 +1,6 @@
 <%= form_with(model: audience, url: audience.persisted? ? adminit_audience_path(audience) : adminit_audiences_path,
       data: {turbo: true}, html: {class: "space-y-4"}) do |form| %>
-  <% if audience.errors.any? %>
-    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-      <h2><%= pluralize(audience.errors.count, "error") %> prohibited this audience from being saved:</h2>
-      <ul>
-        <% audience.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render "adminit/application/form_errors", record: audience %>
 
   <%= form.label :name, t("shared.labels.name") %>
   <%= form.text_field :name, {autofocus: true, required: true, class: "w-full"} %>

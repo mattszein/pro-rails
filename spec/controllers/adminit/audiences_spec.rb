@@ -28,10 +28,9 @@ describe Adminit::AudiencesController, type: :controller do
     end
   end
 
-  # Controller specs don't render views by default (no render_views anywhere
-  # in this app), so response.body is inert everywhere else in this file.
-  # Scoped here, not file-wide, so the rest of the examples above keep
-  # running without the extra render cost.
+  # Controller specs don't render views by default, so response.body is
+  # inert everywhere else in this file — scoped here to keep the extra
+  # render cost off the rest of the examples.
   describe "GET #index (rendered)" do
     render_views
 
@@ -217,7 +216,6 @@ describe Adminit::AudiencesController, type: :controller do
         expect(audience.audience_conditions.count).to eq(2)
       end
 
-      # S26 — a name with every condition off is not saved.
       it "does not save an audience with no enabled conditions" do
         params = {
           audience: {
@@ -246,6 +244,35 @@ describe Adminit::AudiencesController, type: :controller do
         post :create, params: params
         audience = Audience.find_by(name: "Bogus condition audience")
         expect(audience.audience_conditions.map(&:condition_key)).to eq(["adminit_users"])
+      end
+
+      # New renders inside a modal Turbo Frame, so a real submit comes in as
+      # turbo_stream, not html.
+      it "redirects the modal frame to the show page on success (turbo_stream)" do
+        params = {
+          audience: {
+            name: "Frame-created audience",
+            audience_conditions_attributes: {
+              "0" => {condition_key: "adminit_users", enabled: "1", value: "true"}
+            }
+          }
+        }
+
+        post :create, params: params, format: :turbo_stream
+
+        audience = Audience.find_by(name: "Frame-created audience")
+        expect(flash[:notice]).to be_present
+        expect(response.body).to include("turbo-stream")
+        expect(response.body).to include(adminit_audience_path(audience))
+      end
+
+      it "re-renders the form frame in place on failure (turbo_stream)" do
+        params = {audience: {name: "Nothing selected"}}
+
+        post :create, params: params, format: :turbo_stream
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include('target="audience_form"')
       end
     end
   end
@@ -303,6 +330,15 @@ describe Adminit::AudiencesController, type: :controller do
 
         expect(audience.reload.audience_conditions.map(&:condition_key)).to eq(["verified_users"])
       end
+
+      it "redirects the modal frame to the show page on success (turbo_stream)" do
+        audience = create(:audience)
+
+        patch :update, params: {id: audience.id, audience: {name: "Renamed via frame"}}, format: :turbo_stream
+
+        expect(flash[:notice]).to be_present
+        expect(response.body).to include(adminit_audience_path(audience))
+      end
     end
   end
 
@@ -319,7 +355,7 @@ describe Adminit::AudiencesController, type: :controller do
         audience_permission
       end
 
-      it "archives without touching an attached flag's row (S18)" do
+      it "archives without touching an attached flag's row" do
         flag = create(:feature_flag)
         create(:feature_flag_audience, feature_flag: flag, audience: audience)
 
@@ -338,7 +374,6 @@ describe Adminit::AudiencesController, type: :controller do
     end
   end
 
-  # S30 — no admin path destroys an audience.
   describe "routes" do
     it "defines no destroy action" do
       expect(described_class.instance_methods(false)).not_to include(:destroy)

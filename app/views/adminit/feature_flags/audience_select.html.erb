@@ -1,0 +1,16 @@
+<%= render(Core::ModalComponent.new(title: t("adminit.feature_flags.add_audience"))) do %>
+  <% if @attachable_audiences.any? %>
+    <%= form_with(url: attach_audience_adminit_feature_flag_path(@feature_flag), method: :post) do |f| %>
+      <div class="space-y-4">
+        <%= f.label :audience_id, t("adminit.feature_flags.select_audience") %>
+        <%= f.select :audience_id, @attachable_audiences.pluck(:name, :id), {prompt: t("adminit.feature_flags.select_audience")}, {required: true} %>
+        <%= f.button t("adminit.feature_flags.attach_audience"), {theme: :create, fullw: true} %>
+      </div>
+    <% end %>
+  <% else %>
+    <p class="text-slate-500 italic">
+      <%= t("adminit.feature_flags.no_attachable_audiences") %>
+      <%= render(Core::LinkComponent.new(name: t("adminit.audiences.new_audience"), url: new_adminit_audience_path, style: :link, html_options: {data: {turbo_frame: "modal"}})) %>
+    </p>
+  <% end %>
+<% end %>

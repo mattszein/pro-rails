@@ -294,7 +294,7 @@ implements.
 | Decision | `app/lib/feature_flags.rb`, `app/lib/feature_flags/account_evaluator.rb` | `FeatureFlags.for(account)` / `.enabled?(key, account)` — the only entry points. |
 | Consumption | `app/controllers/concerns/feature_gated.rb` | `feature_enabled?(key)`, `require_feature!(key)`, included on `SharedBaseController`. |
 | State | `FeatureFlag`, `Audience`, `AudienceCondition`, `FeatureFlagAudience`, `FeatureFlagAccount` | Access-list rows — read directly only to *display*, never to decide. |
-| Admin | `Adminit::{FeatureFlagsController,AudiencesController,FeatureFlags::{AudiencesController,AccountsController}}` | Flag list/detail, audience CRUD + archive, attach/detach/allow/block — single-row writes directly on the two nested controllers, no interactor. |
+| Admin | `Adminit::{FeatureFlagsController,AudiencesController}` | Flag list/detail (attach/detach an audience, allow/block an account as member actions on the flag), audience CRUD + archive — single-row writes, no interactor. |
 
 **Declare a flag:**
 
@@ -311,8 +311,10 @@ en:
       new_dashboard: {name: "New dashboard", description: "The redesigned account dashboard."}
 ```
 
-It appears in Adminit → Feature Flags on the next request (`FeatureFlag.materialize_declared!` runs
-from the index action), off for everyone until an operator attaches an audience or account entry.
+Run `bin/rails feature_flags:sync` to materialize its row (this also runs automatically as part of
+`db:prepare`/`db:migrate`, so a deploy or a local migration picks up a newly declared flag with no
+manual step). It then shows in Adminit → Feature Flags, off for everyone until an operator attaches
+an audience or account entry.
 
 **Gate a capability:**
 
@@ -332,8 +334,7 @@ Registry.register(
   key: :on_paid_plan,
   type: :boolean, # :affirmative (off/true only) | :id_list (accepts: names the model) | :duration ({amount:, unit:})
   accepts: [true, false],
-  predicate: ->(account, value) { account.paid? == value }, # only account + value — no query of its own, and the answer must not move with the clock (a fixed age threshold is the one allowed exception)
-  scope: ->(relation, value) { raise NotImplementedError } # implement only when something needs a member list (e.g. "how many accounts in this audience") — none does yet
+  predicate: ->(account, value) { account.paid? == value } # only account + value — no query of its own, and the answer must not move with the clock (a fixed age threshold is the one allowed exception)
 )
 ```
 
@@ -346,10 +347,12 @@ one new partial under `app/views/adminit/audiences/conditions/`.
 `false`, logged not raised). An audience only attached to that flag is free to reuse elsewhere.
 
 **Attach an audience, or allow/block an account** — both are Adminit actions on a flag's detail page,
-no code change. See `PRODUCT-PLAN.md`'s decision rules for how block/allow/audience-match combine.
+no code change: a block always wins, an explicit allow beats any audience, otherwise any matching
+attached audience grants.
 
-**`Audience.prune_role`** skips validation by design — the one write allowed to leave an audience with
-no conditions, because refusing it would let flag data veto a role deletion.
+**Account lookup:** every admin screen with a searchable account picker (roles, feature flags, the
+dashboard widget) shares one endpoint, `Adminit::AccountsController#search`
+(`GET /adminit/accounts/search`), narrowed per caller with `not_in_role`/`exclude_closed` params.
 
 ---
 

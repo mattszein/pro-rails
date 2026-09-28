@@ -15,7 +15,6 @@ RSpec.describe FeatureFlagAccount, type: :model do
       expect(entry.errors[:access]).to be_present
     end
 
-    # S9 — one account appears at most once on a flag's access list.
     it "validates uniqueness of account scoped to feature_flag" do
       flag = create(:feature_flag)
       account = create(:account)

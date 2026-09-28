@@ -2,9 +2,9 @@ require "rails_helper"
 
 RSpec.describe FeatureFlag, type: :model do
   describe "associations" do
-    it { is_expected.to have_many(:feature_flag_audiences).dependent(:destroy) }
+    it { is_expected.to have_many(:feature_flag_audiences).dependent(:delete_all) }
     it { is_expected.to have_many(:audiences).through(:feature_flag_audiences) }
-    it { is_expected.to have_many(:account_entries).class_name("FeatureFlagAccount").dependent(:destroy) }
+    it { is_expected.to have_many(:account_entries).class_name("FeatureFlagAccount").dependent(:delete_all) }
   end
 
   describe "validations" do
@@ -23,7 +23,7 @@ RSpec.describe FeatureFlag, type: :model do
   end
 
   describe "#grants?" do
-    it "denies when blocked, even with a matching audience (S7)" do
+    it "denies when blocked, even with a matching audience" do
       flag = create(:feature_flag)
       account = create(:account, :with_role)
       create(:feature_flag_audience, feature_flag: flag, audience: create(:audience))
@@ -32,7 +32,7 @@ RSpec.describe FeatureFlag, type: :model do
       expect(flag.grants?(account)).to be false
     end
 
-    it "allows when explicitly allowed, even without a matching audience (S6, S8)" do
+    it "allows when explicitly allowed, even without a matching audience" do
       flag = create(:feature_flag)
       account = create(:account)
       create(:feature_flag_account, :allowed, feature_flag: flag, account: account)
@@ -40,7 +40,7 @@ RSpec.describe FeatureFlag, type: :model do
       expect(flag.grants?(account)).to be true
     end
 
-    it "allows when any attached audience matches (S12)" do
+    it "allows when any attached audience matches" do
       flag = create(:feature_flag)
       account = create(:account, :with_role)
       non_matching = build(:audience, :without_condition)
@@ -53,7 +53,7 @@ RSpec.describe FeatureFlag, type: :model do
       expect(flag.grants?(account)).to be true
     end
 
-    it "denies otherwise (S1)" do
+    it "denies otherwise" do
       flag = create(:feature_flag)
       account = create(:account, :with_role)
 
@@ -61,18 +61,34 @@ RSpec.describe FeatureFlag, type: :model do
     end
   end
 
-  describe "#display_name / #breadcrumb_title" do
-    it "translates the key through feature_flags.flags.<key>.name" do
+  describe "#attachable_audiences" do
+    it "excludes archived audiences and audiences already attached to the flag" do
+      flag = create(:feature_flag)
+      attachable = create(:audience)
+      already_attached = create(:audience, :attached_to, feature_flag: flag)
+      archived = create(:audience, :archived)
+
+      result = flag.attachable_audiences
+
+      expect(result).to include(attachable)
+      expect(result).not_to include(already_attached, archived)
+    end
+  end
+
+  describe "#display_name / #description / #breadcrumb_title" do
+    it "translates the key through feature_flags.flags.<key>.name/.description" do
       flag = create(:feature_flag, key: "new_dashboard")
-      I18n.backend.store_translations(:en, feature_flags: {flags: {new_dashboard: {name: "New dashboard"}}})
+      I18n.backend.store_translations(:en, feature_flags: {flags: {new_dashboard: {name: "New dashboard", description: "The redesigned dashboard."}}})
 
       expect(flag.display_name).to eq("New dashboard")
+      expect(flag.description).to eq("The redesigned dashboard.")
       expect(flag.breadcrumb_title).to eq("New dashboard")
     end
 
-    it "falls back to the raw key when no translation exists" do
+    it "falls back to the raw key/nil when no translation exists" do
       flag = create(:feature_flag, key: "untranslated_flag")
       expect(flag.display_name).to eq("untranslated_flag")
+      expect(flag.description).to be_nil
     end
   end
 
@@ -141,9 +157,7 @@ RSpec.describe FeatureFlag, type: :model do
     it "includes only rows whose key the registry currently declares" do
       declared_flag = create(:feature_flag, key: "declared_flag")
       retired_flag = create(:feature_flag, key: "retired_flag")
-      # Simulate the capability finishing: the key leaves the vocabulary,
-      # but the row (and its access-list history) remains.
-      FeatureFlags::Registry.registry.delete(:retired_flag)
+      FeatureFlags::Registry.registry.delete(:retired_flag) # simulate retirement
 
       expect(described_class.declared).to contain_exactly(declared_flag)
       expect(described_class.declared).not_to include(retired_flag)

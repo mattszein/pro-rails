@@ -1,7 +1,5 @@
 # Declared flag names and descriptions: feature_flags.flags.<key>.name / .description.
-# No flags are declared in this milestone — teams add entries here when they
-# register a flag with FeatureFlags::Registry.register(key) (see
-# docs/FEATURE-FLAGS.md).
 en:
   feature_flags:
-    flags: {}
+    flags:
+      test_feature_flag: {name: "Test feature flag", description: "Demo flag: gated by a superadmin-only audience."}

@@ -1,6 +1,10 @@
 es:
   shared:
     empty: "Nada para mostrar."
+    errors:
+      prohibited:
+        one: "1 error impidió guardar esto:"
+        other: "%{count} errores impidieron guardar esto:"
     common:
       save: "Guardar"
       show: "Ver"

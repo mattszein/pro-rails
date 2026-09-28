@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe FeatureFlags::AccountEvaluator do
   describe "#enabled?" do
-    it "is false for a nil account (S13)" do
+    it "is false for a nil account" do
       evaluator = described_class.new(nil)
 
       with_feature_flag(:some_flag) do
@@ -10,7 +10,7 @@ RSpec.describe FeatureFlags::AccountEvaluator do
       end
     end
 
-    it "is false for a closed account (S14)" do
+    it "is false for a closed account" do
       account = create(:account, :closed)
       evaluator = described_class.new(account)
 
@@ -19,7 +19,7 @@ RSpec.describe FeatureFlags::AccountEvaluator do
       end
     end
 
-    it "is false for an unverified account with an explicit allow (S6, S8) — verification is not checked here" do
+    it "is true for an unverified account with an explicit allow — verification is not checked here" do
       account = create(:account) # unverified
       with_feature_flag(:some_flag) do
         flag = create(:feature_flag, key: "some_flag")
@@ -29,7 +29,7 @@ RSpec.describe FeatureFlags::AccountEvaluator do
       end
     end
 
-    it "raises UnknownFlagError for an undeclared key outside production (S15)" do
+    it "raises UnknownFlagError for an undeclared key outside production" do
       account = create(:account)
       evaluator = described_class.new(account)
 
@@ -37,7 +37,7 @@ RSpec.describe FeatureFlags::AccountEvaluator do
         .to raise_error(FeatureFlags::UnknownFlagError)
     end
 
-    it "is false when the key is declared but has no feature_flags row (S1)" do
+    it "is false when the key is declared but has no feature_flags row" do
       account = create(:account)
       evaluator = described_class.new(account)
 
@@ -57,7 +57,7 @@ RSpec.describe FeatureFlags::AccountEvaluator do
       end
     end
 
-    it "is false and logs, rather than raising, when evaluation fails unexpectedly (S15)" do
+    it "is false and logs, rather than raising, when evaluation fails unexpectedly" do
       account = create(:account)
       evaluator = described_class.new(account)
 
@@ -94,6 +94,39 @@ RSpec.describe FeatureFlags::AccountEvaluator do
         end
 
         expect(query_count).to eq(0)
+      end
+    end
+
+    it "does not scale with other accounts' entries or other audiences' conditions" do
+      account = create(:account, :with_role)
+
+      with_feature_flag(:priming_flag) do
+        flag = create(:feature_flag, key: "priming_flag")
+        audience = create(:audience)
+        create(:feature_flag_audience, feature_flag: flag, audience: audience)
+
+        # A second flag with many other accounts' entries and a differently
+        # shaped audience — none of this belongs to `account` under test.
+        other_flag = create(:feature_flag)
+        create_list(:feature_flag_account, 10, :blocked, feature_flag: other_flag)
+        noisy_audience = build(:audience, :without_condition)
+        noisy_audience.audience_conditions.build(condition_key: "verified_users", value: true)
+        noisy_audience.audience_conditions.build(condition_key: "registration_age", value: {"amount" => 1, "unit" => "years"})
+        noisy_audience.save!
+        create(:feature_flag_audience, feature_flag: other_flag, audience: noisy_audience)
+
+        query_count = 0
+        subscriber = ActiveSupport::Notifications.subscribe("sql.active_record") do |*, payload|
+          query_count += 1 unless payload[:name] == "SCHEMA"
+        end
+
+        begin
+          described_class.new(account).enabled?(:priming_flag)
+        ensure
+          ActiveSupport::Notifications.unsubscribe(subscriber)
+        end
+
+        expect(query_count).to be <= 6
       end
     end
   end

@@ -31,7 +31,6 @@ RSpec.describe AudienceCondition, type: :model do
       expect(build(:audience_condition, audience: other_audience, condition_key: "adminit_users")).to be_valid
     end
 
-    # S28 — a condition the vocabulary does not declare is not saved.
     describe "condition_key registration" do
       it "is invalid when condition_key is not declared in the vocabulary" do
         condition = build(:audience_condition, condition_key: "not_a_real_condition", value: true)
@@ -47,7 +46,6 @@ RSpec.describe AudienceCondition, type: :model do
       end
     end
 
-    # S27 — a condition turned on needs a value shaped for its type.
     describe "value conformance" do
       it "rejects a non-boolean value for a :boolean condition" do
         condition = build(:audience_condition, :adminit_users, value: "yes")
@@ -125,6 +123,20 @@ RSpec.describe AudienceCondition, type: :model do
         condition = build(:audience_condition, condition_key: "broken_condition", value: true)
         expect(condition.matches?(account)).to be false
       end
+    end
+  end
+
+  describe "#referenced_records" do
+    it "resolves an :id_list value through the model the vocabulary named" do
+      role = create(:role)
+      condition = build(:audience_condition, :roles, value: [role.id])
+
+      expect(condition.referenced_records).to contain_exactly(role)
+    end
+
+    it "is empty for a non-id_list condition" do
+      condition = build(:audience_condition, :adminit_users, value: true)
+      expect(condition.referenced_records).to be_empty
     end
   end
 end

@@ -1,12 +1,8 @@
 <div class="w-full">
-  <div class="flex justify-between items-center pb-2">
-    <%= render(Core::LinkComponent.new(name: t("adminit.feature_flags.back_to_feature_flags"), url: adminit_feature_flags_path, style: :link)) %>
-  </div>
-
   <div class="space-y-4">
     <%= render(Core::CardComponent.new(classes: "space-y-4")) do %>
-      <h1 class="text-xl font-bold"><%= feature_flag_name(@feature_flag) %></h1>
-      <% if (description = feature_flag_description(@feature_flag)) %>
+      <h1 class="text-xl font-bold"><%= @feature_flag.display_name %></h1>
+      <% if (description = @feature_flag.description) %>
         <p class="text-slate-500"><%= description %></p>
       <% end %>
 
@@ -25,41 +21,19 @@
     <%= render Core::CardComponent.new do %>
       <div class="flex items-center justify-between mb-2">
         <h3><%= t("adminit.feature_flags.audiences") %></h3>
+        <%= render(Core::LinkComponent.new(name: t("adminit.feature_flags.add_audience"), url: audience_select_adminit_feature_flag_path(@feature_flag), style: :as_button, theme: :create, size: :sm, html_options: {data: {turbo_frame: "modal"}})) %>
       </div>
 
       <%= render "adminit/feature_flags/audience_list", feature_flag: @feature_flag %>
-
-      <% if @attachable_audiences.any? %>
-        <%= form_with(url: adminit_feature_flag_audiences_path(@feature_flag), method: :post, html: {class: "flex gap-2 items-end mt-4"}) do |f| %>
-          <%= select_tag :audience_id, options_from_collection_for_select(@attachable_audiences, :id, :name), prompt: t("adminit.feature_flags.select_audience") %>
-          <%= f.button t("adminit.feature_flags.attach_audience"), {theme: :create, size: :sm} %>
-        <% end %>
-      <% end %>
     <% end %>
 
     <%= render Core::CardComponent.new do %>
       <div class="flex items-center justify-between mb-2">
         <h3><%= t("adminit.feature_flags.account_entries") %></h3>
+        <%= render(Core::LinkComponent.new(name: t("adminit.feature_flags.add_account"), url: account_select_adminit_feature_flag_path(@feature_flag), style: :as_button, theme: :create, size: :sm, html_options: {data: {turbo_frame: "modal"}})) %>
       </div>
 
       <%= render "adminit/feature_flags/account_entry_list", feature_flag: @feature_flag %>
-
-      <%= form_with(url: adminit_feature_flag_accounts_path(@feature_flag), method: :post, html: {class: "flex gap-2 items-end mt-4"}) do |f| %>
-        <%= select_tag "account_id", options_for_select([]), required: true, data: {
-              controller: "role-account-search",
-              role_account_search_url_value: search_adminit_feature_flag_accounts_path(@feature_flag),
-              placeholder: t("shared.labels.email")
-            } %>
-        <label class="flex items-center gap-1">
-          <%= radio_button_tag :access, "allowed", true %>
-          <%= t("enums.feature_flag_account.access.allowed") %>
-        </label>
-        <label class="flex items-center gap-1">
-          <%= radio_button_tag :access, "blocked", false %>
-          <%= t("enums.feature_flag_account.access.blocked") %>
-        </label>
-        <%= f.button t("adminit.feature_flags.add_account_entry"), {theme: :create, size: :sm} %>
-      <% end %>
     <% end %>
   </div>
 </div>

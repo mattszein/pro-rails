@@ -1,9 +1,6 @@
 # Per-type value validator, called from AudienceCondition#validate. Checks
-# only shape and membership in the declared admissible set — it never queries
-# the database, so it stays usable from anywhere the registry is (boot,
-# migrations, asset builds). Existence checks against a referenced model
-# (e.g. that an :id_list value's ids are real Role rows) are the model's job,
-# not the vocabulary's — the vocabulary only knows the model's name.
+# only shape and membership in the declared admissible set — never queries
+# the database.
 module AudienceConditions
   module VocabularyValidator
     module_function

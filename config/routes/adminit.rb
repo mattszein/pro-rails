@@ -1,7 +1,9 @@
 # Below are the routes for madmin
 namespace :adminit do
   root to: "dashboards#index"
-  resources :accounts
+  resources :accounts do
+    get :search, on: :collection
+  end
   resources :tickets do
     member do
       post :take
@@ -21,7 +23,6 @@ namespace :adminit do
 
   resources :roles, only: [:index, :show] do
     get "account_select", on: :member
-    get "search_accounts", on: :member
     delete "account", to: "roles#remove_account", on: :member
     post "account", to: "roles#add_account", on: :member
   end
@@ -30,13 +31,17 @@ namespace :adminit do
   end
 
   resources :feature_flags, only: [:index, :show] do
-    resources :audiences, only: [:create, :destroy], controller: "feature_flags/audiences"
-    resources :accounts, only: [:create, :destroy], controller: "feature_flags/accounts" do
-      get :search, on: :collection
+    member do
+      get :audience_select
+      post :attach_audience
+      delete :detach_audience
+      get :account_select
+      post :add_account
+      delete :remove_account
     end
   end
 
-  # No :destroy — audiences are archived, never deleted, in Adminit.
+  # No :destroy — audiences are archived, never deleted.
   resources :audiences, except: [:destroy] do
     member do
       patch :archive
@@ -48,9 +53,6 @@ namespace :adminit do
     get "widgets/:key",
       to: "/adminit/dashboards#widget",
       as: :widget
-    get "accounts/search",
-      to: "/adminit/dashboard/accounts#search",
-      as: :accounts_search
     get "accounts/:id/summary",
       to: "/adminit/dashboard/accounts#summary",
       as: :account_summary

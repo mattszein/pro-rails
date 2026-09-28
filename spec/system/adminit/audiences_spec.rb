@@ -1,10 +1,8 @@
 require "system_helper"
 
-# NOTE: exercised against a headless-Chrome-backed Capybara driver — not
-# runnable in every environment (this repo's dev container has no Chrome
-# binary). Written and reviewed against the actual form field names in
-# app/views/adminit/audiences/, but unverified end-to-end pending a
-# Chrome-capable run.
+# NOTE: exercised against a headless-Chrome-backed Capybara driver, same as
+# every other spec/system/** spec — not runnable standalone without the
+# `chrome` compose service and a reachable app server alongside it.
 RSpec.describe "Adminit audiences", type: :system do
   let(:role) { create(:role, name: "audience_admin") }
   let(:account) { create(:account, :verified, role: role) }
@@ -70,7 +68,6 @@ RSpec.describe "Adminit audiences", type: :system do
       expect(audience.audience_conditions.sole.value).to eq({"amount" => "2", "unit" => "years"})
     end
 
-    # S26/S27/S28 — the form refuses an empty condition set.
     it "refuses to save with every condition left off" do
       visit new_adminit_audience_path
       fill_in "audience[name]", with: "Nothing selected"
@@ -78,11 +75,9 @@ RSpec.describe "Adminit audiences", type: :system do
       click_button I18n.t("shared.common.save")
 
       expect(Audience.exists?(name: "Nothing selected")).to be false
-      expect(page).to have_content("prohibited this audience from being saved")
+      expect(page).to have_content("prevented this from being saved")
     end
 
-    # S30 — flags are not created in Adminit: no create action exists
-    # anywhere in the flags screens this audience feature sits beside.
     it "has no flag creation entry point reachable from the audiences UI" do
       visit adminit_audiences_path
       expect(page).not_to have_link(href: /new_adminit_feature_flag/)
@@ -104,7 +99,6 @@ RSpec.describe "Adminit audiences", type: :system do
   end
 
   describe "archiving" do
-    # S18 — archiving an attached audience does not withdraw access.
     it "keeps the capability granted after archiving" do
       flag_key = :audiences_system_spec_flag
       with_feature_flag(flag_key) do
@@ -123,18 +117,15 @@ RSpec.describe "Adminit audiences", type: :system do
       end
     end
 
-    # S19 — an archived audience is not offered when attaching to a flag.
     it "omits an archived audience from the flag attach list" do
       archived = create(:audience, :archived)
       flag = create(:feature_flag)
 
-      visit adminit_feature_flag_path(flag)
+      visit audience_select_adminit_feature_flag_path(flag)
       expect(page).not_to have_select("audience_id", with_options: [archived.name])
     end
   end
 
-  # S21 — an audience attached only to a retired flag counts as attached to
-  # none.
   it "shows zero declared-flag usage for an audience whose only flag has retired" do
     retired_key = :audiences_system_spec_retired_flag
     flag = create(:feature_flag, key: retired_key.to_s)

@@ -3,13 +3,9 @@ FactoryBot.define do
     sequence(:key) { |n| "test_flag_#{n}" }
 
     transient do
-      # FeatureFlags::Flags ships with no registrations — every declared
-      # flag is a team's own addition — so a factory-built key must
-      # register itself to stay valid against FeatureFlag#key_registered.
-      # rails_helper resets FeatureFlags::Registry after every example, so
-      # this never leaks between specs. Pass `auto_register: false` for a
-      # spec that means to build a flag whose key is NOT declared (an
-      # undeclared or retired-from-code flag).
+      # A factory-built key must register itself to stay valid against
+      # FeatureFlag#key_registered. Pass `auto_register: false` to build a
+      # flag whose key is NOT declared (an undeclared/retired flag).
       auto_register { true }
     end
 

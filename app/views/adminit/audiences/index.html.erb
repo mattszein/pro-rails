@@ -1,7 +1,7 @@
 <div class="w-full">
   <div class="flex justify-between items-center pb-2">
     <h1 class="text-xl font-semibold"><%= t("adminit.navigation.audiences") %></h1>
-    <%= render(Core::LinkComponent.new(name: t("adminit.audiences.new_audience"), url: new_adminit_audience_path, style: :as_button, theme: :create, size: :sm)) %>
+    <%= render(Core::LinkComponent.new(name: t("adminit.audiences.new_audience"), url: new_adminit_audience_path, style: :as_button, theme: :create, size: :sm, html_options: {data: {turbo_frame: "modal"}})) %>
   </div>
   <%= render Core::CardComponent.new do %>
     <%= render Core::TableComponent.new(

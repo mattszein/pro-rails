@@ -1,7 +1,5 @@
 class Adminit::RolesController < Adminit::ApplicationController
-  include Adminit::AccountSearchable
-
-  before_action :set_role, only: [:remove_account, :add_account, :account_select, :search_accounts]
+  before_action :set_role, only: [:remove_account, :add_account, :account_select]
   verify_authorized
 
   def index
@@ -31,7 +29,7 @@ class Adminit::RolesController < Adminit::ApplicationController
 
   def add_account
     authorize! @role
-    result = Adminit::Roles::AddMember.call(role: @role, email: role_params[:email])
+    result = Adminit::Roles::AddMember.call(role: @role, account_id: params.dig(:role, :account_id))
     if result.success?
       redirect_to adminit_role_path(@role), notice: I18n.t("adminit.roles.account_added")
     else
@@ -39,18 +37,9 @@ class Adminit::RolesController < Adminit::ApplicationController
     end
   end
 
-  def search_accounts
-    authorize!
-    search_accounts_json(scope: Account.not_in_role(@role), limit: 50)
-  end
-
   private
 
   def set_role
     @role = Role.find(params[:id])
-  end
-
-  def role_params
-    params.require(:role).permit(:email)
   end
 end

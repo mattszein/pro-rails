@@ -24,10 +24,8 @@ RSpec.describe FeatureFlagAudience, type: :model do
     end
   end
 
-  # Supports S31 (proven fully in Phase 2, once FeatureFlag.declared exists to
-  # distinguish a retired flag from an undeclared row): the join row cascades
-  # from the flag side (on_delete: :cascade) while an Audience#destroy is
-  # blocked while any such row exists (see spec/models/audience_spec.rb) —
+  # The join row cascades from the flag side (on_delete: :cascade); an
+  # Audience#destroy is separately restricted while any such row exists —
   # deleting a flag's join rows must never touch the audience itself.
   describe "cascade direction" do
     it "destroys the join row when its flag is destroyed, without touching the audience" do

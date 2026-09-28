@@ -1,21 +1,9 @@
 require "rails_helper"
 
 RSpec.describe "FeatureGated", type: :request do
-  # No production controller is gated in this milestone (teams add
-  # `before_action :require_feature!` when they register a flag), so this
-  # exercises the concern through a demo controller mounted on a route local
-  # to this spec. The route replaces the app's real routes for the duration
-  # of one example (Rails.application.routes.draw clears and redraws), so
-  # login always happens first, against the real routes, and the demo route
-  # is swapped in only for the GET under test; `reload_routes!` restores the
-  # real route set afterward regardless of outcome.
-  #
-  # Requests go through as JSON: the app's existing RecordNotFoundHandler
-  # renders a literal 404 only for json/turbo_stream — HTML redirects to
-  # root with a flash, which is that same existing not-found handling
-  # (S1's "reuses the application's existing 404 rendering"), just not a
-  # bare 404 status for a browser navigation. JSON keeps the assertions
-  # unambiguous without wiring a root route into this spec's route set.
+  # No production controller is gated yet, so this exercises the concern
+  # through a demo controller mounted on a route local to this spec; login
+  # happens against the real routes before the demo route is swapped in.
   before do
     stub_const("FeatureGatedDemoController", Class.new(SharedBaseController) {
       before_action { require_feature!(:demo_flag) }
@@ -40,7 +28,6 @@ RSpec.describe "FeatureGated", type: :request do
     get "/__feature_gated_demo", as: :json
   end
 
-  # S13 — a signed-out person never receives a flagged capability.
   it "is 404 for a signed-out request, indistinguishable from a nonexistent page" do
     draw_demo_route!
     get_demo
@@ -48,7 +35,6 @@ RSpec.describe "FeatureGated", type: :request do
     expect(response).to have_http_status(:not_found)
   end
 
-  # S1 — default off: a flag with an empty access list is absent.
   it "is 404 when the flag has an empty access list" do
     account = create(:account, :verified)
     create(:feature_flag, key: "demo_flag")
@@ -60,7 +46,6 @@ RSpec.describe "FeatureGated", type: :request do
     expect(response).to have_http_status(:not_found)
   end
 
-  # S2 — an attached audience that matches grants the capability.
   it "is 200 when an attached audience matches" do
     account = create(:account, :verified)
     flag = create(:feature_flag, key: "demo_flag")
@@ -76,8 +61,6 @@ RSpec.describe "FeatureGated", type: :request do
     expect(response).to have_http_status(:ok)
   end
 
-  # S6, S8 — an explicit allow grants the capability even without a
-  # matching audience.
   it "is 200 when explicitly allowed, even without a matching audience" do
     account = create(:account, :verified)
     flag = create(:feature_flag, key: "demo_flag")
@@ -90,7 +73,6 @@ RSpec.describe "FeatureGated", type: :request do
     expect(response).to have_http_status(:ok)
   end
 
-  # S16 — withdrawing an audience ends the grant on the next request.
   it "is 404 again once the granting audience is detached" do
     account = create(:account, :verified)
     flag = create(:feature_flag, key: "demo_flag")
@@ -109,7 +91,6 @@ RSpec.describe "FeatureGated", type: :request do
     expect(response).to have_http_status(:not_found)
   end
 
-  # S17 — removing an account entry ends the grant on the next request.
   it "is 404 again once the allowed account entry is removed" do
     account = create(:account, :verified)
     flag = create(:feature_flag, key: "demo_flag")
@@ -125,8 +106,6 @@ RSpec.describe "FeatureGated", type: :request do
     expect(response).to have_http_status(:not_found)
   end
 
-  # S24 — a Roles-condition audience's grant tracks the account's live role;
-  # taking away the matching role withdraws the capability immediately.
   it "reflects a role change on the very next request" do
     matching_role = create(:role)
     other_role = create(:role)

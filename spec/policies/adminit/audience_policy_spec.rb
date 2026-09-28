@@ -63,11 +63,8 @@ RSpec.describe Adminit::AudiencePolicy, type: :policy do
     end
   end
 
-  # No `destroy?` override here — ActionPolicy's `default_rule :manage?`
-  # would resolve it the same as any other unaliased rule if something ever
-  # asked, so the policy layer alone cannot prove "audiences are never
-  # destroyed in Adminit." What proves it is that no admin controller ever
-  # asks: Adminit::AudiencesController defines no destroy action, and
-  # config/routes/adminit.rb exposes no destroy path (asserted in Phase 6's
-  # controller spec).
+  # No `destroy?` override here — what proves audiences are never destroyed
+  # in Adminit is that no admin controller ever asks: AudiencesController
+  # defines no destroy action, and the routes expose no destroy path (see
+  # spec/controllers/adminit/audiences_spec.rb).
 end

@@ -7,7 +7,7 @@ RSpec.describe Adminit::Dashboard::Accounts::GeneralWidgetComponent, type: :comp
     render_inline(described_class.new(account: account))
 
     expect(page).to have_css('select[data-controller="account-lookup"]')
-    expect(page).to have_css("select[data-account-lookup-search-url-value='/adminit/dashboard/accounts/search']")
+    expect(page).to have_css("select[data-account-lookup-search-url-value='/adminit/accounts/search']")
   end
 
   it "passes the summary URL template with an id placeholder" do

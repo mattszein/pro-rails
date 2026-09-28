@@ -22,12 +22,5 @@ module AudienceConditions
       when :duration then {"amount" => 0, "unit" => "fortnights"}
       end
     end
-
-    def sample_accounts
-      [
-        FactoryBot.create(:account, :verified, :with_role),
-        FactoryBot.create(:account)
-      ]
-    end
   end
 end

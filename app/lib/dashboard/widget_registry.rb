@@ -66,10 +66,6 @@ module Dashboard
       end
 
       def for_resource(resource) = all.select { |w| w.resource == resource.to_sym }
-
-      # `all`, `keys`, `registered?` and `reset!` come from DeclaredRegistry.
-      # `clear` is kept as the name every existing call site uses.
-      def clear = reset!
     end
   end
 end

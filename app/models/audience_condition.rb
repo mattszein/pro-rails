@@ -5,26 +5,32 @@ class AudienceCondition < ApplicationRecord
   validate :condition_key_registered
   validate :value_conforms_to_vocabulary, if: :registered?
 
-  # The registered vocabulary entry for this row's condition_key, or nil if
-  # it is not (or no longer) declared — S29's whole-audience guard reads this
-  # to decide whether the audience matches at all.
+  # The registered vocabulary entry for this row, or nil if the key is not
+  # (or no longer) declared.
   def condition
     return nil unless registered?
 
     AudienceConditions::Registry.fetch(condition_key)
   end
 
-  # Delegates to the registered predicate. Rescues broadly rather than
-  # letting a bad predicate lambda — this row's, or a future one's — raise
-  # into the evaluation path; a condition that cannot be evaluated must
-  # narrow access, never widen it.
+  # A condition that cannot be evaluated must narrow access, never widen it.
   def matches?(account)
     cond = condition
     return false unless cond
 
     !!cond.predicate.call(account, value)
-  rescue
+  rescue => e
+    Rails.logger.error("[AudienceCondition] #{condition_key} predicate failed: #{e.class}: #{e.message}")
     false
+  end
+
+  # For an :id_list condition, the actual referenced records (e.g. the Role
+  # rows a "roles" condition points at), resolved through the model the
+  # vocabulary named rather than the vocabulary knowing about it directly.
+  def referenced_records
+    return [] unless condition&.type == :id_list
+
+    condition.accepts.constantize.where(id: Array(value))
   end
 
   private

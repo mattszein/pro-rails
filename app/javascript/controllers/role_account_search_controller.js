@@ -12,7 +12,9 @@ export default class extends Controller {
       create: false,
       load: (query, callback) => {
         if (query.length < 2) return callback()
-        fetch(`${this.urlValue}?q=${encodeURIComponent(query)}`)
+        const url = new URL(this.urlValue, window.location.origin)
+        url.searchParams.set("q", query)
+        fetch(url)
           .then(r => r.json())
           .then(callback)
           .catch(() => callback())

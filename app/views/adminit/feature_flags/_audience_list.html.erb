@@ -13,7 +13,7 @@
           renderer: ->(audience) {
             render(Core::LinkComponent.new(
               name: t("shared.common.delete"),
-              url: adminit_feature_flag_audience_path(feature_flag, audience),
+              url: detach_audience_adminit_feature_flag_path(feature_flag, audience_id: audience.id),
               style: :as_button, theme: :delete, size: :xs,
               html_options: {data: {turbo_method: :delete, turbo_confirm: t("shared.common.are_you_sure")}}
             ))

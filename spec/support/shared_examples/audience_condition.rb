@@ -45,22 +45,4 @@ RSpec.shared_examples "a registered audience condition" do |condition|
     expect(AudienceConditions::VocabularyValidator.valid?(condition, valid_value)).to be true
     expect(AudienceConditions::VocabularyValidator.valid?(condition, invalid_value)).to be false
   end
-
-  # The `scope` slot raises NotImplementedError for every condition in this
-  # milestone (TECH-PLAN §3.1) — pending, not skipped, so the moment a real
-  # scope is written this activates on its own: an implementation that
-  # disagrees with its predicate keeps the example pending (it still fails,
-  # as expected), but one that agrees flips it to an unexpected pass, which
-  # RSpec reports as a failure until the `pending` line is removed.
-  it "keeps predicate and scope in agreement over a fixture set" do
-    pending "scope not implemented for :#{condition.key} (TECH-PLAN §3.1)"
-
-    accounts = AudienceConditions::TestFixtures.sample_accounts
-    value = AudienceConditions::TestFixtures.valid_value_for(condition)
-
-    predicate_matches = accounts.select { |account| condition.predicate.call(account, value) }
-    scope_matches = condition.scope.call(Account.where(id: accounts.map(&:id)), value).to_a
-
-    expect(scope_matches).to match_array(predicate_matches)
-  end
 end

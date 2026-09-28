@@ -1,16 +1,18 @@
 class FeatureFlag < ApplicationRecord
-  has_many :feature_flag_audiences, dependent: :destroy
+  # :delete_all (not :destroy): these join rows carry no callbacks, and it
+  # keeps a plain `.where(...).delete_all` on the association a real DELETE
+  # — with no `dependent:` set at all, Rails nullifies the (non-null)
+  # foreign key instead, which raises.
+  has_many :feature_flag_audiences, dependent: :delete_all
   has_many :audiences, through: :feature_flag_audiences
-  has_many :account_entries, class_name: "FeatureFlagAccount", dependent: :destroy
+  has_many :account_entries, class_name: "FeatureFlagAccount", dependent: :delete_all
 
   validates :key, presence: true, uniqueness: true
   validate :key_registered
 
   before_destroy :abort_destroy
 
-  # No status column: a flag with at least one attached audience or one
-  # allowed entry is open. A flag holding only blocked entries grants
-  # nobody, so it does not count as open.
+  # A flag with no attached audience and no allowed entry grants nobody.
   scope :open_access, -> {
     where(id: FeatureFlagAudience.select(:feature_flag_id))
       .or(where(id: FeatureFlagAccount.allowed.select(:feature_flag_id)))
@@ -25,15 +27,13 @@ class FeatureFlag < ApplicationRecord
     end
   }
 
-  # Only rows for keys the registry currently declares — a flag whose
-  # capability has since been finished (retired from code) is not "declared",
-  # even though its row and access-list history remain (S31).
+  # Only keys the registry currently declares — a retired flag's row and
+  # access-list history stay, but it drops out of the admin list.
   scope :declared, -> { where(key: FeatureFlags::Registry.keys.map(&:to_s)) }
 
   # Insert-ignore a row for every declared key that has none, so the admin
-  # index can stay an ordinary relation (sorting, filtering and pagination in
-  # SQL) instead of merging registry keys with rows in Ruby. Called from the
-  # admin index and nowhere else — the evaluation path performs no writes.
+  # index stays an ordinary relation instead of merging registry keys with
+  # rows in Ruby.
   def self.materialize_declared!
     keys = FeatureFlags::Registry.keys.map(&:to_s)
     return if keys.empty?
@@ -45,15 +45,14 @@ class FeatureFlag < ApplicationRecord
     )
   end
 
-  # For one account and one flag, top to bottom (PRODUCT-PLAN "Decision rules"):
-  # 1. A blocked account entry always wins (S7).
-  # 2. An allowed account entry beats any audience (S6, S8).
-  # 3. Any attached audience that matches grants (S2, S4, S5, S10, S12).
-  # 4. Otherwise, no (S1, S3, S11).
-  #
-  # Reads only associations the caller has already loaded (the evaluator
-  # preloads audiences and account_entries) — this must never issue its own
-  # query, or a page checking several flags multiplies queries per flag.
+  # Audiences offered to attach: active and not already attached.
+  def attachable_audiences
+    Audience.active.where.not(id: audiences.select(:id))
+  end
+
+  # Block always wins; an explicit allow beats any audience; otherwise any
+  # matching attached audience grants. Reads only preloaded associations —
+  # never issues its own query, so checking several flags stays cheap.
   def grants?(account)
     entry = account_entries.detect { |e| e.account_id == account.id }
     return false if entry&.blocked?
@@ -63,6 +62,8 @@ class FeatureFlag < ApplicationRecord
   end
 
   def display_name = I18n.t("feature_flags.flags.#{key}.name", default: key)
+
+  def description = I18n.t("feature_flags.flags.#{key}.description", default: nil)
 
   def breadcrumb_title = display_name
 
@@ -74,8 +75,7 @@ class FeatureFlag < ApplicationRecord
 
   def key_registered
     return if key.blank? # presence validation covers this
-    return if FeatureFlags::Registry.registered?(key)
 
-    errors.add(:key, :not_registered)
+    errors.add(:key, :not_registered) unless FeatureFlags::Registry.registered?(key)
   end
 end

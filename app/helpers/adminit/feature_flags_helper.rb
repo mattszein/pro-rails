@@ -1,15 +1,7 @@
 module Adminit
   module FeatureFlagsHelper
-    def feature_flag_name(feature_flag)
-      feature_flag.display_name
-    end
-
-    def feature_flag_description(feature_flag)
-      I18n.t("feature_flags.flags.#{feature_flag.key}.description", default: nil)
-    end
-
     def feature_flag_access_state(feature_flag)
-      (feature_flag.audiences.any? || feature_flag.account_entries.allowed.any?) ? :open : :empty
+      (feature_flag.audiences.any? || feature_flag.account_entries.any?(&:allowed?)) ? :open : :empty
     end
 
     # Column set drives both the query whitelist (Tableable) and the
@@ -19,7 +11,7 @@ module Adminit
       [
         Core::Table::Column.new(
           label: t("shared.labels.name"),
-          renderer: ->(flag) { link_to(feature_flag_name(flag), adminit_feature_flag_path(flag), data: {turbo_prefetch: false, turbo_frame: "_top"}) }
+          renderer: ->(flag) { link_to(flag.display_name, adminit_feature_flag_path(flag), data: {turbo_prefetch: false, turbo_frame: "_top"}) }
         ),
         Core::Table::Column.new(
           label: t("adminit.feature_flags.key"),
@@ -73,18 +65,13 @@ module Adminit
           renderer: ->(entry) {
             render(Core::LinkComponent.new(
               name: t("shared.common.delete"),
-              url: adminit_feature_flag_account_path(feature_flag, entry.account_id),
+              url: remove_account_adminit_feature_flag_path(feature_flag, account_id: entry.account_id),
               style: :as_button, theme: :delete, size: :xs,
               html_options: {data: {turbo_method: :delete, turbo_confirm: t("shared.common.are_you_sure")}}
             ))
           }
         )
       ]
-    end
-
-    # Audiences offered to attach: active and not already attached (S19).
-    def audience_search_scope(feature_flag)
-      Audience.attachable(feature_flag)
     end
   end
 end

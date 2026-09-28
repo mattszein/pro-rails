@@ -1,1 +1,1 @@
-<%= f.multi_select :value, Role.selectable.pluck(:name, :id) %>
+<%= f.multi_select :value, condition.accepts.constantize.selectable.pluck(:name, :id) %>

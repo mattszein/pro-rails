@@ -3,7 +3,7 @@ module Adminit
     class AddMember
       include Interactor
 
-      delegate :role, :email, to: :context
+      delegate :role, :account_id, to: :context
 
       def call
         validate!
@@ -20,7 +20,7 @@ module Adminit
       end
 
       def account
-        @account ||= Account.find_by(email: email)
+        @account ||= Account.find_by(id: account_id)
       end
     end
   end

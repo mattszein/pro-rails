@@ -1,9 +1,5 @@
-<div class="w-full">
-  <div class="flex justify-between items-center pb-2">
-    <%= render(Core::LinkComponent.new(name: t("adminit.audiences.back_to_audiences"), url: adminit_audiences_path, style: :link)) %>
-  </div>
-  <%= render Core::CardComponent.new do %>
-    <h1 class="text-xl font-bold mb-4"><%= t("adminit.audiences.new_audience") %></h1>
+<%= render(Core::ModalComponent.new(title: t("adminit.audiences.new_audience"))) do %>
+  <%= turbo_frame_tag "audience_form" do %>
     <%= render "form", audience: @audience %>
   <% end %>
-</div>
+<% end %>

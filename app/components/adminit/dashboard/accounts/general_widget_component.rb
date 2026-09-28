@@ -5,7 +5,7 @@ module Adminit
         option :account
 
         def search_url
-          helpers.adminit_dashboard_accounts_search_path
+          helpers.search_adminit_accounts_path
         end
 
         # URL template with a placeholder id — the account-lookup Stimulus

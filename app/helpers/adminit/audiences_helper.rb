@@ -44,9 +44,7 @@ module Adminit
       ]
     end
 
-    # One readable line per stored condition, resolving role ids through
-    # Role so a stale id (left behind after a missed prune) renders as
-    # nothing rather than a blank chip.
+    # One readable line per stored condition.
     def audience_condition_summary(audience)
       audience.audience_conditions.filter_map { |condition| condition_summary_line(condition) }.join(", ")
     end
@@ -58,17 +56,18 @@ module Adminit
       return nil unless condition
 
       label = t("audience_conditions.#{condition.key}.label")
-      "#{label}: #{condition_summary_value(condition, audience_condition.value)}"
+      "#{label}: #{condition_summary_value(audience_condition, condition)}"
     end
 
-    def condition_summary_value(condition, value)
+    def condition_summary_value(audience_condition, condition)
+      value = audience_condition.value
       case condition.type
       when :boolean
         t("audience_conditions.#{condition.key}.values.#{value}")
       when :affirmative
         t("audience_conditions.#{condition.key}.values.true")
       when :id_list
-        Role.where(id: Array(value)).pluck(:name).join(", ").presence || "-"
+        audience_condition.referenced_records.pluck(:name).join(", ").presence || "-"
       when :duration
         amount = value["amount"] || value[:amount]
         unit = value["unit"] || value[:unit]

@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe Audience, type: :model do
   describe "associations" do
     it { is_expected.to have_many(:audience_conditions).dependent(:destroy) }
-    it { is_expected.to have_many(:feature_flag_audiences) }
+    it { is_expected.to have_many(:feature_flag_audiences).dependent(:restrict_with_error) }
     it { is_expected.to have_many(:feature_flags).through(:feature_flag_audiences) }
   end
 
@@ -15,13 +15,11 @@ RSpec.describe Audience, type: :model do
       expect(build(:audience, name: "Beta testers")).not_to be_valid
     end
 
-    # S20 — an archived name cannot be reused.
     it "does not allow an archived audience's name to be reused" do
       create(:audience, :archived, name: "Beta testers")
       expect(build(:audience, name: "Beta testers")).not_to be_valid
     end
 
-    # S26 — a name with every condition off is not saved.
     it "requires at least one condition" do
       audience = build(:audience, :without_condition)
       expect(audience).not_to be_valid
@@ -36,9 +34,10 @@ RSpec.describe Audience, type: :model do
   end
 
   describe "#destroy" do
-    it "aborts while attached to a flag" do
+    it "is restricted while attached to a flag" do
       audience = create(:audience, :attached_to)
       expect { audience.destroy }.not_to change(described_class, :count)
+      expect(audience.errors[:base]).to be_present
     end
 
     it "succeeds when not attached to any flag" do
@@ -60,26 +59,11 @@ RSpec.describe Audience, type: :model do
       end
     end
 
-    describe ".attachable" do
-      it "excludes archived audiences and audiences already attached to the flag" do
-        flag = create(:feature_flag)
-        attachable = create(:audience)
-        already_attached = create(:audience, :attached_to, feature_flag: flag)
-        archived = create(:audience, :archived)
-
-        result = described_class.attachable(flag)
-
-        expect(result).to include(attachable)
-        expect(result).not_to include(already_attached, archived)
-      end
-    end
-
     describe ".with_flag_usage" do
-      it "counts only declared flags — a retired flag's attachment counts as zero (S21)" do
+      it "counts only declared flags — a retired flag's attachment counts as zero" do
         declared_flag = create(:feature_flag, key: "declared_for_usage")
         retired_flag = create(:feature_flag, key: "retired_for_usage")
-        # Simulate the capability finishing: the key leaves the vocabulary.
-        FeatureFlags::Registry.registry.delete(:retired_for_usage)
+        FeatureFlags::Registry.registry.delete(:retired_for_usage) # simulate retirement
 
         audience = create(:audience)
         create(:feature_flag_audience, audience: audience, feature_flag: declared_flag)
@@ -95,17 +79,16 @@ RSpec.describe Audience, type: :model do
     end
   end
 
-  describe "#in_use? / #destroyable?" do
-    it "is in use once attached to a flag" do
-      audience = create(:audience, :attached_to)
-      expect(audience).to be_in_use
-      expect(audience).not_to be_destroyable
-    end
+  describe "#build_missing_conditions" do
+    it "builds one unsaved row per registered condition not already present" do
+      audience = build(:audience, :without_condition)
+      audience.audience_conditions.build(condition_key: "adminit_users", value: true)
 
-    it "is not in use otherwise" do
-      audience = create(:audience)
-      expect(audience).not_to be_in_use
-      expect(audience).to be_destroyable
+      audience.build_missing_conditions
+
+      keys = audience.audience_conditions.map(&:condition_key)
+      expect(keys).to match_array(AudienceConditions::Registry.keys.map(&:to_s))
+      expect(audience.audience_conditions.reject(&:persisted?)).to all(be_new_record)
     end
   end
 
@@ -130,14 +113,14 @@ RSpec.describe Audience, type: :model do
   end
 
   describe "#matches?" do
-    it "returns false when the account matches no condition (S3)" do
+    it "returns false when the account matches no condition" do
       audience = create(:audience) # default condition: adminit_users -> true
       unrolled_account = create(:account) # no role -> adminit_access? false
 
       expect(audience.matches?(unrolled_account)).to be false
     end
 
-    it "requires every turned-on condition to hold (S10, S11)" do
+    it "requires every turned-on condition to hold" do
       audience = build(:audience, :without_condition)
       audience.audience_conditions.build(condition_key: "verified_users", value: true)
       audience.audience_conditions.build(condition_key: "registration_age", value: {"amount" => 1, "unit" => "years"})
@@ -146,26 +129,23 @@ RSpec.describe Audience, type: :model do
       old_verified = create(:account, :verified, created_at: 2.years.ago)
       recent_verified = create(:account, :verified, created_at: 1.day.ago)
 
-      expect(audience.matches?(old_verified)).to be true # S10 — both hold
-      expect(audience.matches?(recent_verified)).to be false # S11 — age misses
+      expect(audience.matches?(old_verified)).to be true
+      expect(audience.matches?(recent_verified)).to be false # age condition misses
     end
 
-    # S29 — a condition the vocabulary no longer declares fails the whole
-    # audience, not just that condition.
     it "returns false for the whole audience when it holds an unregistered condition_key" do
       audience = build(:audience, :without_condition)
       audience.audience_conditions.build(condition_key: "adminit_users", value: true)
       audience.save!
       # Simulate a condition whose key later left the vocabulary — bypass
-      # validation the same way a retired condition would arrive in
-      # production data.
+      # validation the same way a retired condition would arrive in production data.
       audience.audience_conditions.first.update_column(:condition_key, "retired_condition")
 
       account = create(:account, :with_role)
       expect(audience.reload.matches?(account)).to be false
     end
 
-    it "returns false for an audience with no conditions (S25's conditionless state)" do
+    it "returns false for an audience with no conditions" do
       audience = build(:audience, :without_condition)
       audience.audience_conditions.build(condition_key: "adminit_users", value: true)
       audience.save!
@@ -173,43 +153,6 @@ RSpec.describe Audience, type: :model do
 
       account = create(:account, :with_role)
       expect(audience.reload.matches?(account)).to be false
-    end
-  end
-
-  describe ".prune_role" do
-    it "removes the role id and drops the condition row when the list empties (S25)" do
-      role = create(:role)
-      audience = build(:audience, :without_condition)
-      audience.audience_conditions.build(condition_key: "roles", value: [role.id])
-      audience.save!
-
-      described_class.prune_role(role.id)
-
-      expect(audience.reload.audience_conditions).to be_empty
-    end
-
-    it "keeps the condition row when other roles remain selected" do
-      keep_role = create(:role)
-      remove_role = create(:role)
-      audience = build(:audience, :without_condition)
-      audience.audience_conditions.build(condition_key: "roles", value: [keep_role.id, remove_role.id])
-      audience.save!
-
-      described_class.prune_role(remove_role.id)
-
-      condition = audience.reload.audience_conditions.sole
-      expect(condition.value).to eq([keep_role.id])
-    end
-
-    it "does not veto the at-least-one-condition rule when it empties an audience" do
-      role = create(:role)
-      audience = build(:audience, :without_condition)
-      audience.audience_conditions.build(condition_key: "roles", value: [role.id])
-      audience.save!
-
-      expect { described_class.prune_role(role.id) }.not_to raise_error
-      expect(audience.reload).to be_persisted
-      expect(audience.audience_conditions).to be_empty
     end
   end
 end

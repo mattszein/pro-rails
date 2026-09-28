@@ -164,7 +164,7 @@ include_context "adminit_auth"
 | Helper | Location | Use |
 |---|---|---|
 | `with_feature_flag(*keys) { ... }` | `spec/support/feature_flags_helper.rb` | Registers flag keys for the block, restores the registry after. Most specs don't need this — `FeatureFlags::Registry` is reset after every example automatically, and the `:feature_flag` factory self-registers whatever key it's given. |
-| `with_audience_condition(key, type:, accepts:, predicate:, scope:) { ... }` | `spec/support/audience_conditions_helper.rb` | Registers a spec-only condition for the block. `AudienceConditions::Registry` is **not** auto-reset — it ships with four real conditions most specs depend on. |
+| `with_audience_condition(key, type:, accepts:, predicate:) { ... }` | `spec/support/audience_conditions_helper.rb` | Registers a spec-only condition for the block. `AudienceConditions::Registry` is **not** auto-reset — it ships with four real conditions most specs depend on. |
 | `"a registered audience condition"` | `spec/support/shared_examples/audience_condition.rb` | Applied to every entry in `AudienceConditions::Registry.all` by `spec/lib/audience_conditions/vocabulary_spec.rb`. |
 
 ---

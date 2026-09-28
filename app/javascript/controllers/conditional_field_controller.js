@@ -1,8 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 // Reveals a condition's value fields when its toggle is on, hides and
-// disables them when off. No validation logic here — the model validates
-// on save (TECH-PLAN §3.5).
+// disables them when off. No validation logic here — the model validates on save.
 export default class extends Controller {
   static targets = ["toggle", "field"]
 

@@ -1,8 +1,7 @@
 <div class="w-full">
-  <div class="flex justify-between items-center pb-2">
-    <%= render(Core::LinkComponent.new(name: t("adminit.audiences.back_to_audiences"), url: adminit_audiences_path, style: :link)) %>
+  <div class="flex justify-end items-center pb-2">
     <div class="flex gap-2 items-center px-4">
-      <%= render(Core::LinkComponent.new(name: t("shared.common.edit"), url: edit_adminit_audience_path(@audience), style: :as_button, theme: :edit, size: :sm)) %>
+      <%= render(Core::LinkComponent.new(name: t("shared.common.edit"), url: edit_adminit_audience_path(@audience), style: :as_button, theme: :edit, size: :sm, html_options: {data: {turbo_frame: "modal"}})) %>
       <% if @audience.archived? %>
         <%= render(Core::LinkComponent.new(name: t("adminit.audiences.unarchive"), url: unarchive_adminit_audience_path(@audience), style: :as_button, theme: :edit, size: :sm, html_options: {data: {turbo_method: :patch}})) %>
       <% else %>
@@ -33,7 +32,7 @@
           <% end %>
         <% end %>
         <% dl.with_item(term: t("adminit.audiences.flags_attached")) do %>
-          <%= @audience.feature_flags.size %>
+          <%= @audience.feature_flags.merge(FeatureFlag.declared).size %>
         <% end %>
       <% end %>
     <% end %>
