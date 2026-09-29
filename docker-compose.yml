@@ -1,71 +1,85 @@
-services:
-  x-backend: &backend
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: base
-      args:
-        RUBY_VERSION: "3.4.4"
-        PG_MAJOR: "17"
-    environment: &backend_environment
-      RAILS_ENV: ${RAILS_ENV:-development}
-      DB_USERNAME: ${DB_USERNAME:-postgres}
-      DB_PASSWORD: ${DB_PASSWORD:-postgres}
-      DB_PORT: ${DB_PORT:-5432}
-      DB_HOST: ${DB_HOST:-db}
-      DB_NAME_PREFIX: ${DB_NAME_PREFIX:-pro_rails}
-      APP_HOST: ${APP_HOST:-localhost}
-      APP_PORT: ${APP_PORT:-3000}
-      RAILS_MAX_THREADS: 5
-      MAILER_ADDRESS: "maildev"
-      MAILER_PORT: 1025
-      REDIS_URL: ${REDIS_URL:-redis://redis:6379/1}
-      ANYCABLE_WEBSOCKET_URL: ${ANYCABLE_WEBSOCKET_URL:-ws://localhost:8080/cable}
-      ANYCABLE_SECRET: ${ANYCABLE_SECRET:-anycable_key}
-      CHROME_URL: ${CHROME_URL:-http://chrome:3333}
-      HISTFILE: /usr/local/hist/.bash_history
-      IRB_HISTFILE: /usr/local/hist/.irb_history
-      PSQL_HISTFILE: /usr/local/hist/.psql_history
-      EDITOR: vi
-      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
-      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
-      DASHSCOPE_API_KEY: ${DASHSCOPE_API_KEY}
-    volumes:
-      - .:/pro-rails
-      - pro-rails-cache:/pro-rails/tmp/cache
-      - pro-rails-bundle:/usr/local/bundle
-      - pro-rails-storage:/pro-rails/storage
-      - pro-rails-history:/usr/local/hist
-    tmpfs:
-      - /tmp:exec
-      - /app/tmp/pids
-    networks:
-      - default
-    extra_hosts:
-      - host.docker.internal:host-gateway
-    depends_on: &backend_depends_on
-      ws:
-        condition: service_started
-      db:
-        condition: service_healthy
-        required: false
-      redis:
-        condition: service_healthy
-        required: false
+# =============================================================
+# Base stack. Never publishes host ports, never joins an external
+# network. Composition is chosen by COMPOSE_FILE in .env:
+#
+#   embedded + local ports   docker-compose.yml:docker-compose.expose.yml
+#   embedded + traefik       docker-compose.yml:docker-compose.traefik.yml
+#   external + traefik       docker-compose.yml:docker-compose.traefik.yml
+#
+# Infra mode is chosen by COMPOSE_PROFILES in .env:
+#   embedded  COMPOSE_PROFILES=infra   -> db + redis run in this project
+#   external  COMPOSE_PROFILES=        -> connect to DB_HOST / REDIS_HOST
+# =============================================================
 
+x-backend: &backend
+  build:
+    context: .
+    dockerfile: Dockerfile
+    target: base
+    args:
+      RUBY_VERSION: "3.4.4"
+      PG_MAJOR: ${PG_VERSION:-17}
+  environment: &backend_environment
+    RAILS_ENV: ${RAILS_ENV:-development}
+    DB_USERNAME: ${DB_USERNAME:-postgres}
+    DB_PASSWORD: ${DB_PASSWORD:-postgres}
+    DB_PORT: ${DB_PORT:-5432}
+    DB_HOST: ${DB_HOST:-db}
+    DB_NAME_PREFIX: ${DB_NAME_PREFIX:-pro_rails}
+    APP_HOST: ${APP_HOST:-localhost}
+    APP_PORT: ${APP_PORT:-3000}
+    RAILS_MAX_THREADS: 5
+    MAILER_ADDRESS: "maildev"
+    MAILER_PORT: 1025
+    # Assembled from parts so no generator ever hardcodes a host or port.
+    REDIS_URL: redis://${REDIS_HOST:-redis}:${REDIS_PORT:-6379}/${REDIS_DB:-1}
+    ANYCABLE_WEBSOCKET_URL: ${ANYCABLE_WEBSOCKET_URL:-ws://localhost:8080/cable}
+    ANYCABLE_SECRET: ${ANYCABLE_SECRET:-anycable_key}
+    CHROME_URL: ${CHROME_URL:-http://chrome:3333}
+    HISTFILE: /usr/local/hist/.bash_history
+    IRB_HISTFILE: /usr/local/hist/.irb_history
+    PSQL_HISTFILE: /usr/local/hist/.psql_history
+    EDITOR: vi
+    GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+    OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+    DASHSCOPE_API_KEY: ${DASHSCOPE_API_KEY}
+  volumes:
+    - .:/pro-rails
+    - pro-rails-cache:/pro-rails/tmp/cache
+    - pro-rails-bundle:/usr/local/bundle
+    - pro-rails-storage:/pro-rails/storage
+    - pro-rails-history:/usr/local/hist
+  tmpfs:
+    - /tmp:exec
+    - /pro-rails/tmp/pids
+  networks:
+    - default
+  extra_hosts:
+    - host.docker.internal:host-gateway
+  depends_on: &backend_depends_on
+    ws:
+      condition: service_started
+    db:
+      condition: service_healthy
+      required: false
+    redis:
+      condition: service_healthy
+      required: false
+
+services:
   db:
-    image: "postgres:17.5-alpine3.22"
+    image: ${PG_IMAGE:-postgres:17.5-alpine3.22}
     profiles: [infra]
     volumes:
       - pro-rails-postgres-db:/var/lib/postgresql/data
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
       PGDATA: /var/lib/postgresql/data/pgdata
       PSQL_HISTFILE: /root/log/.psql_history
     healthcheck:
-      test: pg_isready -U postgres -h 127.0.0.1
+      test: pg_isready -U ${DB_USERNAME:-postgres} -h 127.0.0.1
       interval: 5s
 
   redis:
@@ -89,7 +103,8 @@ services:
 
   rails:
     <<: *backend
-    command: /bin/bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    # No `rm -f tmp/pids/server.pid`: tmp/pids is a tmpfs, empty on every start.
+    command: /bin/bash -c "bundle exec rails s -p 3000 -b '0.0.0.0'"
     environment:
       <<: *backend_environment
       ANYCABLE_RPC_HOST: 0.0.0.0:50051
@@ -108,7 +123,7 @@ services:
     environment:
       ANYCABLE_HOST: "0.0.0.0"
       ANYCABLE_PORT: 8080
-      ANYCABLE_REDIS_URL: ${REDIS_URL:-redis://redis:6379/1}
+      ANYCABLE_REDIS_URL: redis://${REDIS_HOST:-redis}:${REDIS_PORT:-6379}/${REDIS_DB:-1}
       ANYCABLE_RPC_HOST: rails:50051
       ANYCABLE_DEBUG: true
       ANYCABLE_TURBO_STREAMS: true
@@ -116,7 +131,7 @@ services:
       ANYCABLE_JWT_ID_KEY: ${ANYCABLE_JWT_ID_KEY:-anycable_key}
       ANYCABLE_BROADCAST_ADAPTER: "redisx"
       ANYCABLE_BROKER: "memory"
-      ANYCABLE_REDIS_CHANNEL: __anycable__
+      ANYCABLE_REDIS_CHANNEL: ${ANYCABLE_REDIS_CHANNEL:-__anycable__}
     extra_hosts:
       - host.docker.internal:host-gateway
     networks:
@@ -170,14 +185,14 @@ services:
     environment:
       ANYCABLE_HOST: "0.0.0.0"
       ANYCABLE_PORT: "8081"
-      ANYCABLE_REDIS_URL: ${REDIS_URL:-redis://redis:6379/1}
+      ANYCABLE_REDIS_URL: redis://${REDIS_HOST:-redis}:${REDIS_PORT:-6379}/${REDIS_DB:-1}
       ANYCABLE_BROKER: ""
       ANYCABLE_RPC_HOST: anycable.test:50051
       ANYCABLE_SECRET: ${ANYCABLE_SECRET:-anycable_key}
       ANYCABLE_JWT_ID_KEY: ${ANYCABLE_JWT_ID_KEY:-anycable_key}
       ANYCABLE_BROADCAST_ADAPTER: "redisx"
       ANYCABLE_TURBO_STREAMS: true
-      ANYCABLE_REDIS_CHANNEL: __anycable__
+      ANYCABLE_REDIS_CHANNEL: ${ANYCABLE_REDIS_CHANNEL:-__anycable__}
     networks:
       default:
         aliases:

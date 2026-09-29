@@ -1,44 +1,56 @@
-# docker compose -f docker-compose.infra.yml -p pro-rails-infra up -d
-# global infra compose —shared between worktrees.
+# docker-compose.infra.yml
+# OPTIONAL — a shared dockerized Postgres + Valkey for several worktrees on one
+# machine. You only want this when you'd rather not run N embedded databases.
+#
+# The default path is embedded infra (COMPOSE_PROFILES=infra in the worktree
+# .env), which needs none of this. The other alternative is bare-metal servers,
+# which needs none of this either.
+#
+#   docker compose -f docker-compose.infra.yml --env-file .env.infra \
+#     -p "${INFRA_STACK:-pro-rails-infra}" up -d
+#
+# Every global name is derived from INFRA_STACK, so two stacks with different
+# INFRA_STACK values are fully isolated — previously the hardcoded `name:`
+# fields opted out of project prefixing and both stacks shared one PGDATA.
 
 services:
   db:
-    image: "postgres:17.5-alpine3.22"
+    image: ${PG_IMAGE:-postgres:17.5-alpine3.22}
     volumes:
-      - pro-rails-postgres-db:/var/lib/postgresql/data
+      - postgres-db:/var/lib/postgresql/data
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: ${INFRA_DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${INFRA_DB_PASSWORD:-postgres}
       PGDATA: /var/lib/postgresql/data/pgdata
     ports:
-      - "5432:5432"
+      - "127.0.0.1:${INFRA_DB_PORT:-5432}:5432"
     healthcheck:
-      test: pg_isready -U postgres -h 127.0.0.1
+      test: pg_isready -U ${INFRA_DB_USER:-postgres} -h 127.0.0.1
       interval: 5s
     networks:
-      - pro-rails-infra
+      - infra
 
   redis:
     image: redis:8.2.0-alpine3.22
     volumes:
-      - pro-rails-redis:/data
+      - redis:/data
     ports:
-      - "6379:6379"
+      - "127.0.0.1:${INFRA_REDIS_PORT:-6379}:6379"
     healthcheck:
       test: redis-cli ping
       interval: 1s
       timeout: 3s
       retries: 30
     networks:
-      - pro-rails-infra
+      - infra
 
 networks:
-  pro-rails-infra:
-    name: pro-rails-infra 
+  infra:
+    name: ${INFRA_STACK:-pro-rails-infra}
 
 volumes:
-  pro-rails-postgres-db:
-    name: pro-rails-infra-postgres-db 
-  pro-rails-redis:
-    name: pro-rails-infra-redis
+  postgres-db:
+    name: ${INFRA_STACK:-pro-rails-infra}-postgres-db
+  redis:
+    name: ${INFRA_STACK:-pro-rails-infra}-redis
