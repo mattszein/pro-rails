@@ -1,20 +1,17 @@
-<nav class="bg-white border-b border-gray-200 px-4 py-2.5 dark:bg-gray-800 dark:border-gray-700 fixed left-0 right-0 top-0 z-40 w-full">
-  <div class="flex flex-wrap justify-between items-center">
-    <div class="flex justify-start items-center basis-1/6">
-      <a href="<%= root_path %>" class="flex items-center justify-between mr-4">
-        <%= image_tag("/images/logo.png", alt: "Logo", class: "h-9 mx-auto") %>
-        <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">ProRails</span>
-      </a>
-    </div>
-    <div class="items-center justify-center hidden w-full md:flex md:w-auto basis-3/6" id="navbar-cta">
-    </div>
-    <div class="flex basis-2/6 flex-row-reverse gap-1">
-      <%= render Core::DarkLightComponent.new %>
-      <%= render Core::LocaleSwitcherComponent.new %>
-      <div class="inline-flex items-center"><span class="dark:text-gray-100 px-2"> | </span></div>
-      <%= render(Core::LinkComponent.new(name: t("shared.navigation.sign_in"), url: rodauth.login_path, style: :default, html_options: {class: "order-5"})) %>
-      <div class="inline-flex items-center order-6"><span class="dark:text-gray-100 px-2"> - </span></div>
-      <%= render(Core::LinkComponent.new(name: t("shared.navigation.register"), url: rodauth.create_account_path, style: :default, html_options: {class: "order-7"})) %>
+<nav class="fixed top-0 left-0 right-0 z-40 w-full border-b border-gray-200 dark:border-gray-800 transition-colors duration-300">
+  <div class="flex justify-between items-center h-16 px-4">
+    <a href="<%= root_path %>" class="flex items-center" aria-label="<%= t("shared.layout.app_title") %>">
+      <%= render Core::LogoComponent.new %>
+    </a>
+    <div class="flex items-center gap-3 sm:gap-6">
+      <div class="flex items-center gap-1 sm:gap-2 border-r border-gray-200 dark:border-gray-700 pr-3 sm:pr-6">
+        <%= render Core::LocaleSwitcherComponent.new %>
+        <%= render Core::DarkLightComponent.new %>
+      </div>
+      <div class="flex items-center gap-3 sm:gap-4">
+        <%= render(Core::LinkComponent.new(name: t("shared.navigation.sign_in"), url: rodauth.login_path, style: :link, html_options: {class: "text-sm font-medium whitespace-nowrap"})) %>
+        <%= render(Core::LinkComponent.new(name: t("shared.navigation.register"), url: rodauth.create_account_path, style: :as_button, theme: :primary, size: :sm, html_options: {class: "whitespace-nowrap"})) %>
+      </div>
     </div>
   </div>
 </nav>
