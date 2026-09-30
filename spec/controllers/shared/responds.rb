@@ -82,6 +82,8 @@ RSpec.shared_context "user and permissions adminit" do
   let(:permissions_permission) { create(:permission, resource: :permission, roles: [user_superadmin.role, user.role]) }
   let(:account_permission) { create(:permission, resource: :account, roles: [user_superadmin.role, user.role]) }
   let(:role_permission) { create(:permission, resource: :role, roles: [user_superadmin.role, user.role]) }
+  let(:feature_flag_permission) { create(:permission, resource: :feature_flag, roles: [user_superadmin.role, user.role]) }
+  let(:audience_permission) { create(:permission, resource: :audience, roles: [user_superadmin.role, user.role]) }
 end
 
 RSpec.shared_context "adminit_auth" do

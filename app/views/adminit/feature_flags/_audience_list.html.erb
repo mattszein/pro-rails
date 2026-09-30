@@ -1,0 +1,5 @@
+<% if feature_flag.audiences.any? %>
+  <%= render Core::TableComponent.new(rows: feature_flag.audiences, columns: flag_audience_columns(feature_flag)) %>
+<% else %>
+  <p class="text-slate-500 italic px-4 pb-4"><%= t("adminit.feature_flags.no_audiences") %></p>
+<% end %>

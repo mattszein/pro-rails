@@ -101,57 +101,10 @@ describe Adminit::RolesController, type: :controller do
     end
   end
 
-  describe "GET #search_accounts" do
-    include_context "user and permissions adminit"
-    let(:other_account) { create(:account, :verified, email: "findme@example.com") }
-    let(:params) { {id: user_superadmin.role.id, q: "findme"} }
-
-    subject { get :search_accounts, params: params }
-
-    include_context "adminit_auth"
-
-    context "when logged" do
-      context "with proper permissions" do
-        before do
-          role_permission
-          login_user(user_superadmin)
-          other_account
-        end
-
-        it "is authorized" do
-          expect { subject }.to be_authorized_to(:manage?, Role).with(Adminit::RolePolicy).with_context(user: user_superadmin)
-        end
-
-        it "responds with success" do
-          expect(subject).to have_http_status(200)
-        end
-
-        it "returns matching accounts as JSON" do
-          subject
-          json = JSON.parse(response.body)
-          expect(json).to include(a_hash_including("value" => other_account.email, "text" => other_account.email))
-        end
-
-        it "excludes accounts already in the role" do
-          user_superadmin_email = user_superadmin.email
-          get :search_accounts, params: {id: user_superadmin.role.id, q: user_superadmin_email}
-          json = JSON.parse(response.body)
-          expect(json.pluck("value")).not_to include(user_superadmin_email)
-        end
-
-        it "returns empty array when no accounts match" do
-          get :search_accounts, params: {id: user_superadmin.role.id, q: "nomatch_xyz"}
-          json = JSON.parse(response.body)
-          expect(json).to be_empty
-        end
-      end
-    end
-  end
-
   describe "POST #add_account" do
     include_context "user and permissions adminit"
     let(:new_user) { user_without_permissions }
-    let(:params) { {id: user_superadmin.role.id, role: {email: new_user.email}} }
+    let(:params) { {id: user_superadmin.role.id, role: {account_id: new_user.id}} }
 
     subject { post :add_account, params: params }
 
@@ -175,6 +128,20 @@ describe Adminit::RolesController, type: :controller do
         it "flashes a success message" do
           subject # call subject
           expect(flash[:notice]).not_to be_nil
+        end
+
+        it "alerts when the account is already a member" do
+          new_user.update!(role: user_superadmin.role)
+
+          subject
+
+          expect(flash[:alert]).to eq(I18n.t("adminit.roles.account_already_in_role"))
+        end
+
+        it "alerts when the account does not exist" do
+          post :add_account, params: {id: user_superadmin.role.id, role: {account_id: 0}}
+
+          expect(flash[:alert]).to eq(I18n.t("adminit.roles.account_not_found"))
         end
       end
     end

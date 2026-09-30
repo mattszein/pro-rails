@@ -4,11 +4,11 @@ RSpec.describe Dashboard::WidgetRegistry do
   describe ".register" do
     before do
       # Clear any previously registered test widgets
-      described_class.instance_variable_get(:@widgets).delete(:test_widget)
+      described_class.registry.delete(:test_widget)
     end
 
     after do
-      described_class.instance_variable_get(:@widgets).delete(:test_widget)
+      described_class.registry.delete(:test_widget)
     end
 
     def base_attrs
@@ -76,26 +76,46 @@ RSpec.describe Dashboard::WidgetRegistry do
         described_class.register(**base_attrs.merge(key: :test_widget_2), resource: :permission, span: :full)
       }.to raise_error(ArgumentError, /has span :full.*already registered.*span :half/)
 
-      described_class.instance_variable_get(:@widgets).delete(:test_widget_2)
+      described_class.registry.delete(:test_widget_2)
     end
   end
 
-  describe ".for_resource" do
+  describe ".by_resource" do
     it "returns widgets for a given resource" do
-      widgets = described_class.for_resource(:ticket)
+      widgets = described_class.by_resource(:ticket)
       expect(widgets.map(&:resource)).to all(eq(:ticket))
     end
   end
 
-  describe ".for_keys" do
+  describe ".find_all" do
     it "returns widgets for given keys" do
-      widgets = described_class.for_keys([:tickets_personal, :tickets_general])
+      widgets = described_class.find_all([:tickets_personal, :tickets_general])
       expect(widgets.map(&:key)).to contain_exactly(:tickets_personal, :tickets_general)
     end
 
     it "silently skips unknown keys" do
-      widgets = described_class.for_keys([:tickets_personal, :unknown_key])
+      widgets = described_class.find_all([:tickets_personal, :unknown_key])
       expect(widgets.map(&:key)).to contain_exactly(:tickets_personal)
+    end
+  end
+
+  describe ".reset!" do
+    it "empties the registry" do
+      original = described_class.registry.dup
+
+      begin
+        described_class.register(
+          key: :test_widget, resource: :ticket, kind: :personal,
+          policy_class: "Adminit::TicketPolicy",
+          component_class: "Adminit::Dashboard::Tickets::PersonalWidgetComponent"
+        )
+        expect(described_class.all).not_to be_empty
+
+        described_class.reset!
+        expect(described_class.all).to be_empty
+      ensure
+        described_class.registry.replace(original)
+      end
     end
   end
 end

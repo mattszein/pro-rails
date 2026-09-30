@@ -19,6 +19,14 @@
     <%= render(Core::SidebarLinkComponent.new(label: t("adminit.navigation.tickets"), path: adminit_tickets_path, active_paths: [adminit_tickets_path], icon_name: "adminit/tickets", animated_type: "support")) %>
   <% end %>
 
+  <% if allowed_to? :manage?, with: Adminit::FeatureFlagPolicy %>
+    <%= render(Core::SidebarLinkComponent.new(label: t("adminit.navigation.feature_flags"), path: adminit_feature_flags_path, active_paths: [adminit_feature_flags_path], icon_name: "adminit/permissions", animated_type: "gavel")) %>
+  <% end %>
+
+  <% if allowed_to? :manage?, with: Adminit::AudiencePolicy %>
+    <%= render(Core::SidebarLinkComponent.new(label: t("adminit.navigation.audiences"), path: adminit_audiences_path, active_paths: [adminit_audiences_path], icon_name: "adminit/roles", animated_type: "id-card")) %>
+  <% end %>
+
   <hr class="my-4 border-gray-300 dark:border-gray-700">
 
   <%= render(Core::SidebarLinkComponent.new(label: t("shared.common.dark_light"), path: "#", icon_name: "theme", animated_type: "sunmoon", html_options: {data: {turbo: "false", controller: "dark-mode", dark_mode_target: "themeToggle", action: "click->dark-mode#toggleTheme"}})) %>

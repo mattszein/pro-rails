@@ -8,7 +8,7 @@
         <%= f.multi_select :role_ids, options_for_select(roles.map { |r| [r.name, r.id] }, permission.role_ids), {include_blank: false, include_hidden: false, required: true}, {class: "h-10 group-[.is-loading]:hidden", multiple: true, "data-controller": "core--form--select-component", "data-core--form--select-component-submit-value": "true", "data-core--form--select-component-allow-empty-value": "false", "data-action": "core--form--select-component:loaded->core--loader-component#loaded"} %>
       <% end %>
 
-      <% available_widgets = Dashboard::WidgetRegistry.for_resource(permission.resource) %>
+      <% available_widgets = Dashboard::WidgetRegistry.by_resource(permission.resource) %>
       <% if available_widgets.any? %>
         <div class="mt-3 border-t border-gray-200 dark:border-gray-700 pt-2">
           <p class="font-semibold mb-2"><%= I18n.t("adminit.permissions.widgets_label") %></p>

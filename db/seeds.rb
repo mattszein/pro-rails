@@ -41,7 +41,9 @@ end
   ticket: [role_superadmin, role_support],
   role: [role_superadmin],
   announcement: [role_superadmin],
-  permission: [role_superadmin]
+  permission: [role_superadmin],
+  feature_flag: [role_superadmin],
+  audience: [role_superadmin]
 }.each do |resource, roles|
   permission = Permission.find_or_create_by!(resource: resource) do |p|
     p.roles = roles
@@ -70,6 +72,15 @@ support_widgets = {
       .update!(dashboard_widget_keys: widget_keys)
   end
 end
+
+# Demo feature flag: gated by an audience scoped to the superadmin role, so
+# the whole declare -> seed -> audience -> gate pipeline has one working example.
+test_flag = FeatureFlag.find_or_create_by!(key: "test_feature_flag")
+superadmin_audience = Audience.find_or_create_by!(name: "Superadmins") do |audience|
+  audience.description = "Accounts holding the superadmin role."
+  audience.audience_conditions.build(condition_key: "roles", value: [role_superadmin.id])
+end
+FeatureFlagAudience.find_or_create_by!(feature_flag: test_flag, audience: superadmin_audience)
 
 # Demo data: 30 users, backdated tickets and announcements so dashboards have data
 if Rails.env.development? || ENV["SEED_DEMO_DATA"] == "true"

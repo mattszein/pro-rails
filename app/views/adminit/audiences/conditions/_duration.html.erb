@@ -1,0 +1,10 @@
+<% stored = audience_condition.value.is_a?(Hash) ? audience_condition.value : {} %>
+<div class="flex gap-2 items-center">
+  <%= number_field_tag "audience[audience_conditions_attributes][#{f.index}][value][amount]",
+        stored["amount"] || stored[:amount], min: 1, class: "w-20", autocomplete: "off" %>
+  <%= select_tag "audience[audience_conditions_attributes][#{f.index}][value][unit]",
+        options_for_select(
+          AudienceConditions::Vocabulary::UNITS.map { |unit| [t("audience_conditions.#{condition.key}.units.#{unit}"), unit] },
+          stored["unit"] || stored[:unit]
+        ) %>
+</div>

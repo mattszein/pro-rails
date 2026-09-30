@@ -23,7 +23,9 @@ export default class extends Controller {
       placeholder:  this.element.dataset.placeholder,
       load: (query, callback) => {
         if (query.length < 2) return callback()
-        fetch(`${this.searchUrlValue}?q=${encodeURIComponent(query)}`)
+        const url = new URL(this.searchUrlValue, window.location.origin)
+        url.searchParams.set("q", query)
+        fetch(url)
           .then(r => r.json())
           .then(data => callback(data))
           .catch(() => callback())

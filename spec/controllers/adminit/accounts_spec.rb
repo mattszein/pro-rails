@@ -126,6 +126,58 @@ describe Adminit::AccountsController, type: :controller do
     end
   end
 
+  describe "GET #search" do
+    subject { get :search, params: {q: "user_"} }
+
+    include_context "adminit_auth"
+
+    shared_examples "a permitted searcher" do
+      it "is authorized" do
+        expect { subject }.to be_authorized_to(:search?, Account).with(Adminit::AccountPolicy).with_context(user: user)
+      end
+
+      it "returns matching accounts as {value, text}" do
+        matching = create(:account, email: "user_match@example.com")
+
+        subject
+
+        expect(response.parsed_body).to include("value" => matching.id.to_s, "text" => matching.email)
+      end
+
+      it "short-circuits a too-short query to an empty list" do
+        get :search, params: {q: "a"}
+        expect(response.parsed_body).to eq([])
+      end
+    end
+
+    context "with the account permission" do
+      before do
+        login_user(user)
+        account_permission
+      end
+
+      it_behaves_like "a permitted searcher"
+    end
+
+    context "with the role permission" do
+      before do
+        login_user(user)
+        role_permission
+      end
+
+      it_behaves_like "a permitted searcher"
+    end
+
+    context "with the feature_flag permission" do
+      before do
+        login_user(user)
+        feature_flag_permission
+      end
+
+      it_behaves_like "a permitted searcher"
+    end
+  end
+
   describe "DELETE #destroy" do
     let(:account) { create(:account, :verified) }
 

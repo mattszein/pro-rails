@@ -7,7 +7,9 @@ module Adminit::BreadcrumbsHelper
     "announcements" => :adminit_announcements_path,
     "tickets" => :adminit_tickets_path,
     "roles" => :adminit_roles_path,
-    "permissions" => :adminit_permissions_path
+    "permissions" => :adminit_permissions_path,
+    "feature_flags" => :adminit_feature_flags_path,
+    "audiences" => :adminit_audiences_path
   }.freeze
 
   # Only read views get a trail. Everything else (mutations, modal/frame

@@ -1,15 +1,6 @@
 <%= form_with(model: announcement, url: announcement.persisted? ? adminit_announcement_path(announcement) : adminit_announcements_path,
       data: {turbo: true}, class: "space-y-4") do |form| %>
-  <% if announcement.errors.any? %>
-    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-      <h2><%= pluralize(announcement.errors.count, "error") %> prohibited this announcement from being saved:</h2>
-      <ul>
-        <% announcement.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render "adminit/application/form_errors", record: announcement %>
   <%= form.label :reference, t("shared.labels.reference") %>
   <%= form.text_field :reference, {autofocus: true, required: true, placeholder: t("shared.placeholders.reference"), autocomplete: "off", class: "w-full"} %>
   <%= form.label :title, t("shared.labels.title") %>

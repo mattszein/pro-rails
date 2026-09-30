@@ -1,0 +1,5 @@
+<%= render(Core::ModalComponent.new(title: t("adminit.audiences.edit_audience"))) do %>
+  <%= turbo_frame_tag "audience_form" do %>
+    <%= render "form", audience: @audience %>
+  <% end %>
+<% end %>

@@ -1,0 +1,39 @@
+<div class="w-full">
+  <div class="space-y-4">
+    <%= render(Core::CardComponent.new(classes: "space-y-4")) do %>
+      <h1 class="text-xl font-bold"><%= @feature_flag.display_name %></h1>
+      <% if (description = @feature_flag.description) %>
+        <p class="text-slate-500"><%= description %></p>
+      <% end %>
+
+      <%= render Core::BoxComponent.new do %>
+        <%= render Core::DefinitionListComponent.new(gap: :sm) do |dl| %>
+          <% dl.with_item(term: t("adminit.feature_flags.key")) do %>
+            <%= @feature_flag.key %>
+          <% end %>
+          <% dl.with_item(term: t("adminit.feature_flags.access_state")) do %>
+            <%= t("adminit.feature_flags.access_states.#{feature_flag_access_state(@feature_flag)}") %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <%= render Core::CardComponent.new do %>
+      <div class="flex items-center justify-between mb-2">
+        <h3><%= t("adminit.feature_flags.audiences") %></h3>
+        <%= render(Core::LinkComponent.new(name: t("adminit.feature_flags.add_audience"), url: audience_select_adminit_feature_flag_path(@feature_flag), style: :as_button, theme: :create, size: :sm, html_options: {data: {turbo_frame: "modal"}})) %>
+      </div>
+
+      <%= render "adminit/feature_flags/audience_list", feature_flag: @feature_flag %>
+    <% end %>
+
+    <%= render Core::CardComponent.new do %>
+      <div class="flex items-center justify-between mb-2">
+        <h3><%= t("adminit.feature_flags.account_entries") %></h3>
+        <%= render(Core::LinkComponent.new(name: t("adminit.feature_flags.add_account"), url: account_select_adminit_feature_flag_path(@feature_flag), style: :as_button, theme: :create, size: :sm, html_options: {data: {turbo_frame: "modal"}})) %>
+      </div>
+
+      <%= render "adminit/feature_flags/account_entry_list", feature_flag: @feature_flag %>
+    <% end %>
+  </div>
+</div>

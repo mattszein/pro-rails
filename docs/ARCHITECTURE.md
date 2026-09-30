@@ -265,6 +265,36 @@ Cursor pagination uses the PK index directly — O(1) regardless of depth. `OFFS
 
 ---
 
+## Feature Flags
+
+**Declared-Registry pattern.** A code-declared, in-memory set (flag keys, audience-condition
+vocabulary, dashboard widgets) shares its store-and-reload lifecycle via `DeclaredRegistry`
+(`app/lib/declared_registry.rb`) — `all`/`keys`/`registered?`/`reset!`. `register` and any reader stay
+per-registry (guards and naming differ: `Dashboard::WidgetRegistry#register` enforces duplicate-key/
+span rules no other registry has, and its reader is `find`, not `fetch`). Declarations are autoloaded
+so edits hot-reload in dev; an initializer re-runs `install` only on `to_prepare`. Used by
+`FeatureFlags::Registry`, `AudienceConditions::Registry`, `Dashboard::WidgetRegistry`.
+
+**Evaluation rules:**
+
+- Placement: the decision (`FeatureFlags`, `AccountEvaluator`) is domain logic that queries models, so
+  it lives in `app/models/`. The code-declared registries and declarations stay in `app/lib/`.
+- One entry point: `FeatureFlags.for(account)` / `.enabled?(key, account)`. Nothing else — including
+  admin code — reads `feature_flag_accounts`/`feature_flag_audiences` to decide; admin reads them only
+  to display.
+- Never call the entry point from a model, a migration, or a job/broadcast path that writes — those
+  have no request account.
+- The evaluator is request-scoped and discarded with the request; never cached process-lifetime.
+- No write may be conditional on a flag answer — withdrawal is a read-path change only, or the off
+  path inherits records it can't interpret.
+- Gating is server-side. A hidden/CSS-only client-side toggle still ships the capability in the
+  response body.
+- A flag carries no attribution column. A single field on one record can't honestly represent edits
+  that happen through a different record (an audience, a role) — that history is an audit-log concern,
+  not a stamp forced onto the flag row.
+
+---
+
 ## I18n Rules
 
 ### File Organization
@@ -290,6 +320,7 @@ Cursor pagination uses the PK index directly — O(1) regardless of depth. `OFFS
 
 - Components live in `app/components/core/`
 - Components never write ActiveRecord queries — data comes from model scopes/class methods
+- Feature-flag decisions are passed in as constructor arguments — components never call `FeatureGated`/`FeatureFlags` themselves
 - `CustomFormBuilder` is the default form builder (set in `ApplicationController`)
 - Lookbook previews at `/lookbook` in development
 

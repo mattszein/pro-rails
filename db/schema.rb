@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_11_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_09_200000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -113,6 +113,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_11_120000) do
     t.index ["status"], name: "index_announcements_on_status"
   end
 
+  create_table "audience_conditions", force: :cascade do |t|
+    t.bigint "audience_id", null: false
+    t.string "condition_key", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.jsonb "value", null: false
+    t.index ["audience_id", "condition_key"], name: "index_audience_conditions_on_audience_id_and_condition_key", unique: true
+    t.index ["audience_id"], name: "index_audience_conditions_on_audience_id"
+  end
+
+  create_table "audiences", force: :cascade do |t|
+    t.datetime "archived_at"
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["archived_at"], name: "index_audiences_on_archived_at"
+    t.index ["name"], name: "index_audiences_on_name", unique: true
+  end
+
   create_table "avatars", force: :cascade do |t|
     t.text "assembled_prompt"
     t.datetime "created_at", null: false
@@ -136,6 +156,34 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_11_120000) do
     t.bigint "ticket_id", null: false
     t.datetime "updated_at", null: false
     t.index ["ticket_id"], name: "index_conversations_on_ticket_id"
+  end
+
+  create_table "feature_flag_accounts", force: :cascade do |t|
+    t.integer "access", null: false
+    t.bigint "account_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "feature_flag_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_feature_flag_accounts_on_account_id"
+    t.index ["feature_flag_id", "account_id"], name: "index_feature_flag_accounts_on_flag_and_account", unique: true
+    t.index ["feature_flag_id"], name: "index_feature_flag_accounts_on_feature_flag_id"
+  end
+
+  create_table "feature_flag_audiences", force: :cascade do |t|
+    t.bigint "audience_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "feature_flag_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["audience_id"], name: "index_feature_flag_audiences_on_audience_id"
+    t.index ["feature_flag_id", "audience_id"], name: "index_feature_flag_audiences_on_flag_and_audience", unique: true
+    t.index ["feature_flag_id"], name: "index_feature_flag_audiences_on_feature_flag_id"
+  end
+
+  create_table "feature_flags", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "key", null: false
+    t.datetime "updated_at", null: false
+    t.index ["key"], name: "index_feature_flags_on_key", unique: true
   end
 
   create_table "messages", force: :cascade do |t|
@@ -242,8 +290,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_11_120000) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "announcements", "accounts", column: "author_id"
+  add_foreign_key "audience_conditions", "audiences", on_delete: :cascade
   add_foreign_key "avatars", "profiles"
   add_foreign_key "conversations", "tickets"
+  add_foreign_key "feature_flag_accounts", "accounts", on_delete: :cascade
+  add_foreign_key "feature_flag_accounts", "feature_flags", on_delete: :cascade
+  add_foreign_key "feature_flag_audiences", "audiences", on_delete: :restrict
+  add_foreign_key "feature_flag_audiences", "feature_flags", on_delete: :cascade
   add_foreign_key "messages", "accounts"
   add_foreign_key "messages", "conversations"
   add_foreign_key "profiles", "accounts"

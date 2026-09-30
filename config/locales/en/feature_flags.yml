@@ -1,0 +1,5 @@
+# Declared flag names and descriptions: feature_flags.flags.<key>.name / .description.
+en:
+  feature_flags:
+    flags:
+      test_feature_flag: {name: "Test feature flag", description: "Demo flag: gated by a superadmin-only audience."}

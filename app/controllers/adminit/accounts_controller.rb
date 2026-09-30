@@ -22,6 +22,17 @@ class Adminit::AccountsController < Adminit::ApplicationController
   def edit
   end
 
+  # Shared email lookup for every admin account picker (roles, feature flags, dashboard).
+  def search
+    authorize! to: :search?
+    query = params[:q].to_s.strip
+    return render(json: []) if query.length < 2
+
+    accounts = Account.search_by_email(query).limit(20)
+
+    render json: accounts.map { |account| {value: account.id.to_s, text: account.email} }
+  end
+
   def destroy
     @account.destroy!
 

@@ -1,0 +1,24 @@
+en:
+  audience_conditions:
+    adminit_users:
+      label: "Adminit users"
+      hint: "Whether the account can enter Adminit"
+      values:
+        "true": "Can enter Adminit"
+        "false": "Cannot enter Adminit at all"
+    roles:
+      label: "Roles"
+      hint: "Which Adminit roles the account holds"
+    verified_users:
+      label: "Verified users"
+      hint: "Whether the account's email is confirmed"
+      values:
+        "true": "Email confirmed"
+    registration_age:
+      label: "Registered longer than"
+      hint: "How long the account has existed"
+      units:
+        days: "Days"
+        weeks: "Weeks"
+        months: "Months"
+        years: "Years"

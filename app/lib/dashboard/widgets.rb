@@ -7,7 +7,7 @@ module Dashboard
     module_function
 
     def install
-      WidgetRegistry.clear
+      WidgetRegistry.reset!
 
       # Rendered inline (not via a lazy turbo-frame): TomSelect must initialize in
       # the page's normal Turbo-visit lifecycle. Inside a lazy frame the Stimulus

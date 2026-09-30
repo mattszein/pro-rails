@@ -1,5 +1,7 @@
 module Dashboard
   class WidgetRegistry
+    include DeclaredRegistry
+
     Widget = Data.define(
       :key,
       :resource,
@@ -29,8 +31,6 @@ module Dashboard
       end
     end
 
-    @widgets = {}
-
     class << self
       def register(**attrs)
         attrs[:refresh_interval] ||= nil
@@ -39,7 +39,7 @@ module Dashboard
         attrs[:view_all_params] ||= nil
         widget = Widget.new(**attrs)
 
-        raise ArgumentError, "duplicate widget key: #{widget.key}" if @widgets.key?(widget.key)
+        raise ArgumentError, "duplicate widget key: #{widget.key}" if registry.key?(widget.key)
         if widget.refresh_interval && widget.refresh_interval < 15
           raise ArgumentError, "refresh_interval must be at least 15 seconds (got #{widget.refresh_interval})"
         end
@@ -48,26 +48,25 @@ module Dashboard
         # (app/components/adminit/dashboard/tabbed_container_component.rb) —
         # a mismatched span within a resource would make the layout depend on
         # registration order.
-        sibling = for_resource(widget.resource).first
+        sibling = by_resource(widget.resource).first
         if sibling && sibling.span != widget.span
           raise ArgumentError, "widget :#{widget.key} has span #{widget.span.inspect}, but " \
                                 "resource :#{widget.resource} is already registered with span #{sibling.span.inspect}"
         end
 
-        @widgets[widget.key] = widget
+        registry[widget.key] = widget
       end
 
-      def all = @widgets.values
-      def all_keys = @widgets.keys
-      def find(key) = @widgets[key.to_sym]
+      def find(key) = registry[key.to_sym]
 
-      def for_keys(ks)
-        keys = ks.map(&:to_sym).to_set
-        all.select { |w| keys.include?(w.key) }
+      # Widgets registered under any of the given keys; unknown keys are ignored.
+      def find_all(keys)
+        wanted = keys.map(&:to_sym).to_set
+        all.select { |w| wanted.include?(w.key) }
       end
 
-      def for_resource(resource) = all.select { |w| w.resource == resource.to_sym }
-      def clear = @widgets.clear
+      # Widgets that belong to the given resource.
+      def by_resource(resource) = all.select { |w| w.resource == resource.to_sym }
     end
   end
 end

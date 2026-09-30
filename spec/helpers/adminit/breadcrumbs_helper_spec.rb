@@ -35,6 +35,46 @@ RSpec.describe Adminit::BreadcrumbsHelper, type: :helper do
     expect(trail.last.path).to be_nil
   end
 
+  it "returns Dash and the resource crumb (both linked) for feature flags" do
+    stub_request_context(controller: "feature_flags", action: "index")
+
+    trail = helper.adminit_breadcrumb_trail
+
+    expect(trail.map(&:label)).to eq(["Dash", "Feature Flags"])
+    expect(trail.map(&:path)).to eq([adminit_root_path, adminit_feature_flags_path])
+  end
+
+  it "appends the flag's breadcrumb_title as an unlinked leaf on show" do
+    stub_request_context(controller: "feature_flags", action: "show")
+    record = double(breadcrumb_title: "New dashboard")
+    helper.instance_variable_set(:@feature_flag, record)
+
+    trail = helper.adminit_breadcrumb_trail
+
+    expect(trail.map(&:label)).to eq(["Dash", "Feature Flags", "New dashboard"])
+    expect(trail.last.path).to be_nil
+  end
+
+  it "returns Dash and the resource crumb (both linked) for audiences" do
+    stub_request_context(controller: "audiences", action: "index")
+
+    trail = helper.adminit_breadcrumb_trail
+
+    expect(trail.map(&:label)).to eq(["Dash", "Audiences"])
+    expect(trail.map(&:path)).to eq([adminit_root_path, adminit_audiences_path])
+  end
+
+  it "appends the audience's breadcrumb_title as an unlinked leaf on show" do
+    stub_request_context(controller: "audiences", action: "show")
+    record = double(breadcrumb_title: "Beta testers")
+    helper.instance_variable_set(:@audience, record)
+
+    trail = helper.adminit_breadcrumb_trail
+
+    expect(trail.map(&:label)).to eq(["Dash", "Audiences", "Beta testers"])
+    expect(trail.last.path).to be_nil
+  end
+
   it "falls back to the record id when breadcrumb_title is not defined" do
     stub_request_context(controller: "roles", action: "show")
     record = double(id: 7)

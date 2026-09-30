@@ -6,8 +6,25 @@ en:
       profile: Profile
       role: Role
       ticket: Ticket
+      feature_flag: Feature Flag
+      audience: Audience
+      audience_condition: Audience Condition
     errors:
       models:
+        audience:
+          attributes:
+            base:
+              at_least_one_condition: "must have at least one condition turned on"
+        audience_condition:
+          attributes:
+            condition_key:
+              not_registered: "is not a declared audience condition"
+            value:
+              invalid: "is not a valid value for this condition"
+        feature_flag:
+          attributes:
+            key:
+              not_registered: "is not a declared flag key"
         profile:
           attributes:
             avatar:
@@ -61,6 +78,10 @@ en:
         unverified: "Unverified"
         verified: "Verified"
         closed: "Closed"
+    feature_flag_account:
+      access:
+        blocked: "Blocked"
+        allowed: "Allowed"
     ticket:
       status:
         open: "Open"

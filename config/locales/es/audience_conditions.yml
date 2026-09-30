@@ -1,0 +1,24 @@
+es:
+  audience_conditions:
+    adminit_users:
+      label: "Usuarios de Adminit"
+      hint: "Si la cuenta puede entrar a Adminit"
+      values:
+        "true": "Puede entrar a Adminit"
+        "false": "No puede entrar a Adminit en absoluto"
+    roles:
+      label: "Roles"
+      hint: "Qué roles de Adminit tiene la cuenta"
+    verified_users:
+      label: "Usuarios verificados"
+      hint: "Si el correo de la cuenta está confirmado"
+      values:
+        "true": "Correo confirmado"
+    registration_age:
+      label: "Registrado hace más de"
+      hint: "Cuánto tiempo lleva existiendo la cuenta"
+      units:
+        days: "Días"
+        weeks: "Semanas"
+        months: "Meses"
+        years: "Años"
