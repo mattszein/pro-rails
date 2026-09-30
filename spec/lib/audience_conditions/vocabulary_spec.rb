@@ -7,6 +7,17 @@ RSpec.describe "the audience condition vocabulary" do
     )
   end
 
+  describe ".duration_from" do
+    it "rebuilds a calendar duration from a known unit" do
+      expect(AudienceConditions::Vocabulary.duration_from({"amount" => "2", "unit" => "years"})).to eq(2.years)
+    end
+
+    it "rejects a unit outside the declared set" do
+      expect { AudienceConditions::Vocabulary.duration_from({"amount" => "1", "unit" => "to_s"}) }
+        .to raise_error(ArgumentError, /unknown duration unit/)
+    end
+  end
+
   # Not an ActiveRecord relation — Registry.all is an in-memory array.
   AudienceConditions::Registry.all.each do |condition| # rubocop:disable Rails/FindEach
     describe ":#{condition.key}" do

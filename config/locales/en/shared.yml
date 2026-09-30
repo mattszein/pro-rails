@@ -10,6 +10,7 @@ en:
       show: "Show"
       edit: "Edit"
       delete: "Delete"
+      remove: "Remove"
       create: "Create"
       actions: "Actions"
       are_you_sure: "Are you sure?"

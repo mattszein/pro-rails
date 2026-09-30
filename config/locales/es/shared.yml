@@ -10,6 +10,7 @@ es:
       show: "Ver"
       edit: "Editar"
       delete: "Eliminar"
+      remove: "Quitar"
       create: "Crear"
       actions: "Acciones"
       are_you_sure: "¿Estás seguro?"

@@ -2,7 +2,7 @@
     :affirmative, it needs a control that distinguishes true from false. %>
 <div class="flex gap-4">
   <label class="flex items-center gap-1">
-    <%= radio_button_tag "audience[audience_conditions_attributes][#{f.index}][value]", "true", audience_condition.value == true %>
+    <%= radio_button_tag "audience[audience_conditions_attributes][#{f.index}][value]", "true", audience_condition.value != false %>
     <%= t("audience_conditions.#{condition.key}.values.true") %>
   </label>
   <label class="flex items-center gap-1">

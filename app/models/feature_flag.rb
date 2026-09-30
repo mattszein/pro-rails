@@ -61,6 +61,11 @@ class FeatureFlag < ApplicationRecord
     audiences.any? { |audience| audience.matches?(account) }
   end
 
+  # Ruby form of the `open_access` scope, for an already-loaded flag.
+  def open_access?
+    audiences.any? || account_entries.any?(&:allowed?)
+  end
+
   def display_name = I18n.t("feature_flags.flags.#{key}.name", default: key)
 
   def description = I18n.t("feature_flags.flags.#{key}.description", default: nil)

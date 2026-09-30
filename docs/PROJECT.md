@@ -123,7 +123,7 @@ and `docs/ARCHITECTURE.md` for the evaluation rules.
 
 **Flag** — a switch in front of a capability that already exists in the product. Declared in code
 (never created in Adminit); its access list (audiences and/or per-account allow/block entries) is
-managed by admins. No sample flags ship — a flag exists only when a real capability needs one.
+managed by admins. One demo flag (`test_feature_flag`) ships as a working example; remove it when adopting the feature, and add a flag only when a real capability needs one.
 
 **Audience** — a named, reusable group of accounts defined by a fixed vocabulary of conditions
 (Adminit access, role, email verification, account age). Outlives any one flag; archived rather than

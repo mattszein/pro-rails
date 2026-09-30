@@ -1,7 +1,7 @@
 module Adminit
   module FeatureFlagsHelper
     def feature_flag_access_state(feature_flag)
-      (feature_flag.audiences.any? || feature_flag.account_entries.any?(&:allowed?)) ? :open : :empty
+      feature_flag.open_access? ? :open : :empty
     end
 
     # Column set drives both the query whitelist (Tableable) and the
@@ -45,6 +45,30 @@ module Adminit
       ]
     end
 
+    def flag_audience_columns(feature_flag)
+      [
+        Core::Table::Column.new(
+          label: t("shared.labels.name"),
+          renderer: ->(audience) { link_to(audience.name, adminit_audience_path(audience)) }
+        ),
+        Core::Table::Column.new(
+          label: t("adminit.audiences.conditions"),
+          renderer: ->(audience) { audience_condition_summary(audience) }
+        ),
+        Core::Table::Column.new(
+          label: t("shared.common.actions"),
+          renderer: ->(audience) {
+            render(Core::LinkComponent.new(
+              name: t("shared.common.remove"),
+              url: detach_audience_adminit_feature_flag_path(feature_flag, audience_id: audience.id),
+              style: :as_button, theme: :delete, size: :xs,
+              html_options: {data: {turbo_method: :delete, turbo_confirm: t("shared.common.are_you_sure")}}
+            ))
+          }
+        )
+      ]
+    end
+
     def flag_account_entry_columns(feature_flag)
       [
         Core::Table::Column.new(
@@ -64,7 +88,7 @@ module Adminit
           label: t("shared.common.actions"),
           renderer: ->(entry) {
             render(Core::LinkComponent.new(
-              name: t("shared.common.delete"),
+              name: t("shared.common.remove"),
               url: remove_account_adminit_feature_flag_path(feature_flag, account_id: entry.account_id),
               style: :as_button, theme: :delete, size: :xs,
               html_options: {data: {turbo_method: :delete, turbo_confirm: t("shared.common.are_you_sure")}}

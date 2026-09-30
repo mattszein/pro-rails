@@ -61,6 +61,26 @@ RSpec.describe FeatureFlag, type: :model do
     end
   end
 
+  describe "#open_access?" do
+    let(:flag) { create(:feature_flag) }
+
+    it "is true with an attached audience" do
+      create(:feature_flag_audience, feature_flag: flag, audience: create(:audience))
+      expect(flag.reload).to be_open_access
+    end
+
+    it "is true with an allowed account entry" do
+      create(:feature_flag_account, :allowed, feature_flag: flag)
+      expect(flag.reload).to be_open_access
+    end
+
+    it "is false with nothing attached or only a blocked entry" do
+      expect(flag).not_to be_open_access
+      create(:feature_flag_account, :blocked, feature_flag: flag)
+      expect(flag.reload).not_to be_open_access
+    end
+  end
+
   describe "#attachable_audiences" do
     it "excludes archived audiences and audiences already attached to the flag" do
       flag = create(:feature_flag)

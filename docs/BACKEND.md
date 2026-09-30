@@ -290,7 +290,7 @@ implements.
 | Piece | File | Role |
 |---|---|---|
 | Flag / condition registries | `app/lib/feature_flags/registry.rb`, `app/lib/audience_conditions/registry.rb` | In-memory declared sets (`DeclaredRegistry`). |
-| Declarations | `app/lib/feature_flags/flags.rb`, `app/lib/audience_conditions/vocabulary.rb` | One `Registry.register(...)` call per flag/condition. Ships with none — every flag is a team's own addition. |
+| Declarations | `app/lib/feature_flags/flags.rb`, `app/lib/audience_conditions/vocabulary.rb` | One `Registry.register(...)` call per flag/condition. Ships with one demo flag (`test_feature_flag`, seeded with a superadmin audience and gating a dashboard banner) — replace it with your own. |
 | Decision | `app/models/feature_flags.rb`, `app/models/feature_flags/account_evaluator.rb` | `FeatureFlags.for(account)` / `.enabled?(key, account)` — the only entry points. |
 | Consumption | `app/controllers/concerns/feature_gated.rb` | `feature_enabled?(key)`, `require_feature!(key)`, included on `SharedBaseController`. |
 | State | `FeatureFlag`, `Audience`, `AudienceCondition`, `FeatureFlagAudience`, `FeatureFlagAccount` | Access-list rows — read directly only to *display*, never to decide. |
@@ -312,8 +312,8 @@ en:
 ```
 
 Run `bin/rails feature_flags:sync` to materialize its row (this also runs automatically as part of
-`db:prepare`/`db:migrate`, so a deploy or a local migration picks up a newly declared flag with no
-manual step). It then shows in Adminit → Feature Flags, off for everyone until an operator attaches
+`db:prepare`, so a deploy picks up a newly declared flag with no manual step; `db:migrate` and
+`db:schema:load` do not run it). It then shows in Adminit → Feature Flags, off for everyone until an operator attaches
 an audience or account entry.
 
 **Gate a capability:**

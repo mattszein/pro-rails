@@ -44,6 +44,8 @@ module AudienceConditions
     def duration_from(value)
       amount = (value["amount"] || value[:amount]).to_i
       unit = (value["unit"] || value[:unit]).to_s
+      raise ArgumentError, "unknown duration unit: #{unit.inspect}" unless UNITS.include?(unit)
+
       amount.public_send(unit)
     end
   end
