@@ -38,8 +38,7 @@ class Adminit::FeatureFlagsController < Adminit::ApplicationController
   end
 
   def detach_audience
-    audience = @feature_flag.audiences.find(params[:audience_id])
-    @feature_flag.feature_flag_audiences.where(audience: audience).delete_all
+    @feature_flag.feature_flag_audiences.find_by!(audience_id: params[:audience_id]).destroy!
 
     redirect_to adminit_feature_flag_path(@feature_flag), notice: t("adminit.feature_flags.audience_detached")
   end
@@ -57,8 +56,7 @@ class Adminit::FeatureFlagsController < Adminit::ApplicationController
   end
 
   def remove_account
-    account = Account.find(params[:account_id])
-    @feature_flag.account_entries.where(account: account).delete_all
+    @feature_flag.account_entries.find_by!(account_id: params[:account_id]).destroy!
 
     redirect_to adminit_feature_flag_path(@feature_flag), notice: t("adminit.feature_flags.account_entry_removed")
   end

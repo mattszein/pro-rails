@@ -9,13 +9,13 @@ class PermissionRole < ApplicationRecord
   validate :widget_keys_match_permission_resource
 
   def enabled_widgets
-    Dashboard::WidgetRegistry.for_keys(dashboard_widget_keys)
+    Dashboard::WidgetRegistry.find_all(dashboard_widget_keys)
   end
 
   private
 
   def widget_keys_known_to_registry
-    invalid = dashboard_widget_keys - Dashboard::WidgetRegistry.all_keys.map(&:to_s)
+    invalid = dashboard_widget_keys - Dashboard::WidgetRegistry.keys.map(&:to_s)
     return if invalid.empty?
 
     errors.add(

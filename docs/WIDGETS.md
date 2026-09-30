@@ -91,4 +91,4 @@ reusable across domains. Coverage for these scopes lives in the model specs.
 
 ## Removing a widget
 
-Delete the component files, its registration in `app/lib/dashboard/widgets.rb`, its i18n keys, and its specs. Stale keys left in `permissions_roles.dashboard_widget_keys` are harmless — every read path filters through the registry — but prune them with a one-off data migration or console pass (`keys & WidgetRegistry.all_keys`) to keep the data honest.
+Delete the component files, its registration in `app/lib/dashboard/widgets.rb`, its i18n keys, and its specs. Stale keys left in `permissions_roles.dashboard_widget_keys` are harmless — every read path filters through the registry — but prune them with a one-off data migration or console pass (`keys & WidgetRegistry.keys`) to keep the data honest.

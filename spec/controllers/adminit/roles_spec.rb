@@ -129,6 +129,20 @@ describe Adminit::RolesController, type: :controller do
           subject # call subject
           expect(flash[:notice]).not_to be_nil
         end
+
+        it "alerts when the account is already a member" do
+          new_user.update!(role: user_superadmin.role)
+
+          subject
+
+          expect(flash[:alert]).to eq(I18n.t("adminit.roles.account_already_in_role"))
+        end
+
+        it "alerts when the account does not exist" do
+          post :add_account, params: {id: user_superadmin.role.id, role: {account_id: 0}}
+
+          expect(flash[:alert]).to eq(I18n.t("adminit.roles.account_not_found"))
+        end
       end
     end
   end

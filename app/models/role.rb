@@ -34,6 +34,6 @@ class Role < ApplicationRecord
 
   def dashboard_widgets
     keys = permission_roles.pluck(:dashboard_widget_keys).flatten
-    Dashboard::WidgetRegistry.for_keys(keys)
+    Dashboard::WidgetRegistry.find_all(keys)
   end
 end

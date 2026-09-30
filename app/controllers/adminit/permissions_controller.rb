@@ -53,7 +53,7 @@ class Adminit::PermissionsController < Adminit::ApplicationController
   # dashboard_widget_keys param means "no widgets" — clear, don't skip.
   # update! (not update_all) so PermissionRole validates the keys.
   def update_dashboard_widget_keys
-    return if Dashboard::WidgetRegistry.for_resource(@permission.resource).empty?
+    return if Dashboard::WidgetRegistry.by_resource(@permission.resource).empty?
 
     submitted = permission_params[:dashboard_widget_keys] || {}
     permission_params[:role_ids]&.each do |role_id|

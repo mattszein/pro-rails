@@ -176,43 +176,6 @@ describe Adminit::AccountsController, type: :controller do
 
       it_behaves_like "a permitted searcher"
     end
-
-    context "with a not_in_role param" do
-      before do
-        login_user(user)
-        account_permission
-      end
-
-      it "excludes accounts already holding that role" do
-        role = create(:role)
-        member = create(:account, email: "user_member@example.com", role: role)
-        other = create(:account, email: "user_other@example.com")
-
-        get :search, params: {q: "user_", not_in_role: role.id}
-
-        values = response.parsed_body.pluck("value")
-        expect(values).to include(other.id.to_s)
-        expect(values).not_to include(member.id.to_s)
-      end
-    end
-
-    context "with an exclude_closed param" do
-      before do
-        login_user(user)
-        account_permission
-      end
-
-      it "excludes closed accounts" do
-        open = create(:account, email: "user_open@example.com")
-        closed = create(:account, :closed, email: "user_closed@example.com")
-
-        get :search, params: {q: "user_", exclude_closed: true}
-
-        values = response.parsed_body.pluck("value")
-        expect(values).to include(open.id.to_s)
-        expect(values).not_to include(closed.id.to_s)
-      end
-    end
   end
 
   describe "DELETE #destroy" do

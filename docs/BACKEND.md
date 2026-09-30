@@ -291,7 +291,7 @@ implements.
 |---|---|---|
 | Flag / condition registries | `app/lib/feature_flags/registry.rb`, `app/lib/audience_conditions/registry.rb` | In-memory declared sets (`DeclaredRegistry`). |
 | Declarations | `app/lib/feature_flags/flags.rb`, `app/lib/audience_conditions/vocabulary.rb` | One `Registry.register(...)` call per flag/condition. Ships with none — every flag is a team's own addition. |
-| Decision | `app/lib/feature_flags.rb`, `app/lib/feature_flags/account_evaluator.rb` | `FeatureFlags.for(account)` / `.enabled?(key, account)` — the only entry points. |
+| Decision | `app/models/feature_flags.rb`, `app/models/feature_flags/account_evaluator.rb` | `FeatureFlags.for(account)` / `.enabled?(key, account)` — the only entry points. |
 | Consumption | `app/controllers/concerns/feature_gated.rb` | `feature_enabled?(key)`, `require_feature!(key)`, included on `SharedBaseController`. |
 | State | `FeatureFlag`, `Audience`, `AudienceCondition`, `FeatureFlagAudience`, `FeatureFlagAccount` | Access-list rows — read directly only to *display*, never to decide. |
 | Admin | `Adminit::{FeatureFlagsController,AudiencesController}` | Flag list/detail (attach/detach an audience, allow/block an account as member actions on the flag), audience CRUD + archive — single-row writes, no interactor. |
@@ -352,7 +352,7 @@ attached audience grants.
 
 **Account lookup:** every admin screen with a searchable account picker (roles, feature flags, the
 dashboard widget) shares one endpoint, `Adminit::AccountsController#search`
-(`GET /adminit/accounts/search`), narrowed per caller with `not_in_role`/`exclude_closed` params.
+(`GET /adminit/accounts/search`).
 
 ---
 

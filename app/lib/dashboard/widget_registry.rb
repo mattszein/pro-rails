@@ -48,7 +48,7 @@ module Dashboard
         # (app/components/adminit/dashboard/tabbed_container_component.rb) —
         # a mismatched span within a resource would make the layout depend on
         # registration order.
-        sibling = for_resource(widget.resource).first
+        sibling = by_resource(widget.resource).first
         if sibling && sibling.span != widget.span
           raise ArgumentError, "widget :#{widget.key} has span #{widget.span.inspect}, but " \
                                 "resource :#{widget.resource} is already registered with span #{sibling.span.inspect}"
@@ -58,14 +58,15 @@ module Dashboard
       end
 
       def find(key) = registry[key.to_sym]
-      def all_keys = keys
 
-      def for_keys(ks)
-        want = ks.map(&:to_sym).to_set
-        all.select { |w| want.include?(w.key) }
+      # Widgets registered under any of the given keys; unknown keys are ignored.
+      def find_all(keys)
+        wanted = keys.map(&:to_sym).to_set
+        all.select { |w| wanted.include?(w.key) }
       end
 
-      def for_resource(resource) = all.select { |w| w.resource == resource.to_sym }
+      # Widgets that belong to the given resource.
+      def by_resource(resource) = all.select { |w| w.resource == resource.to_sym }
     end
   end
 end

@@ -80,21 +80,21 @@ RSpec.describe Dashboard::WidgetRegistry do
     end
   end
 
-  describe ".for_resource" do
+  describe ".by_resource" do
     it "returns widgets for a given resource" do
-      widgets = described_class.for_resource(:ticket)
+      widgets = described_class.by_resource(:ticket)
       expect(widgets.map(&:resource)).to all(eq(:ticket))
     end
   end
 
-  describe ".for_keys" do
+  describe ".find_all" do
     it "returns widgets for given keys" do
-      widgets = described_class.for_keys([:tickets_personal, :tickets_general])
+      widgets = described_class.find_all([:tickets_personal, :tickets_general])
       expect(widgets.map(&:key)).to contain_exactly(:tickets_personal, :tickets_general)
     end
 
     it "silently skips unknown keys" do
-      widgets = described_class.for_keys([:tickets_personal, :unknown_key])
+      widgets = described_class.find_all([:tickets_personal, :unknown_key])
       expect(widgets.map(&:key)).to contain_exactly(:tickets_personal)
     end
   end

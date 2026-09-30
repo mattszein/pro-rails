@@ -29,11 +29,16 @@ class Adminit::RolesController < Adminit::ApplicationController
 
   def add_account
     authorize! @role
-    result = Adminit::Roles::AddMember.call(role: @role, account_id: params.dig(:role, :account_id))
-    if result.success?
+    account = Account.find_by(id: params.dig(:role, :account_id))
+
+    if account.nil?
+      redirect_to adminit_role_path(@role), alert: I18n.t("adminit.roles.account_not_found")
+    elsif account.role == @role
+      redirect_to adminit_role_path(@role), alert: I18n.t("adminit.roles.account_already_in_role")
+    elsif account.update(role: @role)
       redirect_to adminit_role_path(@role), notice: I18n.t("adminit.roles.account_added")
     else
-      redirect_to adminit_role_path(@role), alert: result.error
+      redirect_to adminit_role_path(@role), alert: account.errors.full_messages.to_sentence
     end
   end
 

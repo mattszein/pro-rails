@@ -277,6 +277,8 @@ so edits hot-reload in dev; an initializer re-runs `install` only on `to_prepare
 
 **Evaluation rules:**
 
+- Placement: the decision (`FeatureFlags`, `AccountEvaluator`) is domain logic that queries models, so
+  it lives in `app/models/`. The code-declared registries and declarations stay in `app/lib/`.
 - One entry point: `FeatureFlags.for(account)` / `.enabled?(key, account)`. Nothing else — including
   admin code — reads `feature_flag_accounts`/`feature_flag_audiences` to decide; admin reads them only
   to display.
