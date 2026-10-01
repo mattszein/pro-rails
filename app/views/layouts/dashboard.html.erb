@@ -33,7 +33,7 @@
       <%= render(Core::SidebarComponent.new(open: false, title: t("shared.layout.app_menu"))) do %>
         <%= render "partials/navigation" %>
       <% end %>
-      <main class="grow pt-20 px-8 overflow-x-scroll" role="main">
+      <main class="grow pt-16 px-8 overflow-x-scroll" role="main">
         <%= turbo_frame_tag "modal", target: "_top" %>
         <%= yield %>
       </main>
