@@ -1,10 +1,10 @@
 ## Project
 
-Pro-Rails is a Rails 8.0 application template with Hotwire, ViewComponent, and RBAC admin (Adminit). See [PROJECT.md](docs/PROJECT.md) for product overview and domain model. See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for decision frameworks and pattern rules.
+Pro-Rails is a Rails 8.1 application template with Hotwire, ViewComponent, and RBAC admin (Adminit). See [PROJECT.md](docs/PROJECT.md) for product overview and domain model. See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for decision frameworks and pattern rules.
 
 ## Tech Stack
 
-Rails 8.0.2, PostgreSQL, Rodauth (auth), ActionPolicy (authorization), Interactor (workflows), Solid Queue (jobs, separate DB), AnyCable (WebSockets), Redis (cache), TailwindCSS 4.2, Propshaft + Importmap, ViewComponent, Noticed (notifications), Anyway Config, RSpec + FactoryBot, Standard Ruby, Brakeman, Freezolite.
+Rails 8.1.4, PostgreSQL, Rodauth (auth), ActionPolicy (authorization), Interactor (workflows), Solid Queue (jobs, separate DB), AnyCable (WebSockets), Redis (cache), TailwindCSS 4.2, Propshaft + Importmap, ViewComponent, Noticed (notifications), Anyway Config, RSpec + FactoryBot, Standard Ruby, Brakeman, Freezolite.
 
 ## Commands
 
