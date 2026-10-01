@@ -109,8 +109,8 @@ GEM
       smart_properties
     bigdecimal (4.0.1)
     bindex (0.8.1)
-    bootsnap (1.23.0)
-      msgpack (~> 1.2)
+    bootsnap (1.26.0)
+      msgpack (~> 1.5)
     brakeman (8.1.0)
       racc
     builder (3.3.0)
@@ -182,8 +182,8 @@ GEM
     ffi (1.17.3-arm-linux-musl)
     ffi (1.17.3-x86_64-linux-gnu)
     ffi (1.17.3-x86_64-linux-musl)
-    freezolite (0.6.0)
-      require-hooks (~> 0.2)
+    freezolite (0.7.0)
+      require-hooks (~> 0.4)
     fugit (1.12.1)
       et-orbi (~> 1.4)
       raabro (~> 1.4)
@@ -424,7 +424,7 @@ GEM
     regexp_parser (2.11.3)
     reline (0.6.3)
       io-console (~> 0.5)
-    require-hooks (0.2.3)
+    require-hooks (0.5.1)
     roda (3.101.0)
       rack
     rodauth (2.42.0)
