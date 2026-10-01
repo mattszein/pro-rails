@@ -77,7 +77,7 @@ en:
       view_all: "View all notifications →"
     layout:
       app_title: "Pro Rails"
-      app_menu: "RailsApp | Menu"
+      app_menu: "Menu"
     dashboard:
       title: "Super Rails App"
       signed_in_as: "You are signed in as %{email}"

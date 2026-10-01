@@ -3,7 +3,7 @@ en:
     page_title: "Pro Rails — Launch Production-Ready Apps in Days"
     hero:
       title: "Launch Production-Ready Apps in Days, Not Weeks."
-      subtitle: "A Rails 8 starter template with auth, RBAC, real-time, background jobs, and a component library — all wired up and tested."
+      subtitle: "A Rails 8 starter template with auth, RBAC, real-time, background jobs, and a component library. All wired up and tested."
     features:
       authentication:
         title: "Authentication (Rodauth)"

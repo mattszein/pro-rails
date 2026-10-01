@@ -3,7 +3,7 @@ es:
     page_title: "Pro Rails — Lanza apps listas para producción en días"
     hero:
       title: "Lanza apps listas para producción en días, no semanas."
-      subtitle: "Una plantilla Rails 8 con autenticación, RBAC, tiempo real, jobs en background y una librería de componentes — todo configurado y probado."
+      subtitle: "Una plantilla Rails 8 con autenticación, RBAC, tiempo real, jobs en background y una librería de componentes. Todo configurado y probado."
     features:
       authentication:
         title: "Autenticación (Rodauth)"
