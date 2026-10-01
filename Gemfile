@@ -39,7 +39,7 @@ gem "thruster", require: false
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 gem "image_processing", "~> 2.0"
 gem "ruby-vips", "~> 2.3", require: false
-gem "lexxy", "~> 0.1.26.beta"
+gem "lexxy", "~> 1.0"
 
 gem "freezolite" # Freezolite add frozen_string_literals to true to every file in your project
 
