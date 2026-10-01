@@ -1,4 +1,8 @@
 class RodauthApp < Rodauth::Rails::App
+  # Rodauth loads Roda's json_parser without options, and Roda 3.108 then warns and falls back to
+  # matching any content type containing "json". Pin the strict regexp Roda recommends.
+  plugin :json_parser, content_type_regexp: /\Aapplication\/json\b/i
+
   # primary configuration
   configure RodauthMain
 
