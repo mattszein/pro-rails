@@ -88,6 +88,10 @@ end
 group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
+  # Pinned to 0.16: cuprite 0.18 / ferrum 0.18.0 raise "Failed to find browser context" against the
+  # browserless Chrome the system specs use (rubycdp/ferrum#546, #578; fixed on ferrum main in #627/#628,
+  # not yet released). Even with that fix, spec/system/accounts/create_spec.rb passed 4/8 runs on 0.18
+  # vs 8/8 on 0.16. Retry the upgrade once a ferrum release newer than 0.18.0 ships.
   gem "cuprite", "= 0.16"
   gem "test-prof"
 end
