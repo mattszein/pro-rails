@@ -76,7 +76,7 @@ group :development, :test do
   gem "standard-rails"
   gem "erb_lint", require: false
   gem "htmlbeautifier"
-  gem "lookbook", ">= 2.3.11"
+  gem "lookbook", "~> 2.3", ">= 2.3.15"
 end
 
 group :development do
