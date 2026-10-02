@@ -8,8 +8,10 @@ module AvatarAi
 
     private
 
+    # Model ids are OpenRouter ids (see AvatarAiConfig::TEXT_MODELS), including ":free" variants that
+    # rotate faster than ruby_llm's bundled registry, so skip the registry lookup.
     def ask(prompt)
-      RubyLLM.chat(model: @model).ask(prompt)
+      RubyLLM.chat(model: @model, provider: :openrouter, assume_model_exists: true).ask(prompt)
     rescue RubyLLM::Error => e
       raise GenerationError, "#{self.class.name} failed: #{e.message}"
     end

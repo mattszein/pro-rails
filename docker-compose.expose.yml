@@ -22,7 +22,10 @@ services:
   maildev:
     ports:
       - "127.0.0.1:${MAILDEV_SMTP_PORT:-}:1025"
-      - "127.0.0.1:${MAILDEV_WEB_PORT:-}:8025"
+      # The inbox UI is the one port with a fixed default (http://localhost:8025). Running several
+      # worktrees at once? Use the traefik override, or set `MAILDEV_WEB_PORT=` (empty) in .env to
+      # get an ephemeral port back.
+      - "127.0.0.1:${MAILDEV_WEB_PORT-8025}:8025"
 
   chrome:
     ports:

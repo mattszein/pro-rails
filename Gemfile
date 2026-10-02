@@ -37,8 +37,9 @@ gem "kamal", require: false
 gem "thruster", require: false
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-gem "image_processing", "~> 1.2"
-gem "lexxy", "~> 0.1.26.beta"
+gem "image_processing", "~> 2.0"
+gem "ruby-vips", "~> 2.3", require: false
+gem "lexxy", "~> 1.0"
 
 gem "freezolite" # Freezolite add frozen_string_literals to true to every file in your project
 
@@ -47,7 +48,7 @@ gem "view_component", "~> 4.4"
 gem "tailwindcss-rails", "~> 4.2"
 gem "inline_svg"
 
-gem "redis", "~> 5.4", ">= 5.4.1"
+gem "redis", "~> 6.0"
 gem "anyway_config", "~> 2.0"
 gem "anycable-rails", "~> 1.6"
 gem "action_policy"
@@ -75,7 +76,7 @@ group :development, :test do
   gem "standard-rails"
   gem "erb_lint", require: false
   gem "htmlbeautifier"
-  gem "lookbook", ">= 2.3.11"
+  gem "lookbook", "~> 2.3", ">= 2.3.15"
 end
 
 group :development do
@@ -87,11 +88,15 @@ end
 group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
+  # Pinned to 0.16: cuprite 0.18 / ferrum 0.18.0 raise "Failed to find browser context" against the
+  # browserless Chrome the system specs use (rubycdp/ferrum#546, #578; fixed on ferrum main in #627/#628,
+  # not yet released). Even with that fix, spec/system/accounts/create_spec.rb passed 4/8 runs on 0.18
+  # vs 8/8 on 0.16. Retry the upgrade once a ferrum release newer than 0.18.0 ships.
   gem "cuprite", "= 0.16"
   gem "test-prof"
 end
 
-gem "ruby_llm"
+gem "ruby_llm", "~> 2.0"
 
 gem "rodauth-rails", "~> 2.1"
 # Enables Sequel to use Active Record's database connection

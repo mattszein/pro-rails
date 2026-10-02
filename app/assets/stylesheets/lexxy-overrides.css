@@ -1,0 +1,48 @@
+/*
+ * Our additions on top of the Lexxy gem's stylesheets. Don't copy the gem's lexxy-variables.css
+ * here: a file with the same name hides the gem's, so variables added by a Lexxy upgrade go missing.
+ */
+
+/* Restore list styles stripped by Tailwind preflight */
+
+:where(.lexxy-content) ul,
+:where(lexxy-editor) ul {
+  list-style-type: disc;
+  padding-inline-start: 1.5em;
+}
+
+:where(.lexxy-content) ol,
+:where(lexxy-editor) ol {
+  list-style-type: decimal;
+  padding-inline-start: 1.5em;
+}
+
+:where(.lexxy-content) li.lexxy-nested-listitem,
+:where(lexxy-editor) li.lexxy-nested-listitem {
+  list-style-type: none;
+}
+
+/* Dark mode. `:root.dark` (the class is set on <html>) outranks the gem's `:root` variables, so
+   this wins whichever stylesheet loads first. */
+:root.dark {
+  --lexxy-color-ink: oklch(90% 0 0);
+  --lexxy-color-ink-medium: oklch(70% 0 0);
+  --lexxy-color-ink-light: oklch(55% 0 0);
+  --lexxy-color-ink-lighter: oklch(35% 0 0);
+  --lexxy-color-ink-lightest: oklch(20% 0 0);
+  --lexxy-color-ink-inverted: oklch(15% 0 0);
+
+  --lexxy-color-accent-dark: oklch(70% 0.15 260);
+  --lexxy-color-accent-medium: oklch(60% 0.15 258);
+  --lexxy-color-accent-light: oklch(30% 0.05 254);
+  --lexxy-color-accent-lightest: oklch(25% 0.03 254);
+
+  --lexxy-color-code-token-att: #f97583;
+  --lexxy-color-code-token-comment: #8b949e;
+  --lexxy-color-code-token-function: #d2a8ff;
+  --lexxy-color-code-token-operator: #f97583;
+  --lexxy-color-code-token-property: #79c0ff;
+  --lexxy-color-code-token-punctuation: #c9d1d9;
+  --lexxy-color-code-token-selector: #7ee787;
+  --lexxy-color-code-token-variable: #ffa657;
+}

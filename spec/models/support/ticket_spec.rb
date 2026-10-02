@@ -147,4 +147,30 @@ RSpec.describe Support::Ticket, type: :model do
       expect(stats[:by_status]).to include("open" => 1, "in_progress" => 1, "finished" => 1, "closed" => 1)
     end
   end
+
+  # Turbo broadcasts render partials through ApplicationController.render, outside any controller,
+  # so a partial must get everything from its locals (no @ivars set by an action).
+  describe "admin ticket partial rendered for a broadcast" do
+    let(:ticket) { create(:ticket) }
+
+    def render_partial
+      ApplicationController.render(partial: "adminit/tickets/ticket", locals: {ticket: ticket})
+    end
+
+    it "renders a ticket with no notes or messages" do
+      expect(render_partial).to include(I18n.t("adminit.tickets.no_notes"))
+    end
+
+    it "renders notes, messages and a non-image attachment" do
+      ticket.notes.create!(body: "internal note body")
+      create(:message, conversation: ticket.conversation, content: "hello from the thread")
+      ticket.attachments.attach(io: StringIO.new("%PDF-1.4"), filename: "invoice.pdf", content_type: "application/pdf")
+
+      html = render_partial
+
+      expect(html).to include("internal note body")
+      expect(html).to include("hello from the thread")
+      expect(html).to include("invoice.pdf")
+    end
+  end
 end

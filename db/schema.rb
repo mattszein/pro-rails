@@ -116,35 +116,35 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_200000) do
   create_table "audience_conditions", force: :cascade do |t|
     t.bigint "audience_id", null: false
     t.string "condition_key", null: false
+    t.jsonb "value", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.jsonb "value", null: false
     t.index ["audience_id", "condition_key"], name: "index_audience_conditions_on_audience_id_and_condition_key", unique: true
     t.index ["audience_id"], name: "index_audience_conditions_on_audience_id"
   end
 
   create_table "audiences", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
     t.datetime "archived_at"
     t.datetime "created_at", null: false
-    t.text "description"
-    t.string "name", null: false
     t.datetime "updated_at", null: false
     t.index ["archived_at"], name: "index_audiences_on_archived_at"
     t.index ["name"], name: "index_audiences_on_name", unique: true
   end
 
   create_table "avatars", force: :cascade do |t|
-    t.text "assembled_prompt"
-    t.datetime "created_at", null: false
-    t.jsonb "dna", default: {}, null: false
-    t.integer "dna_version"
-    t.string "image_model"
+    t.bigint "profile_id", null: false
     t.integer "kind", null: false
     t.integer "method"
-    t.bigint "profile_id", null: false
+    t.integer "dna_version"
+    t.jsonb "dna", default: {}, null: false
+    t.text "assembled_prompt"
     t.integer "status", default: 0, null: false
-    t.datetime "updated_at", null: false
+    t.string "image_model"
     t.boolean "visible", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["profile_id", "kind"], name: "index_avatars_on_profile_id_and_kind"
     t.index ["profile_id", "status"], name: "index_avatars_on_profile_id_and_status"
     t.index ["profile_id", "visible"], name: "index_avatars_on_profile_id_and_visible"
@@ -159,10 +159,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_200000) do
   end
 
   create_table "feature_flag_accounts", force: :cascade do |t|
-    t.integer "access", null: false
-    t.bigint "account_id", null: false
-    t.datetime "created_at", null: false
     t.bigint "feature_flag_id", null: false
+    t.bigint "account_id", null: false
+    t.integer "access", null: false
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_feature_flag_accounts_on_account_id"
     t.index ["feature_flag_id", "account_id"], name: "index_feature_flag_accounts_on_flag_and_account", unique: true
@@ -170,9 +170,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_200000) do
   end
 
   create_table "feature_flag_audiences", force: :cascade do |t|
+    t.bigint "feature_flag_id", null: false
     t.bigint "audience_id", null: false
     t.datetime "created_at", null: false
-    t.bigint "feature_flag_id", null: false
     t.datetime "updated_at", null: false
     t.index ["audience_id"], name: "index_feature_flag_audiences_on_audience_id"
     t.index ["feature_flag_id", "audience_id"], name: "index_feature_flag_audiences_on_flag_and_audience", unique: true
@@ -180,8 +180,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_200000) do
   end
 
   create_table "feature_flags", force: :cascade do |t|
-    t.datetime "created_at", null: false
     t.string "key", null: false
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["key"], name: "index_feature_flags_on_key", unique: true
   end
@@ -230,9 +230,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_200000) do
   end
 
   create_table "permissions_roles", id: false, force: :cascade do |t|
-    t.jsonb "dashboard_widget_keys", default: [], null: false
     t.bigint "permission_id", null: false
     t.bigint "role_id", null: false
+    t.jsonb "dashboard_widget_keys", default: [], null: false
     t.index ["permission_id", "role_id"], name: "index_permissions_roles_on_permission_id_and_role_id", unique: true
     t.index ["permission_id"], name: "index_permissions_roles_on_permission_id"
     t.index ["role_id"], name: "index_permissions_roles_on_role_id"
@@ -240,11 +240,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_200000) do
 
   create_table "profiles", force: :cascade do |t|
     t.bigint "account_id", null: false
-    t.bigint "avatar_id"
+    t.string "username"
     t.text "bio"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "username"
+    t.bigint "avatar_id"
     t.index ["account_id"], name: "index_profiles_on_account_id", unique: true
     t.index ["avatar_id"], name: "index_profiles_on_avatar_id"
     t.index ["username"], name: "index_profiles_on_username", unique: true, where: "((username IS NOT NULL) AND ((username)::text <> ''::text))"

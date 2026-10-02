@@ -1,7 +1,7 @@
 class Adminit::TicketsController < Adminit::ApplicationController
   include Tableable
 
-  before_action :set_ticket, only: %i[show edit update destroy take leave finish reopen accept_reopen new_reject_reopen reject_reopen]
+  before_action :set_ticket, only: %i[edit update destroy take leave finish reopen accept_reopen new_reject_reopen reject_reopen]
   before_action :ensure_frame_response, only: %i[edit new_reject_reopen]
 
   def index
@@ -15,10 +15,10 @@ class Adminit::TicketsController < Adminit::ApplicationController
 
   # GET /tickets/1 or /tickets/1.json
   def show
+    # The partial is also broadcast from a job (no controller), so it reads plain associations from
+    # `ticket`; preloading here is what keeps this page free of N+1 queries.
+    @ticket = Support::Ticket.includes(notes: :account, conversation: {messages: :account}).find(params[:id])
     authorize! @ticket, with: Adminit::TicketPolicy
-    @conversation = @ticket.conversation
-    @messages = @conversation.messages.includes(:account).order(created_at: :asc)
-    @notes = @ticket.notes.includes(:account).order(created_at: :desc)
   end
 
   # GET /tickets/1/edit

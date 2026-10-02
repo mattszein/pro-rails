@@ -8,9 +8,9 @@ module AiImage
           config.gemini_api_key = ENV.fetch("GOOGLE_API_KEY", nil)
         end
         chat = RubyLLM.chat(model: MODEL)
-          .with_params(generationConfig: {responseModalities: ["image"]})
+          .with_provider_options(generationConfig: {responseModalities: ["image"]})
         response = chat.ask(prompt)
-        attachment = response.content[:attachments]&.first
+        attachment = response.attachments.first
         raise AiImage::Generator::GenerationError, "Nano Banana returned no image" unless attachment
 
         {io: attachment.source, content_type: attachment.mime_type || "image/jpeg"}
