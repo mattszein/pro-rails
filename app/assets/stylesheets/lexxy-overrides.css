@@ -1,12 +1,6 @@
 /*
- * Project-level additions on top of the Lexxy gem's own stylesheets.
- *
- * Do NOT copy the gem's `lexxy-variables.css` here: a file with the same logical name shadows the
- * gem's, so new variables added by a Lexxy upgrade silently go missing. Keep only what the gem does
- * not provide.
- *
- * This file is pulled in by `stylesheet_link_tag :app`, which loads before `stylesheet_link_tag
- * "lexxy"`. Rules below therefore win by specificity (`:root.dark`), not by load order.
+ * Our additions on top of the Lexxy gem's stylesheets. Don't copy the gem's lexxy-variables.css
+ * here: a file with the same name hides the gem's, so variables added by a Lexxy upgrade go missing.
  */
 
 /* Restore list styles stripped by Tailwind preflight */
@@ -28,7 +22,8 @@
   list-style-type: none;
 }
 
-/* Dark mode (the `dark` class is set on <html> by dark_mode_controller.js) */
+/* Dark mode. `:root.dark` (the class is set on <html>) outranks the gem's `:root` variables, so
+   this wins whichever stylesheet loads first. */
 :root.dark {
   --lexxy-color-ink: oklch(90% 0 0);
   --lexxy-color-ink-medium: oklch(70% 0 0);
