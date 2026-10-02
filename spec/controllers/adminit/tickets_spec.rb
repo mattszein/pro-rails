@@ -111,6 +111,31 @@ describe Adminit::TicketsController, type: :controller do
     end
   end
 
+  describe "GET #show" do
+    subject { get :show, params: {id: ticket.id} }
+
+    let(:ticket) { create(:ticket, created: creator_account) }
+
+    before do
+      login_user(user)
+      ticket_permission
+      ticket.notes.create!(body: "internal note", account: user)
+      create(:message, conversation: ticket.conversation, account: creator_account)
+    end
+
+    it_behaves_like "respond to success"
+
+    it "preloads notes and messages with their accounts for the view" do
+      subject
+      loaded = controller.instance_variable_get(:@ticket)
+
+      expect(loaded.association(:notes)).to be_loaded
+      expect(loaded.notes.first.association(:account)).to be_loaded
+      expect(loaded.conversation.association(:messages)).to be_loaded
+      expect(loaded.conversation.messages.first.association(:account)).to be_loaded
+    end
+  end
+
   describe "POST #take" do
     let(:ticket) { create(:ticket, created: creator_account, assigned: nil, status: :open) }
 

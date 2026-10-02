@@ -18,9 +18,8 @@
           <%= render Adminit::Tickets::NoteFormComponent.new(ticket: ticket) %>
         </div>
         <div class="flex-1 overflow-y-auto pr-2 space-y-3 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700 min-h-0">
-          <% notes = ticket.notes.includes(:account) %>
-          <% if notes.any? %>
-            <%= render Adminit::Tickets::NoteComponent.with_collection(notes, as: :note) %>
+          <% if ticket.notes.any? %>
+            <%= render Adminit::Tickets::NoteComponent.with_collection(ticket.notes, as: :note) %>
           <% else %>
             <p class="text-slate-500 italic text-center py-4"><%= t("adminit.tickets.no_notes") %></p>
           <% end %>
@@ -34,7 +33,7 @@
     <%= render(Core::CardComponent.new(variant: :glass, glow: true, classes: "space-y-4")) do %>
       <%= render Support::ConversationComponent.new(
             conversation: ticket.conversation,
-            messages: ticket.conversation.messages.includes(:account)
+            messages: ticket.conversation.messages
           ) do %>
         <%= render "support/conversations/message_form", ticket: ticket %>
       <% end %>
