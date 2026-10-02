@@ -8,7 +8,7 @@
     <%= link_to download_url, target: "_blank",
           class: "flex items-center justify-center h-32 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors", rel: "noopener" do %>
       <div class="text-center">
-        <%= icon "document", {classes: "h-8 mx-auto"} %>
+        <%= helpers.icon "document", {classes: "h-8 mx-auto"} %>
         <p class="text-xs mt-2 px-2 truncate"><%= filename %></p>
       </div>
     <% end %>
