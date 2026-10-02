@@ -16,9 +16,6 @@ class Adminit::TicketsController < Adminit::ApplicationController
   # GET /tickets/1 or /tickets/1.json
   def show
     authorize! @ticket, with: Adminit::TicketPolicy
-    @conversation = @ticket.conversation
-    @messages = @conversation.messages.includes(:account).order(created_at: :asc)
-    @notes = @ticket.notes.includes(:account).order(created_at: :desc)
   end
 
   # GET /tickets/1/edit
