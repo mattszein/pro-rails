@@ -136,6 +136,15 @@ RSpec.describe Support::TicketsController, type: :controller do
         it "is authorized" do
           expect { subject }.to be_authorized_to(:new?, :ticket).with(Support::TicketPolicy).with_context(user: creator_account)
         end
+
+        context "when rendering views" do
+          render_views
+
+          it "renders the article suggestions frame and controller" do
+            subject
+            expect(response.body).to include('data-controller="article-suggestions"', 'id="help_suggestions"', suggestions_help_articles_path)
+          end
+        end
       end
     end
   end

@@ -3,6 +3,7 @@ en:
     models:
       account: Account
       announcement: Announcement
+      support/article: Article
       profile: Profile
       role: Role
       ticket: Ticket
@@ -96,6 +97,16 @@ en:
         billing: "Billing"
         feature_request: "Feature Request"
         other: "Other"
+    article:
+      status:
+        draft: "Draft"
+        published: "Published"
+      category:
+        account_access: "Account Access"
+        technical_issue: "Technical Issue"
+        billing: "Billing"
+        feature_request: "Feature Request"
+        other: "Other"
     announcement:
       status:
         draft: "Draft"
@@ -111,6 +122,10 @@ en:
       can_only_unschedule_scheduled: "Can only unschedule scheduled announcements"
       already_published: "Already published"
       must_be_scheduled_first: "Must be scheduled first"
+  article:
+    transitions:
+      already_published: "Already published"
+      can_only_unpublish_published: "Can only unpublish published articles"
   ticket:
     transitions:
       can_only_finish: "Can only finish in-progress or reopened tickets"

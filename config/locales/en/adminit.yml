@@ -27,6 +27,21 @@ en:
       new_announcement: "New Announcement"
       scheduled_time_notice: "Scheduled time cannot be changed once the announcement is scheduled or published."
       save_draft: "Save Draft"
+    articles:
+      new_article: "New Article"
+      edit_article: "Editing Article"
+      slug: "Slug"
+      slug_placeholder: "Generated from the title if left blank"
+      summary: "Summary"
+      summary_placeholder: "A short plain-text summary"
+      locale: "Language"
+      locales:
+        en: "English"
+        es: "Spanish"
+      general: "General"
+      published: "Article was published."
+      unpublished: "Article was unpublished."
+      unpublish: "Unpublish"
     roles:
       account_removed: "Account was successfully removed from the role."
       account_not_removed: "Account wasn't removed from the role."
@@ -127,6 +142,7 @@ en:
       tickets: "Tickets"
       feature_flags: "Feature Flags"
       audiences: "Audiences"
+      articles: "Articles"
       back_to_app: "Back to App"
     notes:
       system: "System"

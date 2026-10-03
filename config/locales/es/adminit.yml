@@ -27,6 +27,21 @@ es:
       new_announcement: "Nuevo Anuncio"
       scheduled_time_notice: "La hora de programación no se puede cambiar una vez que el anuncio está programado o publicado."
       save_draft: "Guardar Borrador"
+    articles:
+      new_article: "Nuevo Artículo"
+      edit_article: "Editando Artículo"
+      slug: "Slug"
+      slug_placeholder: "Se genera desde el título si se deja vacío"
+      summary: "Resumen"
+      summary_placeholder: "Un breve resumen en texto plano"
+      locale: "Idioma"
+      locales:
+        en: "Inglés"
+        es: "Español"
+      general: "General"
+      published: "El artículo fue publicado."
+      unpublished: "El artículo fue despublicado."
+      unpublish: "Despublicar"
     roles:
       account_removed: "La cuenta fue eliminada del rol exitosamente."
       account_not_removed: "La cuenta no fue eliminada del rol."
@@ -127,6 +142,7 @@ es:
       feature_flags: "Feature Flags"
       audiences: "Audiencias"
       tickets: "Tickets"
+      articles: "Artículos"
       back_to_app: "Volver a la App"
     notes:
       system: "Sistema"

@@ -37,6 +37,10 @@ Rails.application.routes.draw do
       end
     end
 
+    get "help" => "support/articles#index", :as => :help_articles
+    get "help/suggestions" => "support/articles#suggestions", :as => :suggestions_help_articles
+    get "help/:slug" => "support/articles#show", :as => :help_article, :constraints => {slug: /[a-z0-9-]+/}
+
     namespace :settings do
       resources :appearance, only: [:index]
       resource :profile, only: [:edit, :update]

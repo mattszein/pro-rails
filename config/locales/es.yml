@@ -3,6 +3,7 @@ es:
     models:
       account: Cuenta
       announcement: Anuncio
+      support/article: Artículo
       profile: Perfil
       role: Rol
       ticket: Ticket
@@ -96,6 +97,16 @@ es:
         billing: "Facturación"
         feature_request: "Solicitud de Función"
         other: "Otro"
+    article:
+      status:
+        draft: "Borrador"
+        published: "Publicado"
+      category:
+        account_access: "Acceso a Cuenta"
+        technical_issue: "Problema Técnico"
+        billing: "Facturación"
+        feature_request: "Solicitud de Función"
+        other: "Otro"
     announcement:
       status:
         draft: "Borrador"
@@ -111,6 +122,10 @@ es:
       can_only_unschedule_scheduled: "Solo se pueden desprogramar anuncios programados"
       already_published: "Ya está publicado"
       must_be_scheduled_first: "Debe estar programado primero"
+  article:
+    transitions:
+      already_published: "Ya está publicado"
+      can_only_unpublish_published: "Solo se pueden despublicar artículos publicados"
   ticket:
     transitions:
       can_only_finish: "Solo se pueden finalizar tickets en progreso o reabiertos"

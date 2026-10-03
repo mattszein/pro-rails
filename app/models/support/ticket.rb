@@ -2,6 +2,15 @@ module Support
   class Ticket < ApplicationRecord
     class InvalidTransition < StandardError; end
 
+    # Shared with Support::Article so ticket and article categories cannot drift.
+    CATEGORIES = {
+      account_access: 0,
+      technical_issue: 1,
+      billing: 2,
+      feature_request: 3,
+      other: 4
+    }.freeze
+
     self.table_name = "tickets"
 
     belongs_to :created, class_name: "Account", optional: true
@@ -18,13 +27,7 @@ module Support
       reopened: 4,
       closed: 5
     }, default: :open, validate: {allow_nil: false}
-    enum :category, {
-      account_access: 0,
-      technical_issue: 1,
-      billing: 2,
-      feature_request: 3,
-      other: 4
-    }, default: :account_access, validate: {allow_nil: false}
+    enum :category, CATEGORIES, default: :account_access, validate: {allow_nil: false}
     scope :prioritized, -> { order(priority: :desc, created_at: :desc) }
     scope :search_title, ->(query) { where("title ILIKE ?", "%#{sanitize_sql_like(query)}%") }
     scope :assigned_to, ->(account_id) { where(assigned_id: account_id) }

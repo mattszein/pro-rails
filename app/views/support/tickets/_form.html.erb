@@ -1,4 +1,8 @@
-<%= form_with(model: ticket, url: ticket.persisted? ? support_ticket_path(ticket) : support_tickets_path, builder: CustomFormBuilder, multipart: true, data: {turbo: true}) do |form| %>
+<% form_data = {turbo: true} %>
+<% unless ticket.persisted? %>
+  <% form_data.merge!(controller: "article-suggestions", action: "input->article-suggestions#schedule change->article-suggestions#schedule", article_suggestions_url_value: suggestions_help_articles_path) %>
+<% end %>
+<%= form_with(model: ticket, url: ticket.persisted? ? support_ticket_path(ticket) : support_tickets_path, builder: CustomFormBuilder, multipart: true, data: form_data) do |form| %>
   <% if ticket.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
       <h2><%= pluralize(ticket.errors.count, "error") %> prohibited this ticket from being saved:</h2>
@@ -11,18 +15,21 @@
     </div>
   <% end %>
     <%= form.label :title, t("shared.labels.title") %>
-    <%= form.text_field :title, {autofocus: true, required: true, placeholder: t("shared.placeholders.title"), autocomplete: "title", class: "w-full"} %>
+    <%= form.text_field :title, {autofocus: true, required: true, placeholder: t("shared.placeholders.title"), autocomplete: "title", class: "w-full", data: {article_suggestions_target: "title"}} %>
     <div class="mt-6">
       <%= form.label :category %>
       <%= form.select :category,
             options_for_select(Support::Ticket.categories.keys.map { |cat| [t("enums.ticket.category.#{cat}"), cat] }, ticket.persisted? ? ticket.category : nil),
             {include_blank: t("support.tickets.select_category")},
-            {required: true, class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"} %>
+            {required: true, data: {article_suggestions_target: "category"}, class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"} %>
     </div>
     <div class="mt-6">
     <%= form.label :description %>
-    <%= form.text_area :description, rows: 4, placeholder: t("support.tickets.description_placeholder"), class: "w-full" %>
+    <%= form.text_area :description, rows: 4, placeholder: t("support.tickets.description_placeholder"), class: "w-full", data: {article_suggestions_target: "description"} %>
     </div>
+    <% unless ticket.persisted? %>
+      <%= turbo_frame_tag "help_suggestions", data: {article_suggestions_target: "frame"} %>
+    <% end %>
     <% unless ticket.persisted? %>
       <div class="mt-6">
         <%= form.file_field :attachments,

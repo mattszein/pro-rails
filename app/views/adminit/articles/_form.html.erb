@@ -1,0 +1,21 @@
+<%= form_with(model: article, url: article.persisted? ? adminit_article_path(article) : adminit_articles_path,
+      data: {turbo: true}, class: "space-y-4") do |form| %>
+  <%= render "adminit/application/form_errors", record: article %>
+  <%= form.label :title, t("shared.labels.title") %>
+  <%= form.text_field :title, {autofocus: true, required: true, placeholder: t("shared.placeholders.title"), autocomplete: "off", class: "w-full"} %>
+  <%= form.label :slug, t("adminit.articles.slug") %>
+  <%= form.text_field :slug, {placeholder: t("adminit.articles.slug_placeholder"), autocomplete: "off", class: "w-full"} %>
+  <%= form.label :summary, t("adminit.articles.summary") %>
+  <%= form.text_area :summary, {rows: 2, required: true, placeholder: t("adminit.articles.summary_placeholder"), class: "w-full"} %>
+  <%= form.label :category, t("shared.labels.category") %>
+  <%= form.select :category, article_category_options, {include_blank: t("adminit.articles.general")}, {class: "w-full"} %>
+  <%= form.label :locale, t("adminit.articles.locale") %>
+  <%= form.select :locale, article_locale_options, {}, {required: true, class: "w-full"} %>
+  <div>
+    <%= form.label :body, t("shared.labels.content"), class: "block mb-2" %>
+    <%= form.rich_text_area :body %>
+  </div>
+  <div class="mt-6">
+    <%= form.button t("shared.common.save"), {theme: :create, fullw: true} %>
+  </div>
+<% end %>

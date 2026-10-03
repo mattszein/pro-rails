@@ -276,6 +276,15 @@ a disclosure decision, not a convenience query.
 (owner-scoped, `category` filterable) and `/adminit/tickets` (all rows, `priority` sortable). Each
 namespace's helper declares its own column set — that split is intentional, not duplication.
 
+### Full-Text Search (Support::Article)
+
+`Support::Article.search(query, locale:, category:, limit:)` queries a generated, stored `searchable`
+tsvector column (GIN-indexed; title weight A, summary B, body C) with `websearch_to_tsquery('simple', ...)`.
+Rich text can't be indexed directly, so `search_text` is synced from `body.to_plain_text` in a
+`before_save`. Chain `.published` to restrict to public articles; passing a `category` also matches
+general (nil) articles. The category enum reuses the shared `Support::Ticket::CATEGORIES`, so tickets
+and articles never drift.
+
 ---
 
 ## Feature Flags

@@ -21,6 +21,11 @@ namespace :adminit do
     post :unschedule, on: :member
   end
 
+  resources :articles do
+    post :publish, on: :member
+    post :unpublish, on: :member
+  end
+
   resources :roles, only: [:index, :show] do
     get "account_select", on: :member
     delete "account", to: "roles#remove_account", on: :member

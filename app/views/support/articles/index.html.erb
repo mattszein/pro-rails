@@ -1,0 +1,43 @@
+<div class="w-full space-y-2">
+  <%= render Core::CardComponent.new(padding: :sm, classes: "space-y-4") do %>
+    <div>
+      <h1 class="text-xl font-semibold"><%= t("support.articles.title") %></h1>
+      <p class="text-gray-600 dark:text-gray-400"><%= t("support.articles.subtitle") %></p>
+    </div>
+    <%= form_with url: help_articles_path, method: :get, class: "flex gap-2 items-center", data: {turbo_frame: "_top"} do |f| %>
+      <%= hidden_field_tag :category, @category if @category %>
+      <%= search_field_tag :q, @query, placeholder: t("support.articles.search_placeholder"), "aria-label": t("support.articles.search"),
+            class: "w-full rounded-md border border-gray-300 p-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" %>
+      <%= f.submit t("support.articles.search"), name: nil, class: "cursor-pointer rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700" %>
+    <% end %>
+    <div class="flex flex-wrap gap-2">
+      <% help_category_filters.each do |label, value| %>
+        <% active = (value == @category) %>
+        <%= link_to help_articles_path(q: @query.presence, category: value),
+              class: "rounded-full",
+              "aria-current": (active ? "true" : nil) do %>
+          <%= render Core::BadgeComponent.new(label: label, theme: (active ? :primary : :secondary), size: :sm) %>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if @articles.any? %>
+    <div class="grid gap-2">
+      <% @articles.each do |article| %>
+        <%= render Core::CardComponent.new(padding: :sm, classes: "space-y-1") do %>
+          <div class="flex items-center gap-2">
+            <%= link_to article.title, help_article_path(slug: article.slug), class: "text-lg font-semibold text-primary-600 hover:underline dark:text-primary-200" %>
+            <%= render Core::BadgeComponent.new(label: help_article_category_label(article), theme: :secondary, size: :xs) %>
+          </div>
+          <p class="text-gray-600 dark:text-gray-400"><%= article.summary %></p>
+        <% end %>
+      <% end %>
+    </div>
+    <%= render Core::Table::PaginationComponent.new(pagy: @pagy) %>
+  <% else %>
+    <%= render Core::CardComponent.new(padding: :sm) do %>
+      <p class="text-gray-600 dark:text-gray-400"><%= t("support.articles.no_results") %></p>
+    <% end %>
+  <% end %>
+</div>

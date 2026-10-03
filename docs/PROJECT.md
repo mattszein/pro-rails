@@ -84,6 +84,19 @@ open → in_progress → finished → closed
 
 All conversation updates appear in real-time — no page reload needed.
 
+#### Knowledge base / help center
+
+Self-service articles that deflect tickets before they are created.
+
+**What users can do**:
+- Browse and search published articles at `/help` (filter by category; results follow the current language)
+- See suggested articles while filling in the new-ticket form, based on the title and category
+
+**What admins can do** (`article` permission, Super Admin by default):
+- Manage articles in Adminit (create, edit, delete) with a rich-text body
+- Keep articles as **draft** or **published** (only published articles are visible in the help center)
+- Set each article's locale (en/es) and category (same categories as tickets, or none for general articles)
+
 ### Notifications
 
 Two-level notification system: quick access from the header and a full dedicated page.
@@ -213,6 +226,9 @@ Support::Ticket
 Announcement
   └── belongs_to Author (Account)
 
+Support::Article (help center)
+  └── belongs_to Author (Account)
+
 Role ←→ Permissions
 ```
 
@@ -229,8 +245,8 @@ Role ←→ Permissions
 
 | Persona | Access | Can Do |
 |---------|--------|--------|
-| **Regular User** | Dashboard | Login (password or magic link), create/edit tickets, send messages, attach files, request reopens, view notifications, manage profile (avatar, username, bio), customize appearance (40 themes, 8 fonts, dark mode), switch language |
-| **Admin** | Dashboard + Adminit | All user actions + take/finish/reopen tickets, set priority, add internal notes, manage announcements (create, schedule, publish), view accounts |
+| **Regular User** | Dashboard | Login (password or magic link), browse the help center, create/edit tickets, send messages, attach files, request reopens, view notifications, manage profile (avatar, username, bio), customize appearance (40 themes, 8 fonts, dark mode), switch language |
+| **Admin** | Dashboard + Adminit | All user actions + take/finish/reopen tickets, set priority, add internal notes, manage announcements (create, schedule, publish), view accounts (help center articles are Super Admin by default) |
 | **Super Admin** | Dashboard + Adminit (all) | All admin actions + manage roles (add/remove members), manage permissions (role-resource mappings) |
 
 ---

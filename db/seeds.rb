@@ -43,7 +43,8 @@ end
   announcement: [role_superadmin],
   permission: [role_superadmin],
   feature_flag: [role_superadmin],
-  audience: [role_superadmin]
+  audience: [role_superadmin],
+  article: [role_superadmin]
 }.each do |resource, roles|
   permission = Permission.find_or_create_by!(resource: resource) do |p|
     p.roles = roles
@@ -174,6 +175,63 @@ if Rails.env.development? || ENV["SEED_DEMO_DATA"] == "true"
       )
       announcement.save!
       announcement.update_columns(created_at: created_at, updated_at: created_at)
+    end
+  end
+
+  # Help center articles (idempotent on locale + slug)
+  if superadmin_account
+    article_data = {
+      "en" => [
+        [:account_access, "reset-your-password", "How to reset your password", "Forgot your password? Request a reset link in a few steps.", "Open the login page and choose <strong>Forgot your password</strong>. Enter your email and we will send you a link. The link expires after a short time, so use it promptly."],
+        [:account_access, "change-your-email", "Changing your account email", "Update the email address linked to your account.", "Go to Settings and edit your email. You will need to confirm the new address before it becomes active."],
+        [:technical_issue, "dashboard-not-loading", "Dashboard not loading", "Steps to try when the dashboard stays blank or slow.", "Refresh the page, clear your browser cache and try again in a private window. If the problem persists, open a ticket and include your browser version."],
+        [:technical_issue, "file-upload-errors", "File upload errors", "Why an attachment may be rejected.", "Attachments have limits on count, size and file type. Compress large files or convert them to a supported format and try again."],
+        [:billing, "understanding-your-invoice", "Understanding your invoice", "A quick guide to the items on your invoice.", "Each invoice lists the plan, any add-ons and applicable taxes. Contact support if you see a charge you do not recognize."],
+        [:billing, "request-a-refund", "How to request a refund", "Duplicate or incorrect charge? Here is how to ask for a refund.", "Open a ticket in the Billing category with the invoice number and a short description. We review refund requests as quickly as possible."],
+        [:feature_request, "suggest-a-feature", "How to suggest a feature", "Tell us what you would like to see next.", "Create a ticket in the Feature Request category describing the problem you want to solve. Concrete examples help us prioritize."],
+        [:feature_request, "product-roadmap", "Where to find the roadmap", "What we are working on and what comes next.", "Announcements highlight new releases and upcoming changes. Check them regularly to stay up to date."],
+        [:other, "contact-support", "Contacting support", "The best way to reach our team.", "Create a ticket from your dashboard. You can follow the conversation in real time and attach files if needed."],
+        [:other, "support-hours", "Support hours", "When you can expect a reply.", "Our team answers tickets on business days. Messages sent outside those hours are answered the next business day."],
+        [nil, "getting-started", "Getting started", "A short tour of the dashboard.", "Customize your profile and appearance in Settings, then use the Support section to open tickets and read articles."],
+        [nil, "keyboard-and-accessibility", "Accessibility and appearance", "Themes, fonts and dark mode.", "Choose among many themes and fonts and toggle dark mode from the appearance settings."]
+      ],
+      "es" => [
+        [:account_access, "reset-your-password", "Cómo restablecer tu contraseña", "¿Olvidaste tu contraseña? Solicita un enlace en pocos pasos.", "En la página de inicio de sesión elige <strong>Olvidé mi contraseña</strong>. Ingresa tu email y te enviaremos un enlace que expira en poco tiempo."],
+        [:account_access, "change-your-email", "Cambiar el email de tu cuenta", "Actualiza el email asociado a tu cuenta.", "Ve a Configuración y edita tu email. Deberás confirmar la nueva dirección antes de que se active."],
+        [:technical_issue, "dashboard-not-loading", "El panel no carga", "Qué probar si el panel queda en blanco o lento.", "Actualiza la página, borra la caché del navegador e inténtalo en una ventana privada. Si persiste, abre un ticket indicando tu navegador."],
+        [:technical_issue, "file-upload-errors", "Errores al subir archivos", "Por qué un adjunto puede ser rechazado.", "Los adjuntos tienen límites de cantidad, tamaño y tipo. Comprime archivos grandes o conviértelos a un formato admitido."],
+        [:billing, "understanding-your-invoice", "Entender tu factura", "Guía rápida de los conceptos de tu factura.", "Cada factura detalla el plan, los complementos y los impuestos. Contacta a soporte si ves un cargo que no reconoces."],
+        [:billing, "request-a-refund", "Cómo solicitar un reembolso", "¿Cargo duplicado o incorrecto? Así puedes pedir un reembolso.", "Abre un ticket en la categoría Facturación con el número de factura y una breve descripción."],
+        [:feature_request, "suggest-a-feature", "Cómo sugerir una función", "Cuéntanos qué te gustaría ver próximamente.", "Crea un ticket en la categoría Solicitud de función describiendo el problema. Los ejemplos concretos nos ayudan a priorizar."],
+        [:feature_request, "product-roadmap", "Dónde ver la hoja de ruta", "En qué trabajamos y qué viene después.", "Los anuncios destacan nuevas versiones y cambios próximos. Revísalos con frecuencia."],
+        [:other, "contact-support", "Contactar a soporte", "La mejor forma de comunicarte con el equipo.", "Crea un ticket desde tu panel. Podrás seguir la conversación en tiempo real y adjuntar archivos."],
+        [:other, "support-hours", "Horario de soporte", "Cuándo esperar una respuesta.", "Respondemos tickets en días hábiles. Los mensajes fuera de horario se responden el siguiente día hábil."],
+        [nil, "getting-started", "Primeros pasos", "Un breve recorrido por el panel.", "Personaliza tu perfil y apariencia en Configuración y usa la sección de Soporte para abrir tickets y leer artículos."],
+        [nil, "keyboard-and-accessibility", "Accesibilidad y apariencia", "Temas, fuentes y modo oscuro.", "Elige entre muchos temas y fuentes y activa el modo oscuro desde la configuración de apariencia."]
+      ]
+    }
+
+    article_data.each do |locale, rows|
+      rows.each do |category, slug, title, summary, body|
+        Support::Article.find_or_create_by!(locale: locale, slug: slug) do |article|
+          article.category = category
+          article.title = title
+          article.summary = summary
+          article.body = "<p>#{body}</p>"
+          article.status = :published
+          article.published_at = rand(1..30).days.ago
+          article.author = superadmin_account
+        end
+      end
+    end
+
+    Support::Article.find_or_create_by!(locale: "en", slug: "draft-two-factor-guide") do |article|
+      article.category = :account_access
+      article.title = "Setting up two-factor authentication"
+      article.summary = "Draft: how to enable two-factor authentication."
+      article.body = "<p>Work in progress.</p>"
+      article.status = :draft
+      article.author = superadmin_account
     end
   end
 end
