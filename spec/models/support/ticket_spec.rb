@@ -146,6 +146,15 @@ RSpec.describe Support::Ticket, type: :model do
       expect(stats[:resolved]).to eq(2)
       expect(stats[:by_status]).to include("open" => 1, "in_progress" => 1, "finished" => 1, "closed" => 1)
     end
+
+    it "counts open tickets waiting for a human" do
+      create(:ticket, :ai_handoff_requested)
+      create(:ticket, :ai_handoff_requested)
+      create(:ticket, :in_progress, ai_state: :handoff_requested)
+      create(:ticket, :ai_awaiting_user)
+
+      expect(Support::Ticket.dashboard_stats[:needs_human]).to eq(2)
+    end
   end
 
   # Turbo broadcasts render partials through ApplicationController.render, outside any controller,
@@ -171,6 +180,164 @@ RSpec.describe Support::Ticket, type: :model do
       expect(html).to include("internal note body")
       expect(html).to include("hello from the thread")
       expect(html).to include("invoice.pdf")
+    end
+  end
+
+  describe "AI state" do
+    it "defaults to off" do
+      expect(create(:ticket)).to be_ai_off
+    end
+
+    describe "#ai_engaged?" do
+      it "is true for analyzing, awaiting_user and handoff_requested" do
+        expect(build(:ticket, :ai_analyzing)).to be_ai_engaged
+        expect(build(:ticket, :ai_awaiting_user)).to be_ai_engaged
+        expect(build(:ticket, :ai_handoff_requested)).to be_ai_engaged
+      end
+
+      it "is false for off, stepped_back and resolved" do
+        expect(build(:ticket)).not_to be_ai_engaged
+        expect(build(:ticket, :ai_stepped_back)).not_to be_ai_engaged
+        expect(build(:ticket, :ai_resolved)).not_to be_ai_engaged
+      end
+    end
+
+    describe "#messageable?" do
+      it "is true when in progress or reopened" do
+        expect(build(:ticket, :in_progress)).to be_messageable
+        expect(build(:ticket, :reopened)).to be_messageable
+      end
+
+      it "is true for open tickets with an engaged AI" do
+        expect(build(:ticket, :ai_analyzing)).to be_messageable
+        expect(build(:ticket, :ai_awaiting_user)).to be_messageable
+        expect(build(:ticket, :ai_handoff_requested)).to be_messageable
+      end
+
+      it "is false for plain open, stepped-back or finished tickets" do
+        expect(build(:ticket)).not_to be_messageable
+        expect(build(:ticket, :ai_stepped_back)).not_to be_messageable
+        expect(build(:ticket, :finished)).not_to be_messageable
+        expect(build(:ticket, :closed)).not_to be_messageable
+      end
+    end
+
+    describe "transitions" do
+      it "start_ai_analysis! moves off or awaiting_user to analyzing" do
+        expect(create(:ticket).tap(&:start_ai_analysis!)).to be_ai_analyzing
+        expect(create(:ticket, :ai_awaiting_user).tap(&:start_ai_analysis!)).to be_ai_analyzing
+      end
+
+      it "start_ai_analysis! rejects other states" do
+        %i[ai_analyzing ai_handoff_requested ai_stepped_back ai_resolved].each do |trait|
+          expect { create(:ticket, trait).start_ai_analysis! }.to raise_error(Support::Ticket::InvalidTransition)
+        end
+      end
+
+      it "await_user_reply! only from analyzing" do
+        expect(create(:ticket, :ai_analyzing).tap(&:await_user_reply!)).to be_ai_awaiting_user
+        expect { create(:ticket).await_user_reply! }.to raise_error(Support::Ticket::InvalidTransition)
+        expect { create(:ticket, :ai_awaiting_user).await_user_reply! }.to raise_error(Support::Ticket::InvalidTransition)
+      end
+
+      it "request_ai_handoff! from analyzing or awaiting_user" do
+        expect(create(:ticket, :ai_analyzing).tap(&:request_ai_handoff!)).to be_ai_handoff_requested
+        expect(create(:ticket, :ai_awaiting_user).tap(&:request_ai_handoff!)).to be_ai_handoff_requested
+        expect { create(:ticket, :ai_handoff_requested).request_ai_handoff! }.to raise_error(Support::Ticket::InvalidTransition)
+        expect { create(:ticket).request_ai_handoff! }.to raise_error(Support::Ticket::InvalidTransition)
+      end
+
+      it "disable_ai! turns an analyzing ticket off and nothing else" do
+        expect(create(:ticket, :ai_analyzing).tap(&:disable_ai!)).to be_ai_off
+        %i[ai_awaiting_user ai_handoff_requested ai_stepped_back].each do |trait|
+          expect { create(:ticket, trait).disable_ai! }.to raise_error(Support::Ticket::InvalidTransition, I18n.t("ticket.transitions.can_only_disable_ai"))
+        end
+        expect { create(:ticket).disable_ai! }.to raise_error(Support::Ticket::InvalidTransition)
+      end
+
+      it "release_ai! from any engaged state" do
+        %i[ai_analyzing ai_awaiting_user ai_handoff_requested].each do |trait|
+          expect(create(:ticket, trait).tap(&:release_ai!)).to be_ai_stepped_back
+        end
+        expect { create(:ticket).release_ai! }.to raise_error(Support::Ticket::InvalidTransition)
+        expect { create(:ticket, :ai_stepped_back).release_ai! }.to raise_error(Support::Ticket::InvalidTransition)
+      end
+
+      it "resolve_with_ai! finishes the ticket and resolves the AI in one update" do
+        ticket = create(:ticket, :ai_awaiting_user)
+        ticket.resolve_with_ai!
+        ticket.reload
+        expect(ticket).to be_finished
+        expect(ticket).to be_ai_resolved
+      end
+
+      it "resolve_with_ai! requires an open ticket awaiting the user" do
+        expect { create(:ticket, :ai_analyzing).resolve_with_ai! }.to raise_error(Support::Ticket::InvalidTransition)
+        expect { create(:ticket, :in_progress, ai_state: :awaiting_user).resolve_with_ai! }.to raise_error(Support::Ticket::InvalidTransition)
+      end
+
+      it "uses the translated error message" do
+        expect { create(:ticket).release_ai! }.to raise_error(Support::Ticket::InvalidTransition, I18n.t("ticket.transitions.can_only_release_ai"))
+      end
+    end
+
+    describe "ai_state_changed_at" do
+      it "is set when ai_state changes" do
+        ticket = create(:ticket)
+        expect(ticket.ai_state_changed_at).to be_nil
+        freeze_time do
+          ticket.start_ai_analysis!
+          expect(ticket.reload.ai_state_changed_at).to eq(Time.current)
+        end
+      end
+
+      it "is untouched by other updates" do
+        ticket = create(:ticket, :ai_analyzing)
+        ticket.update!(ai_state_changed_at: 1.day.ago)
+        stamp = ticket.reload.ai_state_changed_at
+        ticket.update!(title: "Changed")
+        expect(ticket.reload.ai_state_changed_at).to eq(stamp)
+      end
+    end
+
+    describe "assignment releases the AI" do
+      let(:admin) { create(:account, :verified) }
+
+      it "sets stepped_back when assigned while engaged" do
+        %i[ai_analyzing ai_awaiting_user ai_handoff_requested].each do |trait|
+          ticket = create(:ticket, trait)
+          ticket.update!(assigned: admin)
+          expect(ticket.reload).to be_ai_stepped_back
+          expect(ticket.ai_state_changed_at).to be_present
+        end
+      end
+
+      it "does nothing when the AI is not engaged" do
+        ticket = create(:ticket)
+        ticket.update!(assigned: admin)
+        expect(ticket.reload).to be_ai_off
+        resolved = create(:ticket, :ai_resolved)
+        resolved.update!(assigned: admin)
+        expect(resolved.reload).to be_ai_resolved
+      end
+
+      it "does nothing when assignment is cleared or unchanged" do
+        ticket = create(:ticket, :ai_awaiting_user)
+        ticket.update!(title: "x")
+        expect(ticket.reload).to be_ai_awaiting_user
+      end
+
+      it "leaves a ticket created already assigned and engaged alone" do
+        expect(create(:ticket, :assigned, :ai_analyzing)).to be_ai_analyzing
+      end
+    end
+
+    describe "associations" do
+      it "destroys ai_runs with the ticket and nullifies playbook" do
+        ticket = create(:ticket, ai_playbook: create(:ai_playbook))
+        create(:ai_run, ticket: ticket)
+        expect { ticket.destroy! }.to change(Support::AiRun, :count).by(-1)
+      end
     end
   end
 end

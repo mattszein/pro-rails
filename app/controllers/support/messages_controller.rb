@@ -9,7 +9,7 @@ module Support
 
       authorize! @message, to: :create?
 
-      if @message.save
+      if Support::Messages::Create.call(message: @message).success?
         respond_to do |format|
           format.turbo_stream {
             render "support/messages/create"

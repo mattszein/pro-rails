@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_03_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_19_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -187,14 +187,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_03_120000) do
   end
 
   create_table "messages", force: :cascade do |t|
-    t.bigint "account_id", null: false
+    t.bigint "account_id"
     t.text "content", null: false
     t.bigint "conversation_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "sender", default: 0, null: false
+    t.jsonb "metadata", default: {}, null: false
     t.index ["account_id"], name: "index_messages_on_account_id"
     t.index ["conversation_id", "created_at"], name: "index_messages_on_conversation_id_and_created_at"
     t.index ["conversation_id"], name: "index_messages_on_conversation_id"
+    t.check_constraint "sender = 0 AND account_id IS NOT NULL OR sender = 1 AND account_id IS NULL", name: "messages_sender_account_check"
   end
 
   create_table "noticed_events", force: :cascade do |t|
@@ -256,6 +259,49 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_03_120000) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "support_ai_playbooks", force: :cascade do |t|
+    t.string "name", null: false
+    t.boolean "enabled", default: true, null: false
+    t.integer "position", default: 0, null: false
+    t.boolean "is_default", default: false, null: false
+    t.integer "categories", default: [], null: false, array: true
+    t.integer "min_priority"
+    t.integer "max_priority"
+    t.bigint "audience_id"
+    t.integer "mode", default: 1, null: false
+    t.text "instructions"
+    t.string "capabilities", default: [], null: false, array: true
+    t.integer "max_ai_turns", default: 4, null: false
+    t.integer "idle_reminder_after_hours", default: 24, null: false
+    t.integer "idle_handoff_after_hours", default: 48, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["audience_id"], name: "index_support_ai_playbooks_on_audience_id"
+    t.index ["is_default"], name: "index_support_ai_playbooks_single_default", unique: true, where: "is_default"
+    t.index ["name"], name: "index_support_ai_playbooks_on_name", unique: true
+  end
+
+  create_table "support_ai_runs", force: :cascade do |t|
+    t.bigint "ticket_id", null: false
+    t.bigint "playbook_id"
+    t.integer "run_trigger", null: false
+    t.integer "step", null: false
+    t.string "model"
+    t.integer "status", null: false
+    t.integer "input_tokens"
+    t.integer "output_tokens"
+    t.integer "latency_ms"
+    t.jsonb "tool_calls", default: [], null: false
+    t.jsonb "output", default: {}, null: false
+    t.text "error"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.jsonb "transcript", default: [], null: false
+    t.index ["playbook_id"], name: "index_support_ai_runs_on_playbook_id"
+    t.index ["ticket_id", "created_at"], name: "index_support_ai_runs_on_ticket_id_and_created_at"
+    t.index ["ticket_id"], name: "index_support_ai_runs_on_ticket_id"
+  end
+
   create_table "support_articles", force: :cascade do |t|
     t.string "title", null: false
     t.string "slug", null: false
@@ -296,6 +342,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_03_120000) do
     t.integer "status", default: 0
     t.string "title"
     t.datetime "updated_at", null: false
+    t.integer "ai_state", default: 0, null: false
+    t.datetime "ai_state_changed_at"
+    t.datetime "ai_reminded_at"
+    t.bigint "ai_playbook_id"
+    t.index ["ai_playbook_id"], name: "index_tickets_on_ai_playbook_id"
+    t.index ["ai_state"], name: "index_tickets_on_ai_state"
     t.index ["assigned_id"], name: "index_tickets_on_assigned_id"
     t.index ["created_id"], name: "index_tickets_on_created_id"
   end
@@ -320,9 +372,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_03_120000) do
   add_foreign_key "messages", "conversations"
   add_foreign_key "profiles", "accounts"
   add_foreign_key "profiles", "avatars"
+  add_foreign_key "support_ai_playbooks", "audiences", on_delete: :nullify
+  add_foreign_key "support_ai_runs", "support_ai_playbooks", column: "playbook_id", on_delete: :nullify
+  add_foreign_key "support_ai_runs", "tickets", on_delete: :cascade
   add_foreign_key "support_articles", "accounts", column: "author_id", on_delete: :nullify
   add_foreign_key "support_notes", "accounts"
   add_foreign_key "support_notes", "tickets"
   add_foreign_key "tickets", "accounts", column: "assigned_id"
   add_foreign_key "tickets", "accounts", column: "created_id"
+  add_foreign_key "tickets", "support_ai_playbooks", column: "ai_playbook_id", on_delete: :nullify
 end

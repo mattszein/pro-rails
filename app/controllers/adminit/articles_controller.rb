@@ -18,7 +18,7 @@ class Adminit::ArticlesController < Adminit::ApplicationController
 
   def new
     authorize! Support::Article, with: Adminit::ArticlePolicy
-    @article = Support::Article.new(locale: I18n.locale.to_s)
+    @article = Support::Article.new(new_article_defaults)
   end
 
   def edit
@@ -72,6 +72,21 @@ class Adminit::ArticlesController < Adminit::ApplicationController
   def set_article
     @article = Support::Article.find(params[:id])
     authorize! @article, with: Adminit::ArticlePolicy
+  end
+
+  TITLE_PREFILL_LENGTH = 150
+
+  # Prefill for the "Create article" link of a KB gap. Only title, category and locale are read from the
+  # query string; invalid category/locale are ignored silently.
+  def new_article_defaults
+    defaults = {locale: I18n.locale.to_s}
+    title = params[:title]
+    category = params[:category]
+    locale = params[:locale]
+    defaults[:title] = title.to_s.strip.first(TITLE_PREFILL_LENGTH) if title.is_a?(String) && title.present?
+    defaults[:category] = category if category.is_a?(String) && Support::Article.categories.key?(category)
+    defaults[:locale] = locale if locale.is_a?(String) && I18n.available_locales.map(&:to_s).include?(locale)
+    defaults
   end
 
   def article_params

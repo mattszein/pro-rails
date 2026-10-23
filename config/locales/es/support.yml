@@ -5,27 +5,35 @@ es:
       ticket_number: "Ticket #%{id}"
       add_ticket: "Agregar ticket"
       add_ticket_title: "Agregar Ticket"
-      editing_ticket: "Editando Ticket"
       created: "El ticket fue creado exitosamente"
-      updated: "El ticket fue actualizado exitosamente."
       files_attached: "Los archivos fueron adjuntados exitosamente"
       no_files_selected: "No se seleccionaron archivos"
       reopen_sent: "Solicitud de reapertura enviada."
+      resolved_with_ai: "¡Nos alegra haberte ayudado! El ticket se marcó como resuelto."
+      human_requested: "Un agente de soporte continuará desde aquí."
       back_to_tickets: "Volver a Tickets"
       select_category: "Seleccionar una categoría"
       description_placeholder: "Escribe la descripción de tu ticket aquí"
       attach_files_label: "Adjuntar archivos (imágenes, PDF - máx. 2MB cada uno)"
       upload_limit: "Puedes subir hasta %{max_files} archivos"
+    ai:
+      handoff_message: "Estamos revisando esto. Pasé tu solicitud a una persona de nuestro equipo de soporte y te responderá por aquí."
+    ai_status:
+      talk_to_person: "Hablar con una persona"
     message:
       support_badge: "Soporte"
+      ai_name: "Asistente"
       edit: "Editar"
+      ai_badge: "IA"
+      articles_heading: "Artículos útiles"
+      solved: "Esto lo resolvió"
+      not_solved: "No, todavía necesito ayuda"
     messages:
       sent: "Mensaje enviado."
       not_sent: "No se pudo enviar el mensaje."
       placeholder: "Escribe tu mensaje..."
     conversation:
       title: "Conversación"
-      ticket_active: "Este ticket ahora está activo. Actualiza la página para enviar mensajes."
     reopen_form:
       finished_notice: "Este ticket está marcado como finalizado."
       reopen_instruction: "Si tu problema no está resuelto, puedes solicitar reabrir proporcionando una razón a continuación."

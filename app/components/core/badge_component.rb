@@ -12,7 +12,8 @@ class Core::BadgeComponent < ApplicationViewComponent
     green: "bg-green-300 text-green-800 border border-green-200 dark:bg-green-900/30 dark:text-green-200 dark:border-green-700",
     yellow: "bg-yellow-300 text-yellow-800 border border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-200 dark:border-yellow-700",
     red: "bg-red-300 text-red-800 border border-red-200 dark:bg-red-900/30 dark:text-red-200 dark:border-red-700",
-    orange: "bg-orange-300 text-orange-800 border border-orange-200 dark:bg-orange-900/30 dark:text-orange-200 dark:border-orange-700"
+    orange: "bg-orange-300 text-orange-800 border border-orange-200 dark:bg-orange-900/30 dark:text-orange-200 dark:border-orange-700",
+    violet: "bg-violet-300 text-violet-800 border border-violet-200 dark:bg-violet-900/30 dark:text-violet-200 dark:border-violet-700"
   }.freeze
 
   SIZE_STYLES = {
@@ -28,7 +29,8 @@ class Core::BadgeComponent < ApplicationViewComponent
     green: "bg-green-500",
     yellow: "bg-yellow-500",
     red: "bg-red-500",
-    orange: "bg-orange-500"
+    orange: "bg-orange-500",
+    violet: "bg-violet-500"
   }.freeze
 
   def html_class

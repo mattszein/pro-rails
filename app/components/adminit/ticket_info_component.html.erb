@@ -3,6 +3,9 @@
     <%= helpers.icon "support", {classes: "h-8 dark:text-white"} %>
     <h3><%= t("support.tickets.ticket_number", id: ticket.id) %></h3>
     <%= render(Core::BadgeComponent.new(label: t("enums.ticket.status.#{ticket.status}"), theme: status_theme, icon: "info", size: :md)) %>
+    <% if show_ai_state? %>
+      <%= render(Core::BadgeComponent.new(label: t("enums.ticket.ai_state.#{ticket.ai_state}"), theme: ai_state_theme, size: :md)) %>
+    <% end %>
   </div>
   <%= render Core::BoxComponent.new do %>
     <%= render Core::DefinitionListComponent.new(gap: :sm) do |dl| %>
@@ -26,6 +29,16 @@
       <% end %>
       <% dl.with_item(term: t("shared.labels.status")) do %>
         <%= render(Core::BadgeComponent.new(label: t("enums.ticket.status.#{ticket.status}"), theme: status_theme, icon: "info", size: :md)) %>
+      <% end %>
+      <% if show_ai_state? %>
+        <% dl.with_item(term: t("adminit.tickets.ai_state")) do %>
+          <%= render(Core::BadgeComponent.new(label: t("enums.ticket.ai_state.#{ticket.ai_state}"), theme: ai_state_theme, size: :md)) %>
+        <% end %>
+      <% end %>
+      <% if playbook_name.present? %>
+        <% dl.with_item(term: t("adminit.tickets.ai_playbook")) do %>
+          <%= playbook_name %>
+        <% end %>
       <% end %>
     <% end %>
   <% end %>

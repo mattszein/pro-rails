@@ -540,6 +540,25 @@ end
 
 ---
 
+## Stubbing the LLM (Support AI)
+
+Specs never reach the network. Two helper files in `spec/support/`:
+
+```ruby
+# Workflow / job / interactor specs: replace the Responder
+stub_responder(triage: ai_result(triage_output), respond: ai_result(respond_output(reply: "Hi")))
+stub_responder(respond: SupportAi::Error)   # simulate a provider failure
+
+# Responder / tool specs (type: :service or :llm): stub only the HTTP layer, real tool loop runs
+with_openrouter_key do
+  requests = stub_llm(tool_call_body([["search_articles", {query: "x"}]]), text_body("{...}"))
+end
+```
+
+`ai_result`, `triage_output` and `respond_output` build valid defaults; override only the field under test.
+
+---
+
 ## Factory Conventions
 
 Factories live in `spec/factories/`. Use traits for states:

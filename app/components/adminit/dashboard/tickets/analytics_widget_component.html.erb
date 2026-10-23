@@ -8,6 +8,7 @@
       <%= render Adminit::Dashboard::BaseAnalyticComponent.new(title: I18n.t("enums.ticket.status.open"), content: stats[:open]) %>
       <%= render Adminit::Dashboard::BaseAnalyticComponent.new(title: I18n.t("enums.ticket.status.in_progress"), content: stats[:in_progress]) %>
       <%= render Adminit::Dashboard::BaseAnalyticComponent.new(title: I18n.t("adminit.dashboard_widgets.tickets.analytics.resolved"), content: stats[:resolved]) %>
+      <%= render Adminit::Dashboard::BaseAnalyticComponent.new(title: I18n.t("adminit.dashboard_widgets.tickets.analytics.needs_human"), content: stats[:needs_human]) %>
     </div>
   </div>
 <% end %>

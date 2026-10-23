@@ -1,0 +1,18 @@
+<div class="space-y-2" data-role="ai-activity">
+  <h3 class="font-semibold"><%= t("adminit.tickets.ai_activity") %></h3>
+  <% if runs.empty? %>
+    <p class="text-slate-500 italic text-center py-4"><%= t("adminit.tickets.no_ai_runs") %></p>
+  <% else %>
+    <div class="overflow-x-auto text-sm">
+      <%= render Core::TableComponent.new(rows: sorted_runs, columns: columns) do %>
+        <% sorted_runs.each do |run| %>
+          <tr data-role="ai-run">
+            <% columns.each do |column| %>
+              <%= render Core::TableCellComponent.new do %><%= column.renderer.call(run) %><% end %>
+            <% end %>
+          </tr>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

@@ -5,8 +5,8 @@ module Support
     before_action :require_account
     verify_authorized
 
-    before_action :set_ticket, only: %i[show edit update attach_files request_reopen]
-    before_action :ensure_frame_response, only: %i[new edit]
+    before_action :set_ticket, only: %i[show attach_files request_reopen resolve_with_ai request_human]
+    before_action :ensure_frame_response, only: %i[new]
 
     def index
       authorize! :ticket, with: Support::TicketPolicy
@@ -30,18 +30,13 @@ module Support
       @ticket = Support::Ticket.new
     end
 
-    # GET /support/tickets/1/edit
-    def edit
-      authorize! @ticket, to: :update?
-    end
-
     # POST /support/tickets or /support/tickets.json
     def create
       @ticket = Support::Ticket.new(ticket_params)
       @ticket.created_id = current_account.id
       authorize! @ticket
       respond_to do |format|
-        if @ticket.save
+        if Support::Tickets::Create.call(ticket: @ticket).success?
           flash[:notice] = I18n.t("support.tickets.created")
           format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, support_ticket_url(@ticket)) }
           format.html { redirect_to support_ticket_url(@ticket) }
@@ -49,21 +44,6 @@ module Support
         else
           format.turbo_stream { render turbo_stream: turbo_stream.replace("modal", template: "support/tickets/new", locals: {ticket: @ticket}), status: :unprocessable_content }
           format.html { render :new, status: :unprocessable_content }
-          format.json { render json: @ticket.errors, status: :unprocessable_content }
-        end
-      end
-    end
-
-    # PATCH/PUT /support/tickets/1 or /support/tickets/1.json
-    def update
-      authorize! @ticket
-      respond_to do |format|
-        if @ticket.update(ticket_params)
-          format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, request.referer) }
-          format.html { redirect_to support_ticket_url(@ticket), notice: I18n.t("support.tickets.updated") }
-          format.json { render :show, status: :ok, location: @ticket }
-        else
-          format.turbo_stream { render turbo_stream: turbo_stream.replace("ticket_form", partial: "support/tickets/form", locals: {ticket: @ticket}), status: :unprocessable_content }
           format.json { render json: @ticket.errors, status: :unprocessable_content }
         end
       end
@@ -96,6 +76,30 @@ module Support
 
       if result.success?
         redirect_to support_ticket_path(@ticket), notice: I18n.t("support.tickets.reopen_sent")
+      else
+        redirect_to support_ticket_path(@ticket), alert: result.error
+      end
+    end
+
+    # POST /support/tickets/1/resolve_with_ai
+    def resolve_with_ai
+      authorize! @ticket
+      result = Support::Tickets::ResolveByUser.call(ticket: @ticket, account: current_account)
+
+      if result.success?
+        redirect_to support_ticket_path(@ticket), notice: I18n.t("support.tickets.resolved_with_ai")
+      else
+        redirect_to support_ticket_path(@ticket), alert: result.error
+      end
+    end
+
+    # POST /support/tickets/1/request_human
+    def request_human
+      authorize! @ticket
+      result = Support::Tickets::RequestHuman.call(ticket: @ticket, account: current_account)
+
+      if result.success?
+        redirect_to support_ticket_path(@ticket), notice: I18n.t("support.tickets.human_requested")
       else
         redirect_to support_ticket_path(@ticket), alert: result.error
       end

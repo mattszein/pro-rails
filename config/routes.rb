@@ -28,10 +28,12 @@ Rails.application.routes.draw do
     resources :announcements, only: [:show]
 
     namespace :support do
-      resources :tickets, except: [:destroy] do
+      resources :tickets, except: [:destroy, :edit, :update] do
         member do
           post :attach_files
           post :request_reopen
+          post :resolve_with_ai
+          post :request_human
         end
         resources :messages, only: [:create]
       end

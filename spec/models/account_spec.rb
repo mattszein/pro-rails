@@ -90,4 +90,20 @@ RSpec.describe Account, type: :model do
       expect(stats[:by_month].values).to include(3)
     end
   end
+
+  describe ".ticket_handlers" do
+    it "returns verified accounts whose role grants the ticket permission, once each" do
+      role = create(:role)
+      other_role = create(:role)
+      create(:permission, resource: :ticket, roles: [role, other_role])
+      create(:permission, resource: :article, roles: [role])
+      handler = create(:account, :verified, role: role)
+      second = create(:account, :verified, role: other_role)
+      create(:account, role: role) # unverified
+      create(:account, :verified) # no role
+      create(:account, :verified, role: create(:role)) # role without the permission
+
+      expect(Account.ticket_handlers).to contain_exactly(handler, second)
+    end
+  end
 end

@@ -44,6 +44,23 @@ RSpec.describe Support::Article, type: :model do
     end
   end
 
+  describe "#excerpt" do
+    it "returns the squished plain-text body" do
+      article = create(:article, body: "<p>One  two</p><p>three</p>")
+      expect(article.excerpt).to eq("One two three")
+    end
+
+    it "truncates with an ellipsis" do
+      article = create(:article, body: "<p>#{"word " * 500}</p>")
+      expect(article.excerpt(50).length).to eq(50)
+      expect(article.excerpt(50)).to end_with("...")
+    end
+
+    it "is empty for a blank body" do
+      expect(build(:article, body: "").excerpt).to eq("")
+    end
+  end
+
   describe "category" do
     it "shares values with Support::Ticket" do
       expect(described_class.categories).to eq(Support::Ticket.categories)
@@ -161,6 +178,86 @@ RSpec.describe Support::Article, type: :model do
 
       expect(described_class.published.search("guide")).to eq([published])
       expect(described_class.search("guide")).to contain_exactly(draft, published)
+    end
+
+    describe "OR fallback" do
+      it "keeps an AND hit unchanged and does not widen it" do
+        both = create(:article, title: "Reset password steps")
+        create(:article, title: "Password billing")
+
+        expect(described_class.search("reset password")).to eq([both])
+      end
+
+      it "falls back to an OR of terms when no article has every word" do
+        reset = create(:article, :published, title: "How to reset your password")
+        create(:article, :published, title: "Invoices")
+
+        expect(described_class.search("change password", published_only: true)).to eq([reset])
+      end
+
+      it "excludes body-only OR matches but keeps title and summary matches" do
+        title = create(:article, title: "Change your email", summary: "Nothing", body: "<p>x</p>")
+        summary = create(:article, title: "Other two", summary: "Update your password", body: "<p>x</p>")
+        create(:article, title: "Roadmap", summary: "Nothing", body: "<p>We ship changes monthly</p>")
+
+        expect(described_class.search("change password")).to contain_exactly(title, summary)
+      end
+
+      it "returns only the password article for seeded-style fixtures" do
+        reset = create(:article, :published, title: "How to reset your password", summary: "Recover access", body: "<p>Use the link</p>")
+        create(:article, :published, title: "Where to find the roadmap", summary: "See upcoming work", body: "<p>Read about changes</p>")
+
+        expect(described_class.search("change password", published_only: true)).to eq([reset])
+      end
+
+      it "matches by prefix" do
+        reset = create(:article, title: "Password recovery")
+        expect(described_class.search("recov nonsenseword")).to eq([reset])
+      end
+
+      it "applies the locale and category filters in both modes" do
+        en = create(:article, title: "Password help", category: :account_access)
+        create(:article, :spanish, title: "Password ayuda", category: :account_access)
+        create(:article, title: "Password billing", category: :billing)
+
+        expect(described_class.search("change password", locale: :en, category: :account_access)).to eq([en])
+        expect(described_class.search("password", locale: :en, category: :account_access)).to eq([en])
+      end
+
+      it "is not suppressed by a draft-only AND match when published_only" do
+        create(:article, title: "Change password draft")
+        live = create(:article, :published, title: "Password reset")
+
+        expect(described_class.search("change password", published_only: true)).to eq([live])
+        expect(described_class.search("change password", published_only: true).published).to eq([live])
+      end
+
+      it "decides on the chained scope when called on a relation" do
+        create(:article, title: "Change password draft")
+        live = create(:article, :published, title: "Password reset")
+
+        expect(described_class.published.search("change password")).to eq([live])
+      end
+
+      it "treats tsquery syntax as plain text" do
+        hit = create(:article, title: "Password help")
+
+        expect { described_class.search("password' | !secret & (x").to_a }.not_to raise_error
+        expect(described_class.search("zzz' | !secret & (x:*")).to be_empty
+        expect(described_class.search("nomatch' | !secret & (password")).to eq([hit])
+      end
+
+      it "returns none without usable terms" do
+        create(:article, title: "Go to it")
+        expect(described_class.search("a b !! ??")).to be_empty
+        expect(described_class.search("zz")).to be_empty
+      end
+
+      it "honors limit in fallback mode and limit: nil" do
+        create_list(:article, 3, title: "Setup guide")
+        expect(described_class.search("setup nomatchword", limit: 2).to_a.size).to eq(2)
+        expect(described_class.search("setup nomatchword", limit: nil).to_a.size).to eq(3)
+      end
     end
 
     it "is safe against SQL-like input" do

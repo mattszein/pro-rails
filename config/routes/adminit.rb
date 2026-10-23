@@ -15,6 +15,7 @@ namespace :adminit do
       post :reject_reopen
     end
     resources :notes, only: [:create], controller: "tickets/notes"
+    resources :ai_runs, only: [:show], controller: "tickets/ai_runs"
   end
   resources :announcements do
     post :schedule, on: :member
@@ -24,6 +25,14 @@ namespace :adminit do
   resources :articles do
     post :publish, on: :member
     post :unpublish, on: :member
+  end
+
+  resources :ai_playbooks, except: [:show] do
+    member do
+      post :toggle
+      post :move_up
+      post :move_down
+    end
   end
 
   resources :roles, only: [:index, :show] do

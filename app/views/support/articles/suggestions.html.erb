@@ -1,16 +1,18 @@
 <%= turbo_frame_tag "help_suggestions" do %>
   <% if @articles.any? %>
-    <div class="mt-6 rounded-lg border border-gray-200 p-3 dark:border-gray-700" data-testid="help-suggestions">
-      <h3 class="text-sm font-semibold"><%= t("support.articles.suggestions_title") %></h3>
-      <p class="text-xs text-gray-500 dark:text-gray-400"><%= t("support.articles.suggestions_hint") %></p>
-      <ul class="mt-2 space-y-2">
-        <% @articles.each do |article| %>
-          <li>
-            <%= link_to article.title, help_article_path(slug: article.slug), target: "_blank", rel: "noopener", class: "text-sm font-medium text-primary-600 hover:underline dark:text-primary-200" %>
-            <p class="text-xs text-gray-600 dark:text-gray-400"><%= article.summary %></p>
-          </li>
-        <% end %>
-      </ul>
+    <div class="mt-6" data-testid="help-suggestions">
+      <%= render Core::BoxComponent.new(variant: :neutral, padding: :xs, rounded: :lg) do %>
+        <h3 class="text-sm font-semibold"><%= t("support.articles.suggestions_title") %></h3>
+        <p class="text-xs text-gray-500 dark:text-gray-400"><%= t("support.articles.suggestions_hint") %></p>
+        <ul class="mt-2 space-y-2">
+          <% @articles.each do |article| %>
+            <li>
+              <%= render Core::LinkComponent.new(name: article.title, url: help_article_path(slug: article.slug), style: :link, html_options: {target: "_blank", rel: "noopener", class: "text-sm font-medium"}) %>
+              <p class="text-xs text-gray-600 dark:text-gray-400"><%= article.summary %></p>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
     </div>
   <% end %>
 <% end %>

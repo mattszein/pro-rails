@@ -62,7 +62,6 @@ Full ticket support system with real-time conversations between users and admins
 **What users can do**:
 - Create tickets with title, description, and category (Account Access, Technical Issue, Billing, Feature Request, Other)
 - Attach files to tickets (configurable limits on count, size, and content types)
-- Edit ticket details (when not yet being worked on)
 - Send messages in the conversation thread (when ticket is in progress or reopened)
 - Request to reopen a finished ticket with a reason
 - View full conversation history
@@ -83,6 +82,42 @@ open → in_progress → finished → closed
 ```
 
 All conversation updates appear in real-time — no page reload needed.
+
+#### AI assistant
+
+An optional assistant answers the start of each conversation, then hands the ticket to a person. It is **off by default**: a global kill switch (`SupportAiConfig.enabled`, env `SUPPORT_AI_ENABLED`) plus an `OPENROUTER_API_KEY` turn it on. With the switch off, tickets behave exactly as before.
+
+**What users see**:
+- An assistant banner on the ticket while the AI is engaged, with a typing indicator while it works
+- AI replies in the conversation thread, labelled as the assistant, with suggested help-center article cards
+- **This solved it** — resolves the ticket without a person; **Talk to a person** — asks for a human at any time
+- A handoff message when a person is needed (the assistant escalates, the turn limit is reached, or the AI is unavailable). Users are never left waiting: if the AI fails after retries the ticket is handed off with a generic message
+
+**What admins see** (ticket permission, plus `support_ai` for playbooks):
+- An **AI state** badge on tickets (list and detail), and AI-authored internal notes (investigation findings, handoff summary)
+- An **AI activity** panel per ticket (every step: model, tokens, latency, tool calls, errors)
+- **Take over from AI** — assigning a ticket (or the Take action) makes the AI step back for good on that ticket
+- A **Needs human** filter and a dashboard tile counting tickets waiting on a person
+- Handed-off tickets surface only through the **Needs human** tile and filter; no notification or email is sent
+
+**AI playbooks** (Adminit, `support_ai` permission, Super Admin by default) decide what the assistant does for which tickets:
+- **Conditions**: ticket categories, priority range, and optionally an audience (see Feature Flags). The first enabled playbook that matches wins, in the order shown (reorderable); otherwise the **default playbook**, which always exists, cannot be deleted or moved, and is evaluated last
+- **Mode**: `triage_only` (analyze, set priority, write notes, then hand off without replying to the user) or `assist` (also answers the user, up to a maximum number of AI turns)
+- **Capabilities**: switchable tools and actions per playbook (account facts, past tickets, similar tickets, article search, investigation note, auto-set priority, auto-correct category, suggest articles, propose resolution, request human, vision on attachments)
+- Custom instructions, idle reminder and idle handoff timers, enable/disable per playbook
+
+**AI state vs. status** — the AI state is a second axis next to the ticket status; the status lifecycle above is unchanged:
+
+| AI state | Meaning | Who owns the conversation |
+|----------|---------|---------------------------|
+| `off` | No AI on this ticket (switch off, no playbook, or ticket predates the feature) | Person |
+| `analyzing` | Triage / reply in progress | AI |
+| `awaiting_user` | AI replied and waits for the user | AI |
+| `handoff_requested` | AI asked for a person; shown in Needs human | Person (when taken) |
+| `stepped_back` | An admin took over | Person |
+| `resolved` | User clicked "This solved it" (status becomes finished) | Nobody |
+
+A user message while `awaiting_user` returns the ticket to `analyzing`; any admin assignment moves it to `stepped_back`.
 
 #### Knowledge base / help center
 
@@ -217,11 +252,16 @@ Account
   ├── Support::Tickets (as creator)
   └── Support::Tickets (as assignee)
 
-Support::Ticket
+Support::Ticket (status lifecycle + ai_state)
   ├── Support::Conversation
-  │   └── Support::Messages
-  ├── Support::Notes (internal, admin-only)
+  │   └── Support::Messages (sender: human | ai; AI messages have no account)
+  ├── Support::Notes (internal, admin-only; kind: internal | system | ai)
+  ├── Support::AiRun (one row per AI step: model, tokens, latency, tool calls, error)
+  ├── belongs_to Support::AiPlaybook (the playbook that handled it)
   └── File Attachments
+
+Support::AiPlaybook (conditions, mode, capabilities, limits; optional Audience)
+  └── has_many Support::AiRuns, Support::Tickets
 
 Announcement
   └── belongs_to Author (Account)
@@ -238,6 +278,7 @@ Role ←→ Permissions
 - Roles and Permissions are many-to-many
 - Support models are namespaced under `Support::` with simple table names
 - Permission resources are integer-backed — values must never be reused
+- AI-authored messages and notes have no author account (`account_id` is NULL); a DB check constraint ties `sender` to `account_id` on messages
 
 ---
 
@@ -245,8 +286,8 @@ Role ←→ Permissions
 
 | Persona | Access | Can Do |
 |---------|--------|--------|
-| **Regular User** | Dashboard | Login (password or magic link), browse the help center, create/edit tickets, send messages, attach files, request reopens, view notifications, manage profile (avatar, username, bio), customize appearance (40 themes, 8 fonts, dark mode), switch language |
-| **Admin** | Dashboard + Adminit | All user actions + take/finish/reopen tickets, set priority, add internal notes, manage announcements (create, schedule, publish), view accounts (help center articles are Super Admin by default) |
+| **Regular User** | Dashboard | Login (password or magic link), browse the help center, create tickets, send messages, attach files, request reopens, get first answers from the AI assistant (when enabled), view notifications, manage profile (avatar, username, bio), customize appearance (40 themes, 8 fonts, dark mode), switch language |
+| **Admin** | Dashboard + Adminit | All user actions + take/finish/reopen tickets, set priority, add internal notes, take over from the AI and handle "Needs human" tickets, manage announcements (create, schedule, publish), view accounts (help center articles and AI playbooks are Super Admin by default) |
 | **Super Admin** | Dashboard + Adminit (all) | All admin actions + manage roles (add/remove members), manage permissions (role-resource mappings) |
 
 ---

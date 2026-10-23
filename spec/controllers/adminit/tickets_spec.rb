@@ -136,6 +136,84 @@ describe Adminit::TicketsController, type: :controller do
     end
   end
 
+  describe "GET #index AI state" do
+    render_views
+
+    before do
+      login_user(user)
+      ticket_permission
+    end
+
+    let!(:needs_human) { create(:ticket, :ai_handoff_requested, title: "Needs a person", created: creator_account) }
+    let!(:plain) { create(:ticket, title: "Plain one", created: creator_account) }
+
+    it "renders the AI state column with the Needs human badge" do
+      get :index
+      expect(response.body).to include("Needs human")
+    end
+
+    it "filters by ai_state" do
+      get :index, params: {filter: {ai_state: "handoff_requested"}}
+      expect(controller.instance_variable_get(:@tickets)).to contain_exactly(needs_human)
+    end
+
+    it "sorts by ai_state" do
+      get :index, params: {sort: "ai_state", direction: "desc"}
+      expect(controller.instance_variable_get(:@tickets).first).to eq(needs_human)
+    end
+
+    it "ignores an unknown ai_state filter value without raising" do
+      expect { get :index, params: {filter: {ai_state: "bogus"}} }.not_to raise_error
+      expect(response).to have_http_status(:ok)
+    end
+  end
+
+  describe "GET #show with the assistant" do
+    render_views
+
+    let(:ticket) { create(:ticket, :ai_handoff_requested, created: creator_account) }
+    let(:playbook) { create(:ai_playbook, name: "Billing flow") }
+
+    before do
+      login_user(user)
+      ticket_permission
+      ticket.update!(ai_playbook: playbook)
+      create(:ai_run, ticket: ticket, step: :respond, model: "demo-model")
+      ticket.notes.create!(kind: :ai, account: nil, body: "AI summary body")
+      ticket.notes.create!(kind: :system, account: nil, body: "system body")
+    end
+
+    it "shows the AI badge, playbook, AI activity panel, AI note styling and the takeover label" do
+      get :show, params: {id: ticket.id}
+      body = response.body
+
+      expect(body).to include("Needs human")
+      expect(body).to include("Billing flow")
+      expect(body).to include(I18n.t("adminit.tickets.ai_activity"))
+      expect(body).to include("demo-model")
+      expect(body).to include("/ai_runs/")
+      expect(body).to include("border-violet-400")
+      expect(body).to include("system body")
+      expect(body).to include(I18n.t("adminit.tickets.take_over_from_ai"))
+    end
+
+    it "keeps the plain Take label when the assistant is not engaged and hides the AI panel" do
+      plain = create(:ticket, created: creator_account)
+      get :show, params: {id: plain.id}
+
+      expect(response.body).to include(">#{I18n.t("shared.buttons.take")}<")
+      expect(response.body).not_to include(I18n.t("adminit.tickets.ai_activity"))
+    end
+
+    it "preloads the playbook and runs" do
+      get :show, params: {id: ticket.id}
+      loaded = controller.instance_variable_get(:@ticket)
+
+      expect(loaded.association(:ai_playbook)).to be_loaded
+      expect(loaded.association(:ai_runs)).to be_loaded
+    end
+  end
+
   describe "POST #take" do
     let(:ticket) { create(:ticket, created: creator_account, assigned: nil, status: :open) }
 

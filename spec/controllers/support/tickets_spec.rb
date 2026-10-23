@@ -68,6 +68,78 @@ RSpec.describe Support::TicketsController, type: :controller do
     end
   end
 
+  describe "GET #show with the assistant" do
+    render_views
+
+    before { login_user(creator_account) }
+
+    def show(ticket)
+      get :show, params: {id: ticket.id}
+      response.body
+    end
+
+    it "shows the helping banner, typing indicator and the talk-to-person button while analyzing" do
+      body = show(create(:ticket, :ai_analyzing, created: creator_account))
+
+      expect(body).to include(I18n.t("support.ticket_status_banner.ai_analyzing"))
+      expect(body).to include("typing_support_conversation_")
+      expect(body).to include(I18n.t("support.ai_status.talk_to_person"))
+      expect(body).to include("is=\"#{creator_account.id}\"")
+    end
+
+    it "shows the helping banner without typing while awaiting the user" do
+      body = show(create(:ticket, :ai_awaiting_user, created: creator_account))
+
+      expect(body).to include(I18n.t("support.ticket_status_banner.ai_awaiting_user"))
+      expect(body).not_to include("typing_support_conversation_")
+      expect(body).to include(I18n.t("support.ai_status.talk_to_person"))
+    end
+
+    it "shows the waiting banner, no talk-to-person button and a live composer on handoff" do
+      body = show(create(:ticket, :ai_handoff_requested, created: creator_account))
+
+      expect(body).to include(I18n.t("support.ticket_status_banner.ai_handoff_requested"))
+      expect(body).not_to include(I18n.t("support.ai_status.talk_to_person"))
+      expect(body).to include(I18n.t("support.messages.placeholder"))
+    end
+
+    it "shows the resolved banner and the reopen form for an AI-resolved ticket" do
+      body = show(create(:ticket, :ai_resolved, created: creator_account))
+
+      expect(body).to include(I18n.t("support.ticket_status_banner.ai_resolved"))
+      expect(body).to include(I18n.t("support.reopen_form.request_reopen"))
+    end
+
+    it "keeps the normal in-progress experience once a human stepped in" do
+      body = show(create(:ticket, :in_progress, ai_state: :stepped_back, created: creator_account))
+
+      expect(body).not_to include("ai-status-banner")
+      expect(body).not_to include(I18n.t("support.ai_status.talk_to_person"))
+      expect(body).to include(I18n.t("support.messages.placeholder"))
+    end
+
+    it "renders the solved buttons only on the latest AI message that proposes a resolution" do
+      ticket = create(:ticket, :ai_awaiting_user, created: creator_account)
+      create(:message, :ai, conversation: ticket.conversation, content: "first",
+        metadata: {"article_ids" => [], "resolution_proposed" => true}, created_at: 2.minutes.ago)
+      create(:message, :ai, conversation: ticket.conversation, content: "second",
+        metadata: {"article_ids" => [], "resolution_proposed" => true}, created_at: 1.minute.ago)
+
+      body = show(ticket)
+
+      expect(body.scan("data-resolution-actions").size).to eq(1)
+      expect(body).to include(I18n.t("support.message.solved"))
+    end
+
+    it "lists article cards from an AI message" do
+      article = create(:article, :published, title: "Fix the thing")
+      ticket = create(:ticket, :ai_awaiting_user, created: creator_account)
+      create(:message, :ai, conversation: ticket.conversation, metadata: {"article_ids" => [article.id], "resolution_proposed" => false})
+
+      expect(show(ticket)).to include("Fix the thing")
+    end
+  end
+
   describe "GET #show" do
     subject { get :show, params: {id: ticket.id} }
 
@@ -149,47 +221,6 @@ RSpec.describe Support::TicketsController, type: :controller do
     end
   end
 
-  describe "GET #edit" do
-    context "when not logged in" do
-      it "redirects to login" do
-        expect(get(:edit, params: {id: ticket.id})).to redirect_to(rodauth.login_path)
-      end
-    end
-
-    context "when logged in as ticket creator" do
-      before { login_user(creator_account) }
-
-      it "redirects non-turbo-frame requests to root" do
-        expect(get(:edit, params: {id: ticket.id})).to redirect_to(root_path)
-      end
-
-      context "with turbo frame request" do
-        before { @request.headers["Turbo-Frame"] = "modal" }
-
-        subject { get :edit, params: {id: ticket.id} }
-
-        it_behaves_like "respond to success"
-
-        it "is authorized" do
-          expect { subject }.to be_authorized_to(:update?, ticket).with(Support::TicketPolicy).with_context(user: creator_account)
-        end
-      end
-    end
-
-    context "when logged in as other user" do
-      before do
-        login_user(other_account)
-        @request.headers["Turbo-Frame"] = "modal"
-      end
-
-      it "denies access" do
-        get :edit, params: {id: ticket.id}
-        expect(response).to have_http_status(:redirect)
-        expect(flash[:alert]).to eq(I18n.t("adminit.authorization.unauthorized"))
-      end
-    end
-  end
-
   describe "POST #create" do
     let(:valid_params) { {support_ticket: {title: "Test ticket", description: "A description", category: "account_access"}} }
     let(:invalid_params) { {support_ticket: {title: "", description: "", category: "account_access"}} }
@@ -255,50 +286,6 @@ RSpec.describe Support::TicketsController, type: :controller do
     end
   end
 
-  describe "PATCH #update" do
-    let(:update_params) { {id: ticket.id, support_ticket: {title: "Updated title"}} }
-
-    subject { patch :update, params: update_params }
-
-    context "when not logged in" do
-      it "redirects to login" do
-        expect(subject).to redirect_to(rodauth.login_path)
-      end
-    end
-
-    context "when logged in as ticket creator" do
-      before { login_user(creator_account) }
-
-      it "is authorized" do
-        expect { subject }.to be_authorized_to(:update?, ticket).with(Support::TicketPolicy).with_context(user: creator_account)
-      end
-
-      it "updates the ticket" do
-        subject
-        expect(ticket.reload.title).to eq("Updated title")
-      end
-
-      it "redirects after update" do
-        expect(subject).to have_http_status(:redirect)
-      end
-    end
-
-    context "when logged in as other user" do
-      before { login_user(other_account) }
-
-      it "denies access" do
-        subject
-        expect(response).to have_http_status(:redirect)
-        expect(flash[:alert]).to eq(I18n.t("adminit.authorization.unauthorized"))
-      end
-
-      it "does not update the ticket" do
-        subject
-        expect(ticket.reload.title).not_to eq("Updated title")
-      end
-    end
-  end
-
   describe "POST #attach_files" do
     let(:file) { fixture_file_upload("test_file.txt", "image/png") }
 
@@ -357,6 +344,94 @@ RSpec.describe Support::TicketsController, type: :controller do
 
       it "redirects to the ticket" do
         expect(subject).to redirect_to(support_ticket_path(ticket))
+      end
+    end
+  end
+
+  describe "AI integration" do
+    let(:valid_params) { {support_ticket: {title: "Test ticket", description: "A description", category: "account_access"}} }
+
+    before { login_user(creator_account) }
+
+    describe "POST #create" do
+      it "starts the AI when enabled with an enabled playbook" do
+        allow(SupportAiConfig).to receive(:enabled).and_return(true)
+        create(:ai_playbook)
+
+        expect { post :create, params: valid_params }.to have_enqueued_job(Support::AiProcessJob)
+        created = Support::Ticket.unscoped.order(:id).last
+        expect(created).to be_ai_analyzing
+        expect(response).to redirect_to(support_ticket_url(created))
+      end
+
+      it "leaves the AI off by default" do
+        expect { post :create, params: valid_params }.not_to have_enqueued_job(Support::AiProcessJob)
+        expect(Support::Ticket.unscoped.order(:id).last).to be_ai_off
+      end
+
+      it "still renders the form again for invalid params" do
+        post :create, params: {support_ticket: {title: "", description: "", category: "account_access"}}
+        expect(response).to have_http_status(:unprocessable_content)
+      end
+    end
+
+    describe "POST #resolve_with_ai" do
+      subject { post :resolve_with_ai, params: {id: ticket.id} }
+
+      let(:ticket) { create(:ticket, :ai_awaiting_user, created: creator_account) }
+
+      it "is authorized" do
+        expect { subject }.to be_authorized_to(:resolve_with_ai?, ticket).with(Support::TicketPolicy).with_context(user: creator_account)
+      end
+
+      it "resolves the ticket and redirects with a notice" do
+        subject
+        expect(ticket.reload).to be_finished.and be_ai_resolved
+        expect(response).to redirect_to(support_ticket_path(ticket))
+        expect(flash[:notice]).to eq(I18n.t("support.tickets.resolved_with_ai"))
+      end
+
+      it "is denied for another account" do
+        login_user(other_account)
+        subject
+        expect(ticket.reload).to be_open
+        expect(flash[:alert]).to eq(I18n.t("adminit.authorization.unauthorized"))
+      end
+
+      it "is denied when the AI is not waiting for the user" do
+        ticket.update!(ai_state: :handoff_requested)
+        subject
+        expect(ticket.reload).to be_open
+      end
+    end
+
+    describe "POST #request_human" do
+      subject { post :request_human, params: {id: ticket.id} }
+
+      let(:ticket) { create(:ticket, :ai_awaiting_user, created: creator_account) }
+
+      before { stub_responder(summarize: ai_result("Summary")) }
+
+      it "is authorized" do
+        expect { subject }.to be_authorized_to(:request_human?, ticket).with(Support::TicketPolicy).with_context(user: creator_account)
+      end
+
+      it "hands off and redirects with a notice" do
+        subject
+        expect(ticket.reload).to be_ai_handoff_requested
+        expect(response).to redirect_to(support_ticket_path(ticket))
+        expect(flash[:notice]).to eq(I18n.t("support.tickets.human_requested"))
+      end
+
+      it "is denied once already handed off" do
+        ticket.update!(ai_state: :handoff_requested)
+        expect { subject }.not_to change { ticket.reload.updated_at }
+      end
+
+      it "is denied for another account" do
+        login_user(other_account)
+        subject
+        expect(ticket.reload).to be_ai_awaiting_user
       end
     end
   end

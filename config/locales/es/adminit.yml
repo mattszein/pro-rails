@@ -20,6 +20,38 @@ es:
       reopen_confirm: "¿Estás seguro de que quieres reabrir este ticket?"
       note_form_placeholder: "Agregar una nota interna..."
       add_note: "Agregar Nota"
+      ai_state: "IA"
+      ai_playbook: "Playbook"
+      take_over_from_ai: "Tomar el control de la IA"
+      ai_activity: "Actividad de IA"
+      no_ai_runs: "Todavía no hay ejecuciones de IA."
+      ai_runs:
+        step: "Paso"
+        trigger: "Disparador"
+        model: "Modelo"
+        status: "Estado"
+        tokens: "Tokens entrada/salida"
+        latency: "Latencia (ms)"
+        tools: "Herramientas"
+        error: "Error"
+        view: "Ver"
+        kb_gap: "Brecha de base de conocimiento"
+        create_article: "Crear artículo"
+        kb_queries: "Consultas buscadas en el centro de ayuda"
+        title: "Ejecución de IA"
+        created_at: "Creada el"
+        transcript: "Transcripción"
+        no_transcript: "No se registró una transcripción para esta ejecución."
+        tool_calls: "Llamadas a herramientas"
+        tool_call: "Llamada a herramienta"
+        result_of: "Resultado de"
+        output: "Salida"
+        roles:
+          system: "Sistema"
+          developer: "Sistema"
+          user: "Usuario"
+          assistant: "Asistente"
+          tool: "Herramienta"
     announcements:
       cannot_edit: "No se puede editar este anuncio."
       scheduled: "Anuncio programado para %{time}."
@@ -42,6 +74,42 @@ es:
       published: "El artículo fue publicado."
       unpublished: "El artículo fue despublicado."
       unpublish: "Despublicar"
+    ai_playbooks:
+      new: "Nuevo playbook"
+      edit: "Editando playbook"
+      default_badge: "Por defecto"
+      enabled_on: "Habilitado"
+      enabled_off: "Deshabilitado"
+      toggle_enable: "Habilitar"
+      toggle_disable: "Deshabilitar"
+      move_up: "Subir"
+      move_down: "Bajar"
+      any: "Cualquiera"
+      conditions: "Condiciones"
+      conditions_locked: "El playbook por defecto se aplica a todo ticket que ningún otro playbook cubra, por eso sus condiciones están bloqueadas."
+      categories: "Categorías"
+      categories_hint: "Deja todas sin marcar para cualquier categoría."
+      min_priority: "Prioridad mínima"
+      max_priority: "Prioridad máxima"
+      priority_range: "Prioridad"
+      audience: "Audiencia"
+      no_audience: "Cualquier solicitante"
+      mode: "Modo"
+      instructions: "Instrucciones"
+      instructions_placeholder: "Guía adicional que se agrega al prompt del asistente."
+      capabilities: "Capacidades"
+      read: "Lectura"
+      actions: "Acciones"
+      limits: "Límites"
+      max_ai_turns: "Máx. turnos del asistente"
+      idle_reminder_after_hours: "Recordatorio por inactividad (horas)"
+      idle_handoff_after_hours: "Traspaso por inactividad (horas)"
+      enabled: "Habilitado"
+      position: "Orden"
+      toggled_on: "El playbook fue habilitado."
+      toggled_off: "El playbook fue deshabilitado."
+      moved: "Se actualizó el orden de los playbooks."
+      cannot_move: "El playbook no se puede mover más."
     roles:
       account_removed: "La cuenta fue eliminada del rol exitosamente."
       account_not_removed: "La cuenta no fue eliminada del rol."
@@ -120,6 +188,7 @@ es:
         analytics:
           resolved: "Resueltos"
           series_name: "Tickets"
+          needs_human: "Requiere humano"
       announcements:
         general:
           list_title: "Próximos"
@@ -143,6 +212,7 @@ es:
       audiences: "Audiencias"
       tickets: "Tickets"
       articles: "Artículos"
+      ai_playbooks: "Playbooks de IA"
       back_to_app: "Volver a la App"
     notes:
       system: "Sistema"
@@ -150,5 +220,45 @@ es:
       note_by: "Nota de"
       unknown: "Desconocido"
       ago: "atrás"
+      ai: "IA"
+      ai_note: "Nota del asistente"
     layout:
       title_prefix: "Adminit:"
+  support_ai:
+    capabilities:
+      account_facts:
+        label: "Datos de la cuenta"
+        description: "Estado, verificación, fecha de alta, rol e idioma de quien consulta."
+      past_tickets:
+        label: "Tickets anteriores"
+        description: "Los tickets previos del propio solicitante."
+      similar_tickets:
+        label: "Tickets similares"
+        description: "Tickets finalizados de otros usuarios en la misma categoría. Solo en investigación; nunca llega a la respuesta al usuario."
+      search_articles:
+        label: "Buscar artículos"
+        description: "Busca en los artículos publicados del centro de ayuda."
+      vision_attachments:
+        label: "Leer imágenes adjuntas"
+        description: "Envía las imágenes adjuntas a un modelo con visión."
+      investigate_note:
+        label: "Nota de investigación"
+        description: "Escribe una nota interna con hallazgos y el siguiente paso recomendado."
+      auto_set_priority:
+        label: "Asignar prioridad"
+        description: "Aplica la prioridad sugerida por el triaje."
+      auto_correct_category:
+        label: "Corregir categoría"
+        description: "Aplica la corrección de categoría sugerida por el triaje."
+      suggest_articles:
+        label: "Sugerir artículos"
+        description: "Adjunta tarjetas de artículos de ayuda al mensaje del asistente."
+      propose_resolution:
+        label: "Proponer resolución"
+        description: "Muestra los botones Resuelto / No resuelto al usuario."
+      request_human:
+        label: "Solicitar a una persona"
+        description: "Traspasa el ticket a un agente cuando sea necesario."
+      draft_replies:
+        label: "Borradores de respuesta"
+        description: "Permite a los agentes pedir una respuesta redactada por IA."

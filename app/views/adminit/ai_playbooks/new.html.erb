@@ -1,0 +1,5 @@
+<%= render(Core::ModalComponent.new(title: t("adminit.ai_playbooks.new"))) do %>
+  <%= turbo_frame_tag "ai_playbook_form" do %>
+    <%= render "form", playbook: @playbook %>
+  <% end %>
+<% end %>

@@ -27,7 +27,7 @@ module Support
       else
         category = params[:category].to_s
         category = nil unless Support::Article.categories.key?(category)
-        Support::Article.search(query, locale: I18n.locale, category: category, limit: SUGGESTIONS_LIMIT)
+        Support::Article.search(query, locale: I18n.locale, category: category, limit: SUGGESTIONS_LIMIT, published_only: true)
           .published.to_a
       end
       render layout: false
@@ -43,7 +43,7 @@ module Support
 
     def index_scope
       scope = if @query.present?
-        Support::Article.search(@query, locale: I18n.locale, limit: nil)
+        Support::Article.search(@query, locale: I18n.locale, limit: nil, published_only: true)
       else
         Support::Article.where(locale: I18n.locale.to_s).order(published_at: :desc, id: :asc)
       end

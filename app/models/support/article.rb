@@ -22,19 +22,56 @@ module Support
 
     scope :search_title, ->(query) { where("title ILIKE ?", "%#{sanitize_sql_like(query)}%") }
 
-    # Full-text search over the generated `searchable` column. Chain `.published`
-    # to restrict to published articles. With a category, general (nil) articles match too.
-    def self.search(query, locale: nil, category: nil, limit: 5)
+    # Published articles among `ids`; unknown or unpublished ids are dropped.
+    scope :published_among, ->(ids) { published.where(id: ids) }
+
+    OR_TERM_FORMAT = /[[:alnum:]]{3,}/
+    OR_TERM_LIMIT = 8
+    # The OR pass needs a real hit, not just one stray body word. Measured ts_rank for a single
+    # matching term: title ~0.30, summary ~0.12, body ~0.06. Several terms in the body (~0.18)
+    # also pass, since that is a relevant article.
+    OR_MIN_RANK = 0.1
+
+    # Full-text search over the generated `searchable` column, ranked by ts_rank.
+    #
+    # Two passes: first `websearch_to_tsquery` (all words must match); when that matches no row,
+    # an OR of prefix terms ("change password" -> `chang:* | password:*`), so a partial match still
+    # finds something. Terms are strictly [[:alnum:]], so no tsquery syntax can be injected.
+    #
+    # The pass is decided with `exists?` on the AND query plus the locale/category filters (and any
+    # scope the call is chained on, e.g. `Article.published.search`). A `.published` chained AFTER
+    # `search` is not visible here, so a draft-only AND match would suppress the OR fallback for
+    # published articles. Callers that restrict to published pass `published_only: true` (they may
+    # still chain `.published`, which is then a no-op). With a category, general (nil) articles match too.
+    def self.search(query, locale: nil, category: nil, limit: 5, published_only: false)
       return none if query.blank?
 
+      base = all
+      base = base.published if published_only
+      base = base.where(locale: locale.to_s) if locale.present?
+      base = base.where(category: [categories.fetch(category.to_s), nil]) if category.present?
+
       tsquery = sanitize_sql_array(["websearch_to_tsquery('simple', ?)", query.to_s])
-      scope = where("searchable @@ #{tsquery}")
-      scope = scope.where(locale: locale.to_s) if locale.present?
-      scope = scope.where(category: [categories.fetch(category.to_s), nil]) if category.present?
-      scope.reorder(Arel.sql("ts_rank(searchable, #{tsquery}) DESC, published_at DESC NULLS LAST, id ASC")).limit(limit)
+      min_rank = nil
+      unless base.where("searchable @@ #{tsquery}").exists?
+        terms = query.to_s.downcase.scan(OR_TERM_FORMAT).uniq.first(OR_TERM_LIMIT)
+        return none if terms.empty?
+
+        tsquery = sanitize_sql_array(["to_tsquery('simple', ?)", terms.map { |term| "#{term}:*" }.join(" | ")])
+        min_rank = OR_MIN_RANK
+      end
+
+      base = base.where("searchable @@ #{tsquery}")
+      base = base.where("ts_rank(searchable, #{tsquery}) >= ?", min_rank) if min_rank
+      base
+        .reorder(Arel.sql("ts_rank(searchable, #{tsquery}) DESC, published_at DESC NULLS LAST, id ASC"))
+        .limit(limit)
     end
 
     def breadcrumb_title = title
+
+    # Plain-text body, squished and truncated (with an ellipsis) for prompts.
+    def excerpt(length = 1_200) = search_text.to_s.squish.truncate(length)
 
     def publish!
       raise InvalidTransition, I18n.t("article.transitions.already_published") if published?

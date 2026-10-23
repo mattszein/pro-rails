@@ -37,9 +37,11 @@
     </div>
 
     <%= render(Core::CardComponent.new(classes: "space-y-4")) do %>
+      <%= render "support/conversations/ai_status", ticket: ticket %>
       <%= render Support::ConversationComponent.new(
             conversation: @conversation,
-            messages: @messages
+            messages: @messages,
+            typing: ticket.ai_analyzing?
           ) do %>
           <%= render "support/conversations/message_form", ticket: ticket %>
       <% end %>

@@ -1,7 +1,10 @@
 <div class="p-3 rounded-lg <%= note_classes %>">
   <div class="flex justify-between items-start mb-1">
     <span class="font-bold uppercase tracking-wider <%= label_classes %>">
-      <% if note.system? %>
+      <% if note.ai? %>
+        <%= render(Core::BadgeComponent.new(label: t("adminit.notes.ai"), theme: :violet, size: :xs)) %>
+        <%= t("adminit.notes.ai_note") %>
+      <% elsif note.system? %>
         <%= t("adminit.notes.system") %><% if note.account %> • <%= t("adminit.notes.by", email: note.account.email) %><% end %>
       <% else %>
         <%= t("adminit.notes.note_by") %> <%= note.account&.email || t("adminit.notes.unknown") %>

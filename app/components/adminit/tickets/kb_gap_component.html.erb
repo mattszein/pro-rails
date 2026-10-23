@@ -1,0 +1,4 @@
+<span class="inline-flex items-center gap-2" data-role="kb-gap">
+  <%= render(Core::BadgeComponent.new(label: t("adminit.tickets.ai_runs.kb_gap"), theme: :orange, size: :xs)) %>
+  <%= render(Core::LinkComponent.new(name: t("adminit.tickets.ai_runs.create_article"), url: article_path, style: :link, html_options: {data: {turbo_frame: "modal"}})) %>
+</span>

@@ -1,0 +1,86 @@
+<% param_key = "support_ai_playbook" %>
+<%= form_with(model: playbook, url: playbook.persisted? ? adminit_ai_playbook_path(playbook) : adminit_ai_playbooks_path,
+      data: {turbo: true}, class: "space-y-4") do |form| %>
+  <%= render "adminit/application/form_errors", record: playbook %>
+
+  <%= form.label :name, t("shared.labels.name") %>
+  <%= form.text_field :name, {autofocus: true, required: true, autocomplete: "off", class: "w-full"} %>
+
+  <div class="flex items-center gap-2">
+    <%= form.check_box :enabled %>
+    <%= form.label :enabled, t("adminit.ai_playbooks.enabled") %>
+  </div>
+
+  <%= form.label :mode, t("adminit.ai_playbooks.mode") %>
+  <%= form.select :mode, ai_playbook_mode_options, {}, {required: true, class: "w-full"} %>
+
+  <fieldset class="space-y-3">
+    <legend class="font-semibold mb-2"><%= t("adminit.ai_playbooks.conditions") %></legend>
+    <% if playbook.is_default? %>
+      <p class="text-sm text-slate-500"><%= t("adminit.ai_playbooks.conditions_locked") %></p>
+    <% else %>
+      <div>
+        <p class="font-medium mb-1"><%= t("adminit.ai_playbooks.categories") %></p>
+        <p class="text-sm text-slate-500 mb-2"><%= t("adminit.ai_playbooks.categories_hint") %></p>
+        <%= hidden_field_tag "#{param_key}[category_keys][]", "", id: nil %>
+        <% ai_playbook_category_options.each do |label, key| %>
+          <div class="flex items-center gap-2">
+            <%= form.check_box :category_keys, {name: "#{param_key}[category_keys][]", id: "#{param_key}_category_#{key}", checked: playbook.category_keys.include?(key), include_hidden: false}, key, nil %>
+            <%= label_tag "#{param_key}_category_#{key}", label, class: "mb-0" %>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <%= form.label :min_priority, t("adminit.ai_playbooks.min_priority") %>
+          <%= form.select :min_priority, ai_playbook_priority_options, {include_blank: t("adminit.ai_playbooks.any")}, {class: "w-full"} %>
+        </div>
+        <div>
+          <%= form.label :max_priority, t("adminit.ai_playbooks.max_priority") %>
+          <%= form.select :max_priority, ai_playbook_priority_options, {include_blank: t("adminit.ai_playbooks.any")}, {class: "w-full"} %>
+        </div>
+      </div>
+
+      <%= form.label :audience_id, t("adminit.ai_playbooks.audience") %>
+      <%= form.select :audience_id, ai_playbook_audience_options, {include_blank: t("adminit.ai_playbooks.no_audience")}, {class: "w-full"} %>
+    <% end %>
+  </fieldset>
+
+  <%= form.label :instructions, t("adminit.ai_playbooks.instructions") %>
+  <%= form.text_area :instructions, {rows: 4, placeholder: t("adminit.ai_playbooks.instructions_placeholder"), class: "w-full"} %>
+
+  <fieldset class="space-y-3">
+    <legend class="font-semibold mb-2"><%= t("adminit.ai_playbooks.capabilities") %></legend>
+    <%= hidden_field_tag "#{param_key}[capabilities][]", "", id: nil %>
+    <% ai_playbook_capability_groups.each do |kind, capabilities| %>
+      <div>
+        <p class="font-medium mb-1"><%= t("adminit.ai_playbooks.#{(kind == :read) ? "read" : "actions"}") %></p>
+        <% capabilities.each do |capability| %>
+          <% key = capability.key.to_s %>
+          <div class="flex items-start gap-2 mb-1">
+            <%= form.check_box :capabilities, {name: "#{param_key}[capabilities][]", id: "#{param_key}_capability_#{key}", checked: playbook.capability?(key), include_hidden: false, class: "mt-1"}, key, nil %>
+            <label for="<%= param_key %>_capability_<%= key %>" class="cursor-pointer">
+              <span class="block font-medium"><%= ai_playbook_capability_label(key) %></span>
+              <span class="block text-sm text-slate-500"><%= ai_playbook_capability_description(key) %></span>
+            </label>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </fieldset>
+
+  <fieldset class="space-y-3">
+    <legend class="font-semibold mb-2"><%= t("adminit.ai_playbooks.limits") %></legend>
+    <%= form.label :max_ai_turns, t("adminit.ai_playbooks.max_ai_turns") %>
+    <%= form.number_field :max_ai_turns, {min: 1, required: true, class: "w-full"} %>
+    <%= form.label :idle_reminder_after_hours, t("adminit.ai_playbooks.idle_reminder_after_hours") %>
+    <%= form.number_field :idle_reminder_after_hours, {min: 1, required: true, class: "w-full"} %>
+    <%= form.label :idle_handoff_after_hours, t("adminit.ai_playbooks.idle_handoff_after_hours") %>
+    <%= form.number_field :idle_handoff_after_hours, {min: 1, required: true, class: "w-full"} %>
+  </fieldset>
+
+  <div class="mt-6">
+    <%= form.button t("shared.common.save"), {theme: :create, fullw: true} %>
+  </div>
+<% end %>

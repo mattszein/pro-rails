@@ -11,6 +11,10 @@
     <%= render(Core::SidebarLinkComponent.new(label: t("adminit.navigation.articles"), path: adminit_articles_path, active_paths: [adminit_articles_path], icon_name: "document", animated_type: "book-text")) %>
   <% end %>
 
+  <% if allowed_to? :manage?, with: Adminit::AiPlaybookPolicy %>
+    <%= render(Core::SidebarLinkComponent.new(label: t("adminit.navigation.ai_playbooks"), path: adminit_ai_playbooks_path, active_paths: [adminit_ai_playbooks_path], icon_name: "settings", animated_type: "sliders")) %>
+  <% end %>
+
   <% if allowed_to? :manage?, with: Adminit::PermissionPolicy %>
     <%= render(Core::SidebarLinkComponent.new(label: t("adminit.navigation.permissions"), path: adminit_permissions_path, active_paths: [adminit_permissions_path], icon_name: "adminit/permissions", animated_type: "gavel")) %>
   <% end %>

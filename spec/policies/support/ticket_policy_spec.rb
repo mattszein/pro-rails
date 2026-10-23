@@ -44,24 +44,6 @@ RSpec.describe Support::TicketPolicy, type: :policy do
     end
   end
 
-  describe "#update?" do
-    context "when user is the creator" do
-      let(:policy) { described_class.new(ticket, user: creator_account) }
-
-      it "allows user to update the ticket" do
-        expect(policy).to be_update
-      end
-    end
-
-    context "when user is not the creator" do
-      let(:policy) { described_class.new(ticket, user: other_account) }
-
-      it "denies user from updating the ticket" do
-        expect(policy).not_to be_update
-      end
-    end
-  end
-
   describe "#destroy?" do
     context "when user is the creator" do
       let(:policy) { described_class.new(ticket, user: creator_account) }
@@ -95,6 +77,55 @@ RSpec.describe Support::TicketPolicy, type: :policy do
       it "denies user from attaching files to the ticket" do
         expect(policy).not_to be_attach_files
       end
+    end
+  end
+
+  describe "#resolve_with_ai?" do
+    it "allows the creator of an open ticket awaiting the user" do
+      ticket = create(:ticket, :ai_awaiting_user, created: creator_account)
+      expect(described_class.new(ticket, user: creator_account)).to be_resolve_with_ai
+    end
+
+    it "denies other users" do
+      ticket = create(:ticket, :ai_awaiting_user, created: creator_account)
+      expect(described_class.new(ticket, user: other_account)).not_to be_resolve_with_ai
+    end
+
+    %i[ai_analyzing ai_handoff_requested ai_stepped_back ai_resolved].each do |trait|
+      it "denies the creator when #{trait}" do
+        ticket = create(:ticket, trait, created: creator_account)
+        expect(described_class.new(ticket, user: creator_account)).not_to be_resolve_with_ai
+      end
+    end
+
+    it "denies a ticket that is not open" do
+      ticket = create(:ticket, :in_progress, ai_state: :awaiting_user, created: creator_account)
+      expect(described_class.new(ticket, user: creator_account)).not_to be_resolve_with_ai
+    end
+  end
+
+  describe "#request_human?" do
+    %i[ai_analyzing ai_awaiting_user].each do |trait|
+      it "allows the creator when #{trait}" do
+        ticket = create(:ticket, trait, created: creator_account)
+        expect(described_class.new(ticket, user: creator_account)).to be_request_human
+      end
+    end
+
+    %i[ai_handoff_requested ai_stepped_back ai_resolved].each do |trait|
+      it "denies the creator when #{trait}" do
+        ticket = create(:ticket, trait, created: creator_account)
+        expect(described_class.new(ticket, user: creator_account)).not_to be_request_human
+      end
+    end
+
+    it "denies the creator when the AI is off" do
+      expect(described_class.new(create(:ticket, created: creator_account), user: creator_account)).not_to be_request_human
+    end
+
+    it "denies other users" do
+      ticket = create(:ticket, :ai_awaiting_user, created: creator_account)
+      expect(described_class.new(ticket, user: other_account)).not_to be_request_human
     end
   end
 end

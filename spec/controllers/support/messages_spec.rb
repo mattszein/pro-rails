@@ -197,4 +197,52 @@ RSpec.describe Support::MessagesController, type: :controller do
       end
     end
   end
+
+  describe "AI engaged tickets" do
+    subject { post :create, params: {ticket_id: ticket.id, support_message: {content: "Hello"}}, as: :turbo_stream }
+
+    let(:ticket) { create(:ticket, created_id: creator_account.id, status: :open, ai_state: state) }
+    let(:state) { :awaiting_user }
+
+    context "when the requester writes on an open ticket the AI is handling" do
+      before { login_user(creator_account) }
+
+      it "creates the message (the ticket is messageable)" do
+        expect { subject }.to change(Support::Message, :count).by(1)
+        expect(Support::Message.last).to be_human
+      end
+
+      it "resumes the AI and enqueues the job for the message" do
+        expect { subject }.to have_enqueued_job(Support::AiProcessJob).with(ticket.id, "user_message", a_kind_of(Integer))
+        expect(ticket.reload).to be_ai_analyzing
+      end
+
+      context "when the AI has handed off" do
+        let(:state) { :handoff_requested }
+
+        it "still accepts the message with no AI work" do
+          expect { subject }.to change(Support::Message, :count).by(1)
+          expect { subject }.not_to have_enqueued_job(Support::AiProcessJob)
+        end
+      end
+
+      context "when the AI is off" do
+        let(:state) { :off }
+
+        it "keeps the old rule: no messages on an open, unassigned ticket" do
+          expect { subject }.not_to change(Support::Message, :count)
+        end
+      end
+    end
+
+    context "when an admin writes" do
+      before { login_user(assignee_account) }
+
+      it "steps the AI back" do
+        subject
+        expect(ticket.reload).to be_ai_stepped_back
+        expect(ticket.notes.system.first.body).to eq("Support took over from AI.")
+      end
+    end
+  end
 end

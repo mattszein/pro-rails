@@ -6,9 +6,10 @@
     </div>
     <%= form_with url: help_articles_path, method: :get, class: "flex gap-2 items-center", data: {turbo_frame: "_top"} do |f| %>
       <%= hidden_field_tag :category, @category if @category %>
-      <%= search_field_tag :q, @query, placeholder: t("support.articles.search_placeholder"), "aria-label": t("support.articles.search"),
-            class: "w-full rounded-md border border-gray-300 p-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100" %>
-      <%= f.submit t("support.articles.search"), name: nil, class: "cursor-pointer rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700" %>
+      <div class="flex-1">
+        <%= f.text_field :q, {label: t("support.articles.search"), value: @query, "aria-label": t("support.articles.search")} %>
+      </div>
+      <%= f.button t("support.articles.search"), {theme: :primary}, {name: nil} %>
     <% end %>
     <div class="flex flex-wrap gap-2">
       <% help_category_filters.each do |label, value| %>
@@ -27,7 +28,7 @@
       <% @articles.each do |article| %>
         <%= render Core::CardComponent.new(padding: :sm, classes: "space-y-1") do %>
           <div class="flex items-center gap-2">
-            <%= link_to article.title, help_article_path(slug: article.slug), class: "text-lg font-semibold text-primary-600 hover:underline dark:text-primary-200" %>
+            <%= render Core::LinkComponent.new(name: article.title, url: help_article_path(slug: article.slug), style: :link, html_options: {class: "text-lg font-semibold"}) %>
             <%= render Core::BadgeComponent.new(label: help_article_category_label(article), theme: :secondary, size: :xs) %>
           </div>
           <p class="text-gray-600 dark:text-gray-400"><%= article.summary %></p>
