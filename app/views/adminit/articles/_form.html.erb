@@ -8,7 +8,7 @@
   <%= form.label :summary, t("adminit.articles.summary") %>
   <%= form.text_area :summary, {rows: 2, required: true, placeholder: t("adminit.articles.summary_placeholder"), class: "w-full"} %>
   <%= form.label :category, t("shared.labels.category") %>
-  <%= form.select :category, article_category_options, {include_blank: t("adminit.articles.general")}, {class: "w-full"} %>
+  <%= form.select :category, article_category_options, {}, {class: "w-full"} %>
   <%= form.label :locale, t("adminit.articles.locale") %>
   <%= form.select :locale, article_locale_options, {}, {required: true, class: "w-full"} %>
   <div>

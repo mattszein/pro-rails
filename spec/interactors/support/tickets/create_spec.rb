@@ -43,11 +43,6 @@ RSpec.describe Support::Tickets::Create, type: :interactor do
       expect(ticket.ai_state_changed_at).to be_present
     end
 
-    it "broadcasts the typing indicator" do
-      expect(Support::Ai::Typing).to receive(:show).with(ticket)
-      described_class.call(ticket: ticket)
-    end
-
     it "keeps the ticket when enqueueing fails" do
       allow(Support::AiProcessJob).to receive(:perform_later).and_raise(ActiveJob::EnqueueError, "queue down")
       result = nil

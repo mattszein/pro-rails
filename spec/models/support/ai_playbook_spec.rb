@@ -90,7 +90,7 @@ RSpec.describe Support::AiPlaybook, type: :model do
 
   describe "capabilities" do
     it "accepts every registered key" do
-      keys = SupportAi::Capabilities::Registry.keys.map(&:to_s)
+      keys = Support::AiCapabilities.keys.map(&:to_s)
       expect(build(:ai_playbook, capabilities: keys)).to be_valid
     end
 
@@ -117,49 +117,36 @@ RSpec.describe Support::AiPlaybook, type: :model do
       expect(playbook.capability?("past_tickets")).to be(false)
     end
 
+    it "rejects the retired action keys (the migration strips them from stored playbooks)" do
+      %w[suggest_articles propose_resolution request_human].each do |key|
+        expect(build(:ai_playbook, capabilities: [key])).not_to be_valid
+      end
+    end
+
     it "#capabilities_for delegates to the registry per step" do
-      playbook = build(:ai_playbook, capabilities: %w[account_facts similar_tickets suggest_articles])
-      expect(playbook.capabilities_for(:respond).map(&:key)).to contain_exactly(:account_facts, :suggest_articles)
-      expect(playbook.capabilities_for(:investigate).map(&:key)).to contain_exactly(:account_facts, :similar_tickets)
-    end
-  end
-
-  describe "#move!" do
-    let!(:first) { create(:ai_playbook) }
-    let!(:second) { create(:ai_playbook) }
-    let!(:third) { create(:ai_playbook) }
-    let!(:default) { create(:ai_playbook, :default) }
-
-    def order = described_class.where(is_default: false).ordered.to_a
-
-    it "appends new playbooks after existing ones" do
-      expect(order).to eq([first, second, third])
-    end
-
-    it "swaps with the neighbour" do
-      expect(third.move!(:up)).to be(true)
-      expect(order).to eq([first, third, second])
-      expect(first.move!(:down)).to be(true)
-      expect(order).to eq([third, first, second])
-    end
-
-    it "returns false at the edges" do
-      expect(first.move!(:up)).to be(false)
-      expect(third.move!(:down)).to be(false)
-      expect(order).to eq([first, second, third])
-    end
-
-    it "never moves the default" do
-      expect(default.move!(:up)).to be(false)
-      expect(default.move!(:down)).to be(false)
+      playbook = build(:ai_playbook, capabilities: %w[account_facts similar_tickets search_articles])
+      expect(playbook.capabilities_for(:respond).map(&:key)).to contain_exactly(:account_facts, :search_articles)
+      expect(playbook.capabilities_for(:handle).map(&:key)).to contain_exactly(:account_facts, :similar_tickets, :search_articles)
     end
   end
 
   describe ".listed" do
-    it "puts the default last" do
-      default = create(:ai_playbook, :default)
-      custom = create(:ai_playbook)
-      expect(described_class.listed.to_a).to eq([custom, default])
+    it "orders custom playbooks by name and puts the default last" do
+      default = create(:ai_playbook, :default, name: "A default")
+      zed = create(:ai_playbook, name: "Zed")
+      alpha = create(:ai_playbook, name: "Alpha")
+      expect(described_class.listed.to_a).to eq([alpha, zed, default])
+    end
+  end
+
+  describe "#specificity" do
+    it "counts the conditions that are set" do
+      expect(build(:ai_playbook).specificity).to eq(0)
+      expect(build(:ai_playbook, category_keys: ["billing"]).specificity).to eq(1)
+      expect(build(:ai_playbook, min_priority: 2).specificity).to eq(1)
+      expect(build(:ai_playbook, min_priority: 2, max_priority: 4).specificity).to eq(1)
+      expect(build(:ai_playbook, audience: create(:audience)).specificity).to eq(1)
+      expect(build(:ai_playbook, category_keys: %w[billing other], max_priority: 4, audience: create(:audience)).specificity).to eq(3)
     end
   end
 
@@ -216,8 +203,8 @@ RSpec.describe Support::AiPlaybook, type: :model do
     end
 
     it "prefers a matching non-default over the default" do
-      create(:ai_playbook, :default, position: 0)
-      specific = create(:ai_playbook, position: 5)
+      create(:ai_playbook, :default)
+      specific = create(:ai_playbook)
       expect(described_class.match_for(ticket)).to eq(specific)
     end
 
@@ -231,10 +218,29 @@ RSpec.describe Support::AiPlaybook, type: :model do
       expect(described_class.match_for(ticket)).to be_nil
     end
 
-    it "orders by position then id" do
-      create(:ai_playbook, position: 2)
-      first = create(:ai_playbook, position: 1)
-      expect(described_class.match_for(ticket)).to eq(first)
+    it "picks the most specific matching playbook" do
+      create(:ai_playbook)
+      create(:ai_playbook, category_keys: ["billing"])
+      specific = create(:ai_playbook, category_keys: ["billing"], min_priority: 2)
+      expect(described_class.match_for(ticket)).to eq(specific)
+    end
+
+    it "breaks ties with the oldest playbook" do
+      oldest = create(:ai_playbook, category_keys: ["billing"])
+      create(:ai_playbook, max_priority: 4)
+      expect(described_class.match_for(ticket)).to eq(oldest)
+    end
+
+    it "ignores a more specific playbook that is disabled" do
+      create(:ai_playbook, :disabled, category_keys: ["billing"], min_priority: 2)
+      general = create(:ai_playbook)
+      expect(described_class.match_for(ticket)).to eq(general)
+    end
+
+    it "ignores a more specific playbook that does not match" do
+      create(:ai_playbook, category_keys: ["other"], min_priority: 1, max_priority: 2)
+      general = create(:ai_playbook)
+      expect(described_class.match_for(ticket)).to eq(general)
     end
   end
 end

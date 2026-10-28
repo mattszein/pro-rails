@@ -84,7 +84,7 @@ module Support
     # POST /support/tickets/1/resolve_with_ai
     def resolve_with_ai
       authorize! @ticket
-      result = Support::Tickets::ResolveByUser.call(ticket: @ticket, account: current_account)
+      result = Support::Tickets::ResolveWithAi.call(ticket: @ticket, account: current_account)
 
       if result.success?
         redirect_to support_ticket_path(@ticket), notice: I18n.t("support.tickets.resolved_with_ai")

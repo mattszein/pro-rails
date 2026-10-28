@@ -56,6 +56,13 @@ RSpec.describe Support::AiRun, type: :model do
     expect(described_class.recent).to eq([new, old])
   end
 
+  it "limits recent runs when given a limit" do
+    ticket = create(:ticket)
+    create(:ai_run, ticket: ticket, created_at: 2.days.ago)
+    new = create(:ai_run, ticket: ticket)
+    expect(ticket.recent_ai_runs(1)).to eq([new])
+  end
+
   it "is destroyed with its ticket and nullified with its playbook" do
     playbook = create(:ai_playbook)
     run = create(:ai_run, playbook: playbook)

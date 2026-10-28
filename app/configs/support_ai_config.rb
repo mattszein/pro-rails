@@ -10,6 +10,7 @@ class SupportAiConfig < ApplicationConfig
     :history_limit,
     :max_tool_calls,
     :timeout,
+    :untrusted_marker,
     enabled: false,
     model: "minimax/minimax-m3.1-flash:free",
     # Vision-capable free OpenRouter model, used when a playbook enables vision_attachments.
@@ -17,5 +18,7 @@ class SupportAiConfig < ApplicationConfig
     temperature: 0.3,
     history_limit: 30,
     max_tool_calls: 10,
-    timeout: 60
+    timeout: 60,
+    # Word inside the <<<...>>> delimiters that wrap third-party text in prompts (env SUPPORT_AI_UNTRUSTED_MARKER).
+    untrusted_marker: "UNTRUSTED"
 end

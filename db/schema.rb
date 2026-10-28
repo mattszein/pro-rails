@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_19_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_29_100200) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -262,7 +262,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_100000) do
   create_table "support_ai_playbooks", force: :cascade do |t|
     t.string "name", null: false
     t.boolean "enabled", default: true, null: false
-    t.integer "position", default: 0, null: false
     t.boolean "is_default", default: false, null: false
     t.integer "categories", default: [], null: false, array: true
     t.integer "min_priority"
@@ -297,6 +296,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_100000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.jsonb "transcript", default: [], null: false
+    t.jsonb "playbook_snapshot", default: {}, null: false
     t.index ["playbook_id"], name: "index_support_ai_runs_on_playbook_id"
     t.index ["ticket_id", "created_at"], name: "index_support_ai_runs_on_ticket_id_and_created_at"
     t.index ["ticket_id"], name: "index_support_ai_runs_on_ticket_id"
@@ -306,7 +306,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_100000) do
     t.string "title", null: false
     t.string "slug", null: false
     t.text "summary", null: false
-    t.integer "category"
+    t.integer "category", default: 100, null: false
     t.string "locale", default: "en", null: false
     t.integer "status", default: 0, null: false
     t.datetime "published_at"
@@ -345,8 +345,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_100000) do
     t.integer "ai_state", default: 0, null: false
     t.datetime "ai_state_changed_at"
     t.datetime "ai_reminded_at"
-    t.bigint "ai_playbook_id"
-    t.index ["ai_playbook_id"], name: "index_tickets_on_ai_playbook_id"
     t.index ["ai_state"], name: "index_tickets_on_ai_state"
     t.index ["assigned_id"], name: "index_tickets_on_assigned_id"
     t.index ["created_id"], name: "index_tickets_on_created_id"
@@ -380,5 +378,4 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_100000) do
   add_foreign_key "support_notes", "tickets"
   add_foreign_key "tickets", "accounts", column: "assigned_id"
   add_foreign_key "tickets", "accounts", column: "created_id"
-  add_foreign_key "tickets", "support_ai_playbooks", column: "ai_playbook_id", on_delete: :nullify
 end

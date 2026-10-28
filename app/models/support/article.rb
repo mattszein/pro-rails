@@ -9,7 +9,10 @@ module Support
     belongs_to :author, class_name: "Account", optional: true
     has_rich_text :body
 
-    enum :category, Support::Ticket::CATEGORIES, validate: {allow_nil: true}
+    # Ticket categories plus `general`, for articles that fit no ticket category.
+    GENERAL_CATEGORY = 100
+
+    enum :category, Support::Ticket::CATEGORIES.merge(general: GENERAL_CATEGORY), default: :general, validate: {allow_nil: false}
     enum :status, {draft: 0, published: 1}, default: :draft, validate: {allow_nil: false}
 
     validates :title, :slug, :summary, :locale, presence: true
@@ -24,6 +27,11 @@ module Support
 
     # Published articles among `ids`; unknown or unpublished ids are dropped.
     scope :published_among, ->(ids) { published.where(id: ids) }
+
+    # Help-center search: published articles only, in `locale`, ranked by relevance.
+    def self.published_search(query, locale: nil, category: nil, limit: 5)
+      search(query, locale: locale, category: category, limit: limit, published_only: true)
+    end
 
     OR_TERM_FORMAT = /[[:alnum:]]{3,}/
     OR_TERM_LIMIT = 8
@@ -42,14 +50,14 @@ module Support
     # scope the call is chained on, e.g. `Article.published.search`). A `.published` chained AFTER
     # `search` is not visible here, so a draft-only AND match would suppress the OR fallback for
     # published articles. Callers that restrict to published pass `published_only: true` (they may
-    # still chain `.published`, which is then a no-op). With a category, general (nil) articles match too.
+    # still chain `.published`, which is then a no-op). With a category, general articles match too.
     def self.search(query, locale: nil, category: nil, limit: 5, published_only: false)
       return none if query.blank?
 
       base = all
       base = base.published if published_only
       base = base.where(locale: locale.to_s) if locale.present?
-      base = base.where(category: [categories.fetch(category.to_s), nil]) if category.present?
+      base = base.where(category: [category.to_s, "general"]) if category.present?
 
       tsquery = sanitize_sql_array(["websearch_to_tsquery('simple', ?)", query.to_s])
       min_rank = nil

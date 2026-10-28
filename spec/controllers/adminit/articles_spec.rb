@@ -119,44 +119,9 @@ describe Adminit::ArticlesController, type: :controller do
 
       it_behaves_like "respond to success"
 
-      describe "prefill" do
-        def article
-          get :new, params: params
-          controller.instance_variable_get(:@article)
-        end
-
-        context "with valid params" do
-          let(:params) { {title: "Export data", category: "billing", locale: "es"} }
-
-          it "prefills title, category and locale" do
-            expect(article).to have_attributes(title: "Export data", category: "billing", locale: "es")
-          end
-        end
-
-        context "with invalid category and locale" do
-          let(:params) { {title: "T", category: "bogus", locale: "xx"} }
-
-          it "ignores them" do
-            expect(article).to have_attributes(title: "T", category: nil, locale: I18n.locale.to_s)
-          end
-        end
-
-        context "with a long title" do
-          let(:params) { {title: "a" * 400} }
-
-          it "truncates to 150 characters" do
-            expect(article.title.length).to eq(150)
-          end
-        end
-
-        context "with unrelated or non-string params" do
-          let(:params) { {slug: "hacked", status: "published", summary: "x", body: "y", title: {a: "b"}} }
-
-          it "ignores them" do
-            expect(article).to have_attributes(slug: nil, summary: nil, title: nil, status: "draft")
-            expect(article.body.to_plain_text).to be_blank
-          end
-        end
+      it "defaults the article locale to the current locale" do
+        subject
+        expect(controller.instance_variable_get(:@article)).to have_attributes(locale: I18n.locale.to_s, title: nil)
       end
     end
   end
@@ -217,10 +182,10 @@ describe Adminit::ArticlesController, type: :controller do
         expect(subject).to redirect_to(adminit_article_path(Support::Article.last))
       end
 
-      context "with a blank category" do
+      context "with the general category" do
         it "creates a general article" do
-          post :create, params: {support_article: valid_params[:support_article].merge(category: "")}
-          expect(Support::Article.last.category).to be_nil
+          post :create, params: {support_article: valid_params[:support_article].merge(category: "general")}
+          expect(Support::Article.last.category).to eq("general")
         end
       end
 

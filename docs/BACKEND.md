@@ -278,12 +278,10 @@ namespace's helper declares its own column set — that split is intentional, no
 
 ### Full-Text Search (Support::Article)
 
-`Support::Article.search(query, locale:, category:, limit:)` queries a generated, stored `searchable`
+`Support::Article.search(query, locale:, category:, limit:)` (admin) and `Support::Article.published_search(query, locale:, category:, limit:)` (help center, suggestions and the AI: published only) query a generated, stored `searchable`
 tsvector column (GIN-indexed; title weight A, summary B, body C) with `websearch_to_tsquery('simple', ...)`.
 Rich text can't be indexed directly, so `search_text` is synced from `body.to_plain_text` in a
-`before_save`. Chain `.published` to restrict to public articles; passing a `category` also matches
-general (nil) articles. The category enum reuses the shared `Support::Ticket::CATEGORIES`, so tickets
-and articles never drift.
+`before_save`. Relevance ties are broken by newest `published_at`. Passing a `category` also matches `general` articles. The article category enum is `Support::Ticket::CATEGORIES` plus a real `general` value (`Support::Article::GENERAL_CATEGORY = 100`, the column default; never nil), so tickets and articles never drift.
 
 ---
 
@@ -367,61 +365,121 @@ dashboard widget) shares one endpoint, `Adminit::AccountsController#search`
 
 ## Support AI
 
-The support assistant (see `docs/PROJECT.md`) is a set of interactors run from a job, an LLM facade, and a capability registry. Behavior lives in data (`Support::AiPlaybook` rows); code only declares what is possible.
+The support assistant (see `docs/PROJECT.md`) is a set of interactors run from a job, an LLM facade (`SupportAi::Responder`) and a capability registry. Behavior lives in data (`Support::AiPlaybook` rows); code only declares what is possible.
 
-**Workflow** (`app/interactors/support/ai/`), triggered by `Support::AiProcessJob` (queue `support_ai`):
+**The three rules**
+- **Context = prefetched in code.** What the model needs (requester facts, their own past tickets, matching help-center articles) is put into the first user prompt by `SupportAi::Context`. The model never has to ask for it.
+- **Tools = model-initiated queries only.** The single tool is `search_articles` (refined help-center searches).
+- **Outcomes = JSON fields of the answer.** `{reply, article_ids, resolution_proposed, handoff, handoff_reason}`. There are no action tools (no suggest/propose/request-human tools), and the model never writes to the database.
 
-- `ProcessTicket` (on creation): `Triage → SelectPlaybook → ApplyTriage → Handle → SimilarCases (optional) → Finalize`
-- `ProcessReply` (user wrote while the AI owns the ticket): `SelectPlaybook → Respond → Finalize`
-- Why triage is its own call: the playbook (tools, instructions, mode) is chosen from triage's category and priority, so it must run first (structured output, no tools).
-- `Handle` = ONE RubyLLM chat, ONE `ToolBudget`, two turns (`Responder#handle`, step `handle`, UI "Investigation and reply"). Turn 1 sees the ticket and the triage result and writes internal findings for the admin (stored as the `ai` note when the playbook has `investigate_note`); turn 2, same chat so tool results stay in context, writes the reply to the user. `triage_only` playbooks and escalated triage run turn 1 only (`context.reply` nil). Tools are the `:respond` step set only.
-- `SimilarCases` (optional, admin-only, non-fatal): when the playbook enables `similar_tickets`, `Responder#investigate` writes a second `ai` note ("Similar past cases: ..."). Skipped on a retry if any `investigate` run already exists. Its output never feeds a user-facing prompt.
-- `Respond` (follow-up user messages) now also receives the ticket's succeeded `triage` and `handle` outputs (`ticket.ai_runs.latest_output(step)`); safe because the findings derive from respond-safe tools only.
-- `Finalize` does all DB writes under `ticket.with_lock` after the LLM work is done (short, DB-only lock). Inside the lock it re-checks the AI still owns the ticket (`ai_analyzing?`) and that no newer human message exists; otherwise the reply is discarded. The handoff summary (an LLM call) runs after the lock.
-- Run viewer: the admin ticket's "AI activity" panel links each run to `Adminit::Tickets::AiRunsController#show` (modal, `adminit_ticket_ai_run_path(ticket_id:, id:)`), rendered by `Adminit::Tickets::AiRunTranscriptComponent` (takes the run, never queries). It shows header facts, the error, the recorded `transcript` (system/user/assistant/tool entries, tool calls with JSON arguments) and the `output`.
-- Authorization mirrors `Adminit::TicketsController#show` (`Adminit::TicketPolicy#show?`), and the run is found through `ticket.ai_runs`, so a run can't be read through another ticket. Transcript content is always HTML-escaped (never `raw`); runs created before transcripts existed show a "no transcript" note.
-- `Fallback` hands the ticket to a person with a generic message. Idempotent; called when retries run out or no playbook exists.
+### Pipeline
 
-**Job guards and retries**: the job returns early unless `ai_analyzing?`, debounces bursts (only the newest human message acts), and skips a message that already has an AI answer. `retry_on SupportAi::Error` (3 attempts, polynomial backoff); the exhausted block calls `Fallback`. Retries reuse earlier successful steps (e.g. a succeeded triage run) instead of paying again.
+Triggered by `Support::AiProcessJob` (queue `support_ai`). Organizers live in `app/interactors/support/ai/flows/`, steps in `app/interactors/support/ai/`.
 
-**Fatal vs non-fatal steps**: `Triage` and `SimilarCases` rescue `SupportAi::Error`, log a failed run and let the pipeline continue. `Handle` and `Respond` errors are fatal (raised for retry). Never let an optional step stop the user from getting an answer.
+| Flow | Steps |
+|------|-------|
+| `Flows::ProcessTicket` (ticket created) | `Triage -> SelectPlaybook -> ApplyTriage -> Handle -> Finalize` |
+| `Flows::ProcessReply` (user wrote while the AI owns the ticket) | `SelectPlaybook -> Respond -> Finalize` |
 
-**Capability registry** (`app/lib/support_ai/capabilities.rb`, hot-reloaded via `config/initializers/support_ai_capabilities.rb`): each capability declares `key`, `kind` (`:read`/`:action`), the pipeline `steps` it may run in, a `tool_class` name (String) or nil, and `default` (enabled on the seeded default playbook). Playbooks store enabled keys; validation rejects unregistered keys; the `Responder` only builds tools for capabilities that are both enabled and allowed in the current step.
+| Step | What it does | On failure |
+|------|--------------|------------|
+| `Triage` | One structured LLM call (category, priority, language, escalate). Runs first because the playbook is chosen from its result. A retry reuses an already succeeded triage run | **Non-fatal**: failed run logged, pipeline continues with the ticket's own category/priority |
+| `SelectPlaybook` | `Support::AiPlaybook.match_for(ticket, priority:)` (see below) | No playbook: new ticket -> `ai_state off`; ongoing conversation -> `Fallback`. Organizer stops |
+| `ApplyTriage` | Applies only what the playbook allows (`auto_set_priority`, `auto_correct_category`), only when the value differs, in ONE `update!`, with one English system note per change | DB error bubbles up |
+| `Handle` | `Responder#handle`: one chat, one `ToolBudget`, two turns. Turn 1 writes the findings for admins, turn 2 returns the answer JSON. `triage_only` playbooks and escalated triage run turn 1 only | **Fatal**: failed run logged, error re-raised for retry |
+| `Respond` | `Responder#respond`: answers a follow-up using the ticket's earlier succeeded `triage`/`handle` outputs. Skipped for `triage_only` or escalated triage | **Fatal** |
+| `Finalize` | All DB writes, under `ticket.with_lock` (short, DB only) | See Handoff |
 
-**Security boundary**:
-- The user-facing `handle` and `respond` steps must never see other users' data. `similar_tickets` reads other requesters' tickets, so it is declared for `:investigate` only (the admin-only `SimilarCases` call; `handle` uses the `:respond` tool set) and returns title, category and month only
-- Every tool is scoped to the ticket's requester (`account_facts`, `past_tickets` read only their own data)
-- Prompts (`app/services/support_ai/prompts/`) wrap every user-controlled value in `<<<UNTRUSTED ... UNTRUSTED>>>` markers and instruct the model to never follow instructions inside them, including tool results. Use `Prompts::Base.untrusted` for any new field you inject
+Never let an optional step stop the user from getting an answer.
 
-**AI message author**: `messages.sender` enum (`human`/`ai`) with a nullable `account_id`; check constraint `messages_sender_account_check` guarantees human messages have an account and AI messages do not. Notes follow the same idea with `kind: :ai` and `account: nil`. Never fake an account for AI output.
+**Job guards and retries**: the job returns early unless `ai_analyzing?`, debounces bursts (only the newest human message acts) and skips a message that already has an AI answer. `retry_on SupportAi::Error` (3 attempts, polynomial backoff); when retries run out `Fallback` hands the ticket to a person with the fixed handoff reply plus a `system` note. `Fallback` is idempotent (acts only while the AI still owns the ticket). `Dispatch` enqueues the job; an enqueue failure is logged and never undoes the state change before it.
 
-**Logging**: `Support::Ai::RecordRun` writes one `Support::AiRun` per step (trigger, step, status `succeeded`/`failed`/`discarded`, model, tokens, latency, tool calls, error). It powers the admin AI activity panel; record a run for every new LLM step.
+### Responder, Context, ToolBudget
 
-**Tool budget and transcripts**: each Responder step shares a `SupportAi::ToolBudget` (`SupportAiConfig.max_tool_calls`, default 10) with its tools. `Tools::Base#call` serves identical calls from cache (not counted) and, once the budget is spent, returns a "Tool limit reached" error instead of running `execute`, so the model writes its final answer. Only a model that keeps calling after that (3 more attempts) aborts the step with `SupportAi::Error`. `Responder#run_step` builds a `SupportAi::Transcript` from the chat on both paths (on `Result#transcript` and on `Error#transcript`/`#tool_calls`) and `RecordRun` stores them on `support_ai_runs.transcript`/`tool_calls`, so failed runs are inspectable.
+- **`SupportAi::Responder`** is pure: it returns a `SupportAi::Result` (output, model, tokens, latency, tool calls, transcript) or raises `SupportAi::Error`. It performs no DB writes; interactors persist.
+- **Handle answer parsing**: plain-text JSON parsed tolerantly, one retry, then `SupportAi::Error`. `article_ids` survive only if the model saw them (prefetched or returned by `search_articles` in this step) and they are still published (max 3). `handoff`/`resolution_proposed` are coerced to booleans.
+- **`SupportAi::Context`** (plain Ruby) builds one block per enabled context capability, each wrapped as untrusted: `account_facts` (requester only: status, verified, member since, role; no email), `past_tickets` (requester's own, max 10) and the retrieval-first article prefetch (`search_articles`: ticket text, `[[:alnum:]]` words, ~300 chars, user's locale first then any, published only, top 3 with id/slug/locale/title/summary/excerpt). The prefetch is recorded on the budget, so it counts as a found article.
+- **`SupportAi::ToolBudget`** (`SupportAiConfig.max_tool_calls`, default 10) is shared by every tool of a step. Identical calls are served from cache (not counted); once spent, tools return "Tool limit reached" so the model answers; a model that keeps calling (3 more attempts) aborts the step with `SupportAi::Error`. It also tracks `searched_queries` and `found_article_ids`.
+- **Transcripts**: `Responder#run_step` builds a `SupportAi::Transcript` from the chat on success and on failure (`Result#transcript`, `Error#transcript`/`#tool_calls`), so failed runs are inspectable.
 
-**Config**: global kill switch and model settings in `SupportAiConfig` (`config/support_ai.yml`, env `SUPPORT_AI_ENABLED`, `OPENROUTER_API_KEY` via RubyLLM). Everything else (mode, capabilities, limits, conditions) is a playbook row; the default playbook is seeded in `db/seeds.rb`.
+### Admin note, help-center line, similar tickets
 
-**Grounding rule**: the assistant describes app screens, menus, buttons, URLs or steps ONLY when they appear in a help-center article provided in the prompt, an article returned by `search_articles` in this conversation, or the playbook instructions (`Prompts::Base::GROUNDING`, in the Handle and Respond system prompts). If an article covers the question it summarizes briefly and attaches the article it used with `suggest_articles`; if none does it says it found no guide and calls `request_human`. Prompt wording is not trusted for the no-article case, see KB gap.
+ONE `ai` note per AI pass. `Handle` writes the findings (1-2 factual English sentences, max 40 words, truncated at 1,200 chars) followed by deterministic lines built by code:
+- `Help center: <attached article titles>` or `Help center: no article answered this.`
+- with `similar_tickets` enabled: `Similar resolved tickets: #12 title (2026-09), ...` (other requesters' finished tickets via `Support::Ticket.resolved_similar_to`). It is admin only, runs no LLM and never enters a prompt.
 
-**Retrieval-first KB**: the model does not decide whether to search first. When the playbook has `search_articles`, `Responder#handle` (before turn 1) and `#respond` (before the final ask) search the help center in code with the ticket text (`prefetch_articles`: title + description, or the latest requester message + title for `respond`; `[[:alnum:]]` words only, ~300 chars; the user's locale first, then any locale; published only, top 3). The matches go into the USER prompt through `Prompts::Base#kb_block` (id, slug, locale, and title/summary/`Article#excerpt` (1,200 chars of plain text) each wrapped as untrusted; or a "no article matched, you may try refined searches" line). The prefetch is recorded on the `ToolBudget` (`note_search`), so it appears in `kb_queries` and counts as a found article. Prompt only: nothing is written to the database. The `search_articles` tool remains for refinements.
+`Handle` sets `context.note_written`; `Finalize` then writes no second note. A handoff pass where `Handle` wrote none (`ProcessReply`, or no `investigate_note`) gets `AI handoff: <reason>` from `Finalize`, no LLM call. The user's "Talk to a person" button writes a system note `User requested a human`.
 
-**KB gap**: `kb_gap` is true when the playbook has `search_articles` and neither the automatic search nor any search the model ran found an article. It is computed in code (`Responder#handle`), never by the model. On a gap the turn-2 request carries a "no guide matched" directive and the collector's handoff is forced (`KB_GAP_HANDOFF_REASON`), so the ticket goes to a person. The `handle` `AiRun` output stores `kb_gap` (Boolean) and `kb_queries` (Array, max 3 searched queries); there is no separate KB gap note any more: the same fact appears on the single `ai` note's `Help center:` line. Admins see a "KB gap" badge on that run in the AI activity panel and in the run viewer, with a "Create article" link to `new_adminit_article_path(title:, category:)` (the locale comes from the `:locale` path scope, so the admin UI language is kept; `Adminit::ArticlesController#new` reads only `title`, `category` and `locale`, ignores invalid category/locale and truncates the title to 150 chars). Playbooks without `search_articles` never report a gap; `triage_only` playbooks still compute it for the run output.
+### KB gap
 
-**Search fallback**: `Support::Article.search` runs the AND `websearch_to_tsquery('simple', ...)` first and, when it finds nothing, retries as an OR of prefix terms (`to_tsquery`, terms of 3+ chars, max 8, sanitized) with a minimum rank. The AI `search_articles` tool does not filter by category (the AI's classification can be wrong); it searches the user's language first, then any locale.
+`kb_gap` is true when the playbook has `search_articles` and neither the prefetch nor any search the model ran found an article. It is computed in code in `Responder#handle`, never by the model. On a gap the turn-2 request carries a "no guide matched" directive and the handoff is forced (`KB_GAP_HANDOFF_REASON`; the model's own reason wins if it set one). The `handle` run output stores `kb_gap` and `kb_queries` (max 3). The only admin-facing trace is the note's `Help center:` line. Playbooks without `search_articles` never report a gap; `triage_only` still computes it for the run output. The gap is enforced in `handle` only.
 
-**Admin note format**: ONE `ai` note per AI pass. `Support::Ai::Handle` writes the model's findings (1-2 factual English sentences, at most 40 words: what the user wants plus anything found with the tools; no next step, recommendation, or guesses about features, policies or causes; truncated at 1,200 chars) followed by a deterministic line, `Help center: <attached article titles>` or `Help center: no article answered this.`, and sets `context.note_written`. When `note_written` is set, `Finalize` skips the `HandoffNote` summary (no second note, no extra LLM call); otherwise (follow-up pass via `ProcessReply`, the user's "Talk to a human" button, or no `investigate_note` capability) the summary note is written, under the same constraints (at most 50 words, no judging earlier replies, no next step).
+### Handoff
 
-**Fixed handoff reply**: whenever a pass ends in a handoff (request_human, KB gap, triage escalate, max turns), the user message is the localized `support.ai.handoff_message` template (locale from the triage language, else `I18n.locale`), never the model's reply: "We're looking into this. I've passed your request to a teammate on our support team, and they'll follow up here." `triage_only` playbooks still post no message. `Fallback` uses the same key. `GROUNDING` also forbids stating that the product has or lacks a feature unless an article says so.
+- **Triggers** (in `Finalize`): the answer's `handoff` (including a forced KB gap), triage `escalate`, `triage_only` mode, or `max_ai_turns` reached.
+- **Fixed reply**: on any handoff the user message is the localized `support.ai.handoff_message` (locale from triage language, else `I18n.locale`), never the model's reply. `triage_only` posts no message. `Fallback` uses the same key.
+- **Under the lock** `Finalize` re-checks that the AI still owns the ticket (`ai_analyzing?`) and that no newer human message exists; otherwise the reply is discarded and the run marked `discarded`.
+- **Grounding**: screens, menus, buttons, URLs or steps may be described only if they appear in an article given in the prompt, one returned by `search_articles`, or the playbook instructions; never state that the product has or lacks a feature unless an article says so (`Prompts.grounding`). Wording is not trusted for the no-article case: that is what the KB gap enforces.
+
+### ai_state
+
+`Support::Ticket#ai_state`, changed only through transition methods (each raises `InvalidTransition` from a wrong state):
+
+| Method | From -> to |
+|--------|-----------|
+| `start_ai_analysis!` | `off` / `awaiting_user` -> `analyzing` |
+| `disable_ai!` | `analyzing` -> `off` |
+| `await_user_reply!` | `analyzing` -> `awaiting_user` |
+| `request_ai_handoff!` | `analyzing` / `awaiting_user` -> `handoff_requested` |
+| `release_ai!` | any engaged state -> `stepped_back` (assignment of the ticket, e.g. Take) |
+| `resolve_with_ai!` | `awaiting_user` (ticket open) -> `resolved`, status `finished` |
+
+### Playbooks and matching
+
+`Support::AiPlaybook.match_for(ticket, priority:)` (triaged priority, else the ticket's): among enabled non-default playbooks whose conditions fit, the highest `specificity` wins (count of set conditions: categories, a priority bound, audience); ties go to the lowest id (oldest); otherwise the enabled default; otherwise none. Nothing is stored on the ticket and there is no manual ordering; every pass re-matches with the current rules. The index shows the specificity badge.
+
+### Audit: AiRun
+
+`Support::Ai::RecordRun` writes one `Support::AiRun` per step (trigger, step, status `succeeded`/`failed`/`discarded`, model, tokens, latency, `tool_calls`, `transcript`, `output`, error). Record a run for every new LLM step. `playbook_snapshot` (jsonb, `RecordRun.snapshot_for`: name, mode, capabilities, instructions, limits, conditions) freezes the rules used, so history survives playbook edits; `playbook_id` is only a link and is nullified when the playbook is deleted. `AiRun.step :investigate` is legacy (kept so old rows load).
+
+The admin ticket's "AI activity" panel opens each run in a modal (`Adminit::Tickets::AiRunsController#show`, rendered by `Adminit::Tickets::AiRunTranscriptComponent`, which takes the run and never queries). It shows header facts, the snapshot, the error, the transcript (system/user/assistant/tool entries, tool calls with JSON arguments) and the output. Authorization mirrors `Adminit::TicketsController#show` and the run is found through `ticket.ai_runs`. Transcript content is always escaped (`Core::CodeBlockComponent`, never `raw`); runs from before transcripts existed show a "no transcript" note.
+
+### Capability registry
+
+`Support::AiCapabilities` / `Support::AiCapability` (`app/models/support/`, re-declared on reload by `config/initializers/support_ai_capabilities.rb`). Each capability declares `key`, `kind`, the pipeline `steps` (`handle respond apply_triage draft`), a `tool_class` name or nil, and `default` (enabled on the seeded default playbook). Playbooks store enabled keys; validation rejects unregistered keys; `AiCapabilities.for_step` is the only gate between a playbook and what a step uses.
+
+| Kind | Meaning | Keys |
+|------|---------|------|
+| `context` | prefetched into the prompt | `account_facts`, `past_tickets` |
+| `tool` | model-callable | `search_articles` (also drives the prefetch and KB gap) |
+| `flag` | code switch | `similar_tickets`, `vision_attachments`, `investigate_note`, `auto_set_priority`, `auto_correct_category`, `draft_replies` |
+
+**Security boundary**: other users' data never enters a user-facing prompt. `similar_tickets` reads other requesters' tickets, so it is a code-only flag feeding the admin note line. Context blocks and tools are scoped to the ticket's requester.
 
 **Adding a capability**:
-1. Register it in `SupportAi::Capabilities.install` with the right `kind`, `steps` and `default`
-2. If it is a tool, add `SupportAi::Tools::<Name>` (inherit `Tools::Base`, scope queries to the requester, return minimal fields)
-3. Add `support.ai.capabilities.<key>` label/hint translations in en and es (see existing keys)
-4. Add specs: registry/tool spec, and a Responder or workflow example that uses it
+1. Register it in `Support::AiCapabilities.install` with the right `kind`, `steps` and `default`
+2. Context: add a block to `SupportAi::Context`. Tool: add `SupportAi::Tools::<Name>` (inherit `Tools::Base`, scope queries to the requester, minimal fields)
+3. Add `support.ai.capabilities.<key>` label/hint translations in en and es
+4. Add specs: registry/tool spec, and a Responder or workflow example using it
 
-**Stubbing the LLM in specs**: never hit the network.
-- Workflow, job and interactor specs: `spec/support/support_ai_workflow_helpers.rb` — `stub_responder(triage: ai_result(triage_output), respond: ai_result(respond_output), summarize: ...)` replaces `SupportAi::Responder`; pass an exception class to simulate failure
-- Responder/tool specs (`type: :service` or `:llm`): `spec/support/support_ai_llm_helpers.rb` — `stub_llm(text_body("..."), tool_call_body([[name, args]]))` stubs only the HTTP layer so the real tool loop runs; wrap in `with_openrouter_key`
+### Prompts
+
+All prompts live in one file, `app/services/support_ai/prompts.rb`. Keep them token-lean: short imperative sentences, no repeated rules across system and user prompts, shared parts (`Prompts.grounding`, reply format) defined once. Every user-controlled or third-party value (ticket text, messages, article text, account facts, tool results) is wrapped with `Prompts.untrusted` in `<<<MARKER ... MARKER>>>` delimiters, and the system prompt tells the model never to follow instructions inside them. Use `Prompts.untrusted` for any new field you inject. The marker word is `SupportAiConfig.untrusted_marker` (env `SUPPORT_AI_UNTRUSTED_MARKER`, default `UNTRUSTED`).
+
+### Other
+
+- **Search fallback**: `Support::Article.search` runs the AND `websearch_to_tsquery('simple', ...)` first and, when it finds nothing, retries as an OR of prefix terms (3+ chars, max 8, sanitized) with a minimum rank. The AI never filters by category (its classification can be wrong).
+- **AI message author**: `messages.sender` enum (`human`/`ai`) with a nullable `account_id`; check constraint `messages_sender_account_check` guarantees human messages have an account and AI messages do not. Notes use `kind: :ai` with `account: nil`. Never fake an account for AI output.
+
+### Config
+
+`SupportAiConfig` (`config/support_ai.yml`, Anyway Config): `enabled` (global kill switch, env `SUPPORT_AI_ENABLED`, default false), `model`, `vision_model` (used when a playbook enables `vision_attachments`), `temperature`, `history_limit`, `max_tool_calls`, `timeout`, `untrusted_marker` (env `SUPPORT_AI_UNTRUSTED_MARKER`). Every attr can be overridden with `SUPPORT_AI_<ATTR>`; the provider key is `OPENROUTER_API_KEY` (RubyLLM). Everything else (mode, capabilities, limits, conditions, instructions) is a playbook row; the default playbook is seeded in `db/seeds.rb`.
+
+### Specs
+
+Never hit the network.
+- Workflow, job and interactor specs: `spec/support/support_ai_workflow_helpers.rb`: `stub_responder(triage: ai_result(...), handle: ai_result(...), respond: ai_result(...))` replaces `SupportAi::Responder`; pass an exception class to simulate failure
+- Responder/tool specs (`type: :service` or `:llm`): `spec/support/support_ai_llm_helpers.rb`: `stub_llm(text_body("..."), tool_call_body([[name, args]]))` stubs only the HTTP layer so the real tool loop runs; wrap in `with_openrouter_key`
 
 ---
 
@@ -468,6 +526,7 @@ end
 - **ALWAYS** add `verify_authorized` — ensures every action calls `authorize!`
 - Use `:unprocessable_content` NOT `:unprocessable_entity` (Rack deprecation)
 - For Turbo Frame actions: `ensure_frame_response` before_action redirects before the action body runs
+- Modal create/update forms: `include ModalFormResponses` and use `respond_success(message, path)` / `respond_form_error(action)`; define a private `modal_form_locals` (locals for the `_form` partial; the frame id is `<singular controller name>_form`)
 
 ### Workflow Actions
 

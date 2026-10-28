@@ -42,7 +42,7 @@ x-backend: &backend
     EDITOR: vi
     GOOGLE_API_KEY: ${GOOGLE_API_KEY}
     OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
-    SUPPORT_AI_ENABLED: ${SUPPORT_AI_ENABLED:-false}
+    SUPPORT_AI_ENABLED: ${SUPPORT_AI_ENABLED:-true}
     DASHSCOPE_API_KEY: ${DASHSCOPE_API_KEY}
   volumes:
     - .:/pro-rails

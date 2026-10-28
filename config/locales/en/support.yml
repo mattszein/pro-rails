@@ -53,7 +53,6 @@ en:
       search: "Search"
       clear: "Clear"
       all: "All"
-      general: "General"
       no_results: "No articles found."
       suggestions_title: "These might help"
       suggestions_hint: "Opens in a new tab so you keep your draft."

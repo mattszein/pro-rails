@@ -28,7 +28,7 @@ describe Adminit::AiPlaybooksController, type: :controller do
 
       it_behaves_like "respond to success"
 
-      it "lists custom playbooks by position and the default last" do
+      it "lists custom playbooks by name and the default last" do
         subject
         expect(controller.instance_variable_get(:@playbooks)).to eq([custom, default])
       end
@@ -37,6 +37,7 @@ describe Adminit::AiPlaybooksController, type: :controller do
         subject
         expect(response.body).to include("Billing flow")
         expect(response.body).to include(I18n.t("adminit.ai_playbooks.default_badge"))
+        expect(response.body).to include(I18n.t("adminit.ai_playbooks.specificity"))
       end
     end
   end
@@ -60,12 +61,12 @@ describe Adminit::AiPlaybooksController, type: :controller do
 
       it "renders registry capabilities grouped by kind with defaults checked" do
         subject
-        SupportAi::Capabilities::Registry.keys.each do |key|
+        Support::AiCapabilities.keys.each do |key|
           assert_select "input[type=checkbox][name='support_ai_playbook[capabilities][]'][value=#{key}]", 1
         end
         assert_select "input[value=account_facts][checked]", 1
         assert_select "input[value=similar_tickets][checked]", 0
-        expect(response.body).to include(I18n.t("adminit.ai_playbooks.read"), I18n.t("adminit.ai_playbooks.actions"))
+        expect(response.body).to include(I18n.t("adminit.ai_playbooks.group_context"), I18n.t("adminit.ai_playbooks.group_tool"), I18n.t("adminit.ai_playbooks.group_flag"))
       end
 
       it "shows the conditions section" do
@@ -229,7 +230,7 @@ describe Adminit::AiPlaybooksController, type: :controller do
         let(:params) do
           {id: playbook.id, support_ai_playbook: {
             name: "Fallback", category_keys: ["billing"], min_priority: "3", max_priority: "4",
-            audience_id: create(:audience).id, is_default: "0", position: "9"
+            audience_id: create(:audience).id, is_default: "0"
           }}
         end
 
@@ -246,10 +247,9 @@ describe Adminit::AiPlaybooksController, type: :controller do
           expect(playbook.audience_id).to be_nil
         end
 
-        it "stays the default and keeps its position" do
+        it "stays the default" do
           subject
           expect(playbook.reload).to be_is_default
-          expect(playbook.position).to eq(0)
         end
       end
     end
@@ -324,63 +324,6 @@ describe Adminit::AiPlaybooksController, type: :controller do
     end
   end
 
-  describe "reordering" do
-    let!(:first) { create(:ai_playbook) }
-    let!(:second) { create(:ai_playbook) }
-    let!(:third) { create(:ai_playbook) }
-
-    def order = Support::AiPlaybook.where(is_default: false).ordered.to_a
-
-    context "when logged with permission" do
-      before do
-        login_user(user)
-        permitted
-      end
-
-      describe "POST #move_up" do
-        subject { post :move_up, params: {id: third.id} }
-
-        it "is authorized" do
-          expect { subject }.to be_authorized_to(:manage?, third).with(policy).with_context(user: user)
-        end
-
-        it "swaps with the previous playbook" do
-          subject
-          expect(order).to eq([first, third, second])
-          expect(response).to redirect_to(adminit_ai_playbooks_path)
-        end
-
-        it "alerts at the top edge" do
-          post :move_up, params: {id: first.id}
-          expect(order).to eq([first, second, third])
-          expect(flash[:alert]).to be_present
-        end
-      end
-
-      describe "POST #move_down" do
-        subject { post :move_down, params: {id: first.id} }
-
-        it "swaps with the next playbook" do
-          subject
-          expect(order).to eq([second, first, third])
-        end
-
-        it "alerts at the bottom edge" do
-          post :move_down, params: {id: third.id}
-          expect(order).to eq([first, second, third])
-          expect(flash[:alert]).to be_present
-        end
-
-        it "does not move the default playbook" do
-          default = create(:ai_playbook, :default)
-          post :move_down, params: {id: default.id}
-          expect(flash[:alert]).to be_present
-          expect(order).to eq([first, second, third])
-        end
-      end
-    end
-  end
-
   describe "authorization" do
     let!(:playbook) { create(:ai_playbook) }
 
@@ -398,9 +341,8 @@ describe Adminit::AiPlaybooksController, type: :controller do
         expect { post :create, params: {support_ai_playbook: {name: "x"}} }.not_to change(Support::AiPlaybook, :count)
       end
 
-      it "does not toggle, move or destroy" do
+      it "does not toggle or destroy" do
         post :toggle, params: {id: playbook.id}
-        post :move_up, params: {id: playbook.id}
         expect { delete :destroy, params: {id: playbook.id} }.not_to change(Support::AiPlaybook, :count)
         expect(playbook.reload.enabled).to be(true)
       end

@@ -85,25 +85,26 @@ All conversation updates appear in real-time — no page reload needed.
 
 #### AI assistant
 
-An optional assistant answers the start of each conversation, then hands the ticket to a person. It is **off by default**: a global kill switch (`SupportAiConfig.enabled`, env `SUPPORT_AI_ENABLED`) plus an `OPENROUTER_API_KEY` turn it on. With the switch off, tickets behave exactly as before.
+An optional assistant answers the start of each conversation, then hands the ticket to a person. It is **off by default**: a global switch plus a configured model provider key turn it on (see `docs/BACKEND.md`). With the switch off, tickets behave exactly as before.
 
 **What users see**:
-- An assistant banner on the ticket while the AI is engaged, with a typing indicator while it works
+- An assistant banner on the ticket while the AI is engaged
 - AI replies in the conversation thread, labelled as the assistant, with suggested help-center article cards
 - **This solved it** — resolves the ticket without a person; **Talk to a person** — asks for a human at any time
 - A handoff message when a person is needed (the assistant escalates, the turn limit is reached, or the AI is unavailable). Users are never left waiting: if the AI fails after retries the ticket is handed off with a generic message
+- Replies are grounded in help-center articles: when no article answers the question, the assistant does not guess and hands the ticket to a person. Every handoff shows the same fixed, localized message
 
 **What admins see** (ticket permission, plus `support_ai` for playbooks):
-- An **AI state** badge on tickets (list and detail), and AI-authored internal notes (investigation findings, handoff summary)
-- An **AI activity** panel per ticket (every step: model, tokens, latency, tool calls, errors)
+- An **AI state** badge on tickets (list and detail), and one AI-authored internal note per pass (findings, which help-center article was attached or that none answered, similar resolved tickets when enabled, or the handoff reason)
+- An **AI activity** panel per ticket (every step: model, tokens, latency, errors), with a detail view per run showing the full conversation with the model and a snapshot of the playbook rules used
 - **Take over from AI** — assigning a ticket (or the Take action) makes the AI step back for good on that ticket
 - A **Needs human** filter and a dashboard tile counting tickets waiting on a person
 - Handed-off tickets surface only through the **Needs human** tile and filter; no notification or email is sent
 
 **AI playbooks** (Adminit, `support_ai` permission, Super Admin by default) decide what the assistant does for which tickets:
-- **Conditions**: ticket categories, priority range, and optionally an audience (see Feature Flags). The first enabled playbook that matches wins, in the order shown (reorderable); otherwise the **default playbook**, which always exists, cannot be deleted or moved, and is evaluated last
+- **Conditions**: ticket categories, priority range, and optionally an audience (see Feature Flags). Among enabled playbooks that match, the most specific wins (the one with the most conditions set; a tie goes to the oldest); otherwise the **default playbook**, which always exists, cannot be deleted, and is only the fallback. Playbooks are re-matched on every pass, and each AI run keeps a snapshot of the rules it used
 - **Mode**: `triage_only` (analyze, set priority, write notes, then hand off without replying to the user) or `assist` (also answers the user, up to a maximum number of AI turns)
-- **Capabilities**: switchable tools and actions per playbook (account facts, past tickets, similar tickets, article search, investigation note, auto-set priority, auto-correct category, suggest articles, propose resolution, request human, vision on attachments)
+- **Capabilities**: switchable context and options per playbook (account facts, past tickets, similar resolved tickets, help-center search, internal note, auto-set priority, auto-correct category, vision on attachments). Article suggestions, resolution proposals and human handoff are part of every reply
 - Custom instructions, idle reminder and idle handoff timers, enable/disable per playbook
 
 **AI state vs. status** — the AI state is a second axis next to the ticket status; the status lifecycle above is unchanged:
@@ -130,7 +131,7 @@ Self-service articles that deflect tickets before they are created.
 **What admins can do** (`article` permission, Super Admin by default):
 - Manage articles in Adminit (create, edit, delete) with a rich-text body
 - Keep articles as **draft** or **published** (only published articles are visible in the help center)
-- Set each article's locale (en/es) and category (same categories as tickets, or none for general articles)
+- Set each article's locale (en/es) and category (same categories as tickets, or General for articles that fit none)
 
 ### Notifications
 
@@ -256,8 +257,7 @@ Support::Ticket (status lifecycle + ai_state)
   ├── Support::Conversation
   │   └── Support::Messages (sender: human | ai; AI messages have no account)
   ├── Support::Notes (internal, admin-only; kind: internal | system | ai)
-  ├── Support::AiRun (one row per AI step: model, tokens, latency, tool calls, error)
-  ├── belongs_to Support::AiPlaybook (the playbook that handled it)
+  ├── Support::AiRun (one row per AI step: model, tokens, latency, tool calls, error, snapshot of the playbook used)
   └── File Attachments
 
 Support::AiPlaybook (conditions, mode, capabilities, limits; optional Audience)

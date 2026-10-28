@@ -40,8 +40,7 @@
       <%= render "support/conversations/ai_status", ticket: ticket %>
       <%= render Support::ConversationComponent.new(
             conversation: @conversation,
-            messages: @messages,
-            typing: ticket.ai_analyzing?
+            messages: @messages
           ) do %>
           <%= render "support/conversations/message_form", ticket: ticket %>
       <% end %>

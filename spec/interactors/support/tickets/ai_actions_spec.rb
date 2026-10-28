@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe "Support ticket AI user actions", type: :interactor do
   let(:user) { create(:account, :verified) }
 
-  describe Support::Tickets::ResolveByUser do
+  describe Support::Tickets::ResolveWithAi do
     it "finishes the ticket, marks AI resolved and writes a system note" do
       ticket = create(:ticket, :ai_awaiting_user, created: user)
       result = described_class.call(ticket: ticket, account: user)
@@ -26,30 +26,16 @@ RSpec.describe "Support ticket AI user actions", type: :interactor do
   end
 
   describe Support::Tickets::RequestHuman do
-    before { stub_responder(summarize: ai_result("Summary for admins")) }
-
     %i[ai_awaiting_user ai_analyzing].each do |trait|
-      it "hands off from #{trait}, writes the summary" do
-        ticket = create(:ticket, trait, created: user, ai_playbook: create(:ai_playbook))
+      it "hands off from #{trait} and writes a system note without calling the model" do
+        expect(SupportAi::Responder).not_to receive(:new)
+        ticket = create(:ticket, trait, created: user)
         result = described_class.call(ticket: ticket, account: user)
 
         expect(result).to be_success
         expect(ticket.reload).to be_ai_handoff_requested
-        expect(ticket.notes.ai.first.body).to eq("Summary for admins")
+        expect(ticket.notes.system.pluck(:body)).to eq(["User requested a human"])
       end
-    end
-
-    it "removes typing when it interrupts an analysis" do
-      ticket = create(:ticket, :ai_analyzing, created: user)
-      expect(Support::Ai::Typing).to receive(:hide).with(ticket)
-      described_class.call(ticket: ticket, account: user)
-    end
-
-    it "falls back to a plain note when the summary fails" do
-      stub_responder(summarize: SupportAi::Error.new("down"))
-      ticket = create(:ticket, :ai_awaiting_user, created: user)
-      described_class.call(ticket: ticket, account: user)
-      expect(ticket.notes.ai.first.body).to eq("AI handoff: user requested a human. See conversation.")
     end
 
     %i[ai_handoff_requested ai_stepped_back ai_resolved].each do |trait|

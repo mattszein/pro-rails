@@ -35,11 +35,6 @@
           <%= render(Core::BadgeComponent.new(label: t("enums.ticket.ai_state.#{ticket.ai_state}"), theme: ai_state_theme, size: :md)) %>
         <% end %>
       <% end %>
-      <% if playbook_name.present? %>
-        <% dl.with_item(term: t("adminit.tickets.ai_playbook")) do %>
-          <%= playbook_name %>
-        <% end %>
-      <% end %>
     <% end %>
   <% end %>
 </div>

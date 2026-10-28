@@ -17,7 +17,7 @@ class Adminit::TicketsController < Adminit::ApplicationController
   def show
     # The partial is also broadcast from a job (no controller), so it reads plain associations from
     # `ticket`; preloading here is what keeps this page free of N+1 queries.
-    @ticket = Support::Ticket.includes(:ai_playbook, :ai_runs, notes: :account, conversation: {messages: :account}).find(params[:id])
+    @ticket = Support::Ticket.includes(notes: :account, conversation: {messages: :account}).find(params[:id])
     authorize! @ticket, with: Adminit::TicketPolicy
   end
 

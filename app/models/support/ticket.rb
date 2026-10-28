@@ -16,7 +16,6 @@ module Support
     belongs_to :created, class_name: "Account", optional: true
     belongs_to :assigned, class_name: "Account", optional: true
     has_one :conversation, class_name: "Support::Conversation", dependent: :destroy
-    belongs_to :ai_playbook, class_name: "Support::AiPlaybook", optional: true
     has_many :notes, class_name: "Support::Note", dependent: :destroy
     has_many :ai_runs, class_name: "Support::AiRun", dependent: :destroy
     has_many_attached :attachments
@@ -104,6 +103,14 @@ module Support
 
     def ai_engaged?
       ai_analyzing? || ai_awaiting_user? || ai_handoff_requested?
+    end
+
+    # Newest AI runs first, for the admin "AI activity" panel.
+    def recent_ai_runs(limit = 20) = ai_runs.recent(limit)
+
+    # The AI is still working on the ticket: the "This solved it" prompt may be actionable.
+    def awaiting_ai_resolution?
+      open? && (ai_analyzing? || ai_awaiting_user?)
     end
 
     # The requester's other tickets, newest first. Read by the support assistant.

@@ -61,6 +61,7 @@ app/components/core/
 ### Core Display Components
 
 - `Core::CodeBlockComponent` renders raw text (JSON, transcripts, logs) in a scrollable, escaped `<pre>`: `render Core::CodeBlockComponent.new(text: json, max_height: :md, html_options: {data: {role: "x"}})`. `max_height` is `:sm`, `:md` (default) or `:lg`; `classes` appends extra classes. Do not hand-roll `<pre>` blocks.
+- `Core::ModalComponent` takes `title:` and `size:` (`:md` default, `:xl` for wide content such as the AI run viewer).
 
 ### CustomFormBuilder
 

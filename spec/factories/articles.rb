@@ -19,7 +19,7 @@ FactoryBot.define do
     end
 
     trait :general do
-      category { nil }
+      category { :general }
     end
   end
 end

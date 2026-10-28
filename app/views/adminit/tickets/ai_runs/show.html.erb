@@ -1,14 +1,3 @@
 <%= render(Core::ModalComponent.new(title: t("adminit.tickets.ai_runs.title"), size: :xl)) do %>
-  <% if Adminit::Tickets::KbGapComponent.gap?(@run) %>
-    <%= render Core::BoxComponent.new(variant: :warning, padding: :xs, rounded: :md, classes: "text-sm") do %>
-      <div data-role="kb-gap-detail" class="space-y-1">
-        <%= render(Adminit::Tickets::KbGapComponent.new(ticket: @ticket)) %>
-        <% queries = Array(@run.output["kb_queries"]) %>
-        <% if queries.any? %>
-          <p class="text-slate-500"><%= t("adminit.tickets.ai_runs.kb_queries") %>: <%= queries.map { |q| %("#{q}") }.join(", ") %></p>
-        <% end %>
-      </div>
-    <% end %>
-  <% end %>
-  <%= render Adminit::Tickets::AiRunTranscriptComponent.new(run: @run, playbook_name: @run.playbook&.name) %>
+  <%= render Adminit::Tickets::AiRunTranscriptComponent.new(run: @run) %>
 <% end %>

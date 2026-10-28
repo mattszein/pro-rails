@@ -60,7 +60,7 @@ Support::AiPlaybook.find_or_create_by!(is_default: true) do |playbook|
   playbook.name = "Default"
   playbook.enabled = true
   playbook.mode = :assist
-  playbook.capabilities = SupportAi::Capabilities::Registry.defaults.map { |c| c.key.to_s }
+  playbook.capabilities = Support::AiCapabilities.defaults.map { |c| c.key.to_s }
 end
 
 # Configure dashboard widgets per role/permission
@@ -206,8 +206,8 @@ if Rails.env.development? || ENV["SEED_DEMO_DATA"] == "true"
         [:feature_request, "product-roadmap", "Product updates and announcements", "How new releases and changes are communicated.", "<p>There is no public roadmap. New releases and upcoming changes are published as announcements, which reach you as notifications: click the bell icon at the top right of the page, or choose <strong>View all notifications</strong> for the full list.</p>"],
         [:other, "contact-support", "Contacting support", "The best way to reach our team.", "<p>Choose <strong>Support</strong> in the left menu and click <strong>Add ticket</strong>. Pick a category, describe your question and optionally attach images or PDF files. You can follow the conversation in real time on the ticket page. If the assistant answers first, use <strong>Talk to a person</strong> to reach a teammate.</p>"],
         [:other, "support-hours", "How support requests are handled", "What happens after you open a ticket.", "<p>Support hours are not published in the app. You can open a ticket at any time: it waits for a teammate, and replies appear in the ticket conversation. When a ticket is marked as finished, you can ask to reopen it if you still need help.</p>"],
-        [nil, "getting-started", "Getting started", "A short tour of the app menu.", "<p>Use the left menu to move around: <strong>Home</strong>, <strong>Settings</strong> (Profile, Appearance, Password and Remember), <strong>Support</strong> (your tickets) and <strong>Help</strong> (this help center). The bell icon at the top right shows your notifications.</p>"],
-        [nil, "keyboard-and-accessibility", "Accessibility and appearance", "Themes, fonts and dark mode.", "<p>Go to <strong>Settings</strong> and open <strong>Appearance</strong> to choose a font and a theme. To switch between dark and light mode, use the dark/light toggle at the top of the page or <strong>Dark - Light</strong> in the left menu. The language switcher is also at the top of the page.</p>"]
+        [:general, "getting-started", "Getting started", "A short tour of the app menu.", "<p>Use the left menu to move around: <strong>Home</strong>, <strong>Settings</strong> (Profile, Appearance, Password and Remember), <strong>Support</strong> (your tickets) and <strong>Help</strong> (this help center). The bell icon at the top right shows your notifications.</p>"],
+        [:general, "keyboard-and-accessibility", "Accessibility and appearance", "Themes, fonts and dark mode.", "<p>Go to <strong>Settings</strong> and open <strong>Appearance</strong> to choose a font and a theme. To switch between dark and light mode, use the dark/light toggle at the top of the page or <strong>Dark - Light</strong> in the left menu. The language switcher is also at the top of the page.</p>"]
       ],
       "es" => [
         [:account_access, "reset-your-password", "Cómo restablecer tu contraseña", "¿Olvidaste tu contraseña? Solicita un enlace en pocos pasos.", "<p>Si no puedes iniciar sesión, puedes restablecer tu contraseña desde la página de inicio de sesión.</p><ol><li>Abre la página de inicio de sesión y elige el enlace <strong>Forgot Password?</strong> (se muestra en inglés).</li><li>Ingresa tu correo electrónico y haz clic en <strong>Solicitar Contraseña</strong>.</li><li>Abre el correo que te enviamos y sigue el enlace. Expira después de un tiempo, así que úsalo pronto.</li><li>Ingresa y confirma tu nueva contraseña y haz clic en <strong>Restablecer Contraseña</strong>.</li></ol><p>Si ya iniciaste sesión y solo quieres una contraseña nueva, consulta \"Cambiar tu contraseña\".</p>"],
@@ -221,8 +221,8 @@ if Rails.env.development? || ENV["SEED_DEMO_DATA"] == "true"
         [:feature_request, "product-roadmap", "Novedades y anuncios del producto", "Cómo comunicamos nuevas versiones y cambios.", "<p>No hay una hoja de ruta pública. Las nuevas versiones y los cambios próximos se publican como anuncios, que te llegan como notificaciones: haz clic en la campana de la parte superior derecha o elige <strong>Ver todas las notificaciones</strong> para ver la lista completa.</p>"],
         [:other, "contact-support", "Contactar a soporte", "La mejor forma de comunicarte con el equipo.", "<p>Elige <strong>Soporte</strong> en el menú de la izquierda y haz clic en <strong>Agregar ticket</strong>. Elige una categoría, describe tu consulta y, si quieres, adjunta imágenes o archivos PDF. Puedes seguir la conversación en tiempo real en la página del ticket. Si primero responde el asistente, usa <strong>Hablar con una persona</strong> para comunicarte con el equipo.</p>"],
         [:other, "support-hours", "Cómo se atienden las solicitudes", "Qué pasa después de abrir un ticket.", "<p>El horario de soporte no se publica en la aplicación. Puedes abrir un ticket en cualquier momento: queda a la espera de un integrante del equipo y las respuestas aparecen en la conversación del ticket. Cuando un ticket se marca como finalizado, puedes pedir reabrirlo si aún necesitas ayuda.</p>"],
-        [nil, "getting-started", "Primeros pasos", "Un breve recorrido por el menú de la aplicación.", "<p>Usa el menú de la izquierda para moverte: <strong>Inicio</strong>, <strong>Configuración</strong> (Perfil, Apariencia, Contraseña y Recordar), <strong>Soporte</strong> (tus tickets) y <strong>Ayuda</strong> (este centro de ayuda). La campana de la parte superior derecha muestra tus notificaciones.</p>"],
-        [nil, "keyboard-and-accessibility", "Accesibilidad y apariencia", "Temas, fuentes y modo oscuro.", "<p>Ve a <strong>Configuración</strong> y abre <strong>Apariencia</strong> para elegir una fuente y un tema. Para alternar entre modo oscuro y claro, usa el interruptor de la parte superior de la página u <strong>Oscuro - Claro</strong> en el menú de la izquierda. El selector de idioma también está en la parte superior de la página.</p>"]
+        [:general, "getting-started", "Primeros pasos", "Un breve recorrido por el menú de la aplicación.", "<p>Usa el menú de la izquierda para moverte: <strong>Inicio</strong>, <strong>Configuración</strong> (Perfil, Apariencia, Contraseña y Recordar), <strong>Soporte</strong> (tus tickets) y <strong>Ayuda</strong> (este centro de ayuda). La campana de la parte superior derecha muestra tus notificaciones.</p>"],
+        [:general, "keyboard-and-accessibility", "Accesibilidad y apariencia", "Temas, fuentes y modo oscuro.", "<p>Ve a <strong>Configuración</strong> y abre <strong>Apariencia</strong> para elegir una fuente y un tema. Para alternar entre modo oscuro y claro, usa el interruptor de la parte superior de la página u <strong>Oscuro - Claro</strong> en el menú de la izquierda. El selector de idioma también está en la parte superior de la página.</p>"]
       ]
     }
 
@@ -233,7 +233,7 @@ if Rails.env.development? || ENV["SEED_DEMO_DATA"] == "true"
           article.assign_attributes(category: category, title: title, summary: summary, body: body, status: :published,
             published_at: rand(1..30).days.ago, author: superadmin_account)
           article.save!
-        elsif article.title != title || article.summary != summary || article.category&.to_sym != category ||
+        elsif article.title != title || article.summary != summary || article.category.to_sym != category ||
             article.body.to_plain_text != ActionText::Content.new(body).to_plain_text
           article.update!(category: category, title: title, summary: summary, body: body)
         end
@@ -311,7 +311,7 @@ if Rails.env.development? || ENV["SEED_DEMO_DATA"] == "true"
 
     ticket = Support::Ticket.create!(
       title: demo[:title], description: demo[:messages].first[1], category: :other,
-      created: ai_demo_requester, status: demo[:status], ai_state: demo[:ai_state], ai_playbook: ai_demo_default_playbook
+      created: ai_demo_requester, status: demo[:status], ai_state: demo[:ai_state]
     )
     demo[:messages].each do |sender, content, metadata|
       ticket.conversation.messages.create!(
@@ -323,6 +323,7 @@ if Rails.env.development? || ENV["SEED_DEMO_DATA"] == "true"
     end
     ticket.ai_runs.create!(run_trigger: :ticket_created, step: :handle, status: :succeeded, model: "demo-model",
       input_tokens: 812, output_tokens: 164, latency_ms: 1380, tool_calls: [{name: "search_articles", arguments: {}}],
-      transcript: ai_demo_transcript.call(demo[:title]))
+      transcript: ai_demo_transcript.call(demo[:title]),
+      playbook: ai_demo_default_playbook, playbook_snapshot: Support::Ai::RecordRun.snapshot_for(ai_demo_default_playbook))
   end
 end

@@ -1,6 +1,6 @@
 module Support
   module Ai
-    # Picks the playbook for this run. For a user reply the ticket's recorded playbook is reused.
+    # Picks the playbook for this run with the current rules (most specific match, else the default).
     # With no usable playbook the organizer stops: a fresh ticket goes back to `off`; an ongoing
     # conversation is handed to a human (the user is already talking to the assistant).
     class SelectPlaybook
@@ -9,18 +9,13 @@ module Support
       delegate :ticket, :trigger, :triage, to: :context
 
       def call
-        playbook = reuse_playbook || Support::AiPlaybook.match_for(ticket, priority: triage&.dig(:priority) || ticket.priority)
+        playbook = Support::AiPlaybook.match_for(ticket, priority: triage&.dig(:priority) || ticket.priority)
         return stop_without_playbook unless playbook
 
-        ticket.update!(ai_playbook: playbook) unless ticket.ai_playbook_id == playbook.id
         context.playbook = playbook
       end
 
       private
-
-      def reuse_playbook
-        ticket.ai_playbook if trigger.to_s == "user_message"
-      end
 
       def stop_without_playbook
         if trigger.to_s == "user_message"
@@ -33,7 +28,6 @@ module Support
 
       def disable_ai
         ticket.with_lock { ticket.disable_ai! if ticket.ai_analyzing? }
-        Typing.hide(ticket)
       end
     end
   end

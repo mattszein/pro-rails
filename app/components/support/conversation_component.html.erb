@@ -11,7 +11,6 @@
 <div class="space-y-6 max-h-96 overflow-y-auto" id="<%= dom_id(conversation) %>_messages" data-controller="support--conversation-component" data-support--conversation-component-target="messages">
   <%= helpers.turbo_stream_from conversation %>
   <%= render(collection: messages, partial: "support/conversations/message") %>
-  <%= render(partial: "support/conversations/typing", locals: {conversation: conversation}) if typing %>
 </div>
 <!-- Message Input Form  -->
 <div id="message_form_container">

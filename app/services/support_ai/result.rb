@@ -1,8 +1,8 @@
 module SupportAi
   # What a Responder step returns.
   #
-  # output     - Hash (symbolized keys) for structured steps (triage, respond), String for free text
-  #              (investigate, summarize).
+  # output     - Hash (symbolized keys) for structured steps (triage, handle, respond), String for free text
+  #              (none today).
   # model      - OpenRouter model id actually used.
   # input_tokens / output_tokens - aggregate usage across every provider call of the step (Integer).
   # latency_ms - wall clock for the whole step, tool loop included.

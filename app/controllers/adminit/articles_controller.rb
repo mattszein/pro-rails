@@ -1,5 +1,6 @@
 class Adminit::ArticlesController < Adminit::ApplicationController
   include Tableable
+  include ModalFormResponses
 
   before_action :set_article, only: %i[show edit update destroy publish unpublish]
   verify_authorized
@@ -18,7 +19,7 @@ class Adminit::ArticlesController < Adminit::ApplicationController
 
   def new
     authorize! Support::Article, with: Adminit::ArticlePolicy
-    @article = Support::Article.new(new_article_defaults)
+    @article = Support::Article.new(locale: I18n.locale.to_s)
   end
 
   def edit
@@ -57,8 +58,7 @@ class Adminit::ArticlesController < Adminit::ApplicationController
     redirect_back_or_to adminit_article_path(@article), alert: e.message
   end
 
-  # Any status can be deleted: unlike announcements, nothing is sent or
-  # scheduled from an article, and published articles must be removable.
+  # Unlike announcements, any status can be deleted.
   def destroy
     if @article.destroy
       redirect_to adminit_articles_path, notice: resource_message(:deleted, @article)
@@ -74,47 +74,11 @@ class Adminit::ArticlesController < Adminit::ApplicationController
     authorize! @article, with: Adminit::ArticlePolicy
   end
 
-  TITLE_PREFILL_LENGTH = 150
-
-  # Prefill for the "Create article" link of a KB gap. Only title, category and locale are read from the
-  # query string; invalid category/locale are ignored silently.
-  def new_article_defaults
-    defaults = {locale: I18n.locale.to_s}
-    title = params[:title]
-    category = params[:category]
-    locale = params[:locale]
-    defaults[:title] = title.to_s.strip.first(TITLE_PREFILL_LENGTH) if title.is_a?(String) && title.present?
-    defaults[:category] = category if category.is_a?(String) && Support::Article.categories.key?(category)
-    defaults[:locale] = locale if locale.is_a?(String) && I18n.available_locales.map(&:to_s).include?(locale)
-    defaults
-  end
-
   def article_params
     params.require(:support_article).permit(:title, :slug, :summary, :body, :category, :locale)
   end
 
-  # New/edit render in a modal frame: on success the frame redirects to show,
-  # on failure the form is re-rendered in place.
-  def respond_success(message, path)
-    respond_to do |format|
-      format.html { redirect_to path, notice: message }
-      format.turbo_stream do
-        flash[:notice] = message
-        render turbo_stream: turbo_stream.action(:redirect, path)
-      end
-    end
-  end
-
-  def respond_form_error(action)
-    respond_to do |format|
-      format.html { render action, status: :unprocessable_content }
-      format.turbo_stream do
-        render turbo_stream: turbo_stream.replace(
-          "article_form",
-          partial: "adminit/articles/form",
-          locals: {article: @article}
-        ), status: :unprocessable_content
-      end
-    end
+  def modal_form_locals
+    {article: @article}
   end
 end

@@ -1,27 +1,16 @@
 module Adminit
   module Tickets
-    # "AI activity" panel: the ticket's assistant runs, newest first. Takes the runs as an
-    # argument (already loaded by the caller) and never queries.
+    # "AI activity" panel for a ticket's runs (already ordered and limited by the caller).
     class AiRunsComponent < ApplicationViewComponent
-      LIMIT = 20
       ERROR_LENGTH = 80
       STATUS_THEMES = {"succeeded" => :green, "failed" => :red, "discarded" => :secondary}.freeze
 
       option :runs
       option :ticket, default: -> {}
 
-      def sorted_runs
-        runs.sort_by { |run| [run.created_at, run.id] }.reverse.first(LIMIT)
-      end
-
       def columns
         cols = [
-          column(:step) { |run|
-            safe_join([
-              t("enums.ai_run.step.#{run.step}"),
-              (render(Adminit::Tickets::KbGapComponent.new(ticket: ticket)) if ticket && Adminit::Tickets::KbGapComponent.gap?(run))
-            ].compact, " ")
-          },
+          column(:step) { |run| t("enums.ai_run.step.#{run.step}") },
           column(:trigger) { |run| t("enums.ai_run.run_trigger.#{run.run_trigger}") },
           column(:model) { |run| run.model || "-" },
           column(:status) { |run| render(Core::BadgeComponent.new(label: t("enums.ai_run.status.#{run.status}"), theme: status_theme(run), size: :xs)) },

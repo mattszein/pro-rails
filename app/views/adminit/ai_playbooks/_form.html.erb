@@ -12,10 +12,11 @@
   </div>
 
   <%= form.label :mode, t("adminit.ai_playbooks.mode") %>
-  <%= form.select :mode, ai_playbook_mode_options, {}, {required: true, class: "w-full"} %>
+  <%= form.select :mode, Support::AiPlaybook.modes.keys.map { |mode| [ai_playbook_mode_label(mode), mode] }, {}, {required: true, class: "w-full"} %>
 
   <fieldset class="space-y-3">
     <legend class="font-semibold mb-2"><%= t("adminit.ai_playbooks.conditions") %></legend>
+    <p class="text-sm text-slate-500" data-role="specificity-hint"><%= t("adminit.ai_playbooks.specificity_hint") %></p>
     <% if playbook.is_default? %>
       <p class="text-sm text-slate-500"><%= t("adminit.ai_playbooks.conditions_locked") %></p>
     <% else %>
@@ -23,10 +24,11 @@
         <p class="font-medium mb-1"><%= t("adminit.ai_playbooks.categories") %></p>
         <p class="text-sm text-slate-500 mb-2"><%= t("adminit.ai_playbooks.categories_hint") %></p>
         <%= hidden_field_tag "#{param_key}[category_keys][]", "", id: nil %>
-        <% ai_playbook_category_options.each do |label, key| %>
+        <% Support::Ticket::CATEGORIES.each_key do |category| %>
+          <% key = category.to_s %>
           <div class="flex items-center gap-2">
             <%= form.check_box :category_keys, {name: "#{param_key}[category_keys][]", id: "#{param_key}_category_#{key}", checked: playbook.category_keys.include?(key), include_hidden: false}, key, nil %>
-            <%= label_tag "#{param_key}_category_#{key}", label, class: "mb-0" %>
+            <%= label_tag "#{param_key}_category_#{key}", t("enums.ticket.category.#{key}"), class: "mb-0" %>
           </div>
         <% end %>
       </div>
@@ -43,7 +45,7 @@
       </div>
 
       <%= form.label :audience_id, t("adminit.ai_playbooks.audience") %>
-      <%= form.select :audience_id, ai_playbook_audience_options, {include_blank: t("adminit.ai_playbooks.no_audience")}, {class: "w-full"} %>
+      <%= form.select :audience_id, Audience.active.order(:name).map { |audience| [audience.name, audience.id] }, {include_blank: t("adminit.ai_playbooks.no_audience")}, {class: "w-full"} %>
     <% end %>
   </fieldset>
 
@@ -55,7 +57,7 @@
     <%= hidden_field_tag "#{param_key}[capabilities][]", "", id: nil %>
     <% ai_playbook_capability_groups.each do |kind, capabilities| %>
       <div>
-        <p class="font-medium mb-1"><%= t("adminit.ai_playbooks.#{(kind == :read) ? "read" : "actions"}") %></p>
+        <p class="font-medium mb-1"><%= ai_playbook_group_label(kind) %></p>
         <% capabilities.each do |capability| %>
           <% key = capability.key.to_s %>
           <div class="flex items-start gap-2 mb-1">

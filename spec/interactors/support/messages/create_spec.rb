@@ -31,8 +31,7 @@ RSpec.describe Support::Messages::Create, type: :interactor do
     context "awaiting the user" do
       let(:state) { :awaiting_user }
 
-      it "resumes analysis, shows typing and enqueues the job for the message" do
-        expect(Support::Ai::Typing).to receive(:show).with(an_instance_of(Support::Ticket))
+      it "resumes analysis and enqueues the job for the message" do
         result = nil
         expect { result = call_step(user) }.to have_enqueued_job(Support::AiProcessJob).with(ticket.id, "user_message", a_kind_of(Integer))
         expect(ticket.reload).to be_ai_analyzing
@@ -80,12 +79,6 @@ RSpec.describe Support::Messages::Create, type: :interactor do
           expect(ticket.notes.system.first).to have_attributes(body: "Support took over from AI.", account: nil)
         end
       end
-    end
-
-    it "removes typing when it interrupts an analysis" do
-      ticket.update!(ai_state: :analyzing)
-      expect(Support::Ai::Typing).to receive(:hide).with(an_instance_of(Support::Ticket))
-      call_step(admin)
     end
 
     %i[off stepped_back resolved].each do |inert|

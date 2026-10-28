@@ -9,6 +9,7 @@ module Support
         Support::AiRun.create!(
           ticket: ticket,
           playbook: playbook,
+          playbook_snapshot: snapshot_for(playbook),
           run_trigger: trigger,
           step: step,
           status: status,
@@ -21,6 +22,26 @@ module Support
           output: output_for(result),
           error: error&.then { |e| e.respond_to?(:message) ? e.message : e.to_s }
         )
+      end
+
+      # Frozen copy of the rules the run used, so later playbook edits or deletion do not rewrite history.
+      def snapshot_for(playbook)
+        return {} unless playbook
+
+        {
+          name: playbook.name,
+          mode: playbook.mode,
+          capabilities: playbook.capabilities,
+          instructions: playbook.instructions,
+          max_ai_turns: playbook.max_ai_turns,
+          idle_reminder_after_hours: playbook.idle_reminder_after_hours,
+          idle_handoff_after_hours: playbook.idle_handoff_after_hours,
+          categories: playbook.category_keys,
+          min_priority: playbook.min_priority,
+          max_priority: playbook.max_priority,
+          audience: playbook.audience&.name,
+          is_default: playbook.is_default
+        }
       end
 
       def error_attr(error, name)

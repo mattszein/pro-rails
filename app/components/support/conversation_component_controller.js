@@ -33,7 +33,7 @@ export default class extends Controller {
 
   // Only the prompt on the latest message stays actionable: broadcasts append new messages
   // without re-rendering older ones, so hide every resolution-actions block whose message is
-  // not the last one in the list (the typing indicator is not a message).
+  // not the last one in the list.
   hideStaleResolutionActions() {
     if (!this.hasMessagesTarget) return
 

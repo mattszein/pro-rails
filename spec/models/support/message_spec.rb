@@ -61,6 +61,46 @@ RSpec.describe Support::Message, type: :model do
     expect(create(:message).metadata).to eq({})
   end
 
+  describe "#suggested_articles" do
+    let(:conversation) { create(:conversation) }
+
+    it "returns published articles in the assistant's order, dropping unknown, draft and invalid ids" do
+      first = create(:article, :published)
+      second = create(:article, :published)
+      draft = create(:article)
+      message = create(:message, :ai, conversation: conversation, metadata: {"article_ids" => [second.id, 0, "x", draft.id, first.id]})
+
+      expect(message.suggested_articles).to eq([second, first])
+    end
+
+    it "is empty for human messages and messages without ids" do
+      article = create(:article, :published)
+      expect(create(:message, conversation: conversation, metadata: {"article_ids" => [article.id]}).suggested_articles).to eq([])
+      expect(create(:message, :ai, conversation: conversation).suggested_articles).to eq([])
+    end
+  end
+
+  describe "#resolution_proposed?" do
+    let(:conversation) { create(:conversation) }
+
+    it "is true only for AI messages that flag it" do
+      expect(create(:message, :ai, conversation: conversation, metadata: {"resolution_proposed" => true})).to be_resolution_proposed
+      expect(create(:message, :ai, conversation: conversation, metadata: {"resolution_proposed" => false})).not_to be_resolution_proposed
+      expect(create(:message, conversation: conversation, metadata: {"resolution_proposed" => true})).not_to be_resolution_proposed
+    end
+  end
+
+  describe "#latest?" do
+    it "is true only for the newest message of the conversation" do
+      conversation = create(:conversation)
+      older = create(:message, :ai, conversation: conversation, created_at: 2.minutes.ago)
+      newer = create(:message, :ai, conversation: conversation, created_at: 1.minute.ago)
+
+      expect(newer).to be_latest
+      expect(older).not_to be_latest
+    end
+  end
+
   describe "rendering" do
     it "renders an ai message without an account" do
       message = create(:message, :ai)

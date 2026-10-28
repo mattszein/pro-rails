@@ -35,12 +35,10 @@ en:
         tools: "Tools"
         error: "Error"
         view: "View"
-        kb_gap: "KB gap"
-        create_article: "Create article"
-        kb_queries: "Searched help-center queries"
         title: "AI run"
         created_at: "Created at"
         transcript: "Transcript"
+        playbook_snapshot: "Playbook used"
         no_transcript: "No transcript was recorded for this run."
         tool_calls: "Tool calls"
         tool_call: "Tool call"
@@ -70,7 +68,6 @@ en:
       locales:
         en: "English"
         es: "Spanish"
-      general: "General"
       published: "Article was published."
       unpublished: "Article was unpublished."
       unpublish: "Unpublish"
@@ -82,8 +79,6 @@ en:
       enabled_off: "Disabled"
       toggle_enable: "Enable"
       toggle_disable: "Disable"
-      move_up: "Move up"
-      move_down: "Move down"
       any: "Any"
       conditions: "Conditions"
       conditions_locked: "The default playbook applies to every ticket no other playbook matches, so its conditions are locked."
@@ -98,18 +93,19 @@ en:
       instructions: "Instructions"
       instructions_placeholder: "Extra guidance added to the assistant's system prompt."
       capabilities: "Capabilities"
-      read: "Read"
-      actions: "Actions"
+      group_context: "Context (read before answering)"
+      group_tool: "Tools (the model may call)"
+      group_flag: "Behaviors"
       limits: "Limits"
       max_ai_turns: "Max assistant turns"
       idle_reminder_after_hours: "Idle reminder after (hours)"
       idle_handoff_after_hours: "Idle handoff after (hours)"
       enabled: "Enabled"
-      position: "Order"
+      specificity: "Specificity"
+      fallback: "Fallback"
+      specificity_hint: "The more conditions a playbook sets (categories, priority, audience), the more specific it is, and the most specific match wins. On a tie the oldest playbook wins. The default playbook is only the fallback."
       toggled_on: "Playbook was enabled."
       toggled_off: "Playbook was disabled."
-      moved: "Playbook order was updated."
-      cannot_move: "Playbook cannot be moved further."
     roles:
       account_removed: "Account was successfully removed from the role."
       account_not_removed: "Account wasn't removed from the role."
@@ -228,37 +224,28 @@ en:
     capabilities:
       account_facts:
         label: "Account facts"
-        description: "Requester's account status, verification, signup date, role and locale."
+        description: "Requester's account status, verification, signup date and role."
       past_tickets:
         label: "Past tickets"
         description: "The requester's own earlier tickets."
       similar_tickets:
         label: "Similar tickets"
-        description: "Other users' finished tickets in the same category. Investigation only; never reaches the user-facing reply."
+        description: "Adds a line with similar resolved tickets to the internal note. Admin only; never sent to the model."
       search_articles:
         label: "Search articles"
-        description: "Search the published help center articles."
+        description: "Find published help center articles (looked up automatically; the model can refine the search)."
       vision_attachments:
         label: "Read image attachments"
         description: "Pass image attachments to a vision-capable model."
       investigate_note:
-        label: "Investigation note"
-        description: "Write an internal note with findings and a recommended next step."
+        label: "Internal note"
+        description: "Write one internal note with the findings."
       auto_set_priority:
         label: "Set priority"
         description: "Apply the priority suggested by triage."
       auto_correct_category:
         label: "Correct category"
         description: "Apply a category correction suggested by triage."
-      suggest_articles:
-        label: "Suggest articles"
-        description: "Attach help article cards to the assistant's message."
-      propose_resolution:
-        label: "Propose resolution"
-        description: "Show Solved / Not solved buttons to the user."
-      request_human:
-        label: "Request a human"
-        description: "Hand the ticket to a support agent when needed."
       draft_replies:
         label: "Draft replies"
         description: "Let agents request an AI-drafted reply."

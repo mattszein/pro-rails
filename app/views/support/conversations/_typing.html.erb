@@ -1,7 +1,0 @@
-<div id="<%= dom_id(conversation, :typing) %>" class="w-fit" role="status" aria-live="polite">
-  <%= render Core::BoxComponent.new(variant: :neutral, padding: :xs, rounded: :xl, classes: "flex items-center gap-1 px-4 py-3") do %>
-    <span class="size-2 rounded-full bg-slate-400 animate-bounce [animation-delay:-0.3s]"></span>
-    <span class="size-2 rounded-full bg-slate-400 animate-bounce [animation-delay:-0.15s]"></span>
-    <span class="size-2 rounded-full bg-slate-400 animate-bounce"></span>
-  <% end %>
-</div>

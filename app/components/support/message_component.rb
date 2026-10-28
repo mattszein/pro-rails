@@ -1,13 +1,17 @@
 module Support
   class MessageComponent < ApplicationViewComponent
     option :message
-    # Pre-loaded published articles to render as cards (the component never queries).
-    option :articles, default: -> { [] }
-    # Set (by the partial's data-only check) when the "This solved it" buttons may render.
-    # Only `id` and `created_id` are read from it. The buttons are further gated client-side
-    # to the requester via <turbo-show>, and hidden on all but the latest message by the
-    # conversation Stimulus controller.
-    option :resolution_ticket, default: -> {}
+
+    # Also rendered in Turbo broadcasts (no request, no current_account): read only from the
+    # message and the database. The buttons are gated client-side to the requester via
+    # <turbo-show>, and hidden on all but the latest message by the conversation Stimulus controller.
+    def articles
+      @articles ||= message.suggested_articles
+    end
+
+    def resolution_ticket
+      message.conversation.ticket
+    end
 
     def author_display_name
       message.ai? ? I18n.t("support.message.ai_name") : message.account.email
@@ -38,7 +42,7 @@ module Support
     end
 
     def show_resolution_actions?
-      message.ai? && resolution_ticket.present? && message.metadata["resolution_proposed"].present?
+      message.resolution_proposed? && resolution_ticket.awaiting_ai_resolution? && message.latest?
     end
   end
 end

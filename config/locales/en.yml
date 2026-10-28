@@ -146,6 +146,7 @@ en:
         billing: "Billing"
         feature_request: "Feature Request"
         other: "Other"
+        general: "General"
     announcement:
       status:
         draft: "Draft"

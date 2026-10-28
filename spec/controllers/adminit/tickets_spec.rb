@@ -177,18 +177,16 @@ describe Adminit::TicketsController, type: :controller do
     before do
       login_user(user)
       ticket_permission
-      ticket.update!(ai_playbook: playbook)
-      create(:ai_run, ticket: ticket, step: :respond, model: "demo-model")
+      create(:ai_run, ticket: ticket, step: :respond, model: "demo-model", playbook: playbook)
       ticket.notes.create!(kind: :ai, account: nil, body: "AI summary body")
       ticket.notes.create!(kind: :system, account: nil, body: "system body")
     end
 
-    it "shows the AI badge, playbook, AI activity panel, AI note styling and the takeover label" do
+    it "shows the AI badge, AI activity panel, AI note styling and the takeover label" do
       get :show, params: {id: ticket.id}
       body = response.body
 
       expect(body).to include("Needs human")
-      expect(body).to include("Billing flow")
       expect(body).to include(I18n.t("adminit.tickets.ai_activity"))
       expect(body).to include("demo-model")
       expect(body).to include("/ai_runs/")
@@ -203,14 +201,6 @@ describe Adminit::TicketsController, type: :controller do
 
       expect(response.body).to include(">#{I18n.t("shared.buttons.take")}<")
       expect(response.body).not_to include(I18n.t("adminit.tickets.ai_activity"))
-    end
-
-    it "preloads the playbook and runs" do
-      get :show, params: {id: ticket.id}
-      loaded = controller.instance_variable_get(:@ticket)
-
-      expect(loaded.association(:ai_playbook)).to be_loaded
-      expect(loaded.association(:ai_runs)).to be_loaded
     end
   end
 

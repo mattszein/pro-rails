@@ -8,3 +8,5 @@ default:
   history_limit: 30
   max_tool_calls: 10
   timeout: 60
+  # Word inside the <<<...>>> delimiters that wrap third-party text in prompts.
+  untrusted_marker: UNTRUSTED

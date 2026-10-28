@@ -35,12 +35,10 @@ es:
         tools: "Herramientas"
         error: "Error"
         view: "Ver"
-        kb_gap: "Brecha de base de conocimiento"
-        create_article: "Crear artículo"
-        kb_queries: "Consultas buscadas en el centro de ayuda"
         title: "Ejecución de IA"
         created_at: "Creada el"
         transcript: "Transcripción"
+        playbook_snapshot: "Playbook utilizado"
         no_transcript: "No se registró una transcripción para esta ejecución."
         tool_calls: "Llamadas a herramientas"
         tool_call: "Llamada a herramienta"
@@ -70,7 +68,6 @@ es:
       locales:
         en: "Inglés"
         es: "Español"
-      general: "General"
       published: "El artículo fue publicado."
       unpublished: "El artículo fue despublicado."
       unpublish: "Despublicar"
@@ -82,8 +79,6 @@ es:
       enabled_off: "Deshabilitado"
       toggle_enable: "Habilitar"
       toggle_disable: "Deshabilitar"
-      move_up: "Subir"
-      move_down: "Bajar"
       any: "Cualquiera"
       conditions: "Condiciones"
       conditions_locked: "El playbook por defecto se aplica a todo ticket que ningún otro playbook cubra, por eso sus condiciones están bloqueadas."
@@ -98,18 +93,19 @@ es:
       instructions: "Instrucciones"
       instructions_placeholder: "Guía adicional que se agrega al prompt del asistente."
       capabilities: "Capacidades"
-      read: "Lectura"
-      actions: "Acciones"
+      group_context: "Contexto (se lee antes de responder)"
+      group_tool: "Herramientas (el modelo puede llamarlas)"
+      group_flag: "Comportamientos"
       limits: "Límites"
       max_ai_turns: "Máx. turnos del asistente"
       idle_reminder_after_hours: "Recordatorio por inactividad (horas)"
       idle_handoff_after_hours: "Traspaso por inactividad (horas)"
       enabled: "Habilitado"
-      position: "Orden"
+      specificity: "Especificidad"
+      fallback: "Respaldo"
+      specificity_hint: "Cuantas más condiciones define un playbook (categorías, prioridad, audiencia), más específico es, y gana la coincidencia más específica. En caso de empate gana el playbook más antiguo. El playbook por defecto es solo el respaldo."
       toggled_on: "El playbook fue habilitado."
       toggled_off: "El playbook fue deshabilitado."
-      moved: "Se actualizó el orden de los playbooks."
-      cannot_move: "El playbook no se puede mover más."
     roles:
       account_removed: "La cuenta fue eliminada del rol exitosamente."
       account_not_removed: "La cuenta no fue eliminada del rol."
@@ -228,37 +224,28 @@ es:
     capabilities:
       account_facts:
         label: "Datos de la cuenta"
-        description: "Estado, verificación, fecha de alta, rol e idioma de quien consulta."
+        description: "Estado, verificación, fecha de alta y rol de quien consulta."
       past_tickets:
         label: "Tickets anteriores"
         description: "Los tickets previos del propio solicitante."
       similar_tickets:
         label: "Tickets similares"
-        description: "Tickets finalizados de otros usuarios en la misma categoría. Solo en investigación; nunca llega a la respuesta al usuario."
+        description: "Agrega a la nota interna una línea con tickets similares resueltos. Solo para admins; nunca se envía al modelo."
       search_articles:
         label: "Buscar artículos"
-        description: "Busca en los artículos publicados del centro de ayuda."
+        description: "Encuentra artículos publicados del centro de ayuda (se buscan automáticamente; el modelo puede refinar la búsqueda)."
       vision_attachments:
         label: "Leer imágenes adjuntas"
         description: "Envía las imágenes adjuntas a un modelo con visión."
       investigate_note:
-        label: "Nota de investigación"
-        description: "Escribe una nota interna con hallazgos y el siguiente paso recomendado."
+        label: "Nota interna"
+        description: "Escribe una nota interna con los hallazgos."
       auto_set_priority:
         label: "Asignar prioridad"
         description: "Aplica la prioridad sugerida por el triaje."
       auto_correct_category:
         label: "Corregir categoría"
         description: "Aplica la corrección de categoría sugerida por el triaje."
-      suggest_articles:
-        label: "Sugerir artículos"
-        description: "Adjunta tarjetas de artículos de ayuda al mensaje del asistente."
-      propose_resolution:
-        label: "Proponer resolución"
-        description: "Muestra los botones Resuelto / No resuelto al usuario."
-      request_human:
-        label: "Solicitar a una persona"
-        description: "Traspasa el ticket a un agente cuando sea necesario."
       draft_replies:
         label: "Borradores de respuesta"
         description: "Permite a los agentes pedir una respuesta redactada por IA."

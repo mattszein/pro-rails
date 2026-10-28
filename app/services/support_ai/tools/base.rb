@@ -3,10 +3,8 @@ module SupportAi
     # Base for every assistant tool. Tools are built per call with the ticket they act for and
     # never rescue: errors surface as SupportAi::Error from the Responder.
     class Base < RubyLLM::Tool
-      # "account_facts" rather than ruby_llm's namespaced default.
+      # "search_articles" rather than ruby_llm's namespaced default.
       def self.tool_name = name.demodulize.underscore
-
-      def self.action? = false
 
       def initialize(ticket:, budget: nil, **)
         super()

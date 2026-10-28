@@ -2,7 +2,7 @@ module Support
   module Tickets
     # "This solved it": the requester confirms the AI's fix. Finishes the ticket; the AI state
     # is sticky, so later reopen requests go to humans.
-    class ResolveByUser
+    class ResolveWithAi
       include Interactor
 
       delegate :ticket, :account, to: :context

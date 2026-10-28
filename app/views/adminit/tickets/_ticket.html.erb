@@ -2,7 +2,7 @@
   <!-- Top Row: Info and Notes -->
   <div class="flex space-x-2">
     <%= render(Core::CardComponent.new(classes: "basis-1/2 flex flex-col overflow-y-auto space-y-4")) do %>
-      <%= render Adminit::TicketInfoComponent.new(ticket: ticket, playbook_name: ticket.ai_playbook&.name) %>
+      <%= render Adminit::TicketInfoComponent.new(ticket: ticket) %>
       <h3 class="leading-tight">
         <%= ticket.title %>
       </h3>
@@ -29,9 +29,10 @@
   </div>
 
   <!-- Assistant runs (only for tickets the assistant has touched) -->
-  <% if !ticket.ai_off? || ticket.ai_runs.any? %>
+  <% ai_runs = ticket.recent_ai_runs.to_a %>
+  <% if !ticket.ai_off? || ai_runs.any? %>
     <%= render(Core::CardComponent.new(classes: "space-y-4")) do %>
-      <%= render Adminit::Tickets::AiRunsComponent.new(runs: ticket.ai_runs, ticket: ticket) %>
+      <%= render Adminit::Tickets::AiRunsComponent.new(runs: ai_runs, ticket: ticket) %>
     <% end %>
   <% end %>
 
@@ -40,8 +41,7 @@
     <%= render(Core::CardComponent.new(variant: :glass, glow: true, classes: "space-y-4")) do %>
       <%= render Support::ConversationComponent.new(
             conversation: ticket.conversation,
-            messages: ticket.conversation.messages,
-            typing: ticket.ai_analyzing?
+            messages: ticket.conversation.messages
           ) do %>
         <%= render "support/conversations/message_form", ticket: ticket %>
       <% end %>

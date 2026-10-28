@@ -78,20 +78,18 @@ RSpec.describe Support::TicketsController, type: :controller do
       response.body
     end
 
-    it "shows the helping banner, typing indicator and the talk-to-person button while analyzing" do
+    it "shows the helping banner and the talk-to-person button while analyzing" do
       body = show(create(:ticket, :ai_analyzing, created: creator_account))
 
       expect(body).to include(I18n.t("support.ticket_status_banner.ai_analyzing"))
-      expect(body).to include("typing_support_conversation_")
       expect(body).to include(I18n.t("support.ai_status.talk_to_person"))
       expect(body).to include("is=\"#{creator_account.id}\"")
     end
 
-    it "shows the helping banner without typing while awaiting the user" do
+    it "shows the helping banner while awaiting the user" do
       body = show(create(:ticket, :ai_awaiting_user, created: creator_account))
 
       expect(body).to include(I18n.t("support.ticket_status_banner.ai_awaiting_user"))
-      expect(body).not_to include("typing_support_conversation_")
       expect(body).to include(I18n.t("support.ai_status.talk_to_person"))
     end
 
@@ -409,8 +407,6 @@ RSpec.describe Support::TicketsController, type: :controller do
       subject { post :request_human, params: {id: ticket.id} }
 
       let(:ticket) { create(:ticket, :ai_awaiting_user, created: creator_account) }
-
-      before { stub_responder(summarize: ai_result("Summary")) }
 
       it "is authorized" do
         expect { subject }.to be_authorized_to(:request_human?, ticket).with(Support::TicketPolicy).with_context(user: creator_account)

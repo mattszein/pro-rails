@@ -11,8 +11,6 @@ module Adminit
     }.freeze
 
     option :ticket
-    # Name of the applied AI playbook, loaded by the caller (components never query).
-    option :playbook_name, default: -> {}
 
     def status_theme
       helpers.ticket_status_theme(ticket.status)

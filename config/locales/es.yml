@@ -146,6 +146,7 @@ es:
         billing: "Facturación"
         feature_request: "Solicitud de Función"
         other: "Otro"
+        general: "General"
     announcement:
       status:
         draft: "Borrador"

@@ -13,15 +13,15 @@ module SupportAiWorkflowHelpers
     {reply: "Try resetting your password.", article_ids: [], resolution_proposed: false, handoff_requested: false, handoff_reason: ""}.merge(overrides)
   end
 
-  # Shape of Responder#handle output (kb_gap/kb_queries added in H2).
+  # Shape of Responder#handle output .
   def handle_output(**overrides)
     {findings: "Request: reset password.\nContext: none\nNext step: send the reset link.", reply: "Try resetting your password.", article_ids: [], resolution_proposed: false, handoff_requested: false, handoff_reason: "", kb_gap: false, kb_queries: []}.merge(overrides)
   end
 
   # Returns the instance_double so examples can set further expectations.
-  def stub_responder(triage: nil, handle: nil, investigate: nil, respond: nil, summarize: nil)
+  def stub_responder(triage: nil, handle: nil, respond: nil)
     responder = instance_double(SupportAi::Responder)
-    {triage: triage, handle: handle, investigate: investigate, respond: respond, summarize: summarize}.each do |step, value|
+    {triage: triage, handle: handle, respond: respond}.each do |step, value|
       next if value.nil?
 
       if value.is_a?(Exception) || (value.is_a?(Class) && value <= Exception)

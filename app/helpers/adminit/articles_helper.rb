@@ -6,10 +6,7 @@ module Adminit
       ARTICLE_STATUS_THEME[status.to_sym]
     end
 
-    # nil category means a general article, shown with its own label.
     def article_category_label(article)
-      return I18n.t("adminit.articles.general") if article.category.blank?
-
       I18n.t("enums.article.category.#{article.category}")
     end
 

@@ -30,8 +30,6 @@ namespace :adminit do
   resources :ai_playbooks, except: [:show] do
     member do
       post :toggle
-      post :move_up
-      post :move_down
     end
   end
 

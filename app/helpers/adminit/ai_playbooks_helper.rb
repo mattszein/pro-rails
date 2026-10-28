@@ -4,27 +4,17 @@ module Adminit
       I18n.t("enums.support_ai_playbook.mode.#{mode}")
     end
 
-    def ai_playbook_mode_options
-      Support::AiPlaybook.modes.keys.map { |mode| [ai_playbook_mode_label(mode), mode] }
-    end
-
-    def ai_playbook_category_options
-      Support::Ticket::CATEGORIES.keys.map { |key| [I18n.t("enums.ticket.category.#{key}"), key.to_s] }
-    end
-
     def ai_playbook_priority_options
       Support::AiPlaybook::PRIORITY_RANGE.to_a
     end
 
-    def ai_playbook_audience_options
-      Audience.active.order(:name).map { |audience| [audience.name, audience.id] }
+    # Registry capabilities split into the form's groups (context / tool / flag), in declaration order.
+    def ai_playbook_capability_groups
+      grouped = Support::AiCapabilities.all.group_by(&:kind)
+      Support::AiCapabilities::KINDS.index_with { |kind| grouped[kind] || [] }
     end
 
-    # Registry capabilities split into the form's two groups, in declaration order.
-    def ai_playbook_capability_groups
-      grouped = SupportAi::Capabilities::Registry.all.group_by(&:kind)
-      {read: grouped[:read] || [], action: grouped[:action] || []}
-    end
+    def ai_playbook_group_label(kind) = I18n.t("adminit.ai_playbooks.group_#{kind}")
 
     def ai_playbook_capability_label(key) = I18n.t("support_ai.capabilities.#{key}.label")
 
@@ -72,6 +62,16 @@ module Adminit
           renderer: ->(playbook) { playbook.audience&.name || I18n.t("adminit.ai_playbooks.any") }
         ),
         Core::Table::Column.new(
+          label: I18n.t("adminit.ai_playbooks.specificity"),
+          renderer: ->(playbook) {
+            if playbook.is_default?
+              I18n.t("adminit.ai_playbooks.fallback")
+            else
+              render(Core::BadgeComponent.new(label: playbook.specificity.to_s, theme: playbook.specificity.positive? ? :primary : :secondary, size: :xs))
+            end
+          }
+        ),
+        Core::Table::Column.new(
           label: I18n.t("adminit.ai_playbooks.enabled"),
           renderer: ->(playbook) {
             render(Core::BadgeComponent.new(
@@ -90,10 +90,6 @@ module Adminit
     def ai_playbook_actions(playbook)
       post = {data: {turbo_method: :post, turbo_prefetch: false, turbo_frame: "_top"}}
       links = []
-      unless playbook.is_default?
-        links << ai_playbook_link(I18n.t("adminit.ai_playbooks.move_up"), move_up_adminit_ai_playbook_path(playbook), :show, post)
-        links << ai_playbook_link(I18n.t("adminit.ai_playbooks.move_down"), move_down_adminit_ai_playbook_path(playbook), :show, post)
-      end
       links << ai_playbook_link(
         I18n.t(playbook.enabled? ? "adminit.ai_playbooks.toggle_disable" : "adminit.ai_playbooks.toggle_enable"),
         toggle_adminit_ai_playbook_path(playbook), :edit, post

@@ -4,7 +4,6 @@ RSpec.describe Support::Ai::Fallback, type: :interactor do
   let(:ticket) { create(:ticket, :ai_analyzing) }
 
   it "hands off with a generic AI message, a system note and a failed fallback run" do
-    expect(Support::Ai::Typing).to receive(:hide).with(ticket)
     described_class.call(ticket: ticket, error: "provider down")
 
     expect(ticket.reload).to be_ai_handoff_requested

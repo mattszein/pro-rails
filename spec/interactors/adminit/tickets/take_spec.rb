@@ -38,18 +38,6 @@ RSpec.describe Adminit::Tickets::Take, type: :interactor do
         expect(ticket.notes.system.pluck(:body)).to include("Ticket taken and assigned.", "AI stepped back.")
       end
     end
-
-    it "removes the typing indicator when it was analyzing" do
-      ticket = create(:ticket, :ai_analyzing)
-      expect(Support::Ai::Typing).to receive(:hide).with(ticket)
-      described_class.call(ticket: ticket, account: admin)
-    end
-
-    it "does not touch typing otherwise" do
-      ticket = create(:ticket, :ai_awaiting_user)
-      expect(Support::Ai::Typing).not_to receive(:hide)
-      described_class.call(ticket: ticket, account: admin)
-    end
   end
 
   it "leaves the AI state alone and writes no AI note when it was not engaged" do

@@ -53,7 +53,6 @@ es:
       search: "Buscar"
       clear: "Limpiar"
       all: "Todos"
-      general: "General"
       no_results: "No se encontraron artículos."
       suggestions_title: "Esto podría ayudarte"
       suggestions_hint: "Se abre en una pestaña nueva para conservar tu borrador."

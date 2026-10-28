@@ -33,11 +33,10 @@ RSpec.describe "Support::Ai steps", type: :interactor do
   end
 
   describe Support::Ai::SelectPlaybook do
-    it "stores the matching playbook on the ticket and context" do
+    it "puts the matching playbook on the context" do
       pb = create(:ai_playbook, :default)
       result = described_class.call(ticket: ticket, trigger: "ticket_created", triage: nil)
       expect(result.playbook).to eq(pb)
-      expect(ticket.reload.ai_playbook).to eq(pb)
     end
 
     it "uses the triaged priority to match" do
@@ -47,8 +46,7 @@ RSpec.describe "Support::Ai steps", type: :interactor do
       expect(result.playbook).to eq(urgent)
     end
 
-    it "turns the AI off, clears typing and stops when nothing matches" do
-      expect(Support::Ai::Typing).to receive(:hide).with(ticket)
+    it "turns the AI off and stops when nothing matches" do
       result = described_class.call(ticket: ticket, trigger: "ticket_created")
       expect(result).to be_failure
       expect(ticket.reload).to be_ai_off
@@ -62,14 +60,13 @@ RSpec.describe "Support::Ai steps", type: :interactor do
     end
 
     context "on a user reply" do
-      it "reuses the ticket's recorded playbook" do
-        recorded = create(:ai_playbook)
+      it "matches with the current rules" do
         create(:ai_playbook, :default)
-        ticket.update!(ai_playbook: recorded)
-        expect(described_class.call(ticket: ticket, trigger: "user_message").playbook).to eq(recorded)
+        specific = create(:ai_playbook, category_keys: [ticket.category])
+        expect(described_class.call(ticket: ticket, trigger: "user_message").playbook).to eq(specific)
       end
 
-      it "matches again when none was recorded" do
+      it "falls back to the default" do
         pb = create(:ai_playbook, :default)
         expect(described_class.call(ticket: ticket, trigger: "user_message").playbook).to eq(pb)
       end
@@ -172,6 +169,48 @@ RSpec.describe "Support::Ai steps", type: :interactor do
       end
     end
 
+    context "with similar_tickets" do
+      let(:capabilities) { %w[investigate_note similar_tickets] }
+      let(:other) { create(:account) }
+
+      before { ticket.update!(category: :billing, title: "Invoice charged twice") }
+
+      it "appends a deterministic admin-only line to the single ai note, without calling the model for it" do
+        match = create(:ticket, :finished, created: other, category: :billing, title: "Invoice problem", description: "SECRET DESC")
+        create(:ticket, :finished, created: other, category: :technical_issue, title: "Invoice crash")
+        create(:ticket, created: other, category: :billing, title: "Invoice still open")
+        stub_responder(handle: ai_result(handle_output(findings: "User was charged twice.")))
+
+        call_step
+
+        expect(ticket.notes.ai.pluck(:body)).to eq([
+          "User was charged twice.\nHelp center: no article answered this.\nSimilar resolved tickets: ##{match.id} Invoice problem (#{match.created_at.strftime("%Y-%m")})"
+        ])
+        expect(ticket.notes.ai.first.body).not_to include("SECRET DESC")
+        expect(ticket.ai_runs.pluck(:step)).to eq(%w[handle])
+      end
+
+      it "adds no line when nothing similar exists" do
+        stub_responder(handle: ai_result(handle_output(findings: "User was charged twice.")))
+        call_step
+        expect(ticket.notes.ai.first.body).not_to include("Similar resolved tickets")
+      end
+
+      it "adds nothing without the note capability" do
+        create(:ticket, :finished, created: other, category: :billing, title: "Invoice problem")
+        stub_responder(handle: ai_result(handle_output))
+        call_step(playbook: create(:ai_playbook, capabilities: %w[similar_tickets]))
+        expect(ticket.notes).to be_empty
+      end
+
+      it "skips playbooks without similar_tickets" do
+        create(:ticket, :finished, created: other, category: :billing, title: "Invoice problem")
+        stub_responder(handle: ai_result(handle_output))
+        call_step(playbook: create(:ai_playbook, capabilities: %w[investigate_note]))
+        expect(ticket.notes.ai.first.body).not_to include("Similar resolved")
+      end
+    end
+
     it "strips a leading note label the model added" do
       ["Internal note (for admin): Expired session.", "**Internal note:** Expired session.", "Note: Expired session."].each do |findings|
         ticket.notes.destroy_all
@@ -245,41 +284,6 @@ RSpec.describe "Support::Ai steps", type: :interactor do
       expect { call_step(playbook: create(:ai_playbook, capabilities: ["investigate_note"])) }.to raise_error(SupportAi::Error, "bad output")
       expect(ticket.ai_runs.last).to have_attributes(step: "handle", status: "failed", error: "bad output")
       expect(ticket.notes).to be_empty
-    end
-  end
-
-  describe Support::Ai::SimilarCases do
-    let(:capabilities) { ["similar_tickets"] }
-
-    def call_step
-      described_class.call(ticket: ticket, playbook: playbook, trigger: "ticket_created")
-    end
-
-    it "skips playbooks without similar_tickets" do
-      expect(SupportAi::Responder).not_to receive(:new)
-      described_class.call(ticket: ticket, playbook: create(:ai_playbook, capabilities: []), trigger: "ticket_created")
-    end
-
-    it "writes a second ai note and records an investigate run" do
-      stub_responder(investigate: ai_result("#41 was a duplicate charge."))
-      call_step
-      expect(ticket.notes.ai.first).to have_attributes(account: nil, body: "Similar past cases: #41 was a duplicate charge.")
-      expect(ticket.ai_runs.last).to have_attributes(step: "investigate", status: "succeeded", playbook: playbook)
-    end
-
-    it "is non-fatal on failure" do
-      stub_responder(investigate: SupportAi::Error.new("timeout"))
-      expect(call_step).to be_success
-      expect(ticket.notes).to be_empty
-      expect(ticket.ai_runs.last).to have_attributes(step: "investigate", status: "failed", error: "timeout")
-    end
-
-    %i[succeeded failed].each do |status|
-      it "is skipped on a retry when a #{status} investigate run already exists" do
-        create(:ai_run, ticket: ticket, step: :investigate, status: status)
-        expect(SupportAi::Responder).not_to receive(:new)
-        expect { call_step }.not_to change(Support::Note, :count)
-      end
     end
   end
 

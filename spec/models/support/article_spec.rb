@@ -30,8 +30,10 @@ RSpec.describe Support::Article, type: :model do
       expect(build(:article, :spanish, slug: "reset-password")).to be_valid
     end
 
-    it "allows a nil category (general)" do
+    it "has a real general category by default" do
       expect(build(:article, :general)).to be_valid
+      expect(described_class.new.category).to eq("general")
+      expect(build(:article, category: nil)).not_to be_valid
     end
 
     it "rejects an unknown status" do
@@ -62,8 +64,9 @@ RSpec.describe Support::Article, type: :model do
   end
 
   describe "category" do
-    it "shares values with Support::Ticket" do
-      expect(described_class.categories).to eq(Support::Ticket.categories)
+    it "shares values with Support::Ticket and adds general" do
+      expect(described_class.categories).to eq(Support::Ticket.categories.merge("general" => described_class::GENERAL_CATEGORY))
+      expect(Support::Ticket.categories.values).not_to include(described_class::GENERAL_CATEGORY)
     end
   end
 
@@ -178,6 +181,25 @@ RSpec.describe Support::Article, type: :model do
 
       expect(described_class.published.search("guide")).to eq([published])
       expect(described_class.search("guide")).to contain_exactly(draft, published)
+    end
+
+    describe ".published_search" do
+      it "returns only published articles for the locale, with general ones for the category" do
+        live = create(:article, :published, title: "Billing guide", category: :billing)
+        general = create(:article, :published, :general, title: "Billing basics")
+        create(:article, title: "Billing draft", category: :billing)
+        create(:article, :published, :spanish, title: "Billing guia", category: :billing)
+        create(:article, :published, title: "Billing other", category: :account_access)
+
+        expect(described_class.published_search("billing", locale: :en, category: :billing)).to contain_exactly(live, general)
+      end
+
+      it "breaks relevance ties by newest publication" do
+        older = create(:article, title: "Export data", published_at: 2.days.ago, status: :published)
+        newer = create(:article, title: "Export data", published_at: 1.day.ago, status: :published)
+
+        expect(described_class.published_search("export data").to_a).to eq([newer, older])
+      end
     end
 
     describe "OR fallback" do

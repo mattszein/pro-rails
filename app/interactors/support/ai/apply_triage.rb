@@ -1,7 +1,7 @@
 module Support
   module Ai
     # Applies only what the playbook allows (auto_set_priority / auto_correct_category), only
-    # when the value differs, and leaves an English system note per change.
+    # when the value differs, in one update, with an English system note per change.
     class ApplyTriage
       include Interactor
 
@@ -10,36 +10,36 @@ module Support
       def call
         return unless triage
 
-        apply_priority
-        apply_category
+        changes = {}
+        notes = []
+        collect_priority(changes, notes)
+        collect_category(changes, notes)
+        return if changes.empty?
+
+        ticket.update!(changes)
+        notes.each { |body| ticket.notes.create!(account: nil, kind: :system, body: body) }
       end
 
       private
 
-      def apply_priority
+      def collect_priority(changes, notes)
         return unless playbook.capability?(:auto_set_priority)
 
         priority = triage[:priority]
         return if priority.nil? || priority == ticket.priority
 
-        previous = ticket.priority
-        ticket.update!(priority: priority)
-        note("AI set priority #{priority} (was #{previous}): #{triage[:summary]}")
+        notes << "AI set priority #{priority} (was #{ticket.priority}): #{triage[:summary]}"
+        changes[:priority] = priority
       end
 
-      def apply_category
+      def collect_category(changes, notes)
         return unless playbook.capability?(:auto_correct_category)
 
         category = triage[:category].to_s
         return if category.blank? || category == ticket.category
 
-        previous = ticket.category
-        ticket.update!(category: category)
-        note("AI changed category to #{category} (was #{previous})")
-      end
-
-      def note(body)
-        ticket.notes.create!(account: nil, kind: :system, body: body)
+        notes << "AI changed category to #{category} (was #{ticket.category})"
+        changes[:category] = category
       end
     end
   end

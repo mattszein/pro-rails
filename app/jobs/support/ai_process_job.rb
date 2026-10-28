@@ -29,9 +29,9 @@ module Support
 
       case trigger
       when "ticket_created"
-        run(Support::Ai::ProcessTicket, ticket: ticket, trigger: trigger)
+        run(Support::Ai::Flows::ProcessTicket, ticket: ticket, trigger: trigger)
       when "user_message"
-        run(Support::Ai::ProcessReply, ticket: ticket, trigger: trigger, trigger_message: trigger_message)
+        run(Support::Ai::Flows::ProcessReply, ticket: ticket, trigger: trigger, trigger_message: trigger_message)
       else
         raise ArgumentError, "Unknown AI trigger: #{trigger.inspect}"
       end

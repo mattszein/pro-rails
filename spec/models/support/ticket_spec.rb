@@ -202,6 +202,19 @@ RSpec.describe Support::Ticket, type: :model do
       end
     end
 
+    describe "#awaiting_ai_resolution?" do
+      it "is true for open tickets the AI is analyzing or waiting on" do
+        expect(build(:ticket, :ai_analyzing)).to be_awaiting_ai_resolution
+        expect(build(:ticket, :ai_awaiting_user)).to be_awaiting_ai_resolution
+      end
+
+      it "is false for other AI states and finished tickets" do
+        expect(build(:ticket, :ai_handoff_requested)).not_to be_awaiting_ai_resolution
+        expect(build(:ticket)).not_to be_awaiting_ai_resolution
+        expect(build(:ticket, :ai_awaiting_user, status: :in_progress)).not_to be_awaiting_ai_resolution
+      end
+    end
+
     describe "#messageable?" do
       it "is true when in progress or reopened" do
         expect(build(:ticket, :in_progress)).to be_messageable
@@ -333,8 +346,8 @@ RSpec.describe Support::Ticket, type: :model do
     end
 
     describe "associations" do
-      it "destroys ai_runs with the ticket and nullifies playbook" do
-        ticket = create(:ticket, ai_playbook: create(:ai_playbook))
+      it "destroys ai_runs with the ticket" do
+        ticket = create(:ticket)
         create(:ai_run, ticket: ticket)
         expect { ticket.destroy! }.to change(Support::AiRun, :count).by(-1)
       end

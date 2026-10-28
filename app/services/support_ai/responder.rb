@@ -4,9 +4,8 @@ module SupportAi
   #
   # RubyLLM usage mirrors AvatarAi::BaseGenerator: OpenRouter ids, registry lookup skipped.
   #
-  # Steps (each returns a Result; `output` documented per method):
-  #   triage, handle, investigate (optional admin-only similar cases), respond (follow-ups), summarize. A future `draft` step needs only a new
-  #   Prompts class, a `tools_for(:draft)` entry in the registry and one public method calling `run_step`.
+  # Steps (each returns a Result; `output` documented per method): triage, handle, respond (follow-ups).
+  # A future `draft` step needs only a Prompts function, a registry entry and one public method calling `run_step`.
   class Responder
     TRIAGE_SCHEMA = {
       name: "support_triage",
@@ -31,9 +30,8 @@ module SupportAi
     MAX_IMAGES = 3
     PROVIDER = :openrouter
     MAX_KB_QUERIES = 3
+    MAX_ARTICLES = 3
     KB_GAP_HANDOFF_REASON = "No help-center article matched (KB gap)"
-    PREFETCH_LIMIT = 3
-    PREFETCH_QUERY_LENGTH = 300
 
     attr_reader :ticket, :playbook
 
@@ -47,133 +45,73 @@ module SupportAi
     # language: "en|es|other", summary: String, escalate: true/false, escalate_reason: String}.
     # No tools. Raises SupportAi::Error on invalid category/priority/sentiment/booleans.
     def triage
-      prompt = Prompts::Triage.new(ticket: ticket)
-      run_step(model: SupportAiConfig.model, prompt: prompt, schema: TRIAGE_SCHEMA) do |chat|
+      prompt = Prompts.triage(ticket: ticket)
+      run_step(model: SupportAiConfig.model, system: prompt.system, schema: TRIAGE_SCHEMA) do |chat|
         parse_triage(chat.ask(prompt.user))
       end
     end
 
     # The main step: ONE chat and ONE tool budget, two turns.
-    #   Turn 1: investigate (respond-safe tools, vision when enabled) -> internal findings and a
-    #           recommended next step for the ADMIN (plain text).
-    #   Turn 2 (only when `reply`): "now write the reply to the user", same chat so the tool
-    #           results stay in context. May call suggest_articles/propose_resolution/request_human.
+    #   Turn 1: internal note for the ADMIN (plain text) from the ticket, triage and the Context
+    #           blocks (account facts, past tickets, prefetched articles); vision when enabled.
+    #   Turn 2 (only when `reply`): the reply as a JSON object (see #ask_for_answer), same chat so
+    #           anything search_articles returned stays in context.
     #
     # Result#output: {findings: String (non-empty), reply: String or nil (nil when reply: false),
     # article_ids:, resolution_proposed:, handoff_requested:, handoff_reason:,
     # kb_gap: Boolean, kb_queries: [String] (max 3)}.
     #
-    # Retrieval-first: before turn 1 the code searches the help center with the ticket text and puts
-    # the top matches (title, summary, body excerpt) into the turn-1 prompt. The search is recorded
-    # on the budget, so kb_queries shows it and it counts for the gap. Prompt only, no DB write.
-    #
-    # KB gap (code-enforced): the playbook can search_articles but neither the automatic search nor
-    # any search the model ran in turn 1 returned an article. The reply request then forbids describing the interface and the handoff is forced
-    # (the model's own request_human reason wins). Computed for reply: false too. Playbooks
-    # without search_articles never have a gap.
-    #
-    # Tools are the :respond step set only (account_facts, past_tickets, search_articles + actions):
-    # similar_tickets (other users' data) is declared for :investigate only and can never appear
-    # here, because this chat's output feeds user-facing prompts. request_human is always available.
-    # Empty findings raise; an empty reply is retried once, then raises (flags come from the
-    # ActionCollector since structured schemas are unreliable together with tools on free models).
+    # KB gap (code-enforced): the playbook can search_articles but neither the prefetch nor any
+    # search the model ran returned an article. The reply request then forbids describing the
+    # interface and the handoff is forced (the model's own handoff reason wins). Computed for
+    # reply: false too. Playbooks without search_articles never have a gap.
     def handle(triage: nil, reply: true, trigger_message: nil)
       @search_locale = locale_from(triage)
-      collector = ActionCollector.new
       budget = ToolBudget.new
-      articles = prefetch_articles([ticket.title, ticket.description], budget)
-      prompt = Prompts::Handle.new(ticket: ticket, playbook: playbook, triage: triage, articles: articles)
+      context = Context.new(ticket: ticket, playbook: playbook, budget: budget, locale: search_locale, query_texts: [ticket.title, ticket.description])
+      prompt = Prompts.handle(ticket: ticket, playbook: playbook, triage: triage, context: context.to_prompt)
       images = vision_images
       model = images.any? ? SupportAiConfig.vision_model : SupportAiConfig.model
-      tools = respond_tools(collector: collector, budget: budget)
 
-      run_step(model: model, prompt: prompt, tools: tools, budget: budget) do |chat|
+      run_step(model: model, system: prompt.system, tools: tools_for(:handle, budget), budget: budget) do |chat|
         conversation_turns(trigger_message).each { |turn| chat.add_message(turn) }
 
         findings = (images.any? ? chat.ask(prompt.user, with: images) : chat.ask(prompt.user)).content.to_s.strip
         raise Error, "The model returned no findings" if findings.empty?
 
         kb_gap = playbook.capability?(:search_articles) && !budget.articles_found?
-        reply_text = reply ? ask_for_reply(chat, prompt.reply_request(kb_gap: kb_gap)) : nil
-        collector.force_handoff(KB_GAP_HANDOFF_REASON) if kb_gap && reply
+        answer = reply ? ask_for_answer(chat, Prompts.reply_request(kb_gap: kb_gap), budget) : nil
+        answer = force_kb_gap_handoff(answer) if kb_gap && answer
 
-        {
-          findings: findings,
-          reply: reply_text,
-          article_ids: collector.article_ids,
-          resolution_proposed: collector.resolution_proposed,
-          handoff_requested: collector.handoff,
-          handoff_reason: collector.handoff_reason,
-          kb_gap: kb_gap,
-          kb_queries: budget.searched_queries.first(MAX_KB_QUERIES)
-        }
+        answer_output(answer).merge(findings: findings, kb_gap: kb_gap, kb_queries: budget.searched_queries.first(MAX_KB_QUERIES))
       end
     end
 
-    # Optional ADMIN-ONLY supplement: similar past cases (similar_tickets reads other requesters'
-    # tickets). Result#output: String note. Its output never feeds a user-facing prompt.
-    def investigate
-      prompt = Prompts::Investigate.new(ticket: ticket, playbook: playbook)
-      budget = ToolBudget.new
-      run_step(model: SupportAiConfig.model, prompt: prompt, tools: tools_for(:investigate, budget: budget), budget: budget) do |chat|
-        text = chat.ask(prompt.user).content.to_s.strip
-        raise Error, "Investigation returned an empty note" if text.empty?
-        text
-      end
-    end
-
-    # Result#output: {reply: String (non-empty), article_ids: [Integer] (published only, max 3),
-    # resolution_proposed: Boolean, handoff_requested: Boolean, handoff_reason: String}.
-    #
-    # Reply = the final assistant text. Structured schemas are unreliable together with tools on
-    # free models, so flags come from the ActionCollector the action tools write to. If the model
-    # ends a turn with no text (tool calls only) we ask once more for the reply; if still empty
-    # we raise SupportAi::Error. The user's last message is sent as the final prompt; earlier
+    # Follow-up turns. Result#output: {reply: String (non-empty), article_ids: [Integer] (seen and
+    # published, max 3), resolution_proposed:, handoff_requested:, handoff_reason:}.
+    # The user's last message is sent as the final prompt (with the JSON format request); earlier
     # history is replayed (human requester -> user, ai -> assistant, other senders skipped).
-    # Vision is not attached here (handle only). Triage result and the handle findings come from
-    # the ticket's earlier succeeded runs (see Prompts::Respond).
+    # Triage and the first-pass note come from the ticket's earlier succeeded runs. Vision is
+    # not attached here (handle only).
     def respond(trigger_message: nil)
       history = conversation_turns(trigger_message)
       triage = ticket.ai_runs.latest_output(:triage)
       @search_locale = locale_from(triage)
-      collector = ActionCollector.new
       budget = ToolBudget.new
-      articles = prefetch_articles([latest_requester_text(trigger_message), ticket.title], budget)
-      prompt = Prompts::Respond.new(
+      context = Context.new(ticket: ticket, playbook: playbook, budget: budget, locale: search_locale,
+        query_texts: [latest_requester_text(trigger_message), ticket.title])
+      prompt = Prompts.respond(
         ticket: ticket, playbook: playbook, ai_replies_so_far: history.count { |turn| turn[:role] == :assistant },
-        triage: triage, findings: ticket.ai_runs.latest_output(:handle)&.dig(:findings), articles: articles
+        triage: triage, findings: ticket.ai_runs.latest_output(:handle)&.dig(:findings), context: context.to_prompt
       )
-      tools = respond_tools(collector: collector, budget: budget)
 
-      run_step(model: SupportAiConfig.model, prompt: prompt, tools: tools, budget: budget) do |chat|
+      run_step(model: SupportAiConfig.model, system: prompt.system, tools: tools_for(:respond, budget), budget: budget) do |chat|
         turns = [{role: :user, content: prompt.user}] + history
         turns << {role: :user, content: "Please continue helping with this ticket."} if turns.last[:role] == :assistant
         final = turns.pop
         turns.each { |turn| chat.add_message(turn) }
 
-        message = chat.ask(final[:content])
-        reply = message.content.to_s.strip
-        reply = ask_for_reply(chat, nil) if reply.empty?
-
-        {
-          reply: reply,
-          article_ids: collector.article_ids,
-          resolution_proposed: collector.resolution_proposed,
-          handoff_requested: collector.handoff,
-          handoff_reason: collector.handoff_reason
-        }
-      end
-    end
-
-    # Result#output: String handoff summary for admins. No tools.
-    def summarize
-      transcript = all_messages.map { |message| [speaker_for(message), message.content] }
-      prompt = Prompts::Summary.new(ticket: ticket, playbook: playbook, transcript: transcript)
-
-      run_step(model: SupportAiConfig.model, prompt: prompt) do |chat|
-        text = chat.ask(prompt.user).content.to_s.strip
-        raise Error, "Summary was empty" if text.empty?
-        text
+        answer_output(ask_for_answer(chat, "#{final[:content]}\n\n#{Prompts::REPLY_FORMAT}", budget))
       end
     end
 
@@ -182,10 +120,10 @@ module SupportAi
     # Builds the chat, runs the block (which performs the asks), and wraps the output in a Result.
     # On ANY SupportAi::Error (raised, backstop, or wrapped provider/timeout error) the chat's
     # transcript and the budget's recorded tool calls are attached to the error before re-raising.
-    def run_step(model:, prompt:, tools: [], schema: nil, budget: ToolBudget.new)
+    def run_step(model:, system:, tools: [], schema: nil, budget: ToolBudget.new)
       started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       chat = nil
-      chat = build_chat(model, prompt.system, tools, schema, budget)
+      chat = build_chat(model, system, tools, schema, budget)
 
       output = Timeout.timeout(SupportAiConfig.timeout) { yield chat }
 
@@ -227,33 +165,13 @@ module SupportAi
       chat
     end
 
-    # Tool instances allowed by the registry for `step` and the playbook. Registry.for_step is
-    # the only gate: similar_tickets is declared for :investigate only, so it can never appear
-    # in :respond. Investigate gets read tools only.
     # Triage language when it is a supported locale, else the request locale.
     def locale_from(triage)
       language = triage.to_h.with_indifferent_access[:language].to_s
       %w[en es].include?(language) ? language : nil
     end
 
-    # Searches the help center with `texts` (words only, ~300 chars) and records it on the budget.
-    # Returns nil when the playbook cannot search (no block in the prompt), else the matching
-    # published articles (possibly empty). A blank query is treated as no match and not recorded.
-    def prefetch_articles(texts, budget)
-      return nil unless playbook&.capability?(:search_articles)
-
-      query = texts.join(" ").scan(/[[:alnum:]]+/).join(" ").truncate(PREFETCH_QUERY_LENGTH, omission: "").strip
-      return [] if query.blank?
-
-      articles = search_published(query, search_locale)
-      articles = search_published(query, nil) if articles.empty?
-      budget.note_search(query: query, article_ids: articles.map(&:id))
-      articles
-    end
-
-    def search_published(query, locale)
-      Support::Article.search(query, locale: locale, limit: PREFETCH_LIMIT, published_only: true).published.to_a
-    end
+    def search_locale = @search_locale || I18n.locale.to_s
 
     def latest_requester_text(trigger_message)
       messages = all_messages
@@ -261,48 +179,73 @@ module SupportAi
       messages.reverse.find { |message| !message.ai? && message.account_id == ticket.created_id }&.content.to_s
     end
 
-    def search_locale = @search_locale || I18n.locale.to_s
-
-    def tools_for(step, collector: nil, budget: nil)
-      SupportAi::Capabilities::Registry.for_step(step, playbook&.capabilities).filter_map do |capability|
-        next if capability.tool_class.blank?
-        next if step == :investigate && !capability.read?
-
-        klass = capability.tool_class.constantize
-        klass.action? ? klass.new(ticket: ticket, collector: collector, budget: budget) : klass.new(ticket: ticket, budget: budget, locale: search_locale)
+    # Tool instances for the tool capabilities the playbook enabled in `step` (the registry is the
+    # only gate). Tools only read this user's data or the public help center.
+    def tools_for(step, budget)
+      Support::AiCapabilities.for_step(step, playbook&.capabilities).select(&:tool?).filter_map do |capability|
+        capability.tool_class&.constantize&.new(ticket: ticket, budget: budget, locale: search_locale)
       end
     end
 
-    # request_human is ALWAYS available, even if the playbook did not list it.
-    def respond_tools(collector:, budget:)
-      tools = tools_for(:respond, collector: collector, budget: budget)
-      tools << Tools::RequestHuman.new(ticket: ticket, collector: collector, budget: budget) unless tools.any?(Tools::RequestHuman)
-      tools
+    # Asks for the answer JSON {reply, article_ids, resolution_proposed, handoff, handoff_reason}
+    # as plain text (the spike showed text JSON is as reliable as response schemas next to tools
+    # on the configured model, and works on any provider). One retry on invalid JSON or an empty
+    # reply, then SupportAi::Error. Returns the validated answer Hash.
+    def ask_for_answer(chat, request, budget)
+      parse_answer(chat.ask(request), budget) ||
+        parse_answer(chat.ask(Prompts::RETRY_REQUEST), budget) ||
+        raise(Error, "The model returned no valid reply")
     end
 
-    # Asks for the user-facing reply (`request` nil = only the "write it as text" nudge, used by
-    # #respond after the reply turn came back empty). Retries once if the model returns no text.
-    def ask_for_reply(chat, request)
-      text = request ? chat.ask(request).content.to_s.strip : ""
-      text = chat.ask("Now write your reply to the user, as plain text.").content.to_s.strip if text.empty?
-      raise Error, "The model returned no reply text" if text.empty?
-      text
+    def parse_answer(message, budget)
+      data = parse_json(message)
+      reply = data["reply"].to_s.strip
+      return if reply.empty?
+
+      {
+        reply: reply,
+        article_ids: valid_article_ids(data["article_ids"], budget),
+        resolution_proposed: truthy?(data["resolution_proposed"]),
+        handoff: truthy?(data["handoff"]),
+        handoff_reason: data["handoff_reason"].to_s.strip.truncate(500)
+      }
+    rescue Error, JSON::ParserError
+      nil
+    end
+
+    # Only ids the model actually saw (prefetched or returned by search_articles in this step),
+    # still published, in the model's order, at most MAX_ARTICLES.
+    def valid_article_ids(raw, budget)
+      ids = Array(raw).filter_map { |id| Integer(id, exception: false) } & budget.found_article_ids
+      (ids & Support::Article.published_among(ids).pluck(:id)).first(MAX_ARTICLES)
+    end
+
+    def truthy?(value) = value == true || %w[true yes 1].include?(value.to_s.strip.downcase)
+
+    def force_kb_gap_handoff(answer)
+      return answer if answer[:handoff]
+
+      answer.merge(handoff: true, handoff_reason: KB_GAP_HANDOFF_REASON)
+    end
+
+    def answer_output(answer)
+      {
+        reply: answer&.fetch(:reply),
+        article_ids: answer&.fetch(:article_ids) || [],
+        resolution_proposed: answer&.fetch(:resolution_proposed) || false,
+        handoff_requested: answer&.fetch(:handoff) || false,
+        handoff_reason: answer&.fetch(:handoff_reason) || ""
+      }
     end
 
     def vision_images
-      return [] unless playbook&.capabilities&.include?("vision_attachments")
+      return [] unless playbook&.capability?(:vision_attachments)
 
       ticket.attachments.select { |attachment| attachment.blob.content_type.to_s.start_with?("image/") }.first(MAX_IMAGES)
     end
 
     def all_messages
       ticket.conversation ? ticket.conversation.messages.chronological.last(SupportAiConfig.history_limit) : []
-    end
-
-    def speaker_for(message)
-      return "assistant" if message.ai?
-
-      (message.account_id == ticket.created_id) ? "user" : "admin"
     end
 
     def conversation_turns(trigger_message)
@@ -313,7 +256,7 @@ module SupportAi
         if message.ai?
           {role: :assistant, content: message.content}
         elsif message.account_id == ticket.created_id
-          {role: :user, content: Prompts::Base.untrusted("user message", message.content)}
+          {role: :user, content: Prompts.untrusted("user message", message.content)}
         end
       end
     end
@@ -343,12 +286,19 @@ module SupportAi
       }
     end
 
-    # Models sometimes wrap JSON in ``` fences even with a schema.
+    # Tolerant: models sometimes wrap JSON in ``` fences or add a sentence around it.
     def parse_json(message)
       return message.content.deep_stringify_keys if message.content.is_a?(Hash)
 
       raw = message.content.to_s.strip.sub(/\A```(?:json)?\s*/i, "").sub(/\s*```\z/, "")
-      data = JSON.parse(raw)
+      data = begin
+        JSON.parse(raw)
+      rescue JSON::ParserError
+        embedded = raw[/\{.*\}/m]
+        raise unless embedded
+
+        JSON.parse(embedded)
+      end
       raise Error, "Structured output was not a JSON object" unless data.is_a?(Hash)
       data
     end

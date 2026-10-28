@@ -3,38 +3,28 @@ module Support
     # Commits the outcome. All LLM work is already done, so the lock is short and DB-only.
     # Under the ticket lock it re-checks that the AI still owns the ticket (an admin may have
     # taken over, or the user may have written again) and otherwise discards the reply.
-    # The handoff summary (an LLM call) runs after the lock is released; the ticket is already
-    # `handoff_requested` by then, so nothing can race with it.
+    # A handoff pass that did not already write the `ai` note (Handle did not, e.g. ProcessReply or
+    # no investigate_note capability) writes ONE from the handoff reason: no LLM call.
     class Finalize
       include Interactor
 
       delegate :ticket, :playbook, :triage, :reply, :trigger_message, to: :context
 
       def call
-        outcome = commit
-        finish_handoff(outcome[:reason]) if outcome[:handoff]
-      ensure
-        Typing.hide(ticket)
-      end
-
-      private
-
-      def commit
-        outcome = {handoff: false}
         ticket.with_lock do
           next discard if !ticket.ai_analyzing? || superseded?
 
-          reason = handoff_reason
           create_ai_message
-          if reason
+          if handoff_reason
             ticket.request_ai_handoff!
-            outcome = {handoff: true, reason: reason}
+            write_handoff_note
           else
             ticket.await_user_reply!
           end
         end
-        outcome
       end
+
+      private
 
       def discard
         (context.handle_run || context.respond_run)&.update!(status: :discarded)
@@ -89,8 +79,11 @@ module Support
         ticket.conversation.messages.ai.count
       end
 
-      def finish_handoff(reason)
-        HandoffNote.call(ticket: ticket, playbook: playbook, reason: reason) unless context.note_written
+      def write_handoff_note
+        return if context.note_written
+
+        ticket.notes.create!(account: nil, kind: :ai, body: "AI handoff: #{handoff_reason}")
+        context.note_written = true
       end
     end
   end

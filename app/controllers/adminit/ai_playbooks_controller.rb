@@ -1,5 +1,7 @@
 class Adminit::AiPlaybooksController < Adminit::ApplicationController
-  before_action :set_playbook, only: %i[edit update destroy toggle move_up move_down]
+  include ModalFormResponses
+
+  before_action :set_playbook, only: %i[edit update destroy toggle]
   verify_authorized
 
   def index
@@ -9,7 +11,7 @@ class Adminit::AiPlaybooksController < Adminit::ApplicationController
 
   def new
     authorize! Support::AiPlaybook, with: Adminit::AiPlaybookPolicy
-    @playbook = Support::AiPlaybook.new(capabilities: SupportAi::Capabilities::Registry.defaults.map { |c| c.key.to_s })
+    @playbook = Support::AiPlaybook.new(capabilities: Support::AiCapabilities.defaults.map { |c| c.key.to_s })
   end
 
   def edit
@@ -19,7 +21,7 @@ class Adminit::AiPlaybooksController < Adminit::ApplicationController
     authorize! Support::AiPlaybook, with: Adminit::AiPlaybookPolicy
     @playbook = Support::AiPlaybook.new(playbook_params)
     if @playbook.save
-      respond_success(resource_message(:created, @playbook))
+      respond_success(resource_message(:created, @playbook), adminit_ai_playbooks_path)
     else
       respond_form_error(:new)
     end
@@ -27,7 +29,7 @@ class Adminit::AiPlaybooksController < Adminit::ApplicationController
 
   def update
     if @playbook.update(playbook_params)
-      respond_success(resource_message(:updated, @playbook))
+      respond_success(resource_message(:updated, @playbook), adminit_ai_playbooks_path)
     else
       respond_form_error(:edit)
     end
@@ -50,19 +52,7 @@ class Adminit::AiPlaybooksController < Adminit::ApplicationController
       notice: t(@playbook.enabled? ? "adminit.ai_playbooks.toggled_on" : "adminit.ai_playbooks.toggled_off")
   end
 
-  def move_up = move(:up)
-
-  def move_down = move(:down)
-
   private
-
-  def move(direction)
-    if @playbook.move!(direction)
-      redirect_to adminit_ai_playbooks_path, notice: t("adminit.ai_playbooks.moved")
-    else
-      redirect_to adminit_ai_playbooks_path, alert: t("adminit.ai_playbooks.cannot_move")
-    end
-  end
 
   def set_playbook
     @playbook = Support::AiPlaybook.find(params[:id])
@@ -81,28 +71,7 @@ class Adminit::AiPlaybooksController < Adminit::ApplicationController
     permitted.except(*CONDITIONS, :category_keys)
   end
 
-  # New/edit render in a modal frame: on success the frame redirects to the
-  # index, on failure the form is re-rendered in place.
-  def respond_success(message)
-    respond_to do |format|
-      format.html { redirect_to adminit_ai_playbooks_path, notice: message }
-      format.turbo_stream do
-        flash[:notice] = message
-        render turbo_stream: turbo_stream.action(:redirect, adminit_ai_playbooks_path)
-      end
-    end
-  end
-
-  def respond_form_error(action)
-    respond_to do |format|
-      format.html { render action, status: :unprocessable_content }
-      format.turbo_stream do
-        render turbo_stream: turbo_stream.replace(
-          "ai_playbook_form",
-          partial: "adminit/ai_playbooks/form",
-          locals: {playbook: @playbook}
-        ), status: :unprocessable_content
-      end
-    end
+  def modal_form_locals
+    {playbook: @playbook}
   end
 end

@@ -47,20 +47,6 @@ describe Adminit::Tickets::AiRunsController, type: :controller do
         expect(body).not_to include("<script>alert(1)</script>")
       end
 
-      it "shows the KB gap badge, create link and escaped queries for a gap run" do
-        gap = create(:ai_run, ticket: ticket, step: :handle, output: {"kb_gap" => true, "kb_queries" => ["<script>alert(2)</script>", "refund"]})
-        get :show, params: {ticket_id: ticket.id, id: gap.id}
-
-        body = response.body
-        expect(body).to include(I18n.t("adminit.tickets.ai_runs.kb_gap"), I18n.t("adminit.tickets.ai_runs.create_article"), "/adminit/articles/new?")
-        expect(body).to include("&lt;script&gt;alert(2)&lt;/script&gt;", "refund")
-        expect(body).not_to include("<script>alert(2)</script>")
-      end
-
-      it "shows no KB gap section for a run without a gap" do
-        expect(subject.body).not_to include("kb-gap")
-      end
-
       it "shows the empty-transcript note for legacy runs" do
         legacy = create(:ai_run, ticket: ticket, transcript: [], tool_calls: [{"name" => "x_tool"}])
         get :show, params: {ticket_id: ticket.id, id: legacy.id}

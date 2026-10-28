@@ -27,7 +27,7 @@ module SupportAi
       attr_reader :locale
 
       def search(query, locale: nil)
-        Support::Article.search(query, locale: locale, limit: LIMIT, published_only: true).published.to_a
+        Support::Article.published_search(query, locale: locale, limit: LIMIT).to_a
       end
 
       def present(article)

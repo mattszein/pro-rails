@@ -15,8 +15,41 @@ RSpec.describe Support::Ai::RecordRun do
     expect(run.tool_calls.first["name"]).to eq("x")
   end
 
+  it "records a snapshot of the playbook rules" do
+    audience = create(:audience, name: "VIPs")
+    playbook = create(:ai_playbook, name: "Billing", category_keys: ["billing"], min_priority: 2, audience: audience,
+      instructions: "Be kind.", capabilities: %w[search_articles], max_ai_turns: 3)
+    run = described_class.call(ticket: ticket, playbook: playbook, trigger: "ticket_created", step: :respond, result: ai_result(respond_output))
+
+    expect(run.playbook_snapshot).to include(
+      "name" => "Billing", "mode" => "assist", "capabilities" => ["search_articles"], "instructions" => "Be kind.",
+      "max_ai_turns" => 3, "categories" => ["billing"], "min_priority" => 2, "max_priority" => nil,
+      "audience" => "VIPs", "is_default" => false
+    )
+    expect(run.playbook_snapshot.keys).to include("idle_reminder_after_hours", "idle_handoff_after_hours")
+  end
+
+  it "records the snapshot on failed runs too" do
+    run = described_class.call(ticket: ticket, playbook: playbook, trigger: "user_message", step: :respond, error: SupportAi::Error.new("boom"))
+    expect(run.playbook_snapshot).to include("name" => playbook.name)
+  end
+
+  it "keeps the snapshot after the playbook is changed or deleted" do
+    run = described_class.call(ticket: ticket, playbook: playbook, trigger: "ticket_created", step: :respond, result: ai_result(respond_output))
+    name = playbook.name
+    playbook.update!(name: "Renamed")
+    playbook.destroy!
+    expect(run.reload.playbook_id).to be_nil
+    expect(run.playbook_snapshot["name"]).to eq(name)
+  end
+
+  it "stores an empty snapshot without a playbook" do
+    run = described_class.call(ticket: ticket, trigger: :fallback, step: :respond, error: "x")
+    expect(run.playbook_snapshot).to eq({})
+  end
+
   it "wraps string output as text" do
-    run = described_class.call(ticket: ticket, trigger: :ticket_created, step: :investigate, result: ai_result("findings"))
+    run = described_class.call(ticket: ticket, trigger: :ticket_created, step: :handle, result: ai_result("findings"))
     expect(run.output).to eq({"text" => "findings"})
   end
 
@@ -45,62 +78,21 @@ RSpec.describe Support::Ai::RecordRun do
   end
 end
 
-RSpec.describe Support::Ai::Typing do
-  let(:ticket) { create(:ticket) }
-  let(:conversation) { ticket.conversation }
-
-  it "appends the indicator to the conversation messages container" do
-    expect { described_class.show(ticket) }.to have_broadcasted_to(conversation.to_gid_param).with { |data|
-      expect(data).to include("turbo-stream", "append", "support_conversation_#{conversation.id}_messages", ActionView::RecordIdentifier.dom_id(conversation, :typing))
-    }
-  end
-
-  it "removes the indicator" do
-    expect { described_class.hide(ticket) }.to have_broadcasted_to(conversation.to_gid_param).with { |data|
-      expect(data).to include("remove", ActionView::RecordIdentifier.dom_id(conversation, :typing))
-    }
-  end
-end
-
 RSpec.describe Support::Ai::Dispatch do
   let(:ticket) { create(:ticket, :ai_analyzing) }
 
-  it "shows typing and enqueues the job" do
+  it "enqueues the job" do
     expect { described_class.call(ticket, "user_message", 7) }
       .to have_enqueued_job(Support::AiProcessJob).with(ticket.id, "user_message", 7)
-      .and have_broadcasted_to(ticket.conversation.to_gid_param)
   end
 
-  it "swallows enqueue errors, hides typing and reports false" do
+  it "swallows enqueue errors and reports false" do
     allow(Support::AiProcessJob).to receive(:perform_later).and_raise(ActiveJob::EnqueueError, "down")
-    expect(Support::Ai::Typing).to receive(:hide).with(ticket)
     expect(described_class.call(ticket, "ticket_created")).to be(false)
   end
 
   it "does not swallow unrelated errors" do
     allow(Support::AiProcessJob).to receive(:perform_later).and_raise(NoMethodError)
     expect { described_class.call(ticket, "ticket_created") }.to raise_error(NoMethodError)
-  end
-end
-
-RSpec.describe Support::Ai::HandoffNote do
-  let(:ticket) { create(:ticket, :ai_handoff_requested) }
-  let(:playbook) { create(:ai_playbook) }
-
-  it "stores the AI summary as an ai note" do
-    stub_responder(summarize: ai_result("Summary text"))
-    note = described_class.call(ticket: ticket, playbook: playbook, reason: "r")
-    expect(note).to have_attributes(kind: "ai", account: nil, body: "Summary text")
-  end
-
-  it "falls back to a plain note when the summary fails" do
-    stub_responder(summarize: SupportAi::Error.new("nope"))
-    note = described_class.call(ticket: ticket, playbook: playbook, reason: "user requested a human")
-    expect(note.body).to eq("AI handoff: user requested a human. See conversation.")
-  end
-
-  it "falls back when there is no playbook at all" do
-    note = described_class.call(ticket: ticket, reason: "x")
-    expect(note.body).to eq("AI handoff: x. See conversation.")
   end
 end

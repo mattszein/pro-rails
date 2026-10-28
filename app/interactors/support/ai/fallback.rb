@@ -15,13 +15,15 @@ module Support
           ticket.request_ai_handoff!
           ticket.conversation.messages.create!(sender: :ai, account: nil, content: I18n.t("support.ai.handoff_message"), metadata: {})
           ticket.notes.create!(account: nil, kind: :system, body: note_body)
-          RecordRun.call(ticket: ticket, playbook: ticket.ai_playbook, trigger: :fallback, step: :respond, error: context.error || context.reason || "AI failed after retries")
+          RecordRun.call(ticket: ticket, playbook: playbook, trigger: :fallback, step: :respond, error: context.error || context.reason || "AI failed after retries")
         end
-      ensure
-        Typing.hide(ticket)
       end
 
       private
+
+      def playbook
+        context.playbook || Support::AiPlaybook.match_for(ticket)
+      end
 
       def note_body
         context.reason ? "AI unavailable (#{context.reason}); handed off" : "AI failed after retries; handed off"

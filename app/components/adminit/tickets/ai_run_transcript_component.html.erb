@@ -6,9 +6,6 @@
       <%= render(Core::BadgeComponent.new(label: t("enums.ai_run.status.#{run.status}"), theme: status_theme, size: :xs)) %>
     <% end %>
     <% dl.with_item(term: t("adminit.tickets.ai_runs.model"), size: :sm) { run.model || "-" } %>
-    <% if playbook_name.present? %>
-      <% dl.with_item(term: t("adminit.tickets.ai_playbook"), size: :sm) { playbook_name } %>
-    <% end %>
     <% dl.with_item(term: t("adminit.tickets.ai_runs.tokens"), size: :sm) { tokens } %>
     <% dl.with_item(term: t("adminit.tickets.ai_runs.latency"), size: :sm) { run.latency_ms || "-" } %>
     <% dl.with_item(term: t("adminit.tickets.ai_runs.created_at"), size: :sm) { l(run.created_at, format: :short) } %>
@@ -21,6 +18,21 @@
         <pre class="whitespace-pre-wrap break-words"><%= run.error %></pre>
       </div>
     <% end %>
+  <% end %>
+
+  <% if snapshot? %>
+    <section class="space-y-2" data-role="playbook-snapshot">
+      <h4 class="font-semibold"><%= t("adminit.tickets.ai_runs.playbook_snapshot") %></h4>
+      <%= render Core::DefinitionListComponent.new(gap: :sm, layout: :inline, variant: :default) do |dl| %>
+        <% dl.with_item(term: t("adminit.tickets.ai_playbook"), size: :sm) { snapshot[:name] } %>
+        <% dl.with_item(term: t("adminit.ai_playbooks.mode"), size: :sm) { t("enums.support_ai_playbook.mode.#{snapshot[:mode]}", default: snapshot[:mode].to_s) } %>
+        <% dl.with_item(term: t("adminit.ai_playbooks.capabilities"), size: :sm) { snapshot_capabilities } %>
+        <% dl.with_item(term: t("adminit.ai_playbooks.limits"), size: :sm) { snapshot_limits } %>
+      <% end %>
+      <% if snapshot[:instructions].present? %>
+        <%= render Core::CodeBlockComponent.new(text: snapshot[:instructions]) %>
+      <% end %>
+    </section>
   <% end %>
 
   <section class="space-y-2">

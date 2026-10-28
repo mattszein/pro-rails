@@ -27,30 +27,27 @@ module Support
       else
         category = params[:category].to_s
         category = nil unless Support::Article.categories.key?(category)
-        Support::Article.search(query, locale: I18n.locale, category: category, limit: SUGGESTIONS_LIMIT, published_only: true)
-          .published.to_a
+        Support::Article.published_search(query, locale: I18n.locale, category: category, limit: SUGGESTIONS_LIMIT).to_a
       end
       render layout: false
     end
 
     private
 
-    # Valid category key, "general" (no category) or nil (all categories).
+    # Valid category key, or nil (all categories).
     def selected_category
       value = params[:category].to_s
-      value if value == "general" || Support::Article.categories.key?(value)
+      value if Support::Article.categories.key?(value)
     end
 
     def index_scope
       scope = if @query.present?
-        Support::Article.search(@query, locale: I18n.locale, limit: nil, published_only: true)
+        Support::Article.published_search(@query, locale: I18n.locale, limit: nil)
       else
-        Support::Article.where(locale: I18n.locale.to_s).order(published_at: :desc, id: :asc)
+        Support::Article.published.where(locale: I18n.locale.to_s).order(published_at: :desc, id: :asc)
       end
-      scope = scope.published.includes(:rich_text_body)
-      return scope unless @category
-
-      scope.where(category: (@category == "general") ? nil : @category)
+      scope = scope.includes(:rich_text_body)
+      @category ? scope.where(category: @category) : scope
     end
 
     # Current locale first, then the same slug in any other locale.

@@ -31,24 +31,12 @@ RSpec.describe Support::MessageComponent, type: :component do
 
     it "renders article cards linking to the help center in a new tab" do
       article = create(:article, :published, title: "Reset it", summary: "How to reset", slug: "reset-it")
+      message = create(:message, :ai, conversation: conversation, metadata: {"article_ids" => [article.id], "resolution_proposed" => false})
 
-      render_inline(described_class.new(message: ai_message, articles: [article]))
+      render_inline(described_class.new(message: message))
 
       expect(page).to have_css("a[target='_blank'][href*='/help/reset-it']", text: "Reset it")
       expect(page).to have_text("How to reset")
-    end
-
-    it "does not query the database" do
-      article = create(:article, :published)
-      message = ai_message
-      queries = []
-      callback = ->(*, payload) { queries << payload[:sql] unless payload[:name] == "SCHEMA" }
-
-      ActiveSupport::Notifications.subscribed(callback, "sql.active_record") do
-        render_inline(described_class.new(message: message, articles: [article]))
-      end
-
-      expect(queries).to be_empty
     end
 
     context "with a resolution proposed" do
@@ -57,14 +45,15 @@ RSpec.describe Support::MessageComponent, type: :component do
       end
 
       it "renders both buttons behind a requester-only turbo-show" do
-        render_inline(described_class.new(message: ai_message, resolution_ticket: ticket))
+        render_inline(described_class.new(message: ai_message))
 
         expect(page).to have_css("turbo-show[when='current-user-id'][is='#{ticket.created_id}'] [data-resolution-actions]")
         expect(page).to have_css("a[data-turbo-method='post'][href*='/support/tickets/#{ticket.id}/resolve_with_ai']", text: I18n.t("support.message.solved"))
         expect(page).to have_css("a[data-turbo-method='post'][href*='/support/tickets/#{ticket.id}/request_human']", text: I18n.t("support.message.not_solved"))
       end
 
-      it "renders no buttons without a resolution ticket" do
+      it "renders no buttons when the ticket is no longer awaiting a resolution" do
+        ticket.update!(ai_state: :off)
         render_inline(described_class.new(message: ai_message))
 
         expect(page).not_to have_css("[data-resolution-actions]")
@@ -72,7 +61,7 @@ RSpec.describe Support::MessageComponent, type: :component do
     end
 
     it "renders no buttons when the message did not propose a resolution" do
-      render_inline(described_class.new(message: ai_message, resolution_ticket: ticket))
+      render_inline(described_class.new(message: ai_message))
 
       expect(page).not_to have_css("[data-resolution-actions]")
     end

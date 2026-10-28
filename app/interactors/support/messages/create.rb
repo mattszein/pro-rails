@@ -16,7 +16,6 @@ module Support
 
         ticket = message.conversation.ticket
         action = reconcile_ai(ticket)
-        Support::Ai::Typing.hide(ticket) if action == :released_while_analyzing
         Support::Ai::Dispatch.call(ticket, "user_message", message.id) if %i[resume enqueue].include?(action)
       end
 
@@ -27,10 +26,9 @@ module Support
         ticket.with_lock do
           creator = message.account_id == ticket.created_id
           if !creator && ticket.ai_engaged?
-            was_analyzing = ticket.ai_analyzing?
             ticket.release_ai!
             ticket.notes.create!(account: nil, kind: :system, body: "Support took over from AI.")
-            action = was_analyzing ? :released_while_analyzing : :released
+            action = :released
           elsif creator && ticket.ai_awaiting_user?
             ticket.start_ai_analysis!
             action = :resume

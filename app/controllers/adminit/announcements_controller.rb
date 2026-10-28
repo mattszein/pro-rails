@@ -1,5 +1,6 @@
 class Adminit::AnnouncementsController < Adminit::ApplicationController
   include Tableable
+  include ModalFormResponses
 
   before_action :set_announcement, only: %i[show edit update destroy schedule unschedule]
   verify_authorized
@@ -88,17 +89,6 @@ class Adminit::AnnouncementsController < Adminit::ApplicationController
     params.require(:announcement).permit(:reference, :title, :body, :rich_body, :scheduled_at)
   end
 
-  def respond_success(message, path)
-    respond_to do |format|
-      format.html { redirect_to path, notice: message }
-      format.turbo_stream do
-        flash[:notice] = message
-        render turbo_stream: turbo_stream.action(:redirect, path)
-      end
-      format.json { render :show, status: :ok, location: @announcement }
-    end
-  end
-
   def respond_error(message)
     respond_to do |format|
       format.html { redirect_back_or_to(adminit_announcements_path, alert: message) }
@@ -110,16 +100,7 @@ class Adminit::AnnouncementsController < Adminit::ApplicationController
     end
   end
 
-  def respond_form_error(action)
-    respond_to do |format|
-      format.html { render action, status: :unprocessable_content }
-      format.turbo_stream do
-        render turbo_stream: turbo_stream.replace(
-          "announcement_form",
-          partial: "adminit/announcements/form",
-          locals: {announcement: @announcement}
-        ), status: :unprocessable_content
-      end
-    end
+  def modal_form_locals
+    {announcement: @announcement}
   end
 end
