@@ -6,18 +6,18 @@ RSpec.describe Support::AiStatusComponent, type: :component do
     page.text.squish
   end
 
-  it "shows the helping banner and the talk-to-person button while analyzing" do
+  it "shows the helping banner without the talk-to-person button while analyzing" do
     ticket = create(:ticket, :ai_analyzing)
 
     expect(banner_text(ticket)).to include(I18n.t("support.ticket_status_banner.ai_analyzing"))
-    expect(page).to have_css("turbo-show[is='#{ticket.created_id}'] a[data-turbo-method='post'][href*='/request_human']")
+    expect(page).not_to have_link(I18n.t("support.ai_status.talk_to_person"))
   end
 
   it "shows the helping banner and the button while awaiting the user" do
     ticket = create(:ticket, :ai_awaiting_user)
 
     expect(banner_text(ticket)).to include(I18n.t("support.ticket_status_banner.ai_awaiting_user"))
-    expect(page).to have_link(I18n.t("support.ai_status.talk_to_person"))
+    expect(page).to have_css("turbo-show[is='#{ticket.created_id}'] a[data-turbo-method='post'][href*='/request_human']", text: I18n.t("support.ai_status.talk_to_person"))
   end
 
   it "shows the waiting banner without the button after a handoff request" do

@@ -105,14 +105,12 @@ RSpec.describe Support::TicketPolicy, type: :policy do
   end
 
   describe "#request_human?" do
-    %i[ai_analyzing ai_awaiting_user].each do |trait|
-      it "allows the creator when #{trait}" do
-        ticket = create(:ticket, trait, created: creator_account)
-        expect(described_class.new(ticket, user: creator_account)).to be_request_human
-      end
+    it "allows the creator while the assistant waits for them" do
+      ticket = create(:ticket, :ai_awaiting_user, created: creator_account)
+      expect(described_class.new(ticket, user: creator_account)).to be_request_human
     end
 
-    %i[ai_handoff_requested ai_stepped_back ai_resolved].each do |trait|
+    %i[ai_analyzing ai_handoff_requested ai_stepped_back ai_resolved].each do |trait|
       it "denies the creator when #{trait}" do
         ticket = create(:ticket, trait, created: creator_account)
         expect(described_class.new(ticket, user: creator_account)).not_to be_request_human

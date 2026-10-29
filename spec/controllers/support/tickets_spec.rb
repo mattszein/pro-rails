@@ -78,19 +78,19 @@ RSpec.describe Support::TicketsController, type: :controller do
       response.body
     end
 
-    it "shows the helping banner and the talk-to-person button while analyzing" do
+    it "shows the helping banner without the talk-to-person button while analyzing" do
       body = show(create(:ticket, :ai_analyzing, created: creator_account))
 
       expect(body).to include(I18n.t("support.ticket_status_banner.ai_analyzing"))
-      expect(body).to include(I18n.t("support.ai_status.talk_to_person"))
-      expect(body).to include("is=\"#{creator_account.id}\"")
+      expect(body).not_to include(I18n.t("support.ai_status.talk_to_person"))
     end
 
-    it "shows the helping banner while awaiting the user" do
+    it "shows the helping banner and the talk-to-person button while awaiting the user" do
       body = show(create(:ticket, :ai_awaiting_user, created: creator_account))
 
       expect(body).to include(I18n.t("support.ticket_status_banner.ai_awaiting_user"))
       expect(body).to include(I18n.t("support.ai_status.talk_to_person"))
+      expect(body).to include("is=\"#{creator_account.id}\"")
     end
 
     it "shows the waiting banner, no talk-to-person button and a live composer on handoff" do
@@ -417,6 +417,12 @@ RSpec.describe Support::TicketsController, type: :controller do
         expect(ticket.reload).to be_ai_handoff_requested
         expect(response).to redirect_to(support_ticket_path(ticket))
         expect(flash[:notice]).to eq(I18n.t("support.tickets.human_requested"))
+      end
+
+      it "is denied while the assistant is analyzing" do
+        ticket.update!(ai_state: :analyzing)
+        subject
+        expect(ticket.reload).to be_ai_analyzing
       end
 
       it "is denied once already handed off" do

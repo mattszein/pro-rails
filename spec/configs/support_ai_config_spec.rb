@@ -5,7 +5,7 @@ RSpec.describe SupportAiConfig do
     with_env("SUPPORT_AI_ENABLED" => nil, "SUPPORT_AI_HISTORY_LIMIT" => nil) do
       config = described_class.new
       expect(config.enabled).to be(false)
-      expect(config.model).to eq("minimax/minimax-m3.1-flash:free")
+      expect(config.model).to eq("nvidia/nemotron-3-ultra-550b-a55b:free")
       expect(config.vision_model).to be_present
       expect(config.temperature).to eq(0.3)
       expect(config.history_limit).to eq(30)

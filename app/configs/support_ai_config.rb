@@ -12,7 +12,7 @@ class SupportAiConfig < ApplicationConfig
     :timeout,
     :untrusted_marker,
     enabled: false,
-    model: "minimax/minimax-m3.1-flash:free",
+    model: "nvidia/nemotron-3-ultra-550b-a55b:free",
     # Vision-capable free OpenRouter model, used when a playbook enables vision_attachments.
     vision_model: "google/gemma-4-31b-it:free",
     temperature: 0.3,

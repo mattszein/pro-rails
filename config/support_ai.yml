@@ -1,7 +1,7 @@
 default:
   enabled: false
-  # The previous default (openai/gpt-oss-120b:free) is "unavailable for free" on OpenRouter.
-  model: "minimax/minimax-m3.1-flash:free"
+  # Previous free defaults (openai/gpt-oss-120b, minimax/minimax-m3.1-flash) are no longer free on OpenRouter.
+  model: "nvidia/nemotron-3-ultra-550b-a55b:free"
   # Vision-capable free OpenRouter model, used when a playbook enables vision_attachments.
   vision_model: "google/gemma-4-31b-it:free"
   temperature: 0.3

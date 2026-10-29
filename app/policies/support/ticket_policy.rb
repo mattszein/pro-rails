@@ -38,9 +38,9 @@ module Support
       record.created_id == user.id && record.open? && record.ai_awaiting_user?
     end
 
-    # "Talk to a person": only the requester, while the assistant is engaged and not yet handed off.
+    # "Talk to a person": only the requester, while the assistant is waiting for them (never mid-run).
     def request_human?
-      record.created_id == user.id && (record.ai_analyzing? || record.ai_awaiting_user?)
+      record.created_id == user.id && record.open? && record.ai_awaiting_user?
     end
   end
 end

@@ -203,12 +203,12 @@ RSpec.describe Support::Ticket, type: :model do
     end
 
     describe "#awaiting_ai_resolution?" do
-      it "is true for open tickets the AI is analyzing or waiting on" do
-        expect(build(:ticket, :ai_analyzing)).to be_awaiting_ai_resolution
+      it "is true for open tickets the AI is waiting on" do
         expect(build(:ticket, :ai_awaiting_user)).to be_awaiting_ai_resolution
       end
 
-      it "is false for other AI states and finished tickets" do
+      it "is false while analyzing, for other AI states and for finished tickets" do
+        expect(build(:ticket, :ai_analyzing)).not_to be_awaiting_ai_resolution
         expect(build(:ticket, :ai_handoff_requested)).not_to be_awaiting_ai_resolution
         expect(build(:ticket)).not_to be_awaiting_ai_resolution
         expect(build(:ticket, :ai_awaiting_user, status: :in_progress)).not_to be_awaiting_ai_resolution

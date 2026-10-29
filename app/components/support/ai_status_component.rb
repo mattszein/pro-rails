@@ -32,7 +32,7 @@ module Support
 
     # Mirrors Support::TicketPolicy#request_human? from data alone.
     def talk_to_person?
-      ticket.open? && (ticket.ai_analyzing? || ticket.ai_awaiting_user?)
+      ticket.open? && ticket.ai_awaiting_user?
     end
   end
 end

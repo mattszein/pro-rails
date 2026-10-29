@@ -408,7 +408,7 @@ ONE `ai` note per AI pass. `Handle` writes the findings (1-2 factual English sen
 - `Help center: <attached article titles>` or `Help center: no article answered this.`
 - with `similar_tickets` enabled: `Similar resolved tickets: #12 title (2026-09), ...` (other requesters' finished tickets via `Support::Ticket.resolved_similar_to`). It is admin only, runs no LLM and never enters a prompt.
 
-`Handle` sets `context.note_written`; `Finalize` then writes no second note. A handoff pass where `Handle` wrote none (`ProcessReply`, or no `investigate_note`) gets `AI handoff: <reason>` from `Finalize`, no LLM call. The user's "Talk to a person" button writes a system note `User requested a human`.
+`Handle` sets `context.note_written`; `Finalize` then writes no second note. A handoff pass where `Handle` wrote none (`ProcessReply`, or no `investigate_note`) gets `AI handoff: <reason>` from `Finalize`, no LLM call. The user's "Talk to a person" button (and "I still need help") is allowed only while `awaiting_user` (`TicketPolicy#request_human?`), never mid-run; it writes a system note `User requested a human`.
 
 ### KB gap
 

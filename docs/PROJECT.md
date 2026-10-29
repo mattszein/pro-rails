@@ -90,7 +90,7 @@ An optional assistant answers the start of each conversation, then hands the tic
 **What users see**:
 - An assistant banner on the ticket while the AI is engaged
 - AI replies in the conversation thread, labelled as the assistant, with suggested help-center article cards
-- **This solved it** — resolves the ticket without a person; **Talk to a person** — asks for a human at any time
+- **This solved it** — resolves the ticket without a person; **Talk to a person** — asks for a human once the assistant has replied and is waiting for the user (not while it is working); only an admin can take over mid-run
 - A handoff message when a person is needed (the assistant escalates, the turn limit is reached, or the AI is unavailable). Users are never left waiting: if the AI fails after retries the ticket is handed off with a generic message
 - Replies are grounded in help-center articles: when no article answers the question, the assistant does not guess and hands the ticket to a person. Every handoff shows the same fixed, localized message
 

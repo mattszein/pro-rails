@@ -110,7 +110,7 @@ module Support
 
     # The AI is still working on the ticket: the "This solved it" prompt may be actionable.
     def awaiting_ai_resolution?
-      open? && (ai_analyzing? || ai_awaiting_user?)
+      open? && ai_awaiting_user?
     end
 
     # The requester's other tickets, newest first. Read by the support assistant.

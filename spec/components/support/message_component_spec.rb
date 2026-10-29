@@ -52,6 +52,13 @@ RSpec.describe Support::MessageComponent, type: :component do
         expect(page).to have_css("a[data-turbo-method='post'][href*='/support/tickets/#{ticket.id}/request_human']", text: I18n.t("support.message.not_solved"))
       end
 
+      it "renders no buttons while the assistant is analyzing" do
+        ticket.update!(ai_state: :analyzing)
+        render_inline(described_class.new(message: ai_message))
+
+        expect(page).not_to have_css("[data-resolution-actions]")
+      end
+
       it "renders no buttons when the ticket is no longer awaiting a resolution" do
         ticket.update!(ai_state: :off)
         render_inline(described_class.new(message: ai_message))
