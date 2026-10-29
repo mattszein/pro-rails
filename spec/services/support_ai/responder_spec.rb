@@ -26,7 +26,7 @@ RSpec.describe SupportAi::Responder, :llm do
 
       result = described_class.new(ticket: ticket).triage
 
-      expect(result).to be_a(SupportAi::Result)
+      expect(result).to be_a(Llm::Result)
       expect(result.output).to eq(valid.merge(language: "es"))
       expect(result.model).to eq(SupportAiConfig.model)
       expect([result.input_tokens, result.output_tokens]).to eq([12, 7])
@@ -48,16 +48,16 @@ RSpec.describe SupportAi::Responder, :llm do
       "sentiment" => {sentiment: "furious"},
       "escalate flag" => {escalate: "maybe"}
     }.each do |label, override|
-      it "raises SupportAi::Error for an invalid #{label}" do
+      it "raises Llm::Error for an invalid #{label}" do
         stub_llm(text_body(valid.merge(override).to_json))
-        expect { described_class.new(ticket: ticket).triage }.to raise_error(SupportAi::Error, /Invalid triage/)
+        expect { described_class.new(ticket: ticket).triage }.to raise_error(Llm::Error, /Invalid triage/)
       end
     end
 
-    it "raises SupportAi::Error with the JSON error as cause for unparsable output" do
+    it "raises Llm::Error with the JSON error as cause for unparsable output" do
       stub_llm(text_body("not json at all"))
       expect { described_class.new(ticket: ticket).triage }
-        .to raise_error(SupportAi::Error) { |error| expect(error.cause).to be_a(JSON::ParserError) }
+        .to raise_error(Llm::Error) { |error| expect(error.cause).to be_a(JSON::ParserError) }
     end
   end
 
@@ -170,7 +170,7 @@ RSpec.describe SupportAi::Responder, :llm do
 
       it "raises with the transcript when the reply stays invalid" do
         stub_llm(text_body("findings"), text_body("nope"), text_body("still nope"))
-        expect { responder.handle(triage: en) }.to raise_error(SupportAi::Error, /no valid reply/) { |error| expect(error.transcript).not_to be_empty }
+        expect { responder.handle(triage: en) }.to raise_error(Llm::Error, /no valid reply/) { |error| expect(error.transcript).not_to be_empty }
       end
     end
 
@@ -327,7 +327,7 @@ RSpec.describe SupportAi::Responder, :llm do
 
     it "raises with the transcript when the findings are empty" do
       stub_llm(text_body(""))
-      expect { responder.handle }.to raise_error(SupportAi::Error, /no findings/) { |error| expect(error.transcript.pluck(:role)).to include("system", "user") }
+      expect { responder.handle }.to raise_error(Llm::Error, /no findings/) { |error| expect(error.transcript.pluck(:role)).to include("system", "user") }
     end
 
     it "still succeeds when the tool budget is exhausted" do
@@ -429,7 +429,7 @@ RSpec.describe SupportAi::Responder, :llm do
 
     it "retries once on an invalid answer, then raises if it stays invalid" do
       stub_llm(text_body("plain text"), text_body("still plain"))
-      expect { responder.respond }.to raise_error(SupportAi::Error, /no valid reply/)
+      expect { responder.respond }.to raise_error(Llm::Error, /no valid reply/)
     end
 
     it "recovers when the retry is valid" do
@@ -476,7 +476,7 @@ RSpec.describe SupportAi::Responder, :llm do
         stub_llm(*%w[a b c d e f g].map { |query| tool_call_body([["search_articles", {query: query}]]) })
         allow(SupportAiConfig).to receive(:max_tool_calls).and_return(1)
 
-        expect { responder.respond }.to raise_error(SupportAi::Error, /Too many tool calls/) { |error|
+        expect { responder.respond }.to raise_error(Llm::Error, /Too many tool calls/) { |error|
           expect(error.tool_calls).not_to be_empty
           expect(error.tool_calls.first).to include(name: "search_articles")
           expect(error.transcript.pluck(:role)).to include("system", "assistant", "tool")
@@ -488,7 +488,7 @@ RSpec.describe SupportAi::Responder, :llm do
       stub_llm(text_body(""))
       allow_any_instance_of(RubyLLM::Transport::Connection).to receive(:post).and_raise(RubyLLM::Error, "boom")
 
-      expect { responder.respond }.to raise_error(SupportAi::Error) { |error| expect(error.transcript).to be_an(Array) }
+      expect { responder.respond }.to raise_error(Llm::Error) { |error| expect(error.transcript).to be_an(Array) }
     end
 
     it "includes the ticket's succeeded triage and handle outputs in the system prompt" do
@@ -557,14 +557,14 @@ RSpec.describe SupportAi::Responder, :llm do
       allow_any_instance_of(RubyLLM::Transport::Connection).to receive(:post).and_raise(RubyLLM::Error.new("boom"))
 
       expect { responder.triage }
-        .to raise_error(SupportAi::Error, /boom/) { |error| expect(error.cause).to be_a(RubyLLM::Error) }
+        .to raise_error(Llm::Error, /boom/) { |error| expect(error.cause).to be_a(RubyLLM::Error) }
     end
 
     it "wraps timeouts" do
       allow(SupportAiConfig).to receive(:timeout).and_return(0.05)
       allow_any_instance_of(RubyLLM::Transport::Connection).to receive(:post) { sleep 1 }
 
-      expect { responder.triage }.to raise_error(SupportAi::Error) { |error| expect(error.cause).to be_a(Timeout::Error) }
+      expect { responder.triage }.to raise_error(Llm::Error) { |error| expect(error.cause).to be_a(Timeout::Error) }
     end
   end
 end

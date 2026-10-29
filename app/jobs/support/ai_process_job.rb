@@ -4,7 +4,7 @@ module Support
 
     # Responder failures are transient (provider hiccups): retry, and when retries run out hand
     # the ticket to a human so the user is never left waiting.
-    retry_on SupportAi::Error, wait: :polynomially_longer, attempts: 3 do |job, error|
+    retry_on Llm::Error, wait: :polynomially_longer, attempts: 3 do |job, error|
       ticket = Support::Ticket.find_by(id: job.arguments.first)
       Support::Ai::Fallback.call(ticket: ticket, error: error.message) if ticket
     end

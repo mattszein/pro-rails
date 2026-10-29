@@ -1,8 +1,9 @@
 module SupportAi
   # Runs one LLM step for a ticket. Pure: takes records, calls the model, returns a
-  # SupportAi::Result. Never writes to the database; interactors persist (and log AiRuns).
+  # Llm::Result. Never writes to the database; interactors persist (and log AiRuns).
   #
-  # RubyLLM usage mirrors AvatarAi::BaseGenerator: OpenRouter ids, registry lookup skipped.
+  # The LLM plumbing (chat, timeout, tokens, tool budget) lives in Llm::Runner; this class keeps
+  # the support logic: prompts, parsing, validation, KB gap.
   #
   # Steps (each returns a Result; `output` documented per method): triage, handle, respond (follow-ups).
   # A future `draft` step needs only a Prompts function, a registry entry and one public method calling `run_step`.
@@ -28,7 +29,6 @@ module SupportAi
 
     SENTIMENTS = %w[negative neutral positive].freeze
     MAX_IMAGES = 3
-    PROVIDER = :openrouter
     MAX_KB_QUERIES = 3
     MAX_ARTICLES = 3
     KB_GAP_HANDOFF_REASON = "No help-center article matched (KB gap)"
@@ -43,7 +43,7 @@ module SupportAi
 
     # Result#output: {category: "billing", priority: 1..5, sentiment: "negative|neutral|positive",
     # language: "en|es|other", summary: String, escalate: true/false, escalate_reason: String}.
-    # No tools. Raises SupportAi::Error on invalid category/priority/sentiment/booleans.
+    # No tools. Raises Llm::Error on invalid category/priority/sentiment/booleans.
     def triage
       prompt = Prompts.triage(ticket: ticket)
       run_step(model: SupportAiConfig.model, system: prompt.system, schema: TRIAGE_SCHEMA) do |chat|
@@ -77,7 +77,7 @@ module SupportAi
         conversation_turns(trigger_message).each { |turn| chat.add_message(turn) }
 
         findings = (images.any? ? chat.ask(prompt.user, with: images) : chat.ask(prompt.user)).content.to_s.strip
-        raise Error, "The model returned no findings" if findings.empty?
+        raise Llm::Error, "The model returned no findings" if findings.empty?
 
         kb_gap = playbook.capability?(:search_articles) && !budget.articles_found?
         answer = reply ? ask_for_answer(chat, Prompts.reply_request(kb_gap: kb_gap), budget) : nil
@@ -117,52 +117,14 @@ module SupportAi
 
     private
 
-    # Builds the chat, runs the block (which performs the asks), and wraps the output in a Result.
-    # On ANY SupportAi::Error (raised, backstop, or wrapped provider/timeout error) the chat's
-    # transcript and the budget's recorded tool calls are attached to the error before re-raising.
-    def run_step(model:, system:, tools: [], schema: nil, budget: ToolBudget.new)
-      started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-      chat = nil
-      chat = build_chat(model, system, tools, schema, budget)
-
-      output = Timeout.timeout(SupportAiConfig.timeout) { yield chat }
-
-      usage = chat.tokens
-      Result.new(
-        output: output,
-        model: model,
-        input_tokens: usage.input.to_i,
-        output_tokens: usage.output.to_i,
-        latency_ms: ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started) * 1000).round,
-        tool_calls: budget.calls,
-        transcript: Transcript.build(chat.messages)
-      )
-    rescue Error => e
-      raise capture(e, chat, budget)
-    rescue RubyLLM::Error, RubyLLM::ConfigurationError, RubyLLM::ModelNotFoundError, Timeout::Error, JSON::ParserError => e
-      raise capture(Error.new("#{e.class.name.demodulize}: #{e.message}"), chat, budget)
+    # Runs the block through the shared Llm::Runner (chat setup, timeout, tokens, tool budget
+    # backstop, transcript capture). Any Llm::Error leaves with the transcript and tool calls attached.
+    def run_step(model:, system:, tools: [], schema: nil, budget: ToolBudget.new, &block)
+      runner.call(model: model, system: system, tools: tools, schema: schema, budget: budget, &block)
     end
 
-    def capture(error, chat, budget)
-      error.transcript = chat ? Transcript.build(chat.messages) : []
-      error.tool_calls = budget.calls
-      error
-    end
-
-    def build_chat(model, instructions, tools, schema, budget)
-      chat = RubyLLM.chat(model: model, provider: PROVIDER, assume_model_exists: true)
-        .with_instructions(instructions)
-        .with_temperature(SupportAiConfig.temperature)
-      chat.with_tools(*tools) if tools.any?
-      chat.with_schema(schema) if schema
-      # Records every attempted call; tools answer with a limit message once the budget is spent
-      # (see Tools::Base#call). This only aborts if the model ignores that and keeps calling.
-      chat.before_tool_call do |tool_call|
-        raise Error, "Too many tool calls (limit #{budget.limit})" if budget.backstop_hit?
-
-        budget.record(tool_call.name, tool_call.arguments)
-      end
-      chat
+    def runner
+      @runner ||= Llm::Runner.new(timeout: SupportAiConfig.timeout, temperature: SupportAiConfig.temperature)
     end
 
     # Triage language when it is a supported locale, else the request locale.
@@ -190,11 +152,11 @@ module SupportAi
     # Asks for the answer JSON {reply, article_ids, resolution_proposed, handoff, handoff_reason}
     # as plain text (the spike showed text JSON is as reliable as response schemas next to tools
     # on the configured model, and works on any provider). One retry on invalid JSON or an empty
-    # reply, then SupportAi::Error. Returns the validated answer Hash.
+    # reply, then Llm::Error. Returns the validated answer Hash.
     def ask_for_answer(chat, request, budget)
       parse_answer(chat.ask(request), budget) ||
         parse_answer(chat.ask(Prompts::RETRY_REQUEST), budget) ||
-        raise(Error, "The model returned no valid reply")
+        raise(Llm::Error, "The model returned no valid reply")
     end
 
     def parse_answer(message, budget)
@@ -209,7 +171,7 @@ module SupportAi
         handoff: truthy?(data["handoff"]),
         handoff_reason: data["handoff_reason"].to_s.strip.truncate(500)
       }
-    rescue Error, JSON::ParserError
+    rescue Llm::Error, JSON::ParserError
       nil
     end
 
@@ -264,16 +226,16 @@ module SupportAi
     def parse_triage(message)
       data = parse_json(message)
       category = data["category"].to_s
-      raise Error, "Invalid triage category: #{category.inspect}" unless Support::Ticket::CATEGORIES.key?(category.to_sym)
+      raise Llm::Error, "Invalid triage category: #{category.inspect}" unless Support::Ticket::CATEGORIES.key?(category.to_sym)
 
       priority = Integer(data["priority"], exception: false)
-      raise Error, "Invalid triage priority: #{data["priority"].inspect}" unless priority && (1..5).cover?(priority)
+      raise Llm::Error, "Invalid triage priority: #{data["priority"].inspect}" unless priority && (1..5).cover?(priority)
 
       sentiment = data["sentiment"].to_s
-      raise Error, "Invalid triage sentiment: #{sentiment.inspect}" unless SENTIMENTS.include?(sentiment)
+      raise Llm::Error, "Invalid triage sentiment: #{sentiment.inspect}" unless SENTIMENTS.include?(sentiment)
 
       escalate = data["escalate"]
-      raise Error, "Invalid triage escalate flag: #{escalate.inspect}" unless [true, false].include?(escalate)
+      raise Llm::Error, "Invalid triage escalate flag: #{escalate.inspect}" unless [true, false].include?(escalate)
 
       {
         category: category,
@@ -299,7 +261,7 @@ module SupportAi
 
         JSON.parse(embedded)
       end
-      raise Error, "Structured output was not a JSON object" unless data.is_a?(Hash)
+      raise Llm::Error, "Structured output was not a JSON object" unless data.is_a?(Hash)
       data
     end
   end

@@ -1,6 +1,6 @@
 module Support
   module Ai
-    # Writes a Support::AiRun audit row from a SupportAi::Result (success) or an error (failure).
+    # Writes a Support::AiRun audit row from a Llm::Result (success) or an error (failure).
     module RecordRun
       module_function
 

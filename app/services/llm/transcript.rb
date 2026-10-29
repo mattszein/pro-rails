@@ -1,4 +1,4 @@
-module SupportAi
+module Llm
   # Turns a RubyLLM chat's messages into the JSON stored on Support::AiRun#transcript:
   # [{role:, content:, tool_calls: [{id:, name:, arguments:}], tool_call_id:}] in order.
   # Content is normalized to text (attachments by filename only) and truncated.

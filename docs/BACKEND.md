@@ -363,6 +363,33 @@ dashboard widget) shares one endpoint, `Adminit::AccountsController#search`
 
 ---
 
+## Integrating an LLM (Llm::Runner)
+
+`Llm::Runner` (`app/services/llm/`) is the one way to talk to an LLM. It is generic: no Support or Avatar knowledge. It builds the RubyLLM chat (OpenRouter ids, registry lookup skipped), applies the timeout, measures tokens and latency, enforces the tool-call budget and maps failures to `Llm::Error`.
+
+```ruby
+runner = Llm::Runner.new(timeout: 120, temperature: nil, provider: :openrouter)
+result = runner.call(model: model, system: nil, tools: [], schema: nil, budget: Llm::ToolBudget.new) do |chat|
+  parse(chat.ask(prompt).content)   # whatever the block returns is Result#output
+end
+result.output / .model / .input_tokens / .output_tokens / .latency_ms / .tool_calls / .transcript
+```
+
+- `system`/`temperature` are skipped when nil. `tools` are `Llm::Tools::Base` subclasses sharing the `budget` (identical calls cached, spent budget answers "Tool limit reached", a model that keeps calling aborts with `Llm::Error`).
+- Any `RubyLLM::Error`, `ConfigurationError`, `ModelNotFoundError`, `Timeout::Error` or `JSON::ParserError` becomes `Llm::Error` (original as `cause`); every `Llm::Error` carries `transcript` and `tool_calls`. Raise `Llm::Error` yourself inside the block for invalid output.
+- The runner never writes to the database and does no domain parsing.
+
+**Adding an AI feature**:
+1. Prompt module: pure functions returning the system/user text (`SupportAi::Prompts`, `AvatarAi::Prompts`)
+2. A service that builds an `Llm::Runner` (feature config for model/timeout/temperature) and calls it; the block asks, then parses and validates the domain output (raise `Llm::Error` when invalid)
+3. Callers rescue `Llm::Error` (or a feature error wrapping it, like `AvatarAi::BaseGenerator::GenerationError`); jobs use `retry_on Llm::Error`
+4. If the feature must be auditable, persist the `Result` (or the error's `transcript`/`tool_calls`) in a run table, like `Support::Ai::RecordRun`
+5. Specs stub only the HTTP layer (`stub_llm`, `text_body`, `tool_call_body` in `spec/support/support_ai_llm_helpers.rb`); never call a real model
+
+Examples: `SupportAi::Responder` (tools, budget subclass, multi-turn chat, audited runs) and `AvatarAi::BaseGenerator#ask` (single prompt, text back, errors re-wrapped as `GenerationError`).
+
+---
+
 ## Support AI
 
 The support assistant (see `docs/PROJECT.md`) is a set of interactors run from a job, an LLM facade (`SupportAi::Responder`) and a capability registry. Behavior lives in data (`Support::AiPlaybook` rows); code only declares what is possible.
@@ -392,15 +419,15 @@ Triggered by `Support::AiProcessJob` (queue `support_ai`). Organizers live in `a
 
 Never let an optional step stop the user from getting an answer.
 
-**Job guards and retries**: the job returns early unless `ai_analyzing?`, debounces bursts (only the newest human message acts) and skips a message that already has an AI answer. `retry_on SupportAi::Error` (3 attempts, polynomial backoff); when retries run out `Fallback` hands the ticket to a person with the fixed handoff reply plus a `system` note. `Fallback` is idempotent (acts only while the AI still owns the ticket). `Dispatch` enqueues the job; an enqueue failure is logged and never undoes the state change before it.
+**Job guards and retries**: the job returns early unless `ai_analyzing?`, debounces bursts (only the newest human message acts) and skips a message that already has an AI answer. `retry_on Llm::Error` (3 attempts, polynomial backoff); when retries run out `Fallback` hands the ticket to a person with the fixed handoff reply plus a `system` note. `Fallback` is idempotent (acts only while the AI still owns the ticket). `Dispatch` enqueues the job; an enqueue failure is logged and never undoes the state change before it.
 
 ### Responder, Context, ToolBudget
 
-- **`SupportAi::Responder`** is pure: it returns a `SupportAi::Result` (output, model, tokens, latency, tool calls, transcript) or raises `SupportAi::Error`. It performs no DB writes; interactors persist.
-- **Handle answer parsing**: plain-text JSON parsed tolerantly, one retry, then `SupportAi::Error`. `article_ids` survive only if the model saw them (prefetched or returned by `search_articles` in this step) and they are still published (max 3). `handoff`/`resolution_proposed` are coerced to booleans.
+- **`SupportAi::Responder`** is pure: it keeps all support logic (prompts, parsing, validation, KB gap) and delegates the LLM plumbing to `Llm::Runner` (see "Integrating an LLM"). It returns an `Llm::Result` (output, model, tokens, latency, tool calls, transcript) or raises `Llm::Error`. It performs no DB writes; interactors persist.
+- **Handle answer parsing**: plain-text JSON parsed tolerantly, one retry, then `Llm::Error`. `article_ids` survive only if the model saw them (prefetched or returned by `search_articles` in this step) and they are still published (max 3). `handoff`/`resolution_proposed` are coerced to booleans.
 - **`SupportAi::Context`** (plain Ruby) builds one block per enabled context capability, each wrapped as untrusted: `account_facts` (requester only: status, verified, member since, role; no email), `past_tickets` (requester's own, max 10) and the retrieval-first article prefetch (`search_articles`: ticket text, `[[:alnum:]]` words, ~300 chars, user's locale first then any, published only, top 3 with id/slug/locale/title/summary/excerpt). The prefetch is recorded on the budget, so it counts as a found article.
-- **`SupportAi::ToolBudget`** (`SupportAiConfig.max_tool_calls`, default 10) is shared by every tool of a step. Identical calls are served from cache (not counted); once spent, tools return "Tool limit reached" so the model answers; a model that keeps calling (3 more attempts) aborts the step with `SupportAi::Error`. It also tracks `searched_queries` and `found_article_ids`.
-- **Transcripts**: `Responder#run_step` builds a `SupportAi::Transcript` from the chat on success and on failure (`Result#transcript`, `Error#transcript`/`#tool_calls`), so failed runs are inspectable.
+- **`SupportAi::ToolBudget`** (an `Llm::ToolBudget`; limit defaults to `SupportAiConfig.max_tool_calls`, 10) is shared by every tool of a step. Identical calls are served from cache (not counted); once spent, tools return "Tool limit reached" so the model answers; a model that keeps calling (3 more attempts) aborts the step with `Llm::Error`. On top of the generic budget it tracks `searched_queries` and `found_article_ids`.
+- **Transcripts**: `Llm::Runner` builds an `Llm::Transcript` from the chat on success and on failure (`Result#transcript`, `Error#transcript`/`#tool_calls`), so failed runs are inspectable.
 
 ### Admin note, help-center line, similar tickets
 
@@ -458,7 +485,7 @@ The admin ticket's "AI activity" panel opens each run in a modal (`Adminit::Tick
 
 **Adding a capability**:
 1. Register it in `Support::AiCapabilities.install` with the right `kind`, `steps` and `default`
-2. Context: add a block to `SupportAi::Context`. Tool: add `SupportAi::Tools::<Name>` (inherit `Tools::Base`, scope queries to the requester, minimal fields)
+2. Context: add a block to `SupportAi::Context`. Tool: add `SupportAi::Tools::<Name>` (inherit `Llm::Tools::Base`, scope queries to the requester, minimal fields)
 3. Add `support.ai.capabilities.<key>` label/hint translations in en and es
 4. Add specs: registry/tool spec, and a Responder or workflow example using it
 

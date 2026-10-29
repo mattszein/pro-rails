@@ -16,7 +16,7 @@ RSpec.describe "Support::Ai steps", type: :interactor do
     end
 
     it "is non-fatal: logs a failed run and leaves triage nil" do
-      stub_responder(triage: SupportAi::Error.new("provider down"))
+      stub_responder(triage: Llm::Error.new("provider down"))
       result = described_class.call(ticket: ticket, trigger: "ticket_created")
 
       expect(result).to be_success
@@ -259,8 +259,8 @@ RSpec.describe "Support::Ai steps", type: :interactor do
       end
 
       it "writes nothing when the step fails" do
-        stub_responder(handle: SupportAi::Error.new("bad"))
-        expect { call_step(playbook: create(:ai_playbook, capabilities: ["investigate_note"])) }.to raise_error(SupportAi::Error)
+        stub_responder(handle: Llm::Error.new("bad"))
+        expect { call_step(playbook: create(:ai_playbook, capabilities: ["investigate_note"])) }.to raise_error(Llm::Error)
         expect(ticket.notes).to be_empty
       end
     end
@@ -280,8 +280,8 @@ RSpec.describe "Support::Ai steps", type: :interactor do
     end
 
     it "is fatal: logs a failed run, re-raises and writes no note" do
-      stub_responder(handle: SupportAi::Error.new("bad output"))
-      expect { call_step(playbook: create(:ai_playbook, capabilities: ["investigate_note"])) }.to raise_error(SupportAi::Error, "bad output")
+      stub_responder(handle: Llm::Error.new("bad output"))
+      expect { call_step(playbook: create(:ai_playbook, capabilities: ["investigate_note"])) }.to raise_error(Llm::Error, "bad output")
       expect(ticket.ai_runs.last).to have_attributes(step: "handle", status: "failed", error: "bad output")
       expect(ticket.notes).to be_empty
     end
@@ -317,8 +317,8 @@ RSpec.describe "Support::Ai steps", type: :interactor do
     end
 
     it "is fatal: logs a failed run and re-raises" do
-      stub_responder(respond: SupportAi::Error.new("bad output"))
-      expect { call_step }.to raise_error(SupportAi::Error, "bad output")
+      stub_responder(respond: Llm::Error.new("bad output"))
+      expect { call_step }.to raise_error(Llm::Error, "bad output")
       expect(ticket.ai_runs.last).to have_attributes(step: "respond", status: "failed", error: "bad output")
     end
   end

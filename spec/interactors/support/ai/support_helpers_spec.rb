@@ -30,7 +30,7 @@ RSpec.describe Support::Ai::RecordRun do
   end
 
   it "records the snapshot on failed runs too" do
-    run = described_class.call(ticket: ticket, playbook: playbook, trigger: "user_message", step: :respond, error: SupportAi::Error.new("boom"))
+    run = described_class.call(ticket: ticket, playbook: playbook, trigger: "user_message", step: :respond, error: Llm::Error.new("boom"))
     expect(run.playbook_snapshot).to include("name" => playbook.name)
   end
 
@@ -54,7 +54,7 @@ RSpec.describe Support::Ai::RecordRun do
   end
 
   it "records an error as failed" do
-    run = described_class.call(ticket: ticket, trigger: :user_message, step: :respond, error: SupportAi::Error.new("boom"))
+    run = described_class.call(ticket: ticket, trigger: :user_message, step: :respond, error: Llm::Error.new("boom"))
     expect(run).to have_attributes(status: "failed", error: "boom", output: {})
   end
 
@@ -65,7 +65,7 @@ RSpec.describe Support::Ai::RecordRun do
   end
 
   it "stores transcript and tool_calls from an error" do
-    error = SupportAi::Error.new("boom", transcript: [{role: "user", content: "hi"}], tool_calls: [{name: "account_facts", arguments: {}}])
+    error = Llm::Error.new("boom", transcript: [{role: "user", content: "hi"}], tool_calls: [{name: "account_facts", arguments: {}}])
     run = described_class.call(ticket: ticket, trigger: :user_message, step: :respond, error: error)
 
     expect(run.transcript).to eq([{"role" => "user", "content" => "hi"}])

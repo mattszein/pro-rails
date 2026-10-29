@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe SupportAi::Transcript do
+RSpec.describe Llm::Transcript do
   def message(**attrs) = RubyLLM::Message.new({role: :user, content: "hi"}.merge(attrs))
 
   it "normalizes roles, string content and tool results" do

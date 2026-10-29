@@ -28,15 +28,15 @@ RSpec.describe "AI flows", type: :interactor do
     end
 
     it "carries on when triage fails" do
-      stub_responder(triage: SupportAi::Error.new("x"), handle: ai_result(handle_output))
+      stub_responder(triage: Llm::Error.new("x"), handle: ai_result(handle_output))
       expect(call_organizer).to be_success
       expect(ticket.reload).to be_ai_awaiting_user
       expect(ticket.ai_runs.failed.pluck(:step)).to eq(%w[triage])
     end
 
     it "raises when the handle step fails, leaving the ticket analyzing for the retry" do
-      stub_responder(triage: ai_result(triage_output), handle: SupportAi::Error.new("boom"))
-      expect { call_organizer }.to raise_error(SupportAi::Error)
+      stub_responder(triage: ai_result(triage_output), handle: Llm::Error.new("boom"))
+      expect { call_organizer }.to raise_error(Llm::Error)
       expect(ticket.reload).to be_ai_analyzing
       expect(ticket.ai_runs.handle.failed).to exist
       expect(ticket.notes.ai).to be_empty
@@ -118,8 +118,8 @@ RSpec.describe "AI flows", type: :interactor do
     end
 
     it "raises on a respond failure" do
-      stub_responder(respond: SupportAi::Error.new("boom"))
-      expect { described_class.call(ticket: ticket, trigger: "user_message", trigger_message: trigger_message) }.to raise_error(SupportAi::Error)
+      stub_responder(respond: Llm::Error.new("boom"))
+      expect { described_class.call(ticket: ticket, trigger: "user_message", trigger_message: trigger_message) }.to raise_error(Llm::Error)
     end
   end
 end

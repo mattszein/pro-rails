@@ -31,9 +31,9 @@ RSpec.describe AvatarAi::BaseGenerator do
     it "sends the configured OpenRouter model id even when ruby_llm's bundled registry does not list it" do
       stub_openrouter_reply
 
-      message = described_class.new(model: "openai/gpt-oss-120b:free").send(:ask, "two words")
+      text = described_class.new(model: "openai/gpt-oss-120b:free").send(:ask, "two words")
 
-      expect(message.content).to eq(reply)
+      expect(text).to eq(reply)
       expect(requests.last[:url]).to eq("chat/completions")
       expect(requests.last[:payload]["model"]).to eq("openai/gpt-oss-120b:free")
     end

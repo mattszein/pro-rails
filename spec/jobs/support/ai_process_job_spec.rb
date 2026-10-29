@@ -94,12 +94,12 @@ RSpec.describe Support::AiProcessJob, type: :job do
 
   describe "retries" do
     it "retries Responder errors" do
-      allow(Support::Ai::Flows::ProcessTicket).to receive(:call).and_raise(SupportAi::Error, "boom")
+      allow(Support::Ai::Flows::ProcessTicket).to receive(:call).and_raise(Llm::Error, "boom")
       expect { described_class.perform_now(ticket.id, "ticket_created") }.to have_enqueued_job(described_class).with(ticket.id, "ticket_created")
     end
 
     it "hands the ticket to a human through Fallback when attempts are exhausted" do
-      allow(Support::Ai::Flows::ProcessTicket).to receive(:call).and_raise(SupportAi::Error, "boom")
+      allow(Support::Ai::Flows::ProcessTicket).to receive(:call).and_raise(Llm::Error, "boom")
 
       job = described_class.new(ticket.id, "ticket_created")
       3.times { job.perform_now } # the third attempt exhausts the retries

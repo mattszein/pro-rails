@@ -1,6 +1,6 @@
 module SupportAi
   module Tools
-    class SearchArticles < Base
+    class SearchArticles < Llm::Tools::Base
       LIMIT = 3
 
       description "Search the published help-center articles. Argument: query. Returns up to 3 articles " \
@@ -9,7 +9,8 @@ module SupportAi
       parameter :query, description: "What the user needs help with"
 
       def initialize(ticket:, budget: nil, locale: nil, **)
-        super(ticket: ticket, budget: budget)
+        super(budget: budget)
+        @ticket = ticket
         @locale = locale.presence || I18n.locale.to_s
       end
 
@@ -24,7 +25,7 @@ module SupportAi
 
       private
 
-      attr_reader :locale
+      attr_reader :ticket, :locale
 
       def search(query, locale: nil)
         Support::Article.published_search(query, locale: locale, limit: LIMIT).to_a

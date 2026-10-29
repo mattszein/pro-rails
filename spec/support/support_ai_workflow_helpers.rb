@@ -2,7 +2,7 @@
 # these specs never reach the network.
 module SupportAiWorkflowHelpers
   def ai_result(output, model: "stub-model", input_tokens: 10, output_tokens: 5, latency_ms: 120, tool_calls: [], transcript: [])
-    SupportAi::Result.new(output: output, model: model, input_tokens: input_tokens, output_tokens: output_tokens, latency_ms: latency_ms, tool_calls: tool_calls, transcript: transcript)
+    Llm::Result.new(output: output, model: model, input_tokens: input_tokens, output_tokens: output_tokens, latency_ms: latency_ms, tool_calls: tool_calls, transcript: transcript)
   end
 
   def triage_output(**overrides)

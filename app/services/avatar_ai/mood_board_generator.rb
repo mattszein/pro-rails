@@ -6,8 +6,8 @@ module AvatarAi
     end
 
     def generate_thumbnail_prompts(spark_text)
-      response = ask(build_prompt(spark_text))
-      parse_json_array(response.content, limit: @thumbnail_count)
+      content = ask(build_prompt(spark_text))
+      parse_json_array(content, limit: @thumbnail_count)
     end
 
     private

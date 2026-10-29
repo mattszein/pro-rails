@@ -4,7 +4,7 @@ RSpec.describe "SupportAi tools" do
   let(:requester) { create(:account, :verified, :with_role) }
   let(:ticket) { create(:ticket, created: requester, category: :billing, title: "Invoice charged twice") }
 
-  describe SupportAi::Tools::Base do
+  describe SupportAi::Tools::SearchArticles, "registry" do
     it "uses short snake_case tool names" do
       expect(SupportAi::Tools::SearchArticles.new(ticket: ticket).name).to eq("search_articles")
     end

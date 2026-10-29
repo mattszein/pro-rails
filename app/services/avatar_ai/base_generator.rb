@@ -8,12 +8,18 @@ module AvatarAi
 
     private
 
-    # Model ids are OpenRouter ids (see AvatarAiConfig::TEXT_MODELS), including ":free" variants that
-    # rotate faster than ruby_llm's bundled registry, so skip the registry lookup.
+    TIMEOUT = 120
+
+    # Returns the reply text. Goes through Llm::Runner (OpenRouter model ids, ":free" variants
+    # included, registry lookup skipped); provider failures surface as GenerationError.
     def ask(prompt)
-      RubyLLM.chat(model: @model, provider: :openrouter, assume_model_exists: true).ask(prompt)
-    rescue RubyLLM::Error => e
-      raise GenerationError, "#{self.class.name} failed: #{e.message}"
+      runner.call(model: @model) { |chat| chat.ask(prompt).content.to_s }.output
+    rescue Llm::Error => e
+      raise GenerationError, "#{self.class.name} failed: #{e.cause&.message || e.message}"
+    end
+
+    def runner
+      @runner ||= Llm::Runner.new(timeout: TIMEOUT)
     end
 
     def parse_json_array(content, limit: nil)

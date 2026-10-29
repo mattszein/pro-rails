@@ -23,7 +23,7 @@ module Support
         result = SupportAi::Responder.new(ticket: ticket).triage
         RecordRun.call(ticket: ticket, trigger: trigger, step: :triage, result: result)
         result.output.with_indifferent_access
-      rescue SupportAi::Error => e
+      rescue Llm::Error => e
         RecordRun.call(ticket: ticket, trigger: trigger, step: :triage, error: e)
         nil
       end

@@ -13,7 +13,7 @@ module Support
         result = SupportAi::Responder.new(ticket: ticket, playbook: playbook).respond(trigger_message: trigger_message)
         context.reply = result.output.with_indifferent_access
         context.respond_run = RecordRun.call(ticket: ticket, playbook: playbook, trigger: trigger, step: :respond, result: result)
-      rescue SupportAi::Error => e
+      rescue Llm::Error => e
         RecordRun.call(ticket: ticket, playbook: playbook, trigger: trigger, step: :respond, error: e)
         raise
       end

@@ -547,7 +547,7 @@ Specs never reach the network. Two helper files in `spec/support/`:
 ```ruby
 # Workflow / job / interactor specs: replace the Responder
 stub_responder(triage: ai_result(triage_output), respond: ai_result(respond_output(reply: "Hi")))
-stub_responder(respond: SupportAi::Error)   # simulate a provider failure
+stub_responder(respond: Llm::Error)   # simulate a provider failure
 
 # Responder / tool specs (type: :service or :llm): stub only the HTTP layer, real tool loop runs
 with_openrouter_key do
