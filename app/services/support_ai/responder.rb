@@ -6,7 +6,7 @@ module SupportAi
   # the support logic: prompts, parsing, validation, KB gap.
   #
   # Steps (each returns a Result; `output` documented per method): triage, handle, respond (follow-ups).
-  # A future `draft` step needs only a Prompts function, a registry entry and one public method calling `run_step`.
+  # A future `draft` step needs only a Prompts function, a registry entry and one public method calling `llm.call`.
   class Responder
     TRIAGE_SCHEMA = {
       name: "support_triage",
@@ -46,7 +46,7 @@ module SupportAi
     # No tools. Raises Llm::Error on invalid category/priority/sentiment/booleans.
     def triage
       prompt = Prompts.triage(ticket: ticket)
-      run_step(model: SupportAiConfig.model, system: prompt.system, schema: TRIAGE_SCHEMA) do |chat|
+      llm.call(model: SupportAiConfig.model, system: prompt.system, schema: TRIAGE_SCHEMA) do |chat|
         parse_triage(chat.ask(prompt.user))
       end
     end
@@ -73,7 +73,7 @@ module SupportAi
       images = vision_images
       model = images.any? ? SupportAiConfig.vision_model : SupportAiConfig.model
 
-      run_step(model: model, system: prompt.system, tools: tools_for(:handle, budget), budget: budget) do |chat|
+      llm.call(model: model, system: prompt.system, tools: tools_for(:handle, budget), budget: budget) do |chat|
         conversation_turns(trigger_message).each { |turn| chat.add_message(turn) }
 
         findings = (images.any? ? chat.ask(prompt.user, with: images) : chat.ask(prompt.user)).content.to_s.strip
@@ -105,7 +105,7 @@ module SupportAi
         triage: triage, findings: ticket.ai_runs.latest_output(:handle)&.dig(:findings), context: context.to_prompt
       )
 
-      run_step(model: SupportAiConfig.model, system: prompt.system, tools: tools_for(:respond, budget), budget: budget) do |chat|
+      llm.call(model: SupportAiConfig.model, system: prompt.system, tools: tools_for(:respond, budget), budget: budget) do |chat|
         turns = [{role: :user, content: prompt.user}] + history
         turns << {role: :user, content: "Please continue helping with this ticket."} if turns.last[:role] == :assistant
         final = turns.pop
@@ -117,15 +117,9 @@ module SupportAi
 
     private
 
-    # Runs the block through the shared Llm::Runner (chat setup, timeout, tokens, tool budget
-    # backstop, transcript capture). Any Llm::Error leaves with the transcript and tool calls attached.
-    def run_step(model:, system:, tools: [], schema: nil, budget: ToolBudget.new, &block)
-      runner.call(model: model, system: system, tools: tools, schema: schema, budget: budget, &block)
-    end
-
-    def runner
-      @runner ||= Llm::Runner.new(timeout: SupportAiConfig.timeout, temperature: SupportAiConfig.temperature)
-    end
+    # Shared Llm::Runner (chat setup, timeout, tokens, tool budget backstop, transcript capture).
+    # Any Llm::Error leaves with the transcript and tool calls attached.
+    def llm = @llm ||= Llm::Runner.new(timeout: SupportAiConfig.timeout, temperature: SupportAiConfig.temperature)
 
     # Triage language when it is a supported locale, else the request locale.
     def locale_from(triage)

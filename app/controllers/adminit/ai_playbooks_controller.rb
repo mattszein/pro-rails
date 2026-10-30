@@ -1,6 +1,4 @@
 class Adminit::AiPlaybooksController < Adminit::ApplicationController
-  include ModalFormResponses
-
   before_action :set_playbook, only: %i[edit update destroy toggle]
   verify_authorized
 

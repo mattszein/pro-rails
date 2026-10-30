@@ -16,7 +16,7 @@ module Adminit
 
           ticket.update!(assigned: account, status: :in_progress)
           ticket.notes.create!(account: account, kind: :system, body: "Ticket taken and assigned.")
-          ticket.notes.create!(account: nil, kind: :system, body: "AI stepped back.") if was_engaged
+          ticket.notes.create!(account: nil, kind: :system, body: Support::Ticket::AI_STEPPED_BACK_NOTE) if was_engaged
         end
       rescue Support::Ticket::InvalidTransition, ActiveRecord::RecordInvalid => e
         context.fail!(error: e.message)

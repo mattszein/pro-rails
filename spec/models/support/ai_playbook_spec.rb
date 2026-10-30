@@ -243,4 +243,31 @@ RSpec.describe Support::AiPlaybook, type: :model do
       expect(described_class.match_for(ticket)).to eq(general)
     end
   end
+
+  describe "#snapshot" do
+    it "freezes the rules a run used, including the audience name" do
+      audience = create(:audience, name: "VIPs")
+      playbook = create(:ai_playbook, name: "Billing", categories: [Support::Ticket::CATEGORIES[:billing]],
+        min_priority: 2, max_priority: 4, audience: audience, instructions: "Be kind")
+
+      expect(playbook.snapshot).to eq(
+        name: "Billing",
+        mode: "assist",
+        capabilities: playbook.capabilities,
+        instructions: "Be kind",
+        max_ai_turns: playbook.max_ai_turns,
+        idle_reminder_after_hours: playbook.idle_reminder_after_hours,
+        idle_handoff_after_hours: playbook.idle_handoff_after_hours,
+        categories: ["billing"],
+        min_priority: 2,
+        max_priority: 4,
+        audience: "VIPs",
+        is_default: false
+      )
+    end
+
+    it "has a nil audience when none is set" do
+      expect(build(:ai_playbook, audience: nil).snapshot[:audience]).to be_nil
+    end
+  end
 end

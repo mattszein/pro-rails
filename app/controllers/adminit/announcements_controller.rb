@@ -1,6 +1,5 @@
 class Adminit::AnnouncementsController < Adminit::ApplicationController
   include Tableable
-  include ModalFormResponses
 
   before_action :set_announcement, only: %i[show edit update destroy schedule unschedule]
   verify_authorized

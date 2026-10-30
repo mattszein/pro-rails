@@ -467,7 +467,7 @@ ONE `ai` note per AI pass. `Handle` writes the findings (1-2 factual English sen
 
 ### Audit: AiRun
 
-`Support::Ai::RecordRun` writes one `Support::AiRun` per step (trigger, step, status `succeeded`/`failed`/`discarded`, model, tokens, latency, `tool_calls`, `transcript`, `output`, error). Record a run for every new LLM step. `playbook_snapshot` (jsonb, `RecordRun.snapshot_for`: name, mode, capabilities, instructions, limits, conditions) freezes the rules used, so history survives playbook edits; `playbook_id` is only a link and is nullified when the playbook is deleted. `AiRun.step :investigate` is legacy (kept so old rows load).
+`Support::Ai::RecordRun` writes one `Support::AiRun` per step (trigger, step, status `succeeded`/`failed`/`discarded`, model, tokens, latency, `tool_calls`, `transcript`, `output`, error). Record a run for every new LLM step. `playbook_snapshot` (jsonb, `Support::AiPlaybook#snapshot`: name, mode, capabilities, instructions, limits, conditions) freezes the rules used, so history survives playbook edits; `playbook_id` is only a link and is nullified when the playbook is deleted. `AiRun.step :investigate` is legacy (kept so old rows load).
 
 The admin ticket's "AI activity" panel opens each run in a modal (`Adminit::Tickets::AiRunsController#show`, rendered by `Adminit::Tickets::AiRunTranscriptComponent`, which takes the run and never queries). It shows header facts, the snapshot, the error, the transcript (system/user/assistant/tool entries, tool calls with JSON arguments) and the output. Authorization mirrors `Adminit::TicketsController#show` and the run is found through `ticket.ai_runs`. Transcript content is always escaped (`Core::CodeBlockComponent`, never `raw`); runs from before transcripts existed show a "no transcript" note.
 
@@ -553,7 +553,7 @@ end
 - **ALWAYS** add `verify_authorized` — ensures every action calls `authorize!`
 - Use `:unprocessable_content` NOT `:unprocessable_entity` (Rack deprecation)
 - For Turbo Frame actions: `ensure_frame_response` before_action redirects before the action body runs
-- Modal create/update forms: `include ModalFormResponses` and use `respond_success(message, path)` / `respond_form_error(action)`; define a private `modal_form_locals` (locals for the `_form` partial; the frame id is `<singular controller name>_form`)
+- Modal create/update forms: use `respond_success(message, path)` / `respond_form_error(action)` from the `ModalFormResponses` concern (included in `Adminit::ApplicationController`); define a private `modal_form_locals` (the concern raises `NotImplementedError`) (locals for the `_form` partial; the frame id is `<singular controller name>_form`)
 
 ### Workflow Actions
 

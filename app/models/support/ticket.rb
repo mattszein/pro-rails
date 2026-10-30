@@ -1,5 +1,7 @@
 module Support
   class Ticket < ApplicationRecord
+    AI_STEPPED_BACK_NOTE = "AI stepped back."
+
     class InvalidTransition < StandardError; end
 
     # Shared with Support::Article so ticket and article categories cannot drift.

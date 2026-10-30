@@ -241,7 +241,7 @@ RSpec.describe Support::MessagesController, type: :controller do
       it "steps the AI back" do
         subject
         expect(ticket.reload).to be_ai_stepped_back
-        expect(ticket.notes.system.first.body).to eq("Support took over from AI.")
+        expect(ticket.notes.system.first.body).to eq("AI stepped back.")
       end
     end
   end

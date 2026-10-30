@@ -15,28 +15,33 @@ module Support
         context.fail!(error: message.errors.full_messages.to_sentence) unless message.save
 
         ticket = message.conversation.ticket
-        action = reconcile_ai(ticket)
-        Support::Ai::Dispatch.call(ticket, "user_message", message.id) if %i[resume enqueue].include?(action)
+        Support::Ai::Dispatch.call(ticket, "user_message", message.id) if sync_ai_state(ticket)
       end
 
       private
 
-      def reconcile_ai(ticket)
-        action = nil
+      # Under the ticket lock, applies the AI state change this message causes and returns whether
+      # the AI job must run (the caller dispatches it after the lock is released).
+      #   who writes   x AI state       -> effect
+      #   non-requester x engaged        -> release_ai!, system note; no job
+      #   requester     x awaiting_user  -> start_ai_analysis!; job
+      #   requester     x analyzing      -> no state change; job (debounces to the newest message)
+      #   anyone        x anything else  -> nothing
+      def sync_ai_state(ticket)
+        run_ai = false
         ticket.with_lock do
-          creator = message.account_id == ticket.created_id
-          if !creator && ticket.ai_engaged?
+          requester = message.account_id == ticket.created_id
+          if !requester && ticket.ai_engaged?
             ticket.release_ai!
-            ticket.notes.create!(account: nil, kind: :system, body: "Support took over from AI.")
-            action = :released
-          elsif creator && ticket.ai_awaiting_user?
+            ticket.notes.create!(account: nil, kind: :system, body: Support::Ticket::AI_STEPPED_BACK_NOTE)
+          elsif requester && ticket.ai_awaiting_user?
             ticket.start_ai_analysis!
-            action = :resume
-          elsif creator && ticket.ai_analyzing?
-            action = :enqueue
+            run_ai = true
+          elsif requester && ticket.ai_analyzing?
+            run_ai = true
           end
         end
-        action
+        run_ai
       end
     end
   end

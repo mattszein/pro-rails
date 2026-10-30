@@ -76,7 +76,7 @@ RSpec.describe Support::Messages::Create, type: :interactor do
         it "takes over from the AI with a system note" do
           expect { call_step(admin) }.not_to have_enqueued_job(Support::AiProcessJob)
           expect(ticket.reload).to be_ai_stepped_back
-          expect(ticket.notes.system.first).to have_attributes(body: "Support took over from AI.", account: nil)
+          expect(ticket.notes.system.first).to have_attributes(body: "AI stepped back.", account: nil)
         end
       end
     end

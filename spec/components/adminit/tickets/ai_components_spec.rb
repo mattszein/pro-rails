@@ -98,7 +98,7 @@ RSpec.describe "Adminit ticket AI components", type: :component do
 
     it "shows the playbook snapshot" do
       playbook = create(:ai_playbook, name: "Billing flow", instructions: "Be brief.", capabilities: %w[search_articles])
-      run = create(:ai_run, ticket: ticket, playbook_snapshot: Support::Ai::RecordRun.snapshot_for(playbook))
+      run = create(:ai_run, ticket: ticket, playbook_snapshot: playbook.snapshot)
 
       render_inline(described_class.new(run: run))
 

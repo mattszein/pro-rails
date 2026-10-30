@@ -28,4 +28,8 @@ module ModalFormResponses
       end
     end
   end
+
+  def modal_form_locals
+    raise NotImplementedError, "#{self.class.name} must define #modal_form_locals to use respond_form_error"
+  end
 end

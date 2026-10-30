@@ -61,6 +61,24 @@ module Support
     # Declared capabilities this playbook enabled that may run in `step`.
     def capabilities_for(step) = Support::AiCapabilities.for_step(step, capabilities)
 
+    # Frozen copy of the rules a run used, stored on Support::AiRun so later edits or deletion do not rewrite history.
+    def snapshot
+      {
+        name: name,
+        mode: mode,
+        capabilities: capabilities,
+        instructions: instructions,
+        max_ai_turns: max_ai_turns,
+        idle_reminder_after_hours: idle_reminder_after_hours,
+        idle_handoff_after_hours: idle_handoff_after_hours,
+        categories: category_keys,
+        min_priority: min_priority,
+        max_priority: max_priority,
+        audience: audience&.name,
+        is_default: is_default
+      }
+    end
+
     def breadcrumb_title = name
 
     private
