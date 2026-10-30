@@ -8,7 +8,7 @@ RSpec.describe "Support::Ai steps", type: :interactor do
   describe Support::Ai::Triage do
     it "stores the triage output and records a succeeded run" do
       stub_responder(triage: ai_result(triage_output(priority: 2)))
-      result = described_class.call(ticket: ticket, trigger: "ticket_created")
+      result = described_class.call(ticket: ticket, trigger: :ticket_created)
 
       expect(result.triage[:priority]).to eq(2)
       run = ticket.ai_runs.last
@@ -17,7 +17,7 @@ RSpec.describe "Support::Ai steps", type: :interactor do
 
     it "is non-fatal: logs a failed run and leaves triage nil" do
       stub_responder(triage: Llm::Error.new("provider down"))
-      result = described_class.call(ticket: ticket, trigger: "ticket_created")
+      result = described_class.call(ticket: ticket, trigger: :ticket_created)
 
       expect(result).to be_success
       expect(result.triage).to be_nil
@@ -27,7 +27,7 @@ RSpec.describe "Support::Ai steps", type: :interactor do
     it "reuses a previously succeeded triage instead of calling the model again" do
       create(:ai_run, ticket: ticket, step: :triage, status: :succeeded, run_trigger: :ticket_created, output: triage_output(priority: 1))
       expect(SupportAi::Responder).not_to receive(:new)
-      result = described_class.call(ticket: ticket, trigger: "ticket_created")
+      result = described_class.call(ticket: ticket, trigger: :ticket_created)
       expect(result.triage[:priority]).to eq(1)
     end
   end
@@ -35,26 +35,26 @@ RSpec.describe "Support::Ai steps", type: :interactor do
   describe Support::Ai::SelectPlaybook do
     it "puts the matching playbook on the context" do
       pb = create(:ai_playbook, :default)
-      result = described_class.call(ticket: ticket, trigger: "ticket_created", triage: nil)
+      result = described_class.call(ticket: ticket, trigger: :ticket_created, triage: nil)
       expect(result.playbook).to eq(pb)
     end
 
     it "uses the triaged priority to match" do
       create(:ai_playbook, :default)
       urgent = create(:ai_playbook, min_priority: 5, max_priority: 5)
-      result = described_class.call(ticket: ticket, trigger: "ticket_created", triage: {priority: 5}.with_indifferent_access)
+      result = described_class.call(ticket: ticket, trigger: :ticket_created, triage: {priority: 5}.with_indifferent_access)
       expect(result.playbook).to eq(urgent)
     end
 
     it "turns the AI off and stops when nothing matches" do
-      result = described_class.call(ticket: ticket, trigger: "ticket_created")
+      result = described_class.call(ticket: ticket, trigger: :ticket_created)
       expect(result).to be_failure
       expect(ticket.reload).to be_ai_off
     end
 
     it "does not touch a ticket an admin already took when nothing matches" do
       ticket.update!(ai_state: :stepped_back)
-      result = described_class.call(ticket: ticket, trigger: "ticket_created")
+      result = described_class.call(ticket: ticket, trigger: :ticket_created)
       expect(result).to be_failure
       expect(ticket.reload).to be_ai_stepped_back
     end
@@ -63,7 +63,7 @@ RSpec.describe "Support::Ai steps", type: :interactor do
       stale = Support::Ticket.find(ticket.id)
       ticket.update_columns(ai_state: Support::Ticket.ai_states[:stepped_back])
       result = nil
-      expect { result = described_class.call(ticket: stale, trigger: "ticket_created") }.not_to raise_error
+      expect { result = described_class.call(ticket: stale, trigger: :ticket_created) }.not_to raise_error
       expect(result).to be_failure
       expect(ticket.reload).to be_ai_stepped_back
     end
@@ -72,16 +72,16 @@ RSpec.describe "Support::Ai steps", type: :interactor do
       it "matches with the current rules" do
         create(:ai_playbook, :default)
         specific = create(:ai_playbook, category_keys: [ticket.category])
-        expect(described_class.call(ticket: ticket, trigger: "user_message").playbook).to eq(specific)
+        expect(described_class.call(ticket: ticket, trigger: :user_message).playbook).to eq(specific)
       end
 
       it "falls back to the default" do
         pb = create(:ai_playbook, :default)
-        expect(described_class.call(ticket: ticket, trigger: "user_message").playbook).to eq(pb)
+        expect(described_class.call(ticket: ticket, trigger: :user_message).playbook).to eq(pb)
       end
 
       it "hands off to a human when no playbook is available" do
-        result = described_class.call(ticket: ticket, trigger: "user_message")
+        result = described_class.call(ticket: ticket, trigger: :user_message)
         expect(result).to be_failure
         expect(ticket.reload).to be_ai_handoff_requested
       end
@@ -135,7 +135,7 @@ RSpec.describe "Support::Ai steps", type: :interactor do
 
   describe Support::Ai::Handle do
     def call_step(**ctx)
-      described_class.call({ticket: ticket, playbook: playbook, trigger: "ticket_created", triage: nil}.merge(ctx))
+      described_class.call({ticket: ticket, playbook: playbook, trigger: :ticket_created, triage: nil}.merge(ctx))
     end
 
     it "stores the reply and records one handle run" do
@@ -297,7 +297,7 @@ RSpec.describe "Support::Ai steps", type: :interactor do
 
   describe Support::Ai::Respond do
     def call_step(**ctx)
-      described_class.call({ticket: ticket, playbook: playbook, trigger: "ticket_created", triage: nil}.merge(ctx))
+      described_class.call({ticket: ticket, playbook: playbook, trigger: :ticket_created, triage: nil}.merge(ctx))
     end
 
     it "stores the reply and records the run" do

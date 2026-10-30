@@ -17,7 +17,7 @@ module Support
         context.fail!(error: message.errors.full_messages.to_sentence) unless message.save
 
         ticket = message.conversation.ticket
-        Support::AiProcessJob.enqueue(ticket, "user_message", message.id) if resume_ai(ticket)
+        Support::AiProcessJob.enqueue(ticket, :user_message, message.id) if resume_ai(ticket)
       end
 
       private

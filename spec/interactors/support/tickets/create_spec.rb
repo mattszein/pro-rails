@@ -37,7 +37,7 @@ RSpec.describe Support::Tickets::Create, type: :interactor do
     it "is born analyzing and enqueues the job with the saved id" do
       result = nil
       expect { result = described_class.call(ticket: ticket) }
-        .to have_enqueued_job(Support::AiProcessJob).with { |id, trigger, _| expect([id, trigger]).to eq([ticket.id, "ticket_created"]) }
+        .to have_enqueued_job(Support::AiProcessJob).with { |id, trigger, _| expect([id, trigger]).to eq([ticket.id, :ticket_created]) }
       expect(result).to be_success
       expect(ticket.reload).to be_ai_analyzing
       expect(ticket.ai_state_changed_at).to be_present

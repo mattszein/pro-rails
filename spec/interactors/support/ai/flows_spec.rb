@@ -7,7 +7,7 @@ RSpec.describe "AI flows", type: :interactor do
 
   describe Support::Ai::Flows::ProcessTicket do
     def call_organizer
-      described_class.call(ticket: ticket, trigger: "ticket_created")
+      described_class.call(ticket: ticket, trigger: :ticket_created)
     end
 
     it "runs triage, applies it, handles (note + reply) and waits for the user (assist)" do
@@ -94,7 +94,7 @@ RSpec.describe "AI flows", type: :interactor do
       create(:ai_run, ticket: ticket, step: :triage, output: triage_output(sentiment: "negative"))
       create(:ai_run, ticket: ticket, step: :handle, output: handle_output(findings: "Found it"))
       responder = stub_responder(respond: ai_result(respond_output))
-      result = described_class.call(ticket: ticket, trigger: "user_message", trigger_message: trigger_message)
+      result = described_class.call(ticket: ticket, trigger: :user_message, trigger_message: trigger_message)
 
       expect(result).to be_success
       expect(responder).to have_received(:respond).with(trigger_message: trigger_message)
@@ -104,7 +104,7 @@ RSpec.describe "AI flows", type: :interactor do
 
     it "writes ONE ai handoff note from the model's reason, with no extra model call" do
       responder = stub_responder(respond: ai_result(respond_output(handoff_requested: true, handoff_reason: "Needs a refund")))
-      described_class.call(ticket: ticket, trigger: "user_message", trigger_message: trigger_message)
+      described_class.call(ticket: ticket, trigger: :user_message, trigger_message: trigger_message)
 
       expect(ticket.reload).to be_ai_handoff_requested
       expect(ticket.notes.ai.pluck(:body)).to eq(["AI handoff: Needs a refund"])
@@ -118,7 +118,7 @@ RSpec.describe "AI flows", type: :interactor do
 
     it "raises on a respond failure" do
       stub_responder(respond: Llm::Error.new("boom"))
-      expect { described_class.call(ticket: ticket, trigger: "user_message", trigger_message: trigger_message) }.to raise_error(Llm::Error)
+      expect { described_class.call(ticket: ticket, trigger: :user_message, trigger_message: trigger_message) }.to raise_error(Llm::Error)
     end
   end
 end

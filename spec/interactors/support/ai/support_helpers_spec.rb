@@ -6,7 +6,7 @@ RSpec.describe Support::Ai::RecordRun do
 
   it "records a successful hash result" do
     result = ai_result(triage_output, tool_calls: [{name: "x", arguments: {}}])
-    run = described_class.call(ticket: ticket, playbook: playbook, trigger: "ticket_created", step: :triage, result: result)
+    run = described_class.call(ticket: ticket, playbook: playbook, trigger: :ticket_created, step: :triage, result: result)
 
     expect(run).to be_persisted
     expect(run).to have_attributes(status: "succeeded", step: "triage", run_trigger: "ticket_created", model: "stub-model",
@@ -19,7 +19,7 @@ RSpec.describe Support::Ai::RecordRun do
     audience = create(:audience, name: "VIPs")
     playbook = create(:ai_playbook, name: "Billing", category_keys: ["billing"], min_priority: 2, audience: audience,
       instructions: "Be kind.", capabilities: %w[search_articles], max_ai_turns: 3)
-    run = described_class.call(ticket: ticket, playbook: playbook, trigger: "ticket_created", step: :respond, result: ai_result(respond_output))
+    run = described_class.call(ticket: ticket, playbook: playbook, trigger: :ticket_created, step: :respond, result: ai_result(respond_output))
 
     expect(run.playbook_snapshot).to include(
       "name" => "Billing", "mode" => "assist", "capabilities" => ["search_articles"], "instructions" => "Be kind.",
@@ -30,12 +30,12 @@ RSpec.describe Support::Ai::RecordRun do
   end
 
   it "records the snapshot on failed runs too" do
-    run = described_class.call(ticket: ticket, playbook: playbook, trigger: "user_message", step: :respond, error: Llm::Error.new("boom"))
+    run = described_class.call(ticket: ticket, playbook: playbook, trigger: :user_message, step: :respond, error: Llm::Error.new("boom"))
     expect(run.playbook_snapshot).to include("name" => playbook.name)
   end
 
   it "keeps the snapshot after the playbook is changed or deleted" do
-    run = described_class.call(ticket: ticket, playbook: playbook, trigger: "ticket_created", step: :respond, result: ai_result(respond_output))
+    run = described_class.call(ticket: ticket, playbook: playbook, trigger: :ticket_created, step: :respond, result: ai_result(respond_output))
     name = playbook.name
     playbook.update!(name: "Renamed")
     playbook.destroy!

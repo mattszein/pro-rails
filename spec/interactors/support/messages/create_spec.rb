@@ -33,7 +33,7 @@ RSpec.describe Support::Messages::Create, type: :interactor do
 
       it "resumes analysis and enqueues the job for the message" do
         result = nil
-        expect { result = call_step(user) }.to have_enqueued_job(Support::AiProcessJob).with(ticket.id, "user_message", a_kind_of(Integer))
+        expect { result = call_step(user) }.to have_enqueued_job(Support::AiProcessJob).with(ticket.id, :user_message, a_kind_of(Integer))
         expect(ticket.reload).to be_ai_analyzing
         expect(result.message).to be_persisted
       end

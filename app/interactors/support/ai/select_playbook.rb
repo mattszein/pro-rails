@@ -22,7 +22,7 @@ module Support
         context.fail!(error: "No AI playbook matched")
       end
 
-      def reply_pass? = trigger.to_s == "user_message"
+      def reply_pass? = trigger == :user_message
 
       def hand_off_to_human = Fallback.call(ticket: ticket, reason: "no AI playbook available")
 

@@ -9,12 +9,21 @@ module Support
       Support::Ai::Fallback.call(ticket: ticket, error: error.message) if ticket
     end
 
+    # trigger => organizer. The only place that says which triggers start the AI and what they run;
+    # the keys are Support::AiRun run_trigger names.
+    FLOWS = {
+      ticket_created: Support::Ai::Flows::ProcessTicket,
+      user_message: Support::Ai::Flows::ProcessReply
+    }.freeze
+
     # Enqueues the job after a state change has been committed. Solid Queue uses a separate
     # database, so an enqueue failure must never undo that change: it is logged and reported as
     # false. (No safety-net sweep recovers the ticket yet; it is planned in support-ai-assist.)
-    # Only enqueue errors are rescued; anything else is a bug and bubbles up.
+    # Only enqueue errors are rescued; anything else is a bug and bubbles up, including an
+    # unknown trigger (KeyError).
     def self.enqueue(ticket, trigger, message_id = nil)
-      perform_later(ticket.id, trigger.to_s, message_id)
+      FLOWS.fetch(trigger)
+      perform_later(ticket.id, trigger, message_id)
       true
     rescue ActiveJob::EnqueueError, ActiveRecord::ActiveRecordError => e
       Rails.logger.error("Support AI enqueue failed for ticket #{ticket.id} (#{trigger}): #{e.class}: #{e.message}")
@@ -22,6 +31,9 @@ module Support
     end
 
     def perform(ticket_id, trigger, message_id = nil)
+      trigger = trigger.to_sym # jobs already in the queue carry strings
+      flow = FLOWS.fetch(trigger)
+
       ticket = Support::Ticket.find_by(id: ticket_id)
       return unless ticket
       return unless ticket.ai_analyzing?
@@ -35,18 +47,11 @@ module Support
         return unless messages.human.reorder(id: :desc).first&.id == trigger_message.id
         # Already answered (re-run).
         return if messages.ai.where("messages.id > ?", trigger_message.id).exists?
-      elsif trigger == "ticket_created"
+      elsif trigger == :ticket_created
         return if messages.ai.exists?
       end
 
-      case trigger
-      when "ticket_created"
-        run(Support::Ai::Flows::ProcessTicket, ticket: ticket, trigger: trigger)
-      when "user_message"
-        run(Support::Ai::Flows::ProcessReply, ticket: ticket, trigger: trigger, trigger_message: trigger_message)
-      else
-        raise ArgumentError, "Unknown AI trigger: #{trigger.inspect}"
-      end
+      run(flow, ticket: ticket, trigger: trigger, trigger_message: trigger_message)
     end
 
     private

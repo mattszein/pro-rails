@@ -232,7 +232,7 @@ RSpec.describe Support::MessagesController, type: :controller do
       end
 
       it "resumes the AI and enqueues the job for the message" do
-        expect { subject }.to have_enqueued_job(Support::AiProcessJob).with(ticket.id, "user_message", a_kind_of(Integer))
+        expect { subject }.to have_enqueued_job(Support::AiProcessJob).with(ticket.id, :user_message, a_kind_of(Integer))
         expect(ticket.reload).to be_ai_analyzing
       end
 

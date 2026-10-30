@@ -15,7 +15,7 @@ module Support
           context.fail!(error: ticket.errors.full_messages.to_sentence)
         end
 
-        Support::AiProcessJob.enqueue(ticket, "ticket_created") if ticket.ai_analyzing?
+        Support::AiProcessJob.enqueue(ticket, :ticket_created) if ticket.ai_analyzing?
       end
 
       private
