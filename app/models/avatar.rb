@@ -1,5 +1,5 @@
 class Avatar < ApplicationRecord
-  class InvalidTransition < StandardError; end
+  class InvalidTransition < DomainError; end
 
   include Avatar::Generatable
 

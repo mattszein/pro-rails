@@ -9,6 +9,11 @@ module Support
 
     validates :body, presence: true
 
+    # System notes are the audit trail: they cannot be edited, or deleted on their own. They still
+    # go away with their ticket (dependent: :destroy sets destroyed_by_association).
+    before_update { throw(:abort) if system? }
+    before_destroy { throw(:abort) if system? && !destroyed_by_association }
+
     default_scope { order(created_at: :desc) }
   end
 end

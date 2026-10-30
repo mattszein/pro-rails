@@ -1,6 +1,7 @@
 module Support
   class TicketsController < DashboardController
     include Tableable
+    include TransitionErrors
 
     before_action :require_account
     verify_authorized
@@ -68,29 +69,15 @@ module Support
     # POST /support/tickets/1/request_reopen
     def request_reopen
       authorize! @ticket
-      result = Support::Tickets::RequestReopen.call(
-        ticket: @ticket,
-        account: current_account,
-        body: params[:reason]
-      )
-
-      if result.success?
-        redirect_to support_ticket_path(@ticket), notice: I18n.t("support.tickets.reopen_sent")
-      else
-        redirect_to support_ticket_path(@ticket), alert: result.error
-      end
+      @ticket.request_reopen!(by: current_account, reason: params[:reason])
+      redirect_to support_ticket_path(@ticket), notice: I18n.t("support.tickets.reopen_sent")
     end
 
     # POST /support/tickets/1/resolve_with_ai
     def resolve_with_ai
       authorize! @ticket
-      result = Support::Tickets::ResolveWithAi.call(ticket: @ticket, account: current_account)
-
-      if result.success?
-        redirect_to support_ticket_path(@ticket), notice: I18n.t("support.tickets.resolved_with_ai")
-      else
-        redirect_to support_ticket_path(@ticket), alert: result.error
-      end
+      @ticket.resolve_with_ai!
+      redirect_to support_ticket_path(@ticket), notice: I18n.t("support.tickets.resolved_with_ai")
     end
 
     # POST /support/tickets/1/request_human
@@ -101,7 +88,7 @@ module Support
       if result.success?
         redirect_to support_ticket_path(@ticket), notice: I18n.t("support.tickets.human_requested")
       else
-        redirect_to support_ticket_path(@ticket), alert: result.error
+        render_transition_error(result.error)
       end
     end
 
@@ -109,6 +96,10 @@ module Support
 
     def set_ticket
       @ticket = Support::Ticket.find(params[:id])
+    end
+
+    def transition_error_path
+      @ticket ? support_ticket_path(@ticket) : support_tickets_path
     end
 
     def ticket_params

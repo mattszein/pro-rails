@@ -11,7 +11,9 @@ RSpec.describe "conversation partials rendered for a broadcast" do
   Support::Ticket.statuses.each_key do |status|
     Support::Ticket.ai_states.each_key do |ai_state|
       it "renders message_form and ai_status for #{status} / #{ai_state}" do
-        ticket = create(:ticket, status: status, ai_state: ai_state, assigned: create(:account, :verified))
+        # A human owner and an engaged AI never coexist (Support::Ticket invariant).
+        assignee = create(:account, :verified) unless %w[analyzing awaiting_user handoff_requested].include?(ai_state)
+        ticket = create(:ticket, status: status, ai_state: ai_state, assigned: assignee)
 
         form = nil
         expect { form = render_partial("message_form", {ticket: ticket}) }.not_to raise_error

@@ -48,6 +48,8 @@ en:
               resource_mismatch: "contains widget keys not matching the permission's resource: %{keys}"
         support/ticket:
           attributes:
+            ai_state:
+              engaged_while_assigned: "cannot be engaged while the ticket is assigned"
             attachments:
               too_many_files: "cannot exceed %{max_files} files"
               file_too_large: "%{filename} is too large (max %{max_size}MB)"
@@ -177,5 +179,8 @@ en:
       can_only_disable_ai: "Can only disable the AI while it is analyzing"
       can_only_await_user_reply: "Can only wait for the user while the AI is analyzing"
       can_only_request_ai_handoff: "Can only request a handoff while the AI is engaged"
-      can_only_release_ai: "Can only release the AI while it is engaged"
+      already_assigned: "Ticket already assigned"
+      can_only_take: "Only open, reopen-requested or reopened tickets can be taken"
+      not_assigned: "You are not assigned to this ticket"
+      can_only_unassign: "Can only leave in-progress or reopened tickets"
       can_only_resolve_with_ai: "Can only resolve with AI on open tickets awaiting the user"

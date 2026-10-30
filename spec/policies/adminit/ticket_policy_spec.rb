@@ -20,11 +20,23 @@ RSpec.describe Adminit::TicketPolicy, type: :policy do
       end
     end
 
-    context "with an unassigned closed ticket" do
-      let(:ticket) { create(:ticket, status: :closed, assigned: nil, created: creator_account) }
+    %i[reopen_requested reopened].each do |status|
+      context "with an unassigned #{status} ticket" do
+        let(:ticket) { create(:ticket, status: status, assigned: nil, created: creator_account) }
 
-      it "allows admin to take the ticket" do
-        expect(policy).to be_take
+        it "allows admin to take the ticket" do
+          expect(policy).to be_take
+        end
+      end
+    end
+
+    %i[finished closed in_progress].each do |status|
+      context "with an unassigned #{status} ticket" do
+        let(:ticket) { create(:ticket, status: status, assigned: nil, created: creator_account) }
+
+        it "denies admin from taking the ticket" do
+          expect(policy).not_to be_take
+        end
       end
     end
 
@@ -54,6 +66,24 @@ RSpec.describe Adminit::TicketPolicy, type: :policy do
 
       it "allows admin to leave the ticket" do
         expect(policy).to be_leave
+      end
+    end
+
+    context "when the assigned ticket is reopened" do
+      let(:ticket) { create(:ticket, :reopened, created: creator_account, assigned: admin_account) }
+
+      it "allows admin to leave the ticket" do
+        expect(policy).to be_leave
+      end
+    end
+
+    %i[finished reopen_requested closed].each do |status|
+      context "when the assigned ticket is #{status}" do
+        let(:ticket) { create(:ticket, status: status, created: creator_account, assigned: admin_account) }
+
+        it "denies admin from leaving the ticket" do
+          expect(policy).not_to be_leave
+        end
       end
     end
 

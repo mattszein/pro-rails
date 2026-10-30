@@ -240,6 +240,20 @@ describe Adminit::TicketsController, type: :controller do
         end
       end
 
+      context "with an unassigned reopen_requested ticket" do
+        let(:ticket) { create(:ticket, status: :reopen_requested, assigned: nil, created: creator_account) }
+
+        before do
+          login_user(user)
+          ticket_permission
+        end
+
+        it "assigns the ticket and keeps its status" do
+          expect { subject }.to change { ticket.reload.assigned_id }.from(nil).to(user.id)
+          expect(ticket.status).to eq("reopen_requested")
+        end
+      end
+
       context "with an unassigned closed ticket" do
         let(:ticket) { create(:ticket, status: :closed, assigned: nil, created: creator_account) }
 
@@ -248,12 +262,36 @@ describe Adminit::TicketsController, type: :controller do
           ticket_permission
         end
 
-        it "allows taking the ticket" do
-          expect { subject }.to change { ticket.reload.assigned_id }.from(nil).to(user.id)
+        it "does not allow taking the ticket" do
+          expect { subject }.not_to change { ticket.reload.assigned_id }
         end
 
-        it "changes ticket status to in_progress" do
-          expect { subject }.to change { ticket.reload.status }.from("closed").to("in_progress")
+        it_behaves_like "unauthorized"
+      end
+
+      context "when the transition fails after authorization (lost race)" do
+        before do
+          login_user(user)
+          ticket_permission
+          allow_any_instance_of(Support::Ticket).to receive(:take!).and_raise(Support::Ticket::AlreadyAssigned, "Ticket already assigned")
+        end
+
+        it "redirects back with the error as an alert (html)" do
+          subject
+          expect(response).to redirect_to(adminit_ticket_path(ticket))
+          expect(flash[:alert]).to eq("Ticket already assigned")
+        end
+
+        it "redirects through a turbo stream with a flash alert" do
+          post :take, params: {id: ticket.id}, format: :turbo_stream
+          expect(response.body).to include("redirect")
+          expect(flash[:alert]).to eq("Ticket already assigned")
+        end
+
+        it "responds 422 with the error as json" do
+          post :take, params: {id: ticket.id}, format: :json
+          expect(response).to have_http_status(:unprocessable_content)
+          expect(response.parsed_body).to eq("error" => "Ticket already assigned")
         end
       end
 
@@ -311,6 +349,20 @@ describe Adminit::TicketsController, type: :controller do
         end
       end
 
+      context "with a reopened ticket" do
+        let(:ticket) { create(:ticket, :reopened, created: creator_account, assigned: user) }
+
+        before do
+          login_user(user)
+          ticket_permission
+        end
+
+        it "unassigns but keeps the reopened status" do
+          expect { subject }.to change { ticket.reload.assigned_id }.from(user.id).to(nil)
+          expect(ticket.status).to eq("reopened")
+        end
+      end
+
       context "when trying to leave a ticket not assigned to them" do
         let(:other_admin) { create(:account, :with_role, :verified) }
         let(:ticket) { create(:ticket, :in_progress, created: creator_account, assigned: other_admin) }
@@ -331,7 +383,7 @@ describe Adminit::TicketsController, type: :controller do
 
   describe "PATCH #update" do
     let(:ticket) { create(:ticket, :in_progress, created: creator_account, assigned: user) }
-    let(:params) { {id: ticket.id, support_ticket: {status: :closed}} }
+    let(:params) { {id: ticket.id, support_ticket: {title: "New title"}} }
 
     subject { patch :update, params: params }
 
@@ -348,8 +400,19 @@ describe Adminit::TicketsController, type: :controller do
           expect { subject }.to be_authorized_to(:update?, ticket).with(Adminit::TicketPolicy).with_context(user: user)
         end
 
-        it "allows status update" do
-          expect { subject }.to change { ticket.reload.status }.from("in_progress").to("closed")
+        it "updates the editable fields" do
+          patch :update, params: {id: ticket.id, support_ticket: {title: "New title", priority: 5, category: "billing"}}
+          expect(ticket.reload).to have_attributes(title: "New title", priority: 5, category: "billing")
+        end
+
+        it "ignores status, assigned_id and created_id (they only change through transitions)" do
+          other = create(:account, :with_role, :verified)
+          patch :update, params: {id: ticket.id, support_ticket: {title: "Kept", status: "closed", assigned_id: other.id, created_id: other.id}}
+          ticket.reload
+          expect(ticket.title).to eq("Kept")
+          expect(ticket.status).to eq("in_progress")
+          expect(ticket.assigned_id).to eq(user.id)
+          expect(ticket.created_id).to eq(creator_account.id)
         end
 
         it "redirects after update" do
@@ -372,7 +435,7 @@ describe Adminit::TicketsController, type: :controller do
         end
 
         it "does not allow updating the ticket" do
-          expect { subject }.not_to change { ticket.reload.status }
+          expect { subject }.not_to change { ticket.reload.title }
         end
 
         it_behaves_like "unauthorized"
@@ -387,10 +450,63 @@ describe Adminit::TicketsController, type: :controller do
           login_user(user_superadmin)
         end
 
-        it "allows status update on any ticket" do
-          expect { subject }.to change { ticket.reload.status }.from("in_progress").to("closed")
+        it "allows updating any ticket" do
+          expect { subject }.to change { ticket.reload.title }.to("New title")
         end
       end
+    end
+  end
+
+  describe "status transitions" do
+    let(:assigned_ticket) { create(:ticket, :in_progress, created: creator_account, assigned: user) }
+
+    before do
+      login_user(user)
+      ticket_permission
+    end
+
+    it "POST #finish finishes the ticket with a note by the admin" do
+      post :finish, params: {id: assigned_ticket.id}
+      expect(assigned_ticket.reload).to be_finished
+      expect(assigned_ticket.notes.first).to have_attributes(body: "Ticket finished.", account: user)
+      expect(flash[:notice]).to eq(I18n.t("adminit.tickets.finished"))
+    end
+
+    it "POST #reopen reopens a finished ticket" do
+      ticket = create(:ticket, :finished, created: creator_account, assigned: user)
+      post :reopen, params: {id: ticket.id}
+      expect(ticket.reload).to be_reopened
+      expect(flash[:notice]).to eq(I18n.t("adminit.tickets.reopened"))
+    end
+
+    it "POST #accept_reopen reopens a reopen_requested ticket" do
+      ticket = create(:ticket, status: :reopen_requested, created: creator_account, assigned: user)
+      post :accept_reopen, params: {id: ticket.id}
+      expect(ticket.reload).to be_reopened
+      expect(flash[:notice]).to eq(I18n.t("adminit.tickets.reopen_accepted"))
+    end
+
+    it "POST #reject_reopen closes the ticket and records the reason" do
+      ticket = create(:ticket, status: :reopen_requested, created: creator_account, assigned: user)
+      post :reject_reopen, params: {id: ticket.id, reason: "Not valid"}
+      expect(ticket.reload).to be_closed
+      expect(ticket.notes.first.body).to include("Reason: Not valid")
+      expect(flash[:notice]).to eq(I18n.t("adminit.tickets.reopen_rejected"))
+    end
+
+    it "renders an invalid transition as an alert instead of raising" do
+      allow_any_instance_of(Support::Ticket).to receive(:finish!).and_raise(Support::Ticket::InvalidTransition, "Can only finish in-progress or reopened tickets")
+      post :finish, params: {id: assigned_ticket.id}
+      expect(response).to redirect_to(adminit_ticket_path(assigned_ticket))
+      expect(flash[:alert]).to eq("Can only finish in-progress or reopened tickets")
+    end
+
+    it "renders a RecordInvalid as an alert with the validation messages" do
+      invalid = Support::Ticket.new.tap(&:valid?)
+      allow_any_instance_of(Support::Ticket).to receive(:finish!).and_raise(ActiveRecord::RecordInvalid.new(invalid))
+      post :finish, params: {id: assigned_ticket.id}
+      expect(response).to redirect_to(adminit_ticket_path(assigned_ticket))
+      expect(flash[:alert]).to include("Title can't be blank")
     end
   end
 end

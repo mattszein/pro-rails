@@ -9,8 +9,6 @@ es:
       reopened: "Ticket reabierto."
       reopen_accepted: "Solicitud de reapertura aceptada."
       reopen_rejected: "Solicitud de reapertura rechazada."
-      already_assigned: "El ticket ya está asignado."
-      not_assigned: "No estás asignado a este ticket."
       note_added: "Nota agregada."
       note_error: "No se pudo agregar la nota: %{errors}"
       no_notes: "Sin notas aún."

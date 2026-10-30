@@ -139,6 +139,25 @@ RSpec.describe Support::MessagesController, type: :controller do
       end
     end
 
+    context "when an admin writes on an unassigned or someone else's ticket" do
+      let(:params) { valid_params }
+      let(:other_admin) { create(:account, :with_role, :verified) }
+
+      before { login_user(assignee_account) }
+
+      it "rejects an unassigned ticket" do
+        ticket.update_columns(assigned_id: nil, status: Support::Ticket.statuses[:open])
+        expect { subject }.not_to change(Support::Message, :count)
+        expect(flash.now[:alert]).to eq(I18n.t("adminit.authorization.unauthorized"))
+      end
+
+      it "rejects a ticket assigned to another admin" do
+        ticket.update_columns(assigned_id: other_admin.id)
+        expect { subject }.not_to change(Support::Message, :count)
+        expect(flash.now[:alert]).to eq(I18n.t("adminit.authorization.unauthorized"))
+      end
+    end
+
     context "when ticket has no assignee (open status)" do
       let(:ticket) { create(:ticket, created_id: creator_account.id, assigned_id: nil, status: :open) }
 
@@ -235,13 +254,25 @@ RSpec.describe Support::MessagesController, type: :controller do
       end
     end
 
-    context "when an admin writes" do
+    context "when an admin who has not taken the ticket writes" do
       before { login_user(assignee_account) }
 
-      it "steps the AI back" do
-        subject
+      it "is rejected and leaves the AI untouched" do
+        expect { subject }.not_to change(Support::Message, :count)
+        expect(ticket.reload.ai_state).to eq(state.to_s)
+      end
+    end
+
+    context "when the admin takes it first" do
+      before do
+        login_user(assignee_account)
+        ticket.assign!(to: assignee_account, by: assignee_account)
+      end
+
+      it "can write, and taking already stepped the AI back" do
+        expect { subject }.to change(Support::Message, :count).by(1)
         expect(ticket.reload).to be_ai_stepped_back
-        expect(ticket.notes.system.first.body).to eq("AI stepped back.")
+        expect(ticket.notes.system.pluck(:body)).to include("AI stepped back.")
       end
     end
   end

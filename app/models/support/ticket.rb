@@ -2,7 +2,8 @@ module Support
   class Ticket < ApplicationRecord
     AI_STEPPED_BACK_NOTE = "AI stepped back."
 
-    class InvalidTransition < StandardError; end
+    class InvalidTransition < DomainError; end
+    class AlreadyAssigned < InvalidTransition; end
 
     # Shared with Support::Article so ticket and article categories cannot drift.
     CATEGORIES = {
@@ -39,6 +40,8 @@ module Support
       resolved: 5
     }, prefix: :ai, validate: {allow_nil: false}
     enum :category, CATEGORIES, default: :account_access, validate: {allow_nil: false}
+    include Transitions
+
     scope :prioritized, -> { order(priority: :desc, created_at: :desc) }
     scope :search_title, ->(query) { where("title ILIKE ?", "%#{sanitize_sql_like(query)}%") }
     scope :assigned_to, ->(account_id) { where(assigned_id: account_id) }
@@ -49,14 +52,12 @@ module Support
 
     validates :title, :description, :status, :category, :created_id, presence: true
     validate :validate_attachments
+    validate :ai_not_engaged_while_assigned
 
-    # Dashboard widget reads. `reorder` overrides the default_scope ordering.
+    # Dashboard widget reads. `reorder` drops any ordering from a chained scope (e.g. `prioritized`).
     scope :recent_open, ->(limit: 10) { open.reorder(updated_at: :desc).limit(limit) }
     scope :assigned_open_for, ->(account, limit: 10) { assigned_to(account.id).open.reorder(updated_at: :desc).limit(limit) }
 
-    # Order matters: the takeover release must run before the timestamp stamp so
-    # both land in the same save.
-    before_save :release_ai_on_assignment, unless: :new_record?
     before_save :stamp_ai_state_changed_at, if: :will_save_change_to_ai_state?
     after_create :create_conversation
 
@@ -145,61 +146,6 @@ module Support
       }
     end
 
-    def finish!
-      raise InvalidTransition, I18n.t("ticket.transitions.can_only_finish") unless in_progress? || reopened?
-      update!(status: :finished)
-    end
-
-    def reopen!
-      raise InvalidTransition, I18n.t("ticket.transitions.can_only_reopen") unless finished?
-      update!(status: :reopened)
-    end
-
-    def request_reopen!
-      raise InvalidTransition, I18n.t("ticket.transitions.can_only_request_reopen") unless finished?
-      update!(status: :reopen_requested)
-    end
-
-    def accept_reopen!
-      raise InvalidTransition, I18n.t("ticket.transitions.can_only_accept_reopen") unless reopen_requested?
-      update!(status: :reopened)
-    end
-
-    def reject_reopen!
-      raise InvalidTransition, I18n.t("ticket.transitions.can_only_reject_reopen") unless reopen_requested?
-      update!(status: :closed)
-    end
-
-    def start_ai_analysis!
-      raise InvalidTransition, I18n.t("ticket.transitions.can_only_start_ai_analysis") unless ai_off? || ai_awaiting_user?
-      update!(ai_state: :analyzing)
-    end
-
-    def disable_ai!
-      raise InvalidTransition, I18n.t("ticket.transitions.can_only_disable_ai") unless ai_analyzing?
-      update!(ai_state: :off)
-    end
-
-    def await_user_reply!
-      raise InvalidTransition, I18n.t("ticket.transitions.can_only_await_user_reply") unless ai_analyzing?
-      update!(ai_state: :awaiting_user)
-    end
-
-    def request_ai_handoff!
-      raise InvalidTransition, I18n.t("ticket.transitions.can_only_request_ai_handoff") unless ai_analyzing? || ai_awaiting_user?
-      update!(ai_state: :handoff_requested)
-    end
-
-    def release_ai!
-      raise InvalidTransition, I18n.t("ticket.transitions.can_only_release_ai") unless ai_engaged?
-      update!(ai_state: :stepped_back)
-    end
-
-    def resolve_with_ai!
-      raise InvalidTransition, I18n.t("ticket.transitions.can_only_resolve_with_ai") unless open? && ai_awaiting_user?
-      update!(status: :finished, ai_state: :resolved)
-    end
-
     private
 
     # What the message form area renders: the composer, or the status banner/reopen form of the
@@ -213,10 +159,10 @@ module Support
       message_form_variant(status: status_before_last_save || status, ai_state: ai_state_before_last_save || ai_state)
     end
 
-    # Data integrity: a human taking the ticket always silences the AI, whichever
-    # path set assigned_id (Take, the Adminit form, console).
-    def release_ai_on_assignment
-      self.ai_state = :stepped_back if will_save_change_to_assigned_id? && assigned_id.present? && ai_engaged?
+    # A human owns the ticket or the AI works on it, never both. assign! silences the AI in the
+    # same update; start_ai_analysis! refuses assigned tickets.
+    def ai_not_engaged_while_assigned
+      errors.add(:ai_state, :engaged_while_assigned) if assigned_id.present? && ai_engaged?
     end
 
     def stamp_ai_state_changed_at
@@ -231,7 +177,7 @@ module Support
       return unless attachments.attached?
 
       # Validate number of attachments
-      if attachments.count > FileUploadConfig.max_files_per_ticket
+      if attachments.size > FileUploadConfig.max_files_per_ticket
         errors.add(:attachments, I18n.t("activerecord.errors.models.support/ticket.attributes.attachments.too_many_files", max_files: FileUploadConfig.max_files_per_ticket))
       end
 

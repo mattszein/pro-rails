@@ -43,7 +43,16 @@
             conversation: ticket.conversation,
             messages: ticket.conversation.messages
           ) do %>
-        <%= render "support/conversations/message_form", ticket: ticket %>
+        <%# Admins can only write on a ticket assigned to them (MessagePolicy enforces it). This partial is
+            also rendered by broadcasts (no current_account), so the composer is gated client-side to the
+            assignee with <turbo-show>, and omitted when nobody is assigned. %>
+        <% if !ticket.messageable? %>
+          <%= render "support/conversations/message_form", ticket: ticket %>
+        <% elsif ticket.assigned_id.present? %>
+          <turbo-show when="current-user-id" is="<%= ticket.assigned_id %>">
+            <%= render "support/conversations/message_form", ticket: ticket %>
+          </turbo-show>
+        <% end %>
       <% end %>
     <% end %>
   </div>

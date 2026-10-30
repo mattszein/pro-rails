@@ -403,6 +403,28 @@ RSpec.describe Support::TicketsController, type: :controller do
       end
     end
 
+    describe "POST #request_reopen" do
+      subject { post :request_reopen, params: {id: ticket.id, reason: "Still broken"} }
+
+      let(:ticket) { create(:ticket, :finished, created: creator_account) }
+
+      it "requests the reopen with a note by the requester" do
+        subject
+        expect(ticket.reload).to be_reopen_requested
+        expect(ticket.notes.first).to have_attributes(account: creator_account)
+        expect(ticket.notes.first.body).to include("Reason: Still broken")
+        expect(response).to redirect_to(support_ticket_path(ticket))
+        expect(flash[:notice]).to eq(I18n.t("support.tickets.reopen_sent"))
+      end
+
+      it "renders a domain error as an alert on the ticket page" do
+        allow_any_instance_of(Support::Ticket).to receive(:request_reopen!).and_raise(Support::Ticket::InvalidTransition, "nope")
+        subject
+        expect(response).to redirect_to(support_ticket_path(ticket))
+        expect(flash[:alert]).to eq("nope")
+      end
+    end
+
     describe "POST #request_human" do
       subject { post :request_human, params: {id: ticket.id} }
 

@@ -22,7 +22,7 @@ RSpec.describe Support::Ticket, "user page broadcasts" do
     let(:ticket) { create(:ticket, status: :finished, assigned: create(:account, :verified)) }
 
     it "broadcasts the real composer instead of a refresh-the-page banner" do
-      payloads = payloads_for { ticket.reopen! }
+      payloads = payloads_for { ticket.reopen!(by: create(:account)) }
 
       expect(composer?(payloads)).to be(true)
     end
@@ -43,7 +43,7 @@ RSpec.describe Support::Ticket, "user page broadcasts" do
     let(:ticket) { create(:ticket, :ai_awaiting_user) }
 
     it "keeps the composer untouched" do
-      payloads = payloads_for { ticket.update!(assigned: create(:account, :verified), status: :in_progress) }
+      payloads = payloads_for { ticket.take!(by: create(:account, :verified)) }
 
       expect(composer?(payloads)).to be(false)
     end
@@ -53,7 +53,7 @@ RSpec.describe Support::Ticket, "user page broadcasts" do
     let(:ticket) { create(:ticket, :in_progress) }
 
     it "broadcasts the status banner" do
-      payloads = payloads_for { ticket.finish! }
+      payloads = payloads_for { ticket.finish!(by: create(:account)) }
 
       expect(payloads.any? { |d| d.include?("message_form") && d.include?(I18n.t("support.ticket_status_banner.finished")) }).to be(true)
       expect(composer?(payloads)).to be(false)

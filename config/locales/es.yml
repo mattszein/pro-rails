@@ -48,6 +48,8 @@ es:
               resource_mismatch: "contiene claves de widget que no coinciden con el recurso del permiso: %{keys}"
         support/ticket:
           attributes:
+            ai_state:
+              engaged_while_assigned: "no puede estar activa mientras el ticket está asignado"
             attachments:
               too_many_files: "no puede exceder %{max_files} archivos"
               file_too_large: "%{filename} es demasiado grande (máx. %{max_size}MB)"
@@ -177,5 +179,8 @@ es:
       can_only_disable_ai: "Solo se puede desactivar la IA mientras esta analizando"
       can_only_await_user_reply: "Solo se puede esperar al usuario mientras la IA analiza"
       can_only_request_ai_handoff: "Solo se puede solicitar traspaso mientras la IA está activa"
-      can_only_release_ai: "Solo se puede liberar la IA mientras está activa"
+      already_assigned: "El ticket ya está asignado"
+      can_only_take: "Solo se pueden tomar tickets abiertos, con reapertura solicitada o reabiertos"
+      not_assigned: "No estás asignado a este ticket"
+      can_only_unassign: "Solo se pueden dejar tickets en progreso o reabiertos"
       can_only_resolve_with_ai: "Solo se puede resolver con IA en tickets abiertos esperando al usuario"

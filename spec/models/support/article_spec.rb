@@ -122,6 +122,22 @@ RSpec.describe Support::Article, type: :model do
     end
   end
 
+  describe "transitions on a stale instance" do
+    it "publish! re-checks the status after the lock" do
+      article = create(:article)
+      stale = described_class.find(article.id)
+      described_class.find(article.id).publish!
+      expect { stale.publish! }.to raise_error(Support::Article::InvalidTransition)
+    end
+
+    it "unpublish! re-checks the status after the lock" do
+      article = create(:article, :published)
+      stale = described_class.find(article.id)
+      described_class.find(article.id).unpublish!
+      expect { stale.unpublish! }.to raise_error(Support::Article::InvalidTransition)
+    end
+  end
+
   describe ".search" do
     it "returns none for a blank query" do
       create(:article, title: "Password reset")

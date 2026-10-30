@@ -324,6 +324,6 @@ if Rails.env.development? || ENV["SEED_DEMO_DATA"] == "true"
     ticket.ai_runs.create!(run_trigger: :ticket_created, step: :handle, status: :succeeded, model: "demo-model",
       input_tokens: 812, output_tokens: 164, latency_ms: 1380, tool_calls: [{name: "search_articles", arguments: {}}],
       transcript: ai_demo_transcript.call(demo[:title]),
-      playbook: ai_demo_default_playbook, playbook_snapshot: Support::Ai::RecordRun.snapshot_for(ai_demo_default_playbook))
+      playbook: ai_demo_default_playbook, playbook_snapshot: ai_demo_default_playbook&.snapshot || {})
   end
 end

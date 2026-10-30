@@ -69,24 +69,15 @@ RSpec.describe Support::Messages::Create, type: :interactor do
   end
 
   describe "admin writing" do
-    %i[analyzing awaiting_user handoff_requested].each do |engaged|
-      context "when #{engaged}" do
-        let(:state) { engaged }
-
-        it "takes over from the AI with a system note" do
-          expect { call_step(admin) }.not_to have_enqueued_job(Support::AiProcessJob)
-          expect(ticket.reload).to be_ai_stepped_back
-          expect(ticket.notes.system.first).to have_attributes(body: "AI stepped back.", account: nil)
-        end
-      end
-    end
+    # An admin can only write on a ticket assigned to them (policy); assigning released the AI.
+    let(:ticket) { create(:ticket, created: user, assigned: admin, status: :in_progress, ai_state: state) }
 
     %i[off stepped_back resolved].each do |inert|
       context "when #{inert}" do
         let(:state) { inert }
 
         it "changes nothing AI-related" do
-          call_step(admin)
+          expect { call_step(admin) }.not_to have_enqueued_job(Support::AiProcessJob)
           expect(ticket.reload.ai_state).to eq(inert.to_s)
           expect(ticket.notes).to be_empty
         end

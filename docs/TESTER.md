@@ -432,32 +432,28 @@ end
 
 ### Workflow Integration Test
 
-Test the full lifecycle across multiple interactors:
+Test the full lifecycle across multiple model transitions:
 
 ```ruby
-RSpec.describe "Ticket Workflow", type: :interactor do
+RSpec.describe Support::Ticket, type: :model do
   let(:user) { create(:account) }
   let(:admin) { create(:account, :with_role) }
   let(:ticket) { create(:ticket, created: user) }
 
   it "handles the full reopen workflow" do
-    # 1. Admin takes the ticket
-    result = Adminit::Tickets::Take.call(ticket: ticket, account: admin)
-    expect(result.success?).to be(true), result.error
-    expect(ticket.reload.status).to eq("in_progress")
-    expect(ticket.notes.first.body).to include("taken and assigned")
+    ticket.take!(by: admin)
+    ticket.finish!(by: admin)
+    ticket.request_reopen!(by: user, reason: "It is still broken")
 
-    # 2. Admin finishes the ticket
-    result = Adminit::Tickets::Finish.call(ticket: ticket, account: admin)
-    expect(result.success?).to be(true), result.error
-    expect(ticket.reload.status).to eq("finished")
-
-    # 3. User requests reopen
-    result = Support::Tickets::RequestReopen.call(
-      ticket: ticket, account: user, body: "It is still broken"
-    )
-    expect(result.success?).to be(true), result.error
     expect(ticket.reload.status).to eq("reopen_requested")
+    expect(ticket.notes.first.body).to include("It is still broken")
+  end
+
+  it "refuses a stale instance after the lock" do
+    stale = described_class.find(ticket.id)
+    described_class.find(ticket.id).take!(by: admin)
+
+    expect { stale.take!(by: user) }.to raise_error(Support::Ticket::AlreadyAssigned)
   end
 end
 ```

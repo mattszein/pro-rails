@@ -1,6 +1,6 @@
 module Support
   class Article < ApplicationRecord
-    class InvalidTransition < StandardError; end
+    class InvalidTransition < DomainError; end
 
     SLUG_FORMAT = /\A[a-z0-9]+(?:-[a-z0-9]+)*\z/
 
@@ -82,13 +82,19 @@ module Support
     def excerpt(length = 1_200) = search_text.to_s.squish.truncate(length)
 
     def publish!
-      raise InvalidTransition, I18n.t("article.transitions.already_published") if published?
-      update!(status: :published, published_at: Time.current)
+      with_lock do
+        raise InvalidTransition, I18n.t("article.transitions.already_published") if published?
+        update!(status: :published, published_at: Time.current)
+      end
+      self
     end
 
     def unpublish!
-      raise InvalidTransition, I18n.t("article.transitions.can_only_unpublish_published") unless published?
-      update!(status: :draft)
+      with_lock do
+        raise InvalidTransition, I18n.t("article.transitions.can_only_unpublish_published") unless published?
+        update!(status: :draft)
+      end
+      self
     end
 
     private

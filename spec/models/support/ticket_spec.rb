@@ -55,6 +55,17 @@ RSpec.describe Support::Ticket, type: :model do
       expect(ticket.errors[:attachments]).to include(match(/cannot exceed/))
     end
 
+    it "does not persist a new ticket with too many attachments" do
+      new_ticket = build(:ticket)
+      (FileUploadConfig.max_files_per_ticket + 1).times do
+        new_ticket.attachments.attach(io: StringIO.new("test"), filename: "test.png", content_type: "image/png")
+      end
+
+      expect(new_ticket.save).to be(false)
+      expect(new_ticket.errors[:attachments]).to include(match(/cannot exceed/))
+      expect(new_ticket).not_to be_persisted
+    end
+
     it "allows attaching multiple valid files" do
       3.times do |i|
         ticket.attachments.attach(
@@ -150,7 +161,7 @@ RSpec.describe Support::Ticket, type: :model do
     it "counts open tickets waiting for a human" do
       create(:ticket, :ai_handoff_requested)
       create(:ticket, :ai_handoff_requested)
-      create(:ticket, :in_progress, ai_state: :handoff_requested)
+      create(:ticket, :in_progress, ai_state: :stepped_back)
       create(:ticket, :ai_awaiting_user)
 
       expect(Support::Ticket.dashboard_stats[:needs_human]).to eq(2)
@@ -268,14 +279,6 @@ RSpec.describe Support::Ticket, type: :model do
         expect { create(:ticket).disable_ai! }.to raise_error(Support::Ticket::InvalidTransition)
       end
 
-      it "release_ai! from any engaged state" do
-        %i[ai_analyzing ai_awaiting_user ai_handoff_requested].each do |trait|
-          expect(create(:ticket, trait).tap(&:release_ai!)).to be_ai_stepped_back
-        end
-        expect { create(:ticket).release_ai! }.to raise_error(Support::Ticket::InvalidTransition)
-        expect { create(:ticket, :ai_stepped_back).release_ai! }.to raise_error(Support::Ticket::InvalidTransition)
-      end
-
       it "resolve_with_ai! finishes the ticket and resolves the AI in one update" do
         ticket = create(:ticket, :ai_awaiting_user)
         ticket.resolve_with_ai!
@@ -286,11 +289,11 @@ RSpec.describe Support::Ticket, type: :model do
 
       it "resolve_with_ai! requires an open ticket awaiting the user" do
         expect { create(:ticket, :ai_analyzing).resolve_with_ai! }.to raise_error(Support::Ticket::InvalidTransition)
-        expect { create(:ticket, :in_progress, ai_state: :awaiting_user).resolve_with_ai! }.to raise_error(Support::Ticket::InvalidTransition)
+        expect { create(:ticket, status: :in_progress, ai_state: :awaiting_user).resolve_with_ai! }.to raise_error(Support::Ticket::InvalidTransition)
       end
 
       it "uses the translated error message" do
-        expect { create(:ticket).release_ai! }.to raise_error(Support::Ticket::InvalidTransition, I18n.t("ticket.transitions.can_only_release_ai"))
+        expect { create(:ticket).resolve_with_ai! }.to raise_error(Support::Ticket::InvalidTransition, I18n.t("ticket.transitions.can_only_resolve_with_ai"))
       end
     end
 
@@ -313,35 +316,72 @@ RSpec.describe Support::Ticket, type: :model do
       end
     end
 
-    describe "assignment releases the AI" do
-      let(:admin) { create(:account, :verified) }
-
-      it "sets stepped_back when assigned while engaged" do
-        %i[ai_analyzing ai_awaiting_user ai_handoff_requested].each do |trait|
-          ticket = create(:ticket, trait)
-          ticket.update!(assigned: admin)
-          expect(ticket.reload).to be_ai_stepped_back
-          expect(ticket.ai_state_changed_at).to be_present
+    describe "AI transitions on a stale instance" do
+      {
+        start_ai_analysis!: [:ai_analyzing, nil],
+        await_user_reply!: [:ai_awaiting_user, :ai_analyzing],
+        disable_ai!: [:ai_off, :ai_analyzing],
+        request_ai_handoff!: [:ai_stepped_back, :ai_analyzing]
+      }.each do |transition, (moved_state, initial_trait)|
+        it "#{transition} re-checks the state after the lock" do
+          ticket = initial_trait ? create(:ticket, initial_trait) : create(:ticket)
+          stale = described_class.find(ticket.id)
+          described_class.find(ticket.id).update_columns(ai_state: described_class.ai_states.fetch(moved_state.to_s.delete_prefix("ai_")))
+          expect { stale.public_send(transition) }.to raise_error(Support::Ticket::InvalidTransition)
         end
       end
 
-      it "does nothing when the AI is not engaged" do
-        ticket = create(:ticket)
-        ticket.update!(assigned: admin)
-        expect(ticket.reload).to be_ai_off
-        resolved = create(:ticket, :ai_resolved)
-        resolved.update!(assigned: admin)
-        expect(resolved.reload).to be_ai_resolved
-      end
-
-      it "does nothing when assignment is cleared or unchanged" do
+      it "resolve_with_ai! re-checks the state after the lock" do
         ticket = create(:ticket, :ai_awaiting_user)
-        ticket.update!(title: "x")
-        expect(ticket.reload).to be_ai_awaiting_user
+        stale = described_class.find(ticket.id)
+        described_class.find(ticket.id).update!(status: :in_progress)
+        expect { stale.resolve_with_ai! }.to raise_error(Support::Ticket::InvalidTransition)
+      end
+    end
+
+    describe "resolve_with_ai! notes" do
+      it "resolve_with_ai! writes the resolution system note" do
+        ticket = create(:ticket, :ai_awaiting_user)
+        ticket.resolve_with_ai!
+        expect(ticket.notes.system.first).to have_attributes(body: "Resolved by the user with AI assistance.", account: nil)
       end
 
-      it "leaves a ticket created already assigned and engaged alone" do
-        expect(create(:ticket, :assigned, :ai_analyzing)).to be_ai_analyzing
+      it "writes no note when the transition is rejected" do
+        ticket = create(:ticket)
+        expect { ticket.resolve_with_ai! }.to raise_error(Support::Ticket::InvalidTransition)
+        expect(ticket.notes).to be_empty
+      end
+    end
+
+    describe "AI/assignment invariant" do
+      it "is invalid when built assigned and engaged" do
+        %i[ai_analyzing ai_awaiting_user ai_handoff_requested].each do |trait|
+          ticket = build(:ticket, trait, assigned: create(:account), created: create(:account))
+          expect(ticket).not_to be_valid
+          expect(ticket.errors[:ai_state]).to be_present
+        end
+      end
+
+      it "is invalid when an engaged ticket is assigned by a plain update" do
+        ticket = create(:ticket, :ai_analyzing)
+        expect(ticket.update(assigned: create(:account))).to be(false)
+        expect(ticket.errors[:ai_state]).to include(I18n.t("activerecord.errors.models.support/ticket.attributes.ai_state.engaged_while_assigned"))
+      end
+
+      it "is invalid when the AI is engaged on an assigned ticket" do
+        ticket = create(:ticket, :assigned)
+        expect(ticket.update(ai_state: :analyzing)).to be(false)
+      end
+
+      it "allows assigned tickets with the AI off, stepped back or resolved" do
+        %i[ai_stepped_back ai_resolved].each { |trait| expect(create(:ticket, :assigned, trait)).to be_valid }
+        expect(create(:ticket, :assigned)).to be_valid
+      end
+
+      it "start_ai_analysis! refuses assigned tickets" do
+        ticket = create(:ticket, :assigned)
+        expect { ticket.start_ai_analysis! }.to raise_error(Support::Ticket::InvalidTransition)
+        expect(ticket.reload).to be_ai_off
       end
     end
 

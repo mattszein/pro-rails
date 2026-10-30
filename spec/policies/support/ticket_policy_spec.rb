@@ -99,7 +99,7 @@ RSpec.describe Support::TicketPolicy, type: :policy do
     end
 
     it "denies a ticket that is not open" do
-      ticket = create(:ticket, :in_progress, ai_state: :awaiting_user, created: creator_account)
+      ticket = create(:ticket, status: :in_progress, ai_state: :awaiting_user, created: creator_account)
       expect(described_class.new(ticket, user: creator_account)).not_to be_resolve_with_ai
     end
   end

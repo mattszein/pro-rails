@@ -1,5 +1,6 @@
 class Adminit::ArticlesController < Adminit::ApplicationController
   include Tableable
+  include TransitionErrors
 
   before_action :set_article, only: %i[show edit update destroy publish unpublish]
   verify_authorized
@@ -46,15 +47,11 @@ class Adminit::ArticlesController < Adminit::ApplicationController
   def publish
     @article.publish!
     redirect_to adminit_article_path(@article), notice: t("adminit.articles.published")
-  rescue Support::Article::InvalidTransition, ActiveRecord::RecordInvalid => e
-    redirect_back_or_to adminit_article_path(@article), alert: e.message
   end
 
   def unpublish
     @article.unpublish!
     redirect_to adminit_article_path(@article), notice: t("adminit.articles.unpublished")
-  rescue Support::Article::InvalidTransition, ActiveRecord::RecordInvalid => e
-    redirect_back_or_to adminit_article_path(@article), alert: e.message
   end
 
   # Unlike announcements, any status can be deleted.
@@ -67,6 +64,10 @@ class Adminit::ArticlesController < Adminit::ApplicationController
   end
 
   private
+
+  def transition_error_path
+    @article ? adminit_article_path(@article) : adminit_articles_path
+  end
 
   def set_article
     @article = Support::Article.find(params[:id])
