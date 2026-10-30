@@ -1,5 +1,7 @@
 module Support
   class Ticket < ApplicationRecord
+    include Transitions
+
     AI_STEPPED_BACK_NOTE = "AI stepped back."
 
     class InvalidTransition < DomainError; end
@@ -40,7 +42,10 @@ module Support
       resolved: 5
     }, prefix: :ai, validate: {allow_nil: false}
     enum :category, CATEGORIES, default: :account_access, validate: {allow_nil: false}
-    include Transitions
+
+    validates :title, :description, :status, :category, :created_id, presence: true
+    validate :validate_attachments
+    validate :ai_not_engaged_while_assigned
 
     scope :prioritized, -> { order(priority: :desc, created_at: :desc) }
     scope :search_title, ->(query) { where("title ILIKE ?", "%#{sanitize_sql_like(query)}%") }
@@ -49,11 +54,6 @@ module Support
       patterns = Array(terms).map { |term| "%#{sanitize_sql_like(term.to_s)}%" }
       patterns.empty? ? none : where(patterns.map { "title ILIKE ?" }.join(" OR "), *patterns)
     }
-
-    validates :title, :description, :status, :category, :created_id, presence: true
-    validate :validate_attachments
-    validate :ai_not_engaged_while_assigned
-
     # Dashboard widget reads. `reorder` drops any ordering from a chained scope (e.g. `prioritized`).
     scope :recent_open, ->(limit: 10) { open.reorder(updated_at: :desc).limit(limit) }
     scope :assigned_open_for, ->(account, limit: 10) { assigned_to(account.id).open.reorder(updated_at: :desc).limit(limit) }
