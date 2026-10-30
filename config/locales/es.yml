@@ -78,6 +78,7 @@ es:
       reopen_requested: "Solicitud de reapertura pendiente de aprobación. Podrás enviar mensajes una vez que un administrador la acepte."
       closed: "Este ticket está cerrado permanentemente."
       default: "Esperando que un administrador tome este ticket. Podrás enviar mensajes una vez que el ticket esté en progreso."
+      analyzing: "Nuestro asistente está analizando tu ticket. Podrás responder en cuanto termine."
       ai_analyzing: "Nuestro asistente te está ayudando. Un agente de soporte puede unirse en cualquier momento."
       ai_awaiting_user: "Nuestro asistente te está ayudando. Un agente de soporte puede unirse en cualquier momento."
       ai_handoff_requested: "Esperando a un agente de soporte."

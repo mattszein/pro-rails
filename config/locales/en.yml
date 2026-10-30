@@ -78,6 +78,7 @@ en:
       reopen_requested: "Reopen request pending approval. You will be able to message once an admin accepts it."
       closed: "This ticket is permanently closed."
       default: "Waiting for an admin to take this ticket. You can send messages once the ticket is in progress."
+      analyzing: "Our assistant is analyzing your ticket. You will be able to reply as soon as it answers."
       ai_analyzing: "Our assistant is helping. A support agent can join anytime."
       ai_awaiting_user: "Our assistant is helping. A support agent can join anytime."
       ai_handoff_requested: "Waiting for a support agent."

@@ -1,11 +1,11 @@
 module Support
   module Ai
-    # The main LLM call: ONE chat that writes the internal note (max 1,200 chars -> `ai` note when the
+    # The main LLM call: ONE chat that writes the internal note (max 1,200 chars, when the
     # playbook has investigate_note) and then the reply to the user. context.reply stays nil in
-    # triage_only mode or when triage escalated (only the note turn runs). The single `ai` note
-    # also gets two deterministic lines built by code (never by or for the model). FATAL: failures are logged and re-raised so
-    # the job retries. The note is created only after the whole Result is obtained, so a retry
-    # after a failure can never leave a duplicate.
+    # triage_only mode or when triage escalated (only the note turn runs). The note text, plus two
+    # deterministic lines built by code (never by or for the model), goes to context.note_body:
+    # Handle writes no record, Finalize commits the `ai` note. FATAL: failures are logged and
+    # re-raised so the job retries.
     class Handle
       include Interactor
 
@@ -20,7 +20,7 @@ module Support
         reply = !playbook.triage_only? && !triage&.dig(:escalate)
         result = SupportAi::Responder.new(ticket: ticket, playbook: playbook).handle(triage: triage, reply: reply, trigger_message: trigger_message)
 
-        write_note(result.output) if playbook.capability?(:investigate_note)
+        context.note_body = build_note_body(result.output) if playbook.capability?(:investigate_note)
         context.reply = reply ? result.output : nil
         context.handle_run = RecordRun.call(ticket: ticket, playbook: playbook, trigger: trigger, step: :handle, result: result)
       rescue Llm::Error => e
@@ -30,12 +30,10 @@ module Support
 
       private
 
-      # ONE note per pass: the model's short findings plus a deterministic help-center line.
-      def write_note(output)
+      # Text of the ONE note per pass: the model's short findings plus a deterministic help-center line.
+      def build_note_body(output)
         findings = strip_label(output[:findings].to_s).truncate(NOTE_LIMIT, omission: "…")
-        lines = [findings, help_center_line(output[:article_ids]), similar_tickets_line]
-        ticket.notes.create!(account: nil, kind: :ai, body: lines.compact_blank.join("\n"))
-        context.note_written = true
+        [findings, help_center_line(output[:article_ids]), similar_tickets_line].compact_blank.join("\n")
       end
 
       def strip_label(text)

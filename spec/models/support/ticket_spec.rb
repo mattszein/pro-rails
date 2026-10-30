@@ -232,10 +232,15 @@ RSpec.describe Support::Ticket, type: :model do
         expect(build(:ticket, :reopened)).to be_messageable
       end
 
-      it "is true for open tickets with an engaged AI" do
-        expect(build(:ticket, :ai_analyzing)).to be_messageable
+      it "is true for open tickets while the AI awaits the user or a human" do
         expect(build(:ticket, :ai_awaiting_user)).to be_messageable
         expect(build(:ticket, :ai_handoff_requested)).to be_messageable
+      end
+
+      it "is false while the assistant analyzes (the pass is uninterrupted) but the AI stays engaged" do
+        ticket = build(:ticket, :ai_analyzing)
+        expect(ticket).not_to be_messageable
+        expect(ticket).to be_ai_engaged
       end
 
       it "is false for plain open, stepped-back or finished tickets" do

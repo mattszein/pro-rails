@@ -82,6 +82,8 @@ RSpec.describe Support::TicketsController, type: :controller do
       body = show(create(:ticket, :ai_analyzing, created: creator_account))
 
       expect(body).to include(I18n.t("support.ticket_status_banner.ai_analyzing"))
+      expect(body).to include(I18n.t("support.ticket_status_banner.analyzing"))
+      expect(body).not_to include(I18n.t("support.messages.placeholder"))
       expect(body).not_to include(I18n.t("support.ai_status.talk_to_person"))
     end
 

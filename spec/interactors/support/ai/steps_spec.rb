@@ -154,27 +154,28 @@ RSpec.describe "Support::Ai steps", type: :interactor do
       expect(responder).to have_received(:handle).with(hash_including(trigger_message: message))
     end
 
-    it "writes no ai note without investigate_note" do
+    it "sets no note_body and writes no note without investigate_note" do
       stub_responder(handle: ai_result(handle_output))
-      expect { call_step }.not_to change(Support::Note, :count)
+      result = nil
+      expect { result = call_step }.not_to change(Support::Note, :count)
+      expect(result.note_body).to be_nil
     end
 
     context "with investigate_note" do
       let(:capabilities) { ["investigate_note"] }
 
-      it "writes ONE ai note: the findings plus the help-center line" do
+      it "builds the note body (findings plus help-center line) and writes no record" do
         stub_responder(handle: ai_result(handle_output(findings: "Expired session.")))
-        result = call_step
-        expect(ticket.notes.ai.count).to eq(1)
-        expect(ticket.notes.ai.first).to have_attributes(account: nil, body: "Expired session.\nHelp center: no article answered this.")
-        expect(result.note_written).to be(true)
+        result = nil
+        expect { result = call_step }.not_to change(Support::Note, :count)
+        expect(result.note_body).to eq("Expired session.\nHelp center: no article answered this.")
       end
 
       it "lists the attached article titles in the help-center line" do
         article = create(:article, :published, title: "Changing your password")
         stub_responder(handle: ai_result(handle_output(findings: "User wants a new password.", article_ids: [article.id])))
-        call_step
-        expect(ticket.notes.ai.first.body).to eq("User wants a new password.\nHelp center: Changing your password")
+        result = call_step
+        expect(result.note_body).to eq("User wants a new password.\nHelp center: Changing your password")
       end
     end
 
@@ -190,56 +191,54 @@ RSpec.describe "Support::Ai steps", type: :interactor do
         create(:ticket, created: other, category: :billing, title: "Invoice still open")
         stub_responder(handle: ai_result(handle_output(findings: "User was charged twice.")))
 
-        call_step
+        result = call_step
 
-        expect(ticket.notes.ai.pluck(:body)).to eq([
+        expect(result.note_body).to eq(
           "User was charged twice.\nHelp center: no article answered this.\nSimilar resolved tickets: ##{match.id} Invoice problem (#{match.created_at.strftime("%Y-%m")})"
-        ])
-        expect(ticket.notes.ai.first.body).not_to include("SECRET DESC")
+        )
+        expect(result.note_body).not_to include("SECRET DESC")
         expect(ticket.ai_runs.pluck(:step)).to eq(%w[handle])
       end
 
       it "adds no line when nothing similar exists" do
         stub_responder(handle: ai_result(handle_output(findings: "User was charged twice.")))
-        call_step
-        expect(ticket.notes.ai.first.body).not_to include("Similar resolved tickets")
+        expect(call_step.note_body).not_to include("Similar resolved tickets")
       end
 
       it "adds nothing without the note capability" do
         create(:ticket, :finished, created: other, category: :billing, title: "Invoice problem")
         stub_responder(handle: ai_result(handle_output))
-        call_step(playbook: create(:ai_playbook, capabilities: %w[similar_tickets]))
+        result = call_step(playbook: create(:ai_playbook, capabilities: %w[similar_tickets]))
+        expect(result.note_body).to be_nil
         expect(ticket.notes).to be_empty
       end
 
       it "skips playbooks without similar_tickets" do
         create(:ticket, :finished, created: other, category: :billing, title: "Invoice problem")
         stub_responder(handle: ai_result(handle_output))
-        call_step(playbook: create(:ai_playbook, capabilities: %w[investigate_note]))
-        expect(ticket.notes.ai.first.body).not_to include("Similar resolved")
+        result = call_step(playbook: create(:ai_playbook, capabilities: %w[investigate_note]))
+        expect(result.note_body).not_to include("Similar resolved")
       end
     end
 
     it "strips a leading note label the model added" do
       ["Internal note (for admin): Expired session.", "**Internal note:** Expired session.", "Note: Expired session."].each do |findings|
-        ticket.notes.destroy_all
         stub_responder(handle: ai_result(handle_output(findings: findings)))
-        call_step(playbook: create(:ai_playbook, capabilities: ["investigate_note"]))
-        expect(ticket.notes.ai.first.body).to eq("Expired session.\nHelp center: no article answered this.")
+        result = call_step(playbook: create(:ai_playbook, capabilities: ["investigate_note"]))
+        expect(result.note_body).to eq("Expired session.\nHelp center: no article answered this.")
       end
     end
 
     it "keeps findings that merely start with the word note" do
       stub_responder(handle: ai_result(handle_output(findings: "Note that the user wants an export.")))
-      call_step(playbook: create(:ai_playbook, capabilities: ["investigate_note"]))
-      expect(ticket.notes.ai.first.body).to start_with("Note that the user wants an export.")
+      result = call_step(playbook: create(:ai_playbook, capabilities: ["investigate_note"]))
+      expect(result.note_body).to start_with("Note that the user wants an export.")
     end
 
     it "truncates the stored note at 1,200 characters" do
       stub_responder(handle: ai_result(handle_output(findings: "x" * 2_000)))
-      call_step(playbook: create(:ai_playbook, capabilities: ["investigate_note"]))
-      body = ticket.notes.ai.first.body
-      findings, line = body.split("\n")
+      result = call_step(playbook: create(:ai_playbook, capabilities: ["investigate_note"]))
+      findings, line = result.note_body.split("\n")
       expect(findings.length).to eq(Support::Ai::Handle::NOTE_LIMIT)
       expect(findings).to end_with("…")
       expect(line).to eq("Help center: no article answered this.")
@@ -258,13 +257,13 @@ RSpec.describe "Support::Ai steps", type: :interactor do
         stub_responder(handle: ai_result(gap))
         result = call_step
         expect(ticket.notes).to be_empty
-        expect(result.note_written).to be_falsey
+        expect(result.note_body).to be_nil
       end
 
-      it "writes a single note with the no-article line" do
+      it "builds a single note body with the no-article line" do
         stub_responder(handle: ai_result(gap.merge(findings: "User wants an export.")))
-        call_step(playbook: create(:ai_playbook, capabilities: ["investigate_note"]))
-        expect(ticket.notes.ai.pluck(:body)).to eq(["User wants an export.\nHelp center: no article answered this."])
+        result = call_step(playbook: create(:ai_playbook, capabilities: ["investigate_note"]))
+        expect(result.note_body).to eq("User wants an export.\nHelp center: no article answered this.")
       end
 
       it "writes nothing when the step fails" do

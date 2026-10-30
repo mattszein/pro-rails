@@ -16,23 +16,37 @@ RSpec.describe Support::Ai::Finalize, type: :interactor do
     expect(ticket.notes).to be_empty
   end
 
+  it "writes the findings note with a normal reply" do
+    call_step(note_body: "Expired session.")
+    expect(ticket.reload).to be_ai_awaiting_user
+    expect(ticket.notes.ai.pluck(:body)).to eq(["Expired session."])
+    expect(ticket.conversation.messages.ai.count).to eq(1)
+  end
+
+  it "rolls back note, message and transition together on failure" do
+    allow(ticket).to receive(:await_user_reply!).and_raise(ActiveRecord::RecordInvalid)
+    expect { call_step(note_body: "Expired session.") }.to raise_error(ActiveRecord::RecordInvalid)
+    expect(ticket.notes.reload).to be_empty
+    expect(ticket.conversation.messages.ai).to be_empty
+    expect(ticket.reload).to be_ai_analyzing
+  end
+
   context "when the pass ends in a handoff" do
     let(:handoff) { reply.merge(handoff_requested: true, handoff_reason: "Needs a refund") }
 
     it "writes ONE ai note from the reason when Handle wrote none, without any model call" do
       expect(SupportAi::Responder).not_to receive(:new)
-      result = call_step(reply: handoff)
+      call_step(reply: handoff)
 
       expect(ticket.reload).to be_ai_handoff_requested
       expect(ticket.notes.ai.pluck(:body)).to eq(["AI handoff: Needs a refund"])
-      expect(result.note_written).to be(true)
       expect(ticket.conversation.messages.ai.last.content).to eq(I18n.t("support.ai.handoff_message"))
     end
 
-    it "writes no second note when Handle already wrote one" do
-      call_step(reply: handoff, note_written: true)
+    it "writes ONE note: the findings body ending with the handoff line" do
+      call_step(reply: handoff, note_body: "Expired session.\nHelp center: no article answered this.")
       expect(ticket.reload).to be_ai_handoff_requested
-      expect(ticket.notes).to be_empty
+      expect(ticket.notes.ai.pluck(:body)).to eq(["Expired session.\nHelp center: no article answered this.\nAI handoff: Needs a refund"])
     end
 
     it "uses the triage escalation reason" do
@@ -52,10 +66,39 @@ RSpec.describe Support::Ai::Finalize, type: :interactor do
     end
   end
 
-  it "discards when the AI no longer owns the ticket" do
-    ticket.update!(ai_state: :stepped_back)
-    result = call_step(reply: reply.merge(handoff_requested: true, handoff_reason: "x"))
-    expect(result.discarded).to be(true)
-    expect(ticket.notes).to be_empty
+  describe "discarding" do
+    let(:run) { create(:ai_run, ticket: ticket, playbook: playbook, step: :handle, status: :succeeded, output: {"findings" => "Expired session."}) }
+    let(:not_sent) { "Reply not sent: the ticket changed while the assistant was working." }
+
+    it "discards when the AI no longer owns the ticket" do
+      ticket.update!(ai_state: :stepped_back)
+      result = call_step(reply: reply.merge(handoff_requested: true, handoff_reason: "x"))
+      expect(result.discarded).to be(true)
+      expect(ticket.notes).to be_empty
+    end
+
+    it "keeps the findings in a note ending with the not-sent line, without handoff line, message or transition" do
+      ticket.update!(ai_state: :stepped_back)
+      result = call_step(reply: reply.merge(handoff_requested: true, handoff_reason: "x"), note_body: "Expired session.", handle_run: run)
+
+      expect(result.discarded).to be(true)
+      expect(ticket.notes.ai.pluck(:body)).to eq(["Expired session.\n#{not_sent}"])
+      expect(ticket.conversation.messages.ai).to be_empty
+      expect(ticket.reload).to be_ai_stepped_back
+      expect(run.reload).to be_discarded
+      expect(run.output).to include("findings" => "Expired session.")
+    end
+
+    it "is discarded by a newer human message and still keeps the note" do
+      trigger = create(:message, conversation: ticket.conversation, account: ticket.created)
+      create(:message, conversation: ticket.conversation, account: ticket.created)
+      result = call_step(trigger_message: trigger, note_body: "Expired session.", handle_run: run)
+
+      expect(result.discarded).to be(true)
+      expect(ticket.notes.ai.pluck(:body)).to eq(["Expired session.\n#{not_sent}"])
+      expect(ticket.conversation.messages.ai).to be_empty
+      expect(ticket.reload).to be_ai_analyzing
+      expect(run.reload).to be_discarded
+    end
   end
 end

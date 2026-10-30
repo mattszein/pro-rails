@@ -101,7 +101,7 @@ module Support
     def breadcrumb_title = "##{id} #{title}"
 
     def messageable?
-      in_progress? || reopened? || (open? && ai_engaged?)
+      in_progress? || reopened? || (open? && (ai_awaiting_user? || ai_handoff_requested?))
     end
 
     def ai_engaged?
@@ -149,10 +149,12 @@ module Support
     private
 
     # What the message form area renders: the composer, or the status banner/reopen form of the
-    # current status.
+    # current status. The requester is locked out while the assistant analyzes (one pass at a time).
     def message_form_variant(status: self.status, ai_state: self.ai_state)
-      messageable = self.class.new(status: status, ai_state: ai_state).messageable?
-      messageable ? :composer : status.to_s
+      probe = self.class.new(status: status, ai_state: ai_state)
+      return :composer if probe.messageable?
+
+      (probe.open? && probe.ai_analyzing?) ? :ai_analyzing : status.to_s
     end
 
     def message_form_variant_before_last_save

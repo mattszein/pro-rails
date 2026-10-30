@@ -57,8 +57,7 @@ RSpec.describe "AI flows", type: :interactor do
       expect(responder).to have_received(:handle).with(hash_including(reply: false))
       expect(ticket.reload).to be_ai_handoff_requested
       expect(ticket.conversation.messages).to be_empty
-      expect(ticket.notes.ai.pluck(:body)).to include("Request: reset password.\nContext: none\nNext step: send the reset link.\nHelp center: no article answered this.")
-      expect(ticket.notes.ai.count).to eq(1)
+      expect(ticket.notes.ai.pluck(:body)).to eq(["Request: reset password.\nContext: none\nNext step: send the reset link.\nHelp center: no article answered this.\nAI handoff: playbook is triage only"])
     end
 
     it "escalates: handoff plus the generic message" do
@@ -79,7 +78,7 @@ RSpec.describe "AI flows", type: :interactor do
       expect(ticket).to be_ai_handoff_requested
       expect(ticket.conversation.messages.ai.last.content).to eq(I18n.t("support.ai.handoff_message"))
       expect(ticket.notes.ai.pluck(:body).grep(/Help center/).size).to eq(1)
-      expect(ticket.notes.ai.pluck(:body).join).not_to include("KB gap")
+      expect(ticket.notes.ai.pluck(:body).last).to end_with("AI handoff: No help-center article matched (KB gap)")
       expect(ticket.ai_runs.find_by(step: :handle).output).to include("kb_gap" => true)
     end
 

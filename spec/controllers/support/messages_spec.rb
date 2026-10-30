@@ -245,6 +245,16 @@ RSpec.describe Support::MessagesController, type: :controller do
         end
       end
 
+      context "when the assistant is analyzing" do
+        let(:state) { :analyzing }
+
+        it "rejects a direct POST: no message, no job" do
+          expect { subject }.not_to change(Support::Message, :count)
+          expect { subject }.not_to have_enqueued_job(Support::AiProcessJob)
+          expect(ticket.reload).to be_ai_analyzing
+        end
+      end
+
       context "when the AI is off" do
         let(:state) { :off }
 

@@ -3,30 +3,36 @@ module Support
     # Commits the outcome. All LLM work is already done, so the lock is short and DB-only.
     # Under the ticket lock it re-checks that the AI still owns the ticket (an admin may have
     # taken over, or the user may have written again) and otherwise discards the reply.
-    # A handoff pass that did not already write the `ai` note (Handle did not, e.g. ProcessReply or
-    # no investigate_note capability) writes ONE from the handoff reason: no LLM call.
+    # It is the only writer of the pass's `ai` note: Handle's context.note_body, plus the handoff
+    # reason when the pass ends in a handoff (no LLM call). A discarded pass keeps the findings
+    # note, marked as not sent.
     class Finalize
       include Interactor
 
-      delegate :ticket, :playbook, :triage, :reply, :trigger_message, to: :context
+      NOT_SENT_LINE = "Reply not sent: the ticket changed while the assistant was working."
+
+      delegate :ticket, :playbook, :triage, :reply, :trigger_message, :note_body, to: :context
 
       def call
         ticket.with_lock do
-          next discard if !ticket.ai_analyzing? || superseded?
-
-          create_ai_message
-          if handoff_reason
-            ticket.request_ai_handoff!
-            write_handoff_note
-          else
-            ticket.await_user_reply!
-          end
+          owned? ? commit : discard
         end
       end
 
       private
 
+      def owned?
+        ticket.ai_analyzing? && !superseded?
+      end
+
+      def commit
+        write_note(handoff_reason && "AI handoff: #{handoff_reason}")
+        create_ai_message
+        handoff_reason ? ticket.request_ai_handoff! : ticket.await_user_reply!
+      end
+
       def discard
+        write_note(NOT_SENT_LINE) if context.note_body.present?
         (context.handle_run || context.respond_run)&.update!(status: :discarded)
         context.discarded = true
       end
@@ -79,11 +85,9 @@ module Support
         ticket.conversation.messages.ai.count
       end
 
-      def write_handoff_note
-        return if context.note_written
-
-        ticket.notes.create!(account: nil, kind: :ai, body: "AI handoff: #{handoff_reason}")
-        context.note_written = true
+      def write_note(line = nil)
+        body = [note_body, line].compact_blank.join("\n")
+        ticket.notes.create!(account: nil, kind: :ai, body: body) if body.present?
       end
     end
   end

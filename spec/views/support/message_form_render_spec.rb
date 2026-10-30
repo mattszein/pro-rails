@@ -30,6 +30,20 @@ RSpec.describe "conversation partials rendered for a broadcast" do
     end
   end
 
+  it "shows the analyzing banner and no composer while the assistant analyzes" do
+    html = render_partial("message_form", {ticket: create(:ticket, :ai_analyzing)})
+
+    expect(html).to include(I18n.t("support.ticket_status_banner.analyzing"))
+    expect(html).not_to include(I18n.t("support.messages.placeholder"))
+  end
+
+  it "shows the composer when the assistant awaits the user" do
+    html = render_partial("message_form", {ticket: create(:ticket, :ai_awaiting_user)})
+
+    expect(html).to include(I18n.t("support.messages.placeholder"))
+    expect(html).not_to include(I18n.t("support.ticket_status_banner.analyzing"))
+  end
+
   it "gates the reopen form to the requester with turbo-show on a finished ticket" do
     ticket = create(:ticket, :finished)
     html = render_partial("message_form", {ticket: ticket})

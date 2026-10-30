@@ -28,14 +28,39 @@ RSpec.describe Support::Ticket, "user page broadcasts" do
     end
   end
 
-  context "when the assistant's reply flips ai_state but the ticket stays messageable" do
+  context "when the assistant finishes analyzing" do
     let(:ticket) { create(:ticket, :ai_analyzing) }
 
-    it "does not re-broadcast the composer (it would wipe the user's draft) but updates the status banner" do
+    it "broadcasts the composer and the status banner" do
       payloads = payloads_for { ticket.await_user_reply! }
 
-      expect(composer?(payloads)).to be(false)
+      expect(composer?(payloads)).to be(true)
       expect(payloads.any? { |d| d.include?("ai_status") && d.include?(I18n.t("support.ticket_status_banner.ai_awaiting_user")) }).to be(true)
+    end
+
+    it "broadcasts the composer on handoff" do
+      expect(composer?(payloads_for { ticket.request_ai_handoff! })).to be(true)
+    end
+  end
+
+  context "when the assistant starts analyzing" do
+    let(:ticket) { create(:ticket, :ai_awaiting_user) }
+
+    it "replaces the composer with the analyzing banner" do
+      payloads = payloads_for { ticket.start_ai_analysis! }
+
+      expect(composer?(payloads)).to be(false)
+      expect(payloads.any? { |d| d.include?("message_form") && d.include?(I18n.t("support.ticket_status_banner.analyzing")) }).to be(true)
+    end
+  end
+
+  context "when the assistant's reply flips ai_state from awaiting_user to handoff" do
+    let(:ticket) { create(:ticket, :ai_awaiting_user) }
+
+    it "does not re-broadcast the live composer (it would wipe the user's draft)" do
+      payloads = payloads_for { ticket.request_ai_handoff! }
+
+      expect(composer?(payloads)).to be(false)
     end
   end
 
