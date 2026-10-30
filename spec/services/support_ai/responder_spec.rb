@@ -27,7 +27,7 @@ RSpec.describe SupportAi::Responder, :llm do
       result = described_class.new(ticket: ticket).triage
 
       expect(result).to be_a(Llm::Result)
-      expect(result.output).to eq(valid.merge(language: "es"))
+      expect(result.output).to be_a(ActiveSupport::HashWithIndifferentAccess).and eq(valid.merge(language: "es").with_indifferent_access)
       expect(result.model).to eq(SupportAiConfig.model)
       expect([result.input_tokens, result.output_tokens]).to eq([12, 7])
       expect(result.latency_ms).to be >= 0
@@ -74,11 +74,11 @@ RSpec.describe SupportAi::Responder, :llm do
 
       result = responder.handle(triage: triage)
 
-      expect(result.output).to eq(
+      expect(result.output).to be_a(ActiveSupport::HashWithIndifferentAccess).and eq({
         findings: "User reports a double charge; account verified.", reply: "Lamentamos el cobro doble.",
         article_ids: [], resolution_proposed: true, handoff_requested: true, handoff_reason: reason,
         kb_gap: true, kb_queries: [automatic_query]
-      )
+      }.with_indifferent_access)
       expect(requests.size).to eq(2)
       expect(requests.first["messages"].to_json).to include("requester account facts", "status: verified", "requester past tickets")
       expect(requests.last["messages"].to_json).to include("account verified.", "Now write the reply to the user", "resolution_proposed")
@@ -383,7 +383,7 @@ RSpec.describe SupportAi::Responder, :llm do
 
       result = responder.respond
 
-      expect(result.output).to eq(reply: "Hello, let me help.", article_ids: [], resolution_proposed: false, handoff_requested: false, handoff_reason: "")
+      expect(result.output).to be_a(ActiveSupport::HashWithIndifferentAccess).and eq({reply: "Hello, let me help.", article_ids: [], resolution_proposed: false, handoff_requested: false, handoff_reason: ""}.with_indifferent_access)
       expect(requests.last["messages"].last["content"].to_json).to include("resolution_proposed", "handoff_reason")
     end
 

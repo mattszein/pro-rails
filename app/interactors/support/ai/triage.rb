@@ -15,14 +15,13 @@ module Support
       private
 
       def previous_output
-        run = ticket.ai_runs.triage.succeeded.where(run_trigger: trigger).order(:id).last
-        run&.output&.with_indifferent_access.presence
+        ticket.ai_runs.latest_output(:triage)
       end
 
       def run_triage
         result = SupportAi::Responder.new(ticket: ticket).triage
         RecordRun.call(ticket: ticket, trigger: trigger, step: :triage, result: result)
-        result.output.with_indifferent_access
+        result.output
       rescue Llm::Error => e
         RecordRun.call(ticket: ticket, trigger: trigger, step: :triage, error: e)
         nil

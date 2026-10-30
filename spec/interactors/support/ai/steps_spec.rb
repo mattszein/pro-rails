@@ -59,6 +59,15 @@ RSpec.describe "Support::Ai steps", type: :interactor do
       expect(ticket.reload).to be_ai_stepped_back
     end
 
+    it "does not raise when an admin took over after the ticket was loaded" do
+      stale = Support::Ticket.find(ticket.id)
+      ticket.update_columns(ai_state: Support::Ticket.ai_states[:stepped_back])
+      result = nil
+      expect { result = described_class.call(ticket: stale, trigger: "ticket_created") }.not_to raise_error
+      expect(result).to be_failure
+      expect(ticket.reload).to be_ai_stepped_back
+    end
+
     context "on a user reply" do
       it "matches with the current rules" do
         create(:ai_playbook, :default)

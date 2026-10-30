@@ -21,7 +21,7 @@ module Support
         result = SupportAi::Responder.new(ticket: ticket, playbook: playbook).handle(triage: triage, reply: reply, trigger_message: trigger_message)
 
         write_note(result.output) if playbook.capability?(:investigate_note)
-        context.reply = reply ? result.output.with_indifferent_access : nil
+        context.reply = reply ? result.output : nil
         context.handle_run = RecordRun.call(ticket: ticket, playbook: playbook, trigger: trigger, step: :handle, result: result)
       rescue Llm::Error => e
         RecordRun.call(ticket: ticket, playbook: playbook, trigger: trigger, step: :handle, error: e)

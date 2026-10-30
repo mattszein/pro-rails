@@ -9,6 +9,18 @@ module Support
       Support::Ai::Fallback.call(ticket: ticket, error: error.message) if ticket
     end
 
+    # Enqueues the job after a state change has been committed. Solid Queue uses a separate
+    # database, so an enqueue failure must never undo that change: it is logged and reported as
+    # false. (No safety-net sweep recovers the ticket yet; it is planned in support-ai-assist.)
+    # Only enqueue errors are rescued; anything else is a bug and bubbles up.
+    def self.enqueue(ticket, trigger, message_id = nil)
+      perform_later(ticket.id, trigger.to_s, message_id)
+      true
+    rescue ActiveJob::EnqueueError, ActiveRecord::ActiveRecordError => e
+      Rails.logger.error("Support AI enqueue failed for ticket #{ticket.id} (#{trigger}): #{e.class}: #{e.message}")
+      false
+    end
+
     def perform(ticket_id, trigger, message_id = nil)
       ticket = Support::Ticket.find_by(id: ticket_id)
       return unless ticket

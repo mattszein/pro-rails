@@ -47,7 +47,7 @@ module SupportAi
     def triage
       prompt = Prompts.triage(ticket: ticket)
       llm.call(model: SupportAiConfig.model, system: prompt.system, schema: TRIAGE_SCHEMA) do |chat|
-        parse_triage(chat.ask(prompt.user))
+        indifferent(parse_triage(chat.ask(prompt.user)))
       end
     end
 
@@ -83,7 +83,7 @@ module SupportAi
         answer = reply ? ask_for_answer(chat, Prompts.reply_request(kb_gap: kb_gap), budget) : nil
         answer = force_kb_gap_handoff(answer) if kb_gap && answer
 
-        answer_output(answer).merge(findings: findings, kb_gap: kb_gap, kb_queries: budget.searched_queries.first(MAX_KB_QUERIES))
+        indifferent(answer_output(answer).merge(findings: findings, kb_gap: kb_gap, kb_queries: budget.searched_queries.first(MAX_KB_QUERIES)))
       end
     end
 
@@ -111,7 +111,7 @@ module SupportAi
         final = turns.pop
         turns.each { |turn| chat.add_message(turn) }
 
-        answer_output(ask_for_answer(chat, "#{final[:content]}\n\n#{Prompts::REPLY_FORMAT}", budget))
+        indifferent(answer_output(ask_for_answer(chat, "#{final[:content]}\n\n#{Prompts::REPLY_FORMAT}", budget)))
       end
     end
 
@@ -121,9 +121,13 @@ module SupportAi
     # Any Llm::Error leaves with the transcript and tool calls attached.
     def llm = @llm ||= Llm::Runner.new(timeout: SupportAiConfig.timeout, temperature: SupportAiConfig.temperature)
 
+    # Outputs leave here with indifferent access: callers read them with symbols, while the same
+    # data comes back from jsonb (AiRun.output) with string keys.
+    def indifferent(output) = output.with_indifferent_access
+
     # Triage language when it is a supported locale, else the request locale.
     def locale_from(triage)
-      language = triage.to_h.with_indifferent_access[:language].to_s
+      language = triage&.dig(:language).to_s
       %w[en es].include?(language) ? language : nil
     end
 

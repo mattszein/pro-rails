@@ -77,22 +77,3 @@ RSpec.describe Support::Ai::RecordRun do
     expect(run.status).to eq("discarded")
   end
 end
-
-RSpec.describe Support::Ai::Dispatch do
-  let(:ticket) { create(:ticket, :ai_analyzing) }
-
-  it "enqueues the job" do
-    expect { described_class.call(ticket, "user_message", 7) }
-      .to have_enqueued_job(Support::AiProcessJob).with(ticket.id, "user_message", 7)
-  end
-
-  it "swallows enqueue errors and reports false" do
-    allow(Support::AiProcessJob).to receive(:perform_later).and_raise(ActiveJob::EnqueueError, "down")
-    expect(described_class.call(ticket, "ticket_created")).to be(false)
-  end
-
-  it "does not swallow unrelated errors" do
-    allow(Support::AiProcessJob).to receive(:perform_later).and_raise(NoMethodError)
-    expect { described_class.call(ticket, "ticket_created") }.to raise_error(NoMethodError)
-  end
-end

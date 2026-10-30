@@ -2,6 +2,7 @@ class SharedBaseController < ApplicationController
   include Pagy::Method
   include ActionPolicyHandler
   include RecordNotFoundHandler
+  include TransitionErrors
   include FeatureGated
 
   private

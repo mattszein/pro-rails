@@ -1,7 +1,6 @@
 module Support
   class TicketsController < DashboardController
     include Tableable
-    include TransitionErrors
 
     before_action :require_account
     verify_authorized

@@ -1,6 +1,5 @@
 class Adminit::TicketsController < Adminit::ApplicationController
   include Tableable
-  include TransitionErrors
 
   before_action :set_ticket, only: %i[edit update destroy take leave finish reopen accept_reopen new_reject_reopen reject_reopen]
   before_action :ensure_frame_response, only: %i[edit new_reject_reopen]

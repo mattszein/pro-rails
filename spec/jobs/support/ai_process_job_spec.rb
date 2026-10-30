@@ -109,4 +109,21 @@ RSpec.describe Support::AiProcessJob, type: :job do
       expect(ticket.notes.system.pluck(:body)).to include("AI failed after retries; handed off")
     end
   end
+
+  describe ".enqueue" do
+    it "enqueues the job" do
+      expect { described_class.enqueue(ticket, "user_message", 7) }
+        .to have_enqueued_job(described_class).with(ticket.id, "user_message", 7)
+    end
+
+    it "swallows enqueue errors and reports false" do
+      allow(described_class).to receive(:perform_later).and_raise(ActiveJob::EnqueueError, "down")
+      expect(described_class.enqueue(ticket, "ticket_created")).to be(false)
+    end
+
+    it "does not swallow unrelated errors" do
+      allow(described_class).to receive(:perform_later).and_raise(NoMethodError)
+      expect { described_class.enqueue(ticket, "ticket_created") }.to raise_error(NoMethodError)
+    end
+  end
 end
