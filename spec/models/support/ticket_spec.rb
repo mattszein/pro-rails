@@ -213,36 +213,6 @@ RSpec.describe Support::Ticket, type: :model do
       end
     end
 
-    describe "#ai_pass_current?" do
-      let(:ticket) { create(:ticket, :ai_analyzing) }
-      let(:account) { ticket.created }
-
-      it "is true while analyzing with no newer human message" do
-        trigger = create(:message, conversation: ticket.conversation, account: account)
-        expect(ticket).to be_ai_pass_current(trigger)
-      end
-
-      it "is false when the ticket is not analyzing" do
-        ticket.update!(ai_state: :stepped_back)
-        expect(ticket).not_to be_ai_pass_current
-      end
-
-      it "is false when the user wrote after the trigger message" do
-        trigger = create(:message, conversation: ticket.conversation, account: account)
-        create(:message, conversation: ticket.conversation, account: account)
-        expect(ticket).not_to be_ai_pass_current(trigger)
-      end
-
-      it "without a trigger message is true when there is no human message" do
-        expect(ticket).to be_ai_pass_current
-      end
-
-      it "without a trigger message is false once any human message exists" do
-        create(:message, conversation: ticket.conversation, account: account)
-        expect(ticket).not_to be_ai_pass_current
-      end
-    end
-
     describe "#awaiting_ai_resolution?" do
       it "is true for open tickets the AI is waiting on" do
         expect(build(:ticket, :ai_awaiting_user)).to be_awaiting_ai_resolution

@@ -40,7 +40,7 @@ module Support
       trigger_message = ticket.conversation.messages.find_by(id: message_id) if message_id
       return if message_id && trigger_message.nil?
       # Cheap early exit so a stale pass spends no LLM call; Finalize re-checks it under the lock.
-      return unless ticket.ai_pass_current?(trigger_message)
+      return unless ticket.ai_analyzing?
 
       result = flow.call(ticket: ticket, trigger: trigger, trigger_message: trigger_message)
       Rails.logger.info("Support AI #{flow.name} halted for ticket #{ticket.id}: #{result.error}") if result.failure?

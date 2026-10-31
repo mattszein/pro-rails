@@ -88,17 +88,5 @@ RSpec.describe Support::Ai::Finalize, type: :interactor do
       expect(run.reload).to be_discarded
       expect(run.output).to include("findings" => "Expired session.")
     end
-
-    it "is discarded by a newer human message and still keeps the note" do
-      trigger = create(:message, conversation: ticket.conversation, account: ticket.created)
-      create(:message, conversation: ticket.conversation, account: ticket.created)
-      result = call_step(trigger_message: trigger, note_body: "Expired session.", handle_run: run)
-
-      expect(result.discarded).to be(true)
-      expect(ticket.notes.ai.pluck(:body)).to eq(["Expired session.\n#{not_sent}"])
-      expect(ticket.conversation.messages.ai).to be_empty
-      expect(ticket.reload).to be_ai_analyzing
-      expect(run.reload).to be_discarded
-    end
   end
 end

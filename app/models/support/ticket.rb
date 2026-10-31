@@ -108,12 +108,6 @@ module Support
       ai_analyzing? || ai_awaiting_user? || ai_handoff_requested?
     end
 
-    # An AI pass is current while the AI owns the ticket and the user has not written since its
-    # trigger message. A ticket_created pass has no trigger message, so any human message makes it stale.
-    def ai_pass_current?(trigger_message = nil)
-      ai_analyzing? && !conversation.messages.human.where("messages.id > ?", trigger_message&.id || 0).exists?
-    end
-
     # Newest AI runs first, for the admin "AI activity" panel.
     def recent_ai_runs(limit = 20) = ai_runs.recent(limit)
 

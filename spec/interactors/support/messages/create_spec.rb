@@ -15,6 +15,7 @@ RSpec.describe Support::Messages::Create, type: :interactor do
   end
 
   it "saves a human message" do
+    ticket.update!(ai_state: :handoff_requested) # open + off is not messageable for the requester
     result = call_step(user)
     expect(result).to be_success
     expect(result.message).to be_persisted.and have_attributes(sender: "human", account: user)
@@ -49,9 +50,53 @@ RSpec.describe Support::Messages::Create, type: :interactor do
     context "already analyzing" do
       let(:state) { :analyzing }
 
-      it "only enqueues; the state is unchanged" do
-        expect { call_step(user) }.to have_enqueued_job(Support::AiProcessJob)
+      it "refuses the message: nothing saved, no job, state unchanged" do
+        result = nil
+        expect { result = call_step(user) }.not_to have_enqueued_job(Support::AiProcessJob)
+        expect(result).to be_failure
+        expect(result.message).not_to be_persisted
+        expect(ticket.conversation.messages.reload).to be_empty
         expect(ticket.reload).to be_ai_analyzing
+      end
+    end
+
+    context "when the ticket moved to analyzing after the policy ran (stale instance)" do
+      let(:state) { :awaiting_user }
+
+      it "refuses the message because the lock reloads the fresh state" do
+        message = message_by(user) # its ticket instance still says awaiting_user
+        Support::Ticket.find(ticket.id).start_ai_analysis!
+
+        result = nil
+        expect { result = described_class.call(message: message) }.not_to have_enqueued_job(Support::AiProcessJob)
+        expect(result).to be_failure
+        expect(message).not_to be_persisted
+        expect(ticket.reload).to be_ai_analyzing
+      end
+    end
+
+    %i[finished closed].each do |status|
+      context "on a #{status} ticket" do
+        let(:state) { :awaiting_user }
+
+        it "refuses the message" do
+          ticket.update_columns(status: Support::Ticket.statuses.fetch(status))
+          result = nil
+          expect { result = call_step(user) }.not_to have_enqueued_job(Support::AiProcessJob)
+          expect(result).to be_failure
+          expect(result.message).not_to be_persisted
+        end
+      end
+    end
+
+    context "when the message cannot be saved" do
+      let(:state) { :awaiting_user }
+
+      it "does not flip the state or enqueue" do
+        result = nil
+        expect { result = call_step(user, content: "") }.not_to have_enqueued_job(Support::AiProcessJob)
+        expect(result).to be_failure
+        expect(ticket.reload).to be_ai_awaiting_user
       end
     end
 

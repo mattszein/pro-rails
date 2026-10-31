@@ -11,7 +11,7 @@ module Support
 
       NOT_SENT_LINE = "Reply not sent: the ticket changed while the assistant was working."
 
-      delegate :ticket, :playbook, :triage, :reply, :trigger_message, :note_body, to: :context
+      delegate :ticket, :playbook, :triage, :reply, :note_body, to: :context
 
       def call
         ticket.with_lock do
@@ -22,7 +22,7 @@ module Support
       private
 
       def owned?
-        ticket.ai_pass_current?(trigger_message)
+        ticket.ai_analyzing?
       end
 
       def commit

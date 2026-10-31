@@ -33,12 +33,6 @@ RSpec.describe Support::AiProcessJob, type: :job do
       end
     end
 
-    it "does nothing when the user has already written (stale pass)" do
-      create(:message, conversation: conversation, account: user)
-      described_class.perform_now(ticket.id, :ticket_created)
-      expect(Support::Ai::Flows::ProcessTicket).not_to have_received(:call)
-    end
-
     it "logs when the organizer halts" do
       allow(Support::Ai::Flows::ProcessTicket).to receive(:call).and_return(double(failure?: true, error: "No AI playbook matched"))
       ticket
@@ -58,12 +52,6 @@ RSpec.describe Support::AiProcessJob, type: :job do
 
     it "does nothing when the message is gone" do
       described_class.perform_now(ticket.id, :user_message, 0)
-      expect(Support::Ai::Flows::ProcessReply).not_to have_received(:call)
-    end
-
-    it "debounces: a newer human message gets its own job" do
-      create(:message, conversation: conversation, account: user, content: "second")
-      described_class.perform_now(ticket.id, :user_message, message.id)
       expect(Support::Ai::Flows::ProcessReply).not_to have_received(:call)
     end
 
