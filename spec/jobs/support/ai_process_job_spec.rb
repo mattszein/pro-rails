@@ -33,8 +33,8 @@ RSpec.describe Support::AiProcessJob, type: :job do
       end
     end
 
-    it "does nothing when an AI message already exists (idempotent re-run)" do
-      create(:message, :ai, conversation: conversation)
+    it "does nothing when the user has already written (stale pass)" do
+      create(:message, conversation: conversation, account: user)
       described_class.perform_now(ticket.id, :ticket_created)
       expect(Support::Ai::Flows::ProcessTicket).not_to have_received(:call)
     end
@@ -63,12 +63,6 @@ RSpec.describe Support::AiProcessJob, type: :job do
 
     it "debounces: a newer human message gets its own job" do
       create(:message, conversation: conversation, account: user, content: "second")
-      described_class.perform_now(ticket.id, :user_message, message.id)
-      expect(Support::Ai::Flows::ProcessReply).not_to have_received(:call)
-    end
-
-    it "does nothing when an AI message newer than the trigger exists" do
-      create(:message, :ai, conversation: conversation)
       described_class.perform_now(ticket.id, :user_message, message.id)
       expect(Support::Ai::Flows::ProcessReply).not_to have_received(:call)
     end

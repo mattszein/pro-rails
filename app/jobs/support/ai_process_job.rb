@@ -36,29 +36,14 @@ module Support
 
       ticket = Support::Ticket.find_by(id: ticket_id)
       return unless ticket
-      return unless ticket.ai_analyzing?
 
-      trigger_message = nil
-      messages = ticket.conversation.messages
-      if message_id
-        trigger_message = messages.find_by(id: message_id)
-        return unless trigger_message
-        # A newer human message gets its own job: this debounces bursts.
-        return unless messages.human.reorder(id: :desc).first&.id == trigger_message.id
-        # Already answered (re-run).
-        return if messages.ai.where("messages.id > ?", trigger_message.id).exists?
-      elsif trigger == :ticket_created
-        return if messages.ai.exists?
-      end
+      trigger_message = ticket.conversation.messages.find_by(id: message_id) if message_id
+      return if message_id && trigger_message.nil?
+      # Cheap early exit so a stale pass spends no LLM call; Finalize re-checks it under the lock.
+      return unless ticket.ai_pass_current?(trigger_message)
 
-      run(flow, ticket: ticket, trigger: trigger, trigger_message: trigger_message)
-    end
-
-    private
-
-    def run(organizer, **context)
-      result = organizer.call(**context)
-      Rails.logger.info("Support AI #{organizer.name} halted for ticket #{context[:ticket].id}: #{result.error}") if result.failure?
+      result = flow.call(ticket: ticket, trigger: trigger, trigger_message: trigger_message)
+      Rails.logger.info("Support AI #{flow.name} halted for ticket #{ticket.id}: #{result.error}") if result.failure?
     end
   end
 end

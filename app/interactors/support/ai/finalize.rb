@@ -22,7 +22,7 @@ module Support
       private
 
       def owned?
-        ticket.ai_analyzing? && !superseded?
+        ticket.ai_pass_current?(trigger_message)
       end
 
       def commit
@@ -35,12 +35,6 @@ module Support
         write_note(NOT_SENT_LINE) if context.note_body.present?
         (context.handle_run || context.respond_run)&.update!(status: :discarded)
         context.discarded = true
-      end
-
-      # A newer human message means its own job will answer. A ticket_created run (no trigger
-      # message) is superseded by any human message the user typed while it was working.
-      def superseded?
-        ticket.conversation.messages.human.where("messages.id > ?", trigger_message&.id || 0).exists?
       end
 
       def create_ai_message
