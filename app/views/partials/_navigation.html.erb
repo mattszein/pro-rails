@@ -5,5 +5,6 @@
 <% end %>
 <%= render(Core::SidebarLinkComponent.new(label: t("shared.navigation.settings"), path: edit_settings_profile_path, active_paths: [edit_settings_profile_path], icon_name: "settings", animated_type: "sliders")) %>
 <%= render(Core::SidebarLinkComponent.new(label: t("shared.navigation.support"), path: support_tickets_path, active_paths: [support_tickets_path], icon_name: "support", animated_type: "support")) %>
+<%= render(Core::SidebarLinkComponent.new(label: t("shared.navigation.help"), path: help_articles_path, active_paths: [help_articles_path], icon_name: "info", animated_type: "support")) %>
 <%= render(Core::SidebarLinkComponent.new(label: t("shared.common.dark_light"), path: "#", icon_name: "theme", animated_type: "sunmoon", html_options: {data: {turbo: "false", controller: "dark-mode", dark_mode_target: "themeToggle", action: "click->dark-mode#toggleTheme"}})) %>
 <%= render(Core::SidebarLinkComponent.new(label: t("shared.common.logout"), path: rodauth.logout_path, icon_name: "logout", animated_type: "logout", html_options: {data: {turbo_prefetch: "false", turbo_method: "post"}, method: :post})) %>

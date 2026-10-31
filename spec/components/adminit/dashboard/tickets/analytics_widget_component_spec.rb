@@ -31,4 +31,12 @@ RSpec.describe Adminit::Dashboard::Tickets::AnalyticsWidgetComponent, type: :com
     expect(page).to have_text("3")
     expect(page).to have_text(I18n.t("adminit.dashboard_widgets.tickets.analytics.resolved"))
   end
+
+  it "shows the needs-human count" do
+    create(:ticket, :ai_handoff_requested)
+    render_inline(described_class.new(account: account))
+
+    expect(page).to have_text(I18n.t("adminit.dashboard_widgets.tickets.analytics.needs_human"))
+    expect(described_class.new(account: account).stats[:needs_human]).to eq(1)
+  end
 end

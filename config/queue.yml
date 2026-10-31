@@ -3,7 +3,12 @@ default: &default
     - polling_interval: 1
       batch_size: 500
   workers:
-    - queues: "*"
+    - queues: support_ai
+      threads: 2
+      processes: <%= ENV.fetch("JOB_CONCURRENCY", 1) %>
+      polling_interval: 0.1
+    # Everything else. New queues must be added here ("*" would also pull support_ai).
+    - queues: [default, notifications, mailers, active_storage_analysis, active_storage_purge]
       threads: 3
       processes: <%= ENV.fetch("JOB_CONCURRENCY", 1) %>
       polling_interval: 0.1

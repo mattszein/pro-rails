@@ -1,0 +1,79 @@
+<div class="space-y-4 text-sm" data-role="ai-run-detail">
+  <%= render Core::DefinitionListComponent.new(gap: :sm, layout: :inline, variant: :default) do |dl| %>
+    <% dl.with_item(term: t("adminit.tickets.ai_runs.step"), size: :sm) { t("enums.ai_run.step.#{run.step}") } %>
+    <% dl.with_item(term: t("adminit.tickets.ai_runs.trigger"), size: :sm) { t("enums.ai_run.run_trigger.#{run.run_trigger}") } %>
+    <% dl.with_item(term: t("adminit.tickets.ai_runs.status"), size: :sm) do %>
+      <%= render(Core::BadgeComponent.new(label: t("enums.ai_run.status.#{run.status}"), theme: status_theme, size: :xs)) %>
+    <% end %>
+    <% dl.with_item(term: t("adminit.tickets.ai_runs.model"), size: :sm) { run.model || "-" } %>
+    <% dl.with_item(term: t("adminit.tickets.ai_runs.tokens"), size: :sm) { tokens } %>
+    <% dl.with_item(term: t("adminit.tickets.ai_runs.latency"), size: :sm) { run.latency_ms || "-" } %>
+    <% dl.with_item(term: t("adminit.tickets.ai_runs.created_at"), size: :sm) { l(run.created_at, format: :short) } %>
+  <% end %>
+
+  <% if run.error.present? %>
+    <%= render Core::BoxComponent.new(variant: :error, padding: :xs, rounded: :md) do %>
+      <div data-role="ai-run-error">
+        <p class="font-semibold"><%= t("adminit.tickets.ai_runs.error") %></p>
+        <pre class="whitespace-pre-wrap break-words"><%= run.error %></pre>
+      </div>
+    <% end %>
+  <% end %>
+
+  <% if snapshot? %>
+    <section class="space-y-2" data-role="playbook-snapshot">
+      <h4 class="font-semibold"><%= t("adminit.tickets.ai_runs.playbook_snapshot") %></h4>
+      <%= render Core::DefinitionListComponent.new(gap: :sm, layout: :inline, variant: :default) do |dl| %>
+        <% dl.with_item(term: t("adminit.tickets.ai_playbook"), size: :sm) { snapshot[:name] } %>
+        <% dl.with_item(term: t("adminit.ai_playbooks.mode"), size: :sm) { t("enums.support_ai_playbook.mode.#{snapshot[:mode]}", default: snapshot[:mode].to_s) } %>
+        <% dl.with_item(term: t("adminit.ai_playbooks.capabilities"), size: :sm) { snapshot_capabilities } %>
+        <% dl.with_item(term: t("adminit.ai_playbooks.limits"), size: :sm) { snapshot_limits } %>
+      <% end %>
+      <% if snapshot[:instructions].present? %>
+        <%= render Core::CodeBlockComponent.new(text: snapshot[:instructions]) %>
+      <% end %>
+    </section>
+  <% end %>
+
+  <section class="space-y-2">
+    <h4 class="font-semibold"><%= t("adminit.tickets.ai_runs.transcript") %></h4>
+    <% if entries.empty? %>
+      <p class="text-slate-500 italic" data-role="no-transcript"><%= t("adminit.tickets.ai_runs.no_transcript") %></p>
+      <% if run_tool_calls.any? %>
+        <h5 class="font-semibold"><%= t("adminit.tickets.ai_runs.tool_calls") %></h5>
+        <%= render Core::CodeBlockComponent.new(text: pretty(run_tool_calls)) %>
+      <% end %>
+    <% else %>
+      <ol class="space-y-3" data-role="transcript">
+        <% entries.each do |entry| %>
+          <li data-role="transcript-entry">
+            <%= render Core::BoxComponent.new(variant: :neutral, padding: :xs, rounded: :md, classes: "space-y-1") do %>
+              <div class="flex items-center gap-2">
+                <%= render(Core::BadgeComponent.new(label: role_label(entry), theme: role_theme(entry), size: :xs)) %>
+                <% if role_of(entry) == "tool" && tool_result_label(entry) %>
+                  <span class="text-xs text-slate-500"><%= t("adminit.tickets.ai_runs.result_of") %> <%= tool_result_label(entry) %></span>
+                <% end %>
+              </div>
+              <% if entry["content"].present? %>
+                <%= render Core::CodeBlockComponent.new(text: entry["content"].is_a?(String) ? entry["content"] : pretty(entry["content"])) %>
+              <% end %>
+              <% tool_calls_of(entry).each do |call| %>
+                <div class="space-y-1" data-role="tool-call">
+                  <p class="text-xs font-semibold"><%= t("adminit.tickets.ai_runs.tool_call") %>: <%= call["name"] %></p>
+                  <%= render Core::CodeBlockComponent.new(text: call["arguments"].is_a?(String) ? call["arguments"] : pretty(call["arguments"])) %>
+                </div>
+              <% end %>
+            <% end %>
+          </li>
+        <% end %>
+      </ol>
+    <% end %>
+  </section>
+
+  <% if output? %>
+    <section class="space-y-2">
+      <h4 class="font-semibold"><%= t("adminit.tickets.ai_runs.output") %></h4>
+      <%= render Core::CodeBlockComponent.new(text: pretty(run.output), html_options: {data: {role: "ai-run-output"}}) %>
+    </section>
+  <% end %>
+</div>

@@ -1,5 +1,5 @@
 class Announcement < ApplicationRecord
-  class InvalidTransition < StandardError; end
+  class InvalidTransition < DomainError; end
   SCHEDULE_TOLERANCE = 3.minutes
   belongs_to :author, class_name: "Account"
   has_rich_text :rich_body

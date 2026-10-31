@@ -1,6 +1,7 @@
 module Support
   class MessagePolicy < ApplicationPolicy
-    # Allow creating messages if the user is either the ticket creator or assignee
+    # The requester can write while the ticket is messageable; an admin only on a ticket assigned
+    # to them (they must take it first).
     def create?
       return false unless record.conversation&.ticket
 
@@ -11,8 +12,7 @@ module Support
         return ticket.messageable?
       end
 
-      # Assignee or Adminit access can always message
-      user.id == ticket.assigned_id || user.adminit_access?
+      user.id == ticket.assigned_id
     end
 
     # Only the message author can update their own messages

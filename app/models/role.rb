@@ -13,6 +13,7 @@ class Role < ApplicationRecord
       .select("roles.*, (SELECT COUNT(*) FROM accounts WHERE accounts.role_id = roles.id) AS accounts_count")
   }
   scope :selectable, -> { order(:name) }
+  scope :permitting, ->(resource_key) { where(id: joins(:permissions).where(permissions: {resource: Permission.resources.fetch(resource_key.to_s)}).select(:id)) }
 
   def self.superadmin
     Role.find_by(name: SUPERADMIN)

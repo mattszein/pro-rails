@@ -1,8 +1,8 @@
 module AvatarAi
   class ConceptGenerator < BaseGenerator
     def generate(spark_text:, style:, color_preference: nil)
-      response = ask(build_prompt(spark_text, style, color_preference))
-      parse_json_array(response.content, limit: 3)
+      content = ask(build_prompt(spark_text, style, color_preference))
+      parse_json_array(content, limit: 3)
     end
 
     private

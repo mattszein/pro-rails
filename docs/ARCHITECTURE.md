@@ -1,388 +1,226 @@
 # Architecture Reference
 
-Decision frameworks, pattern rules, and architectural boundaries. For implementation details and code examples, load the relevant skill (backend, frontend, tester). For product overview, see [PROJECT.md](PROJECT.md).
-
----
+Rules and boundaries. Code examples live in the skills (backend, frontend, tester). Product overview: [PROJECT.md](PROJECT.md).
 
 ## Core Principles
 
-1. **Right tool for the right complexity** — Simple solutions for simple problems, patterns for complex ones
-2. **Single source of truth** — Each rule lives in one place
-3. **Explicit over implicit** — Visible dependencies, no hidden magic
-4. **Defense in depth** — Multiple layers protect data integrity
+1. **Right tool for the complexity**: simple solutions for simple problems, patterns for complex ones. Escalate on evidence, not in advance.
+2. **Single source of truth**: each rule lives in one place.
+3. **Explicit over implicit**: visible dependencies, no hidden magic.
+4. **Defense in depth**: several layers protect data integrity.
+5. **Consistency boundaries over model count**: an operation owns every write that keeps its aggregate consistent; anything that crosses that boundary is orchestrated elsewhere.
 
 ---
 
-## Business Logic Layers
+## Layers
 
-| Layer | Responsibility | Question It Answers |
-|-------|----------------|---------------------|
-| **Model** | Data integrity, state transitions | "Is this data valid?" / "Is this transition legal?" |
-| **Controller** | HTTP handling, authorization, UX guards | "Can this user attempt this action?" |
-| **Interactor** | Workflow orchestration, side effects | "What sequence of things must happen?" |
-
-### Request Flow
+| Layer | Owns | Answers |
+|---|---|---|
+| Model | Integrity, transitions, owned records | Is this valid? Is this transition legal? |
+| Controller | HTTP, authorization, UX guards | Can this user attempt this? |
+| Interactor | Workflows beyond one aggregate, side effects | What must happen, in what order? |
 
 ```
-HTTP Request
-  → Controller (params, authorization via ActionPolicy)
-    → Simple CRUD? → Model directly
-    → Workflow?    → Interactor → Model + Jobs + Notifications
-  → Model (validates, transitions, persists)
-  → Controller (response: redirect, render, turbo stream)
+Controller (params, authorize!)
+  → CRUD                           → Model
+  → single-aggregate transition    → model.transition!
+  → anything beyond the aggregate  → Interactor → transition + jobs / notifications
 ```
 
-### Pattern Selection
+### Where Code Belongs
 
-| Scenario | Pattern | Layer |
-|----------|---------|-------|
-| Simple CRUD (no side effects) | Controller + Model | Presentation + Domain |
-| State change + side effects | Interactor | Application |
-| Multiple models affected | Interactor | Application |
-| External API call | Service Object | Infrastructure |
-| Complex/reusable query | Model Scope or class method | Domain |
-| Table sort/filter whitelist (what a request may touch) | `Core::Table::Column`/`Filter` on the controller's column set | Presentation |
-| Authorization rules | Policy (ActionPolicy) | Application |
-| Notifications | Notifier (Noticed) via Interactor | Application |
-| Background processing | Job (Solid Queue) | Infrastructure |
-| Real-time CRUD sync | `broadcasts_to` in Model | Domain |
-| Bidirectional real-time | Custom ActionCable Channel | Presentation |
-| Multi-step content processing | Pipeline (Chain of Responsibility) | Infrastructure |
-| Typed configuration | Config class (Anyway Config) | Infrastructure |
+| Code | Home |
+|---|---|
+| Validations, cross-attribute invariants | Model |
+| Transitions + their owned records (history notes) | Model transition method |
+| UI state queries | Model query methods |
+| Reusable or table SQL | Model scope / class method |
+| Record-state broadcasts | Model |
+| Destroy protection | Model `before_destroy` |
+| Who may act | Policy (ActionPolicy) |
+| HTTP, UX guards, row-level access | Controller |
+| Domain error → HTTP response | `TransitionErrors` concern |
+| Table sort/filter whitelist | `Core::Table::Column` / `Filter` (per context) |
+| Side effects, cross-aggregate writes, workflow notes and broadcasts | Interactor |
+| 4+ reusable steps | `Interactor::Organizer` |
+| Notifications | Noticed notifier, triggered by an interactor |
+| Background work | Solid Queue job |
+| External APIs | Service object |
+| Multi-step content processing | Pipeline (`app/services/`) |
+| Typed configuration | Anyway Config |
+| Bidirectional real-time | ActionCable channel, one per concern |
+| DOM behavior / complex JS logic | Stimulus controller / `app/javascript/models/` |
 
-**`app/queries/` is not part of this template.** A standalone query object is justified only when a
-read has no owning model *and* is reused across domains — that case hasn't appeared. If it does, it
-goes in `app/services/` as a reporting object, not a new top-level layer. See "Table Queries" below
-for where table SQL and whitelists actually live.
+There is no `app/queries/`. A query with no owning model that is reused across domains goes in `app/services/` as a reporting object (not needed yet).
+
+### Domain Errors in Controllers
+
+The `TransitionErrors` concern rescues `DomainError` and `RecordInvalid` raised by transitions. Interactor failures render through the same method, so both paths look identical to the user. Never rescue `InvalidTransition` ad hoc.
 
 ---
 
 ## Authentication
 
-Rodauth. Configured in `app/misc/rodauth_main.rb` and `app/misc/rodauth_app.rb`.
-
-| Status | Value | Description |
-|--------|-------|-------------|
-| `unverified` | 1 | Account created, email not verified |
-| `verified` | 2 | Email verified, active |
-| `closed` | 3 | Closed by user or admin |
-
-Access current user via `current_account` in controllers/views. No `CurrentAttributes` — request context is passed explicitly to interactors and services.
-
----
+Rodauth (`app/misc/rodauth_main.rb`, `app/misc/rodauth_app.rb`). Account status: `unverified` 1, `verified` 2, `closed` 3. Current user: `current_account`. No `CurrentAttributes`: request context is passed explicitly.
 
 ## Authorization
 
-ActionPolicy with custom RBAC for admin (Adminit).
+ActionPolicy with custom RBAC in Adminit. Three gates: `Account#adminit_access?` → `before_action :authorize_adminit_access` → `authorize!` per action.
 
-### Three-Layer Authorization (Adminit)
+Each policy defines `POLICY_RESOURCE` (an integer enum key in `Permission::RESOURCE_REGISTRY`) and `self.identifier`. The base `get_access` calls `Role#permitted?`, which checks a memoized `Set`, so there is one query per request however many checks run.
 
-1. **Account-level gate** — `Account#adminit_access?` checks if role exists
-2. **Controller-level gate** — `before_action :authorize_adminit_access`
-3. **Policy-level check** — `authorize!` per action/resource
+Policy answers "can this USER?"; the model answers "can this RECORD?".
 
-### Policy Architecture
-
-Each policy defines `POLICY_RESOURCE` (matching an integer enum key in `Permission::RESOURCE_REGISTRY`) and `self.identifier`. The base `get_access` method checks whether the user's role has the matching permission via `Role#permitted?`, backed by a memoized `Set` of resource keys. One query per request regardless of how many policy checks run.
-
-| Question | Where |
-|----------|-------|
-| "Can this USER do this?" | Policy |
-| "Can this RECORD have this done?" | Model |
-
-### Adding a New Adminit Resource
-
-1. Add to `Permission::RESOURCE_REGISTRY` (integer enum — NEVER reuse values)
-2. Create policy with `POLICY_RESOURCE` matching the enum key
-3. Set `self.identifier` for ActionPolicy
+New resource: add the registry key (never reuse an integer) → policy with `POLICY_RESOURCE` → `self.identifier`.
 
 ---
 
 ## Model Rules
 
+### Aggregates
+
+An aggregate is a root plus the records it owns. A record is owned if it has no meaning without the parent, is destroyed with it, and is never written independently. A ticket's system notes are owned; `Account` is not.
+
 ### Validations
 
-Always in models. They're the last line of defense — fire regardless of caller (controller, interactor, job, console, seeds). Use `status_was` to check previous value in state-based validations.
+The last line of defense: they fire for every caller. Use `status_was` for the previous value. Cross-attribute invariants are validations, not corrective callbacks: a wrong path fails loudly instead of being silently fixed.
 
 ### Transition Methods
 
-Pure database operations. **NEVER** enqueue jobs, send emails, call APIs, or trigger any side effects from transition methods. This ensures models are safe to use in Console, Tests, and Seeds.
+The only path that changes state columns and ownership FKs (`status`, `ai_state`, `assigned_id`). Controllers never mass-assign them.
 
-Side effects belong in the Interactor that calls the transition.
+- Every guard runs inside `with_lock`, which reloads the row. Use plain `with_lock`, no helper.
+- One `update!` per transition. Never compose bang transitions.
+- May write owned records inside the lock.
+- No side effects: no jobs, mail, notifications or external I/O, so models stay safe in the console, tests and seeds. Record-state `after_commit` broadcasts are fine.
+- Returns `self`.
+- Every transition has a stale-instance spec. That spec is what enforces the lock rule.
 
-### Destroy Protection
-
-Use `before_destroy` callbacks with `throw(:abort)` to prevent invalid deletions.
-
-### Custom Exceptions
-
-Define `InvalidTransition < StandardError` per model for domain-specific transition failures.
-
-### Callback Scoring
+### Callbacks
 
 | Score | Type | Example | Action |
-|-------|------|---------|--------|
+|---|---|---|---|
 | 5 | Transformer | `before_validation :normalize_email` | Keep |
-| 4 | Normalizer | `before_save :strip_whitespace` | Keep |
-| 4 | Counter | `after_create :update_counter_cache` | Keep |
-| 3 | Auto-broadcast | `broadcasts_to` (CRUD sync) | Keep |
-| 2 | Observer | `after_save :notify_admin` | Extract to Interactor |
-| 1 | Operation | `after_create :send_welcome_email` | Extract to Interactor |
+| 4 | Normalizer / counter | `before_save :strip_whitespace` | Keep |
+| 3 | State broadcast | `broadcasts_to` | Keep |
+| 2 | Domain mutation | `before_save :release_ai_on_assignment` | Explicit transition step + invariant validation |
+| 2 | Observer | `after_save :notify_admin` | Move to an interactor |
+| 1 | Operation | `after_create :send_welcome_email` | Move to an interactor |
 
-**Rule**: If removing the callback breaks data integrity → keep. If it triggers external side-effects → extract.
+Keep a callback if removing it breaks integrity. Callers never pre-capture state, or read `saved_change_to_*`, to learn what a callback did; the transition makes it explicit.
 
-### Concern Organization
+### Other Model Rules
 
-Cross-cutting concerns (used by 2+ models) → flat in `app/models/concerns/`. Model-specific concerns → subdirectory named after the model, created when a model accumulates its 2nd concern.
-
-### Namespace Decision
-
-| Condition | Approach |
-|-----------|----------|
-| Multiple related models forming a domain | Namespace (`Support::Ticket`, `Support::Conversation`) |
-| Single standalone model | No namespace (`Announcement`) |
-| Model used across multiple domains | No namespace |
-
-### STI vs Enums
-
-| Use STI When | Use Enums When |
-|-------------|---------------|
-| Subtypes have different behavior (callbacks, validations, scopes) | Variants differ in label but follow same workflow |
-| Conditional logic around type in 3+ places | Number of variants might grow beyond 4-5 |
-| Each variant has a meaningful name | No behavioral difference between types |
+- **Exceptions:** `DomainError` → `Model::InvalidTransition` → subclasses that callers must distinguish (`AlreadyAssigned`).
+- **Destroy protection:** `before_destroy` with `throw(:abort)`.
+- **Audit records (system notes):** immutable. Use `before_update` → abort, and `before_destroy` → abort unless `destroyed_by_association`. Not `readonly?`, which also blocks the parent's `dependent: :destroy`. Policies expose no edit or delete. Notes describing the transition are written by the model; notes carrying workflow context by the interactor. English only.
+- **Concerns:** cross-model → flat in `app/models/concerns/`; model-specific → `concerns/{model}/`, starting with the model's 2nd concern.
+- **Namespaces:** related models forming a domain → namespace (`Support::Ticket`, `Support::Conversation`). Standalone or cross-domain models → none.
+- **STI vs enum:** STI when subtypes differ in behavior or type conditionals appear in 3+ places; enum when variants differ only in label.
 
 ---
 
-## Table Queries (sort/filter)
+## Table Queries
 
-**Queries belong to the model.** Anything that builds SQL is a scope or a class method on the model
-that owns the data — including filter and search predicates. When a model accumulates several such
-clusters, extract a model-specific concern (`app/models/concerns/{model}/{aspect}.rb`), per the
-concern rule above.
+- SQL (filters, search) is a model scope or class method. A model with 2+ query clusters → a model concern.
+- The sort/filter whitelist is declared once, on the column set (`Core::Table::Column#sort_key` / `#filter`, `app/components/core/table/column.rb`). The controller passes the same array to `Tableable#apply_table_params` (`app/controllers/concerns/tableable.rb`) and to the view, so they can't drift, and a request can't touch a field the table doesn't render.
+- Capability is per context, not per model: `/support/tickets` and `/adminit/tickets` have different column sets and row scopes on purpose. One whitelist keyed off the model couldn't express that.
+- Row-level access is the controller's base relation, set before filters. Filters `AND` onto it, so they only narrow and can never escape a scope like `where(created_id: current_account.id)`.
+- Association option lists go through a scope named for their audience (`Role.selectable`, `Account.assignable`), never a raw `where` in the helper: rendering a list discloses its contents.
+- Role-conditional columns use `allowed_to?` in the column helper, which removes header, cell, sort link and filter together. Not built yet: `Permission::RESOURCE_REGISTRY` is resource-level only, so per-field capability isn't expressible until a real need appears.
 
-**What a request is allowed to filter and sort is declared once, on the table's column set**
-(`Core::Table::Column#sort_key` / `#filter`, `app/components/core/table/column.rb`). The controller
-derives the whitelist from the same array it hands to the view (`Tableable#apply_table_params`,
-`app/controllers/concerns/tableable.rb`) — one object, used twice, so it cannot drift. A sort or
-filter cannot reach a field the table doesn't render, because the capability is declared on the
-column that renders it.
-
-**Sort/filter capability is per context, not per model.** One model exposed by two namespaces (e.g.
-`Support::Ticket` via `/support/tickets` and `/adminit/tickets`) legitimately has two different
-column sets, with different sortable/filterable fields and different row scopes. That is the
-mechanism, not duplication to eliminate — a single whitelist keyed off the model can't express it.
-
-**Row-level access is not a filter.** Which rows an index action may see belongs in the controller's
-base relation, before `apply_table_params` runs. Filters `AND` onto that relation, so they can only
-narrow — they can never be used to escape a scope like `where(created_id: current_account.id)`.
-
-**Filter option lists that query an association go through a model scope named for their audience**
-(`Role.selectable`, `Account.assignable`), not raw `Model.where(...)` in the helper. Rendering an
-option list publishes its contents to anyone who can see the filter bar — that is a disclosure
-decision, and it deserves a reviewable, named home.
-
-**Role-conditional capability** (a column only some roles may sort/filter by) is a policy check
-(`allowed_to?`) in the column-building helper, which removes the header, cell, sort link and filter
-control together. Not built speculatively — `Permission::RESOURCE_REGISTRY` is resource-level only
-today, so per-field capability isn't expressible yet. Escalate to it when a real requirement appears.
-
-The escalation ladder for "where does this query go":
+Where a query goes:
 
 | Situation | Home |
 |---|---|
-| One-off lookup used by a single action | `where(...)` in the controller — fine, don't ceremony it |
-| Reused or non-trivial predicate | Named scope on the model |
-| Returns an aggregate/hash, not a relation | Class method on the model (`dashboard_stats`) |
-| Model has 2+ query clusters and is getting long | Model concern (`Support::Ticket::Filterable`, `Account::Statistics`) |
-| Needs `current_account` / request state | One-line lambda passed by the controller, over a model scope |
-| No owning model at all, reused across domains | Reporting object in `app/services/` (not yet needed) |
-
-This is the same ladder used for callbacks and interactors above: escalate on evidence, not in
-advance.
+| One-off, single action | `where` in the controller |
+| Reused or non-trivial | Model scope |
+| Returns an aggregate or hash | Model class method (`dashboard_stats`) |
+| 2+ query clusters | Model concern (`Support::Ticket::Filterable`, `Account::Statistics`) |
+| Needs request state | Controller lambda over a scope |
+| No owning model, cross-domain | Reporting object in `app/services/` |
 
 ---
 
 ## Interactor Rules
 
-- Only rescue domain errors (`InvalidTransition`, `RecordInvalid`). Let code bugs bubble up.
-- Wrap multi-model writes in transactions only when they target the **same database**.
-- **Solid Queue uses a SEPARATE database** — `perform_later` is NOT part of the app's transaction.
-- Use `Interactor::Organizer` for 4+ reusable steps. For 2-3 steps, a single interactor is simpler.
-- Pass request context (IP, user-agent) explicitly — do NOT use `CurrentAttributes`.
+- An interactor exists only when the operation goes beyond one aggregate: side effects, cross-aggregate writes, or request context. Introduce it with the first side effect.
+- Rescue only `DomainError` and `RecordInvalid`. Bugs bubble up.
+- Transactions only for writes across aggregates in the same DB. A single aggregate is covered by the transition's lock.
+- Solid Queue is a separate DB: enqueue jobs and deliver notifications after the transition returns, never inside a transaction (the job could run before the commit).
+- Organizer for 4+ reusable steps.
+- Pass request context (IP, user-agent) explicitly.
 
----
+## Background Jobs
 
-## Background Job Rules
-
-- Jobs must be **idempotent** — safe to run multiple times.
-- Guards go in the job: record exists + timestamp matches.
-- Do NOT add redundant state guards — the model's transition method raises `InvalidTransition`.
-- For critical jobs, add a recurring **safety net** that catches missed records.
-- Solid Queue on separate DB: if a job fails to enqueue after a state change, the state change still commits.
-
----
+- Idempotent. Guards: the record exists and its timestamp matches.
+- No correctness guards: locked transitions raise `InvalidTransition`, even when the job holds a stale record. A cheap early return is allowed only to skip expensive work (an LLM call); the locked step re-checks.
+- Critical jobs get a recurring safety net.
+- A failed enqueue is logged and doesn't undo the state change before it.
 
 ## Pagination
 
-| Scenario | Approach |
-|----------|----------|
-| Admin tables, moderate data (< 100K) | `pagy` or `pagy_countless` |
-| Infinite scroll feeds | `pagy_countless` with Turbo Frames |
-| Chat/messages/audit logs (10K+, real-time inserts) | Cursor-based (`WHERE id < :cursor`) |
-| API endpoints | `pagy` with `pagy/extras/headers` |
+| Case | Use |
+|---|---|
+| Admin tables (< 100K rows) | `pagy` / `pagy_countless` |
+| Infinite scroll | `pagy_countless` + Turbo Frames |
+| Chat, messages, audit logs (10K+, live inserts) | Cursor (`WHERE id < :cursor`): O(1), unlike OFFSET |
+| API | `pagy` + `pagy/extras/headers` |
 
-Cursor pagination uses the PK index directly — O(1) regardless of depth. `OFFSET` scans and discards rows.
+## Real-Time
 
----
+- A broadcast that reflects record state lives in the model (`broadcasts_to` / `after_commit`), even when conditional: it must fire on every path.
+- A broadcast that exists because of one workflow lives in that interactor. User-specific broadcasts: interactor or controller.
+- Broadcast partials have no `current_account`: their HTML is viewer-neutral. Per-viewer visibility is decided client-side (`<turbo-show>`); authorization stays in the policy, so a hidden or stale control still can't act.
+- A broadcast that replaces an input area (composer) fires only when its variant changes, never on every update, or it wipes what the user is typing.
+- One channel per concern. Turbo Streams for server-to-client HTML; a custom ActionCable channel for bidirectional features (typing, presence).
 
-## Real-Time Architecture
+## Notifications
 
-### Broadcasting Decision
-
-| Scenario | Where to Broadcast |
-|----------|-------------------|
-| Simple CRUD sync | Model (`broadcasts_to`) |
-| Workflow with notifications | Interactor |
-| Conditional broadcasts | Interactor |
-| User-specific broadcasts | Interactor or Controller |
-
-### Channel Architecture
-
-**One channel per concern.** Never route multiple features through a single channel with type flags.
-
-| Mechanism | When |
-|-----------|------|
-| Turbo Streams (`broadcasts_to`) | Server pushes HTML. CRUD. One-directional. |
-| Custom ActionCable Channel | Client sends AND receives. Typing, presence, live cursors. |
-
----
-
-## Notification Rules
-
-- Trigger notifications from **Interactors**, never from models.
-- For bulk delivery (many recipients), enqueue a **background job** instead of delivering inline.
-- Bulk delivery jobs must be **idempotent** — query already-notified recipients before delivering.
+Triggered from interactors only, outside transactions. Many recipients → an idempotent job that skips those already notified.
 
 ---
 
 ## Feature Flags
 
-**Declared-Registry pattern.** A code-declared, in-memory set (flag keys, audience-condition
-vocabulary, dashboard widgets) shares its store-and-reload lifecycle via `DeclaredRegistry`
-(`app/lib/declared_registry.rb`) — `all`/`keys`/`registered?`/`reset!`. `register` and any reader stay
-per-registry (guards and naming differ: `Dashboard::WidgetRegistry#register` enforces duplicate-key/
-span rules no other registry has, and its reader is `find`, not `fetch`). Declarations are autoloaded
-so edits hot-reload in dev; an initializer re-runs `install` only on `to_prepare`. Used by
-`FeatureFlags::Registry`, `AudienceConditions::Registry`, `Dashboard::WidgetRegistry`.
+- `DeclaredRegistry` (`app/lib/declared_registry.rb`) gives code-declared sets (`FeatureFlags::Registry`, `AudienceConditions::Registry`, `Dashboard::WidgetRegistry`) a shared store and reload (`all`, `keys`, `registered?`, `reset!`). `register` and readers stay per registry because guards and naming differ (`Dashboard::WidgetRegistry#register` enforces duplicate-key and span rules; its reader is `find`, not `fetch`). Declarations autoload, so edits hot-reload in dev; an initializer re-runs `install` on `to_prepare`.
+- The decision (`FeatureFlags`, `AccountEvaluator`) queries models, so it lives in `app/models/`. Registries and declarations stay in `app/lib/`.
+- One entry point: `FeatureFlags.for(account)` / `.enabled?(key, account)`. Nothing else, admin code included, reads `feature_flag_accounts` / `feature_flag_audiences` to decide; admin reads them only to display.
+- Never call it from models, migrations, or job/broadcast paths that write: they have no request account.
+- The evaluator is request-scoped, never cached process-wide.
+- No write may depend on a flag answer: withdrawing a flag must only change the read path, or the off path inherits records it can't interpret.
+- Gate server-side. A CSS-hidden toggle still ships the capability.
+- Flags have no attribution column; that history belongs to an audit log.
 
-**Evaluation rules:**
+## I18n
 
-- Placement: the decision (`FeatureFlags`, `AccountEvaluator`) is domain logic that queries models, so
-  it lives in `app/models/`. The code-declared registries and declarations stay in `app/lib/`.
-- One entry point: `FeatureFlags.for(account)` / `.enabled?(key, account)`. Nothing else — including
-  admin code — reads `feature_flag_accounts`/`feature_flag_audiences` to decide; admin reads them only
-  to display.
-- Never call the entry point from a model, a migration, or a job/broadcast path that writes — those
-  have no request account.
-- The evaluator is request-scoped and discarded with the request; never cached process-lifetime.
-- No write may be conditional on a flag answer — withdrawal is a read-path change only, or the off
-  path inherits records it can't interpret.
-- Gating is server-side. A hidden/CSS-only client-side toggle still ships the capability in the
-  response body.
-- A flag carries no attribution column. A single field on one record can't honestly represent edits
-  that happen through a different record (an audience, a role) — that history is an audit-log concern,
-  not a stamp forced onto the flag row.
+- Files: 2+ domains → `{locale}/shared.yml`; one domain → `{locale}/{domain}.yml`; model layer (enums, validations, transition errors) → root `{locale}.yml`.
+- Explicit keys (`t("adminit.tickets.updated")`), never lazy lookup.
+- Enums: `t("enums.ticket.status.#{status}")`, never `.humanize`.
+- Form labels always explicit.
+- System notes in English; Turbo broadcasts locale-neutral.
+- Every key in both `en` and `es`.
 
----
+## ViewComponents
 
-## I18n Rules
+In `app/components/core/`. No queries: data comes from scopes. Feature-flag decisions arrive as constructor arguments; components never call `FeatureGated` / `FeatureFlags`. `CustomFormBuilder` is the default. Lookbook at `/lookbook`.
 
-### File Organization
+## JavaScript
 
-| Scope | Location |
-|-------|----------|
-| Used by 2+ domains | `config/locales/{locale}/shared.yml` |
-| Specific to one domain | `config/locales/{locale}/{domain}.yml` |
-| Model layer (enums, validations) | `config/locales/{locale}.yml` (root) |
-
-### Key Rules
-
-- **Explicit namespaced keys** (`t("adminit.tickets.updated")`), never lazy lookup
-- **Enum display**: `t("enums.ticket.status.#{status}")`, never `.humanize`
-- **Form labels**: always explicit `label: t(...)`, never auto-generated
-- **System notes** (interactors): English only — internal audit records
-- **Turbo broadcasts**: locale-neutral — render data, not translated labels
-- **Always** add strings to both `en/` and `es/` locale files
-
----
-
-## ViewComponent Rules
-
-- Components live in `app/components/core/`
-- Components never write ActiveRecord queries — data comes from model scopes/class methods
-- Feature-flag decisions are passed in as constructor arguments — components never call `FeatureGated`/`FeatureFlags` themselves
-- `CustomFormBuilder` is the default form builder (set in `ApplicationController`)
-- Lookbook previews at `/lookbook` in development
-
----
-
-## JavaScript Architecture
-
-| Location | Purpose |
-|----------|---------|
-| `controllers/` | Stimulus controllers — thin, orchestrate DOM |
-| `models/` | Plain JS classes — complex logic, testable in isolation |
-| `icons/` | SVG animation modules (`start`/`stop` exports) |
-| `library/` | Shared utilities |
-
-**Rule**: When a Stimulus controller grows past ~80 lines of non-DOM logic, extract to `models/`.
-
----
+`controllers/` thin Stimulus controllers · `models/` plain classes (extract past ~80 lines of non-DOM logic) · `icons/` SVG animations (`start` / `stop`) · `library/` shared utilities.
 
 ## File Organization
 
-| Code Type | Location |
-|-----------|----------|
-| Models | `app/models/` (namespaced in subdirs) |
-| Concerns | `app/models/concerns/` (model-specific in subdirs) |
-| Controllers | `app/controllers/` (dashboard + adminit namespaces) |
+| Code | Location |
+|---|---|
+| Models, `domain_error.rb` | `app/models/` (namespaced subdirs) |
+| Model concerns | `app/models/concerns/` (model-specific subdirs) |
+| Controllers / concerns (`TransitionErrors`, `Tableable`) | `app/controllers/` / `app/controllers/concerns/` |
 | Interactors | `app/interactors/{domain}/` |
-| Policies | `app/policies/` (mirrors controller structure) |
-| Jobs | `app/jobs/` |
-| Services | `app/services/external_services/` |
-| Pipelines | `app/services/` |
-| Notifiers | `app/notifiers/` |
+| Policies | `app/policies/` (mirrors controllers) |
+| Jobs / notifiers | `app/jobs/` / `app/notifiers/` |
+| Services / pipelines | `app/services/external_services/` / `app/services/` |
 | Components | `app/components/core/` |
 | Config | `config/configs/` |
-| JS Controllers | `app/javascript/controllers/` |
-| JS Models | `app/javascript/models/` |
-| Icons | `app/javascript/icons/` |
+| JS | `app/javascript/{controllers,models,icons,library}/` |
 | Locales | `config/locales/{en,es}/{domain}.yml` |
-
----
-
-## Summary: Where Does Code Belong?
-
-| Code Type | Location |
-|-----------|----------|
-| Data validations | Model |
-| State transition rules | Model (transition methods) |
-| State queries for UI | Model (query methods) |
-| Destroy protection | Model (before_destroy callback) |
-| Simple CRUD broadcasts | Model (`broadcasts_to`) |
-| Table filter/search SQL | Model scope (`search_title`, `assigned_to`, …) |
-| Table sort/filter whitelist | `Core::Table::Column`/`Filter` on the column set (per context, not per model) |
-| Table row-level access | Controller base relation, before filters apply |
-| Filter option-list disclosure | Model scope named for its audience (`Role.selectable`) |
-| Authorization (WHO) | Policy |
-| Workflow orchestration | Interactor |
-| Side effects (jobs, emails) | Interactor |
-| Complex broadcasts | Interactor |
-| External API calls | Service Object |
-| Multi-step content processing | Pipeline (`app/services/`) |
-| HTTP handling | Controller |
-| UX guards | Controller |
-| Typed configuration | Config class (Anyway Config) |
-| DOM events, targets, lifecycle | Stimulus controller |
-| Complex JS business logic | Plain JS class (`app/javascript/models/`) |
-| Bidirectional real-time | Custom ActionCable channel (one per concern) |

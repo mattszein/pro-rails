@@ -26,6 +26,7 @@ es:
       admin: "Admin"
       settings: "Configuración"
       support: "Soporte"
+      help: "Ayuda"
       sign_in: "Iniciar Sesión"
       register: "Registrarse"
     labels:

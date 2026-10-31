@@ -61,19 +61,19 @@ Full ticket support system with real-time conversations between users and admins
 
 **What users can do**:
 - Create tickets with title, description, and category (Account Access, Technical Issue, Billing, Feature Request, Other)
-- Attach files to tickets (configurable limits on count, size, and content types)
-- Edit ticket details (when not yet being worked on)
-- Send messages in the conversation thread (when ticket is in progress or reopened)
+- Attach files to tickets (configurable limits on count, size, and content types). Title, description and category cannot be edited after creation; more files can still be attached
+- Send messages in the conversation thread while the ticket is in progress or reopened, or while an open ticket has the assistant waiting for the user or handed off. The composer is **locked** while the assistant analyzes (replaced by a banner); this is enforced when the message is created, so a second tab cannot bypass it
 - Request to reopen a finished ticket with a reason
 - View full conversation history
 
 **What admins can do**:
-- Take/leave assignment of tickets
-- Set priority (1–5 scale)
-- Mark tickets as finished
-- Accept or reject reopen requests (with reason)
+- **Take** an unassigned ticket (`open` → `in_progress`; `reopen_requested` / `reopened` keep their status; `finished` / `closed` cannot be taken). Taking silences the AI for good. **Leave** a held ticket (`in_progress` → `open`; `reopened` stays)
+- **Reply only on a ticket assigned to them** (take it first; a Super Admin who is not the assignee cannot reply)
+- Set priority (1–5) and edit title, description and category; the edit form never changes status, assignee or requester
+- Finish, reopen, accept or reject reopen requests (with reason): assignee or Super Admin
 - Add internal notes (visible only to admins)
 - Delete tickets
+- Admins cannot attach files; only the requester can
 
 **Ticket lifecycle**:
 ```
@@ -82,7 +82,70 @@ open → in_progress → finished → closed
                                      → closed (if rejected)
 ```
 
+Every transition writes a neutral, immutable **system note** (actor stored on the note; notes disappear only with their ticket). Guards are checked under a row lock, so two admins acting at once cannot both succeed.
+
 All conversation updates appear in real-time — no page reload needed.
+
+#### AI assistant
+
+An optional assistant answers the start of each conversation, then hands the ticket to a person. It is **off by default**: a global switch plus a configured model provider key turn it on (see `docs/BACKEND.md`). With the switch off, tickets behave exactly as before.
+
+**What users see**:
+- An assistant banner on the ticket while the AI is engaged
+- AI replies in the conversation thread, labelled as the assistant, with suggested help-center article cards
+- **This solved it** — resolves the ticket without a person; **Talk to a person** — asks for a human once the assistant has replied and is waiting for the user (not while it is working); only an admin can take over mid-run
+- A handoff message when a person is needed (the assistant escalates, the turn limit is reached, or the AI is unavailable). Users are never left waiting: if the AI fails after retries the ticket is handed off with a generic message
+- Replies are grounded in help-center articles: when no article answers the question, the assistant does not guess and hands the ticket to a person. Any handoff in `assist` mode (or a failure after retries) shows the same fixed, localized message; `triage_only` playbooks and "Talk to a person" post no assistant message
+
+**What admins see** (ticket permission, plus `support_ai` for playbooks):
+- An **AI state** badge on tickets (list and detail), and one AI-authored internal note per pass (findings, which help-center article was attached or that none answered, similar resolved tickets when enabled, and the handoff reason as last line). The note is saved together with the reply; if the ticket changed meanwhile (e.g. an admin took it), the reply is discarded and the note ends with "Reply not sent"
+- An **AI activity** panel per ticket (every step: model, tokens, latency, errors), with a detail view per run showing the full conversation with the model and a snapshot of the playbook rules used
+- **Take over from AI** — assigning a ticket (or the Take action) makes the AI step back for good on that ticket
+- An **AI state** filter on the tickets table (`handoff_requested` is labelled **Needs human**) and a dashboard tile counting open tickets waiting on a person
+- Handed-off tickets surface only through the **Needs human** tile and filter; no notification or email is sent
+
+**AI playbooks** (Adminit, `support_ai` permission, Super Admin by default) decide what the assistant does for which tickets:
+- **Conditions**: ticket categories, priority range, and optionally an audience (see Feature Flags). Among enabled playbooks that match, the most specific wins (the one with the most conditions set; a tie goes to the oldest); otherwise the **default playbook**, which always exists, cannot be deleted, and is only the fallback. Playbooks are re-matched on every pass, and each AI run keeps a snapshot of the rules it used
+- **Mode**: `triage_only` (analyze, set priority, write notes, then hand off without replying to the user) or `assist` (also answers the user, up to a maximum number of AI turns)
+- **Capabilities**: switchable context and options per playbook (account facts, past tickets, similar resolved tickets, help-center search, internal note, auto-set priority, auto-correct category, vision on attachments). Article suggestions, resolution proposals and human handoff are part of every reply
+- Custom instructions, maximum AI turns (default 4), enable/disable per playbook. Disabling the default means tickets matching nothing get no AI
+- Idle reminder / handoff timers (24h / 48h) are stored but **not active yet** (see roadmap)
+- Seeds: Default everywhere; an example "Billing (triage only)" playbook only with demo data
+
+**AI state vs. status** — the AI state is a second axis next to the ticket status; the status lifecycle above is unchanged:
+
+| AI state | Meaning | Owner | Requester can write? |
+|----------|---------|-------|----------------------|
+| `off` | No AI (switch off, no playbook matched, or ticket predates the feature) | Person | Once a person has the ticket |
+| `analyzing` | Triage / reply in progress | AI | No (composer locked) |
+| `awaiting_user` | AI replied and waits | AI | Yes (starts a new pass) |
+| `handoff_requested` | AI asked for a person; shown in Needs human | Person (when taken) | Yes |
+| `stepped_back` | An admin took over | Person | Once in progress |
+| `resolved` | User clicked "This solved it" (status becomes finished) | Nobody | No (reopen request only) |
+
+A user message while `awaiting_user` returns the ticket to `analyzing`. Taking a ticket while the AI is engaged (`analyzing`, `awaiting_user`, `handoff_requested`) moves it to `stepped_back`; on `off` nothing changes. Invariant: **an assigned ticket never has the AI engaged**, and `stepped_back` is permanent (leaving the ticket does not re-engage the AI).
+
+#### Knowledge base / help center
+
+Self-service articles that deflect tickets before they are created.
+
+**What users can do**:
+- Browse and search published articles at `/help` (filter by category; results follow the current language)
+- See suggested articles while filling in the new-ticket form, based on the title and category
+
+**What admins can do** (`article` permission, Super Admin by default):
+- Manage articles in Adminit (create, edit, delete) with a rich-text body
+- Keep articles as **draft** or **published** (only published articles are visible in the help center)
+- Set each article's locale (en/es) and category (same categories as tickets, or General for articles that fit none)
+
+#### AI assistant roadmap (not built)
+
+Planned `support-ai-assist`; only leftovers exist (idle columns, `draft_replies` capability):
+
+- **Suggest reply**: admin button (playbook has `draft_replies`, ticket `handoff_requested` / `stepped_back`); draft generated in background with all read context, logged as an AI run, pushed to the admin composer only; never auto-sent
+- **Idle sweep**: recurring job over `awaiting_user` tickets: reminder after the playbook's idle hours, handoff with summary after more. Idempotent; never finishes a ticket. Would also recover tickets stuck in `analyzing` after a failed enqueue (today the requester stays locked until an admin takes it)
+- **AI metrics** widgets: deflection rate, handoff rate, turns before handoff, tokens and failed runs (7/30 days)
+- Typing indicator; end-to-end system spec of the AI flow
 
 ### Notifications
 
@@ -165,6 +228,7 @@ Live updates across the app without page reloads:
 
 - Ticket conversation messages appear instantly for both user and admin
 - Ticket status changes reflect in real-time
+- The assistant banner and composer switch live as the AI starts and stops; the composer is only re-rendered when its variant changes, so a draft being typed is never wiped
 - Admin tables update when new tickets arrive
 - Notifications push to the bell icon live
 
@@ -204,13 +268,20 @@ Account
   ├── Support::Tickets (as creator)
   └── Support::Tickets (as assignee)
 
-Support::Ticket
+Support::Ticket (status lifecycle + ai_state)
   ├── Support::Conversation
-  │   └── Support::Messages
-  ├── Support::Notes (internal, admin-only)
+  │   └── Support::Messages (sender: human | ai; AI messages have no account)
+  ├── Support::Notes (internal, admin-only; kind: internal | system | ai)
+  ├── Support::AiRun (one row per AI step: model, tokens, latency, tool calls, error, snapshot of the playbook used)
   └── File Attachments
 
+Support::AiPlaybook (conditions, mode, capabilities, limits; optional Audience)
+  └── has_many Support::AiRuns (nullable link; each run keeps a snapshot of the rules used)
+
 Announcement
+  └── belongs_to Author (Account)
+
+Support::Article (help center)
   └── belongs_to Author (Account)
 
 Role ←→ Permissions
@@ -222,6 +293,8 @@ Role ←→ Permissions
 - Roles and Permissions are many-to-many
 - Support models are namespaced under `Support::` with simple table names
 - Permission resources are integer-backed — values must never be reused
+- A ticket is not linked to a playbook: the playbook is re-matched on every AI pass and recorded only on the runs
+- AI-authored messages and notes have no author account (`account_id` is NULL); a DB check constraint ties `sender` to `account_id` on messages
 
 ---
 
@@ -229,8 +302,8 @@ Role ←→ Permissions
 
 | Persona | Access | Can Do |
 |---------|--------|--------|
-| **Regular User** | Dashboard | Login (password or magic link), create/edit tickets, send messages, attach files, request reopens, view notifications, manage profile (avatar, username, bio), customize appearance (40 themes, 8 fonts, dark mode), switch language |
-| **Admin** | Dashboard + Adminit | All user actions + take/finish/reopen tickets, set priority, add internal notes, manage announcements (create, schedule, publish), view accounts |
+| **Regular User** | Dashboard | Login (password or magic link), browse the help center, create tickets, send messages, attach files, request reopens, get first answers from the AI assistant (when enabled), view notifications, manage profile (avatar, username, bio), customize appearance (40 themes, 8 fonts, dark mode), switch language |
+| **Admin** | Dashboard + Adminit | All user actions + take/leave/finish/reopen tickets (replying requires taking first), set priority, add internal notes, take over from the AI and handle "Needs human" tickets, manage announcements (create, schedule, publish), view accounts (help center articles and AI playbooks are Super Admin by default) |
 | **Super Admin** | Dashboard + Adminit (all) | All admin actions + manage roles (add/remove members), manage permissions (role-resource mappings) |
 
 ---
@@ -243,7 +316,8 @@ Role ←→ Permissions
 | Auth | Rodauth | Feature-complete (verification, MFA-ready, magic links) without reinventing |
 | Authorization | ActionPolicy | Policy objects with scoping, integrates with Rails conventions |
 | Workflows | Interactor gem | Explicit, testable, reusable orchestration units for multi-step operations |
-| Background Jobs | Solid Queue | Database-backed (PostgreSQL), no Redis dependency for jobs, Rails 8 default |
+| Background Jobs | Solid Queue | Database-backed (PostgreSQL), no Redis dependency for jobs, Rails 8 default. AI runs on its own `support_ai` worker so slow model calls never starve mail or notifications |
+| LLM calls | RubyLLM via `Llm::Runner` (OpenRouter) | One generic runner (timeout, token/latency accounting, tool budget, transcript) shared by the assistant and avatar generation. Settings in `config/support_ai.yml`, key in `OPENROUTER_API_KEY` |
 | WebSockets | AnyCable | 10x throughput over Action Cable, required for horizontal scaling |
 | Cache | Redis | Fast key-value store for caching and sessions |
 | CSS | TailwindCSS 4.2 | Utility-first, fast to build, consistent design tokens |

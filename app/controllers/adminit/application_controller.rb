@@ -1,5 +1,7 @@
 module Adminit
   class ApplicationController < SharedBaseController
+    include ModalFormResponses
+
     before_action :authorize_adminit_access
     verify_authorized
 

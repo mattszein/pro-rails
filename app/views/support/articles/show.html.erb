@@ -1,0 +1,18 @@
+<div class="w-full space-y-2">
+  <%= render Core::CardComponent.new(padding: :sm) do %>
+    <%= render Core::LinkComponent.new(name: t("support.articles.back_to_help"), url: help_articles_path, style: :link) %>
+  <% end %>
+  <%= render Core::CardComponent.new(classes: "space-y-4") do %>
+    <div class="flex items-center gap-4">
+      <h1 class="text-2xl font-semibold"><%= @article.title %></h1>
+      <%= render Core::BadgeComponent.new(label: help_article_category_label(@article), theme: :secondary, size: :sm) %>
+    </div>
+    <p class="text-gray-600 dark:text-gray-400"><%= @article.summary %></p>
+    <div class="prose dark:prose-invert max-w-none">
+      <%= @article.body %>
+    </div>
+    <% if @article.published_at.present? %>
+      <p class="text-sm text-gray-500"><%= t("support.articles.updated_on", date: l(@article.updated_at.to_date, format: :long)) %></p>
+    <% end %>
+  <% end %>
+</div>

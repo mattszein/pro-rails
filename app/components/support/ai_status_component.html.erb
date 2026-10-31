@@ -1,0 +1,12 @@
+<div id="<%= dom_id(ticket, :ai_status) %>">
+  <% if banner_key %>
+    <%= render Core::BoxComponent.new(variant: banner_variant, rounded: :xl, classes: "flex flex-wrap items-center justify-between gap-3") do %>
+      <p class="font-medium" data-role="ai-status-banner"><%= banner_text %></p>
+      <% if talk_to_person? %>
+        <turbo-show when="current-user-id" is="<%= ticket.created_id %>">
+          <%= render Core::LinkComponent.new(name: t("support.ai_status.talk_to_person"), url: helpers.request_human_support_ticket_path(ticket.id), style: :as_button, theme: :secondary, size: :sm, html_options: {data: {turbo_method: :post}}) %>
+        </turbo-show>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>

@@ -3,6 +3,8 @@ en:
     models:
       account: Account
       announcement: Announcement
+      support/ai_playbook: AI Playbook
+      support/article: Article
       profile: Profile
       role: Role
       ticket: Ticket
@@ -46,10 +48,18 @@ en:
               resource_mismatch: "contains widget keys not matching the permission's resource: %{keys}"
         support/ticket:
           attributes:
+            ai_state:
+              engaged_while_assigned: "cannot be engaged while the ticket is assigned"
             attachments:
               too_many_files: "cannot exceed %{max_files} files"
               file_too_large: "%{filename} is too large (max %{max_size}MB)"
               invalid_file_type: "%{filename} has an invalid file type"
+        support/ai_playbook:
+          attributes:
+            capabilities:
+              not_registered: "is not a declared AI capability"
+            base:
+              cannot_destroy_default: "Cannot delete the default playbook"
   authentication:
     unauthenticated: "You need to sign in before continuing."
   adminit:
@@ -68,6 +78,11 @@ en:
       reopen_requested: "Reopen request pending approval. You will be able to message once an admin accepts it."
       closed: "This ticket is permanently closed."
       default: "Waiting for an admin to take this ticket. You can send messages once the ticket is in progress."
+      analyzing: "Our assistant is analyzing your ticket. You will be able to reply as soon as it answers."
+      ai_analyzing: "Our assistant is helping. A support agent can join anytime."
+      ai_awaiting_user: "Our assistant is helping. A support agent can join anytime."
+      ai_handoff_requested: "Waiting for a support agent."
+      ai_resolved: "Resolved with our assistant."
   notifiers:
     announcement_notifier:
       notification:
@@ -90,12 +105,51 @@ en:
         reopen_requested: "Reopen Requested"
         reopened: "Reopened"
         closed: "Closed"
+      ai_state:
+        off: "Off"
+        analyzing: "Analyzing"
+        awaiting_user: "Awaiting user"
+        handoff_requested: "Needs human"
+        stepped_back: "Stepped back"
+        resolved: "Resolved by AI"
       category:
         account_access: "Account Access"
         technical_issue: "Technical Issue"
         billing: "Billing"
         feature_request: "Feature Request"
         other: "Other"
+    ai_run:
+      step:
+        triage: "Classification"
+        investigate: "Investigate"
+        respond: "Respond"
+        draft: "Draft"
+        handle: "Investigation and reply"
+      run_trigger:
+        ticket_created: "Ticket created"
+        user_message: "User message"
+        draft_reply: "Draft reply"
+        idle_reminder: "Idle reminder"
+        fallback: "Fallback"
+      status:
+        succeeded: "Succeeded"
+        failed: "Failed"
+        discarded: "Discarded"
+    support_ai_playbook:
+      mode:
+        triage_only: "Triage only"
+        assist: "Assist"
+    article:
+      status:
+        draft: "Draft"
+        published: "Published"
+      category:
+        account_access: "Account Access"
+        technical_issue: "Technical Issue"
+        billing: "Billing"
+        feature_request: "Feature Request"
+        other: "Other"
+        general: "General"
     announcement:
       status:
         draft: "Draft"
@@ -111,6 +165,10 @@ en:
       can_only_unschedule_scheduled: "Can only unschedule scheduled announcements"
       already_published: "Already published"
       must_be_scheduled_first: "Must be scheduled first"
+  article:
+    transitions:
+      already_published: "Already published"
+      can_only_unpublish_published: "Can only unpublish published articles"
   ticket:
     transitions:
       can_only_finish: "Can only finish in-progress or reopened tickets"
@@ -118,3 +176,12 @@ en:
       can_only_request_reopen: "Can only request reopen on finished tickets"
       can_only_accept_reopen: "Can only accept reopen on reopen-requested tickets"
       can_only_reject_reopen: "Can only reject reopen on reopen-requested tickets"
+      can_only_start_ai_analysis: "AI analysis can only start when the AI is off or waiting for the user"
+      can_only_disable_ai: "Can only disable the AI while it is analyzing"
+      can_only_await_user_reply: "Can only wait for the user while the AI is analyzing"
+      can_only_request_ai_handoff: "Can only request a handoff while the AI is engaged"
+      already_assigned: "Ticket already assigned"
+      can_only_take: "Only open, reopen-requested or reopened tickets can be taken"
+      not_assigned: "You are not assigned to this ticket"
+      can_only_unassign: "Can only leave in-progress or reopened tickets"
+      can_only_resolve_with_ai: "Can only resolve with AI on open tickets awaiting the user"

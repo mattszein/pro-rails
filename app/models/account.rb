@@ -10,6 +10,8 @@ class Account < ApplicationRecord
 
   scope :search_by_email, ->(query) { where("email ILIKE ?", "%#{sanitize_sql_like(query)}%") }
   scope :assignable, -> { where.not(role_id: nil).order(:email) }
+  # Verified admins whose role grants the :ticket permission: who gets told a ticket needs a human.
+  scope :ticket_handlers, -> { verified.where(role_id: Role.permitting(:ticket).select(:id)) }
 
   DASHBOARD_STATS_MONTHS = 6
 
