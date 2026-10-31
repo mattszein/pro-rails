@@ -251,7 +251,9 @@ Product overview: `docs/PROJECT.md`. The assistant is interactors run from a job
 
 Optional steps never stop the user from getting an answer.
 
-**Job:** returns unless `ai_analyzing?`; debounces (only the newest human message acts); skips a message that already has an AI answer. `retry_on Llm::Error` (3 attempts, polynomial). When retries run out, `Fallback` (idempotent: acts only while the AI owns the ticket) posts the handoff reply plus a system note. `Dispatch` enqueues; an enqueue failure is logged and never undoes the state change.
+**Job** (`queue_as :support_ai`, own worker in `config/queue.yml`; add new queues to the general worker): `FLOWS` maps trigger (`ticket_created`, `user_message`, the `AiRun` trigger names) → organizer. `AiProcessJob.enqueue(ticket, trigger, message_id)` validates the trigger (unknown → `KeyError`), rescues only enqueue errors, logs and returns false; it never undoes the state change. `perform` returns if the ticket or trigger message is gone, or unless `ai_analyzing?` (cost early exit; `Finalize` re-checks under the lock). No debounce: nobody writes while the AI analyzes. `retry_on Llm::Error` (3 attempts, polynomial); when retries run out, `Fallback` (idempotent) posts the handoff reply plus a system note.
+
+**User messages:** `Support::Messages::Create` takes `ticket.with_lock`, refuses the requester unless `messageable?` (`support.messages.not_sent`), saves the message and `start_ai_analysis!` atomically, and enqueues `:user_message` after the lock. Admin messages (assignee only) never flip or enqueue.
 
 ### Responder, Context, ToolBudget
 
@@ -266,12 +268,12 @@ Optional steps never stop the user from getting an answer.
 
 ### Notes
 
-One `ai` note per pass. `Handle` writes the findings (1–2 English sentences, ≤ 40 words, truncated at 1,200 chars), then code-built lines:
+One `ai` note per pass, written only by `Finalize`, in the same lock as the reply. `Handle` builds `context.note_body` (only with `investigate_note`): findings (1–2 English sentences, ≤ 40 words, truncated at 1,200 chars), then code-built lines:
 
 - `Help center: <attached titles>` or `Help center: no article answered this.`
 - With `similar_tickets`: `Similar resolved tickets: #12 title (2026-09), ...` via `Support::Ticket.resolved_similar_to`. Admin only; no LLM; never in a prompt.
 
-`Handle` sets `context.note_written`, so `Finalize` writes no second note. A handoff pass with no note from `Handle` gets `AI handoff: <reason>` (no LLM call). "Talk to a person" and "I still need help" are allowed only while `awaiting_user` (`TicketPolicy#request_human?`) and write `User requested a human`.
+A handoff appends `AI handoff: <reason>` as the last line (no LLM call), even without findings. A discarded pass keeps the findings, ending with `Reply not sent: ...`. "Talk to a person" and "I still need help" are allowed only while `awaiting_user` (`TicketPolicy#request_human?`) and write `User requested a human`.
 
 ### KB Gap
 
@@ -284,7 +286,7 @@ One `ai` note per pass. `Handle` writes the findings (1–2 English sentences, �
 
 - **Triggers** (in Finalize): the answer's `handoff` (including a KB gap), triage `escalate`, `triage_only`, or `max_ai_turns` reached.
 - **Reply:** the localized `support.ai.handoff_message` (triage language, else `I18n.locale`), never the model's reply. `triage_only` posts nothing. `Fallback` uses the same key.
-- **Under the lock,** Finalize re-checks `ai_analyzing?` and that no newer human message exists; otherwise the reply is discarded and the run marked `discarded`.
+- **Under the lock,** Finalize re-checks `ai_analyzing?` (an admin may have taken the ticket); otherwise the reply is discarded and the run marked `discarded`.
 - **Grounding** (`Prompts.grounding`): screens, menus, URLs or steps only from given or found articles or the playbook instructions; never claim a feature exists or not unless an article says so.
 
 ### ai_state
@@ -445,7 +447,7 @@ class PublishAnnouncementJob < ApplicationJob
 end
 ```
 
-No state guards in jobs: locked transitions raise `InvalidTransition`, even when the job holds a stale record.
+No state guards in jobs: locked transitions raise `InvalidTransition`, even when the job holds a stale record. A cheap early return is fine only to skip expensive work (see Support AI → Job).
 
 ## Policies
 

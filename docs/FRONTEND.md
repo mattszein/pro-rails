@@ -251,8 +251,9 @@ Operators: `is`, `is_not`, `in`, `not_in`, `includes`, `excludes`, `greater_than
 The message form area (composer, status banner, reopen form) is re-rendered by broadcast, with no request, session or `current_user`:
 
 - Partials rendered by a broadcast must not call request-context helpers (`current_user`, `current_account`, `allowed_to?`, `request`). Render for everyone and gate per viewer with `turbo-show` (e.g. `when="current-user-id" is="<%= ticket.created_id %>"`)
-- Only re-broadcast the composer when its **variant** changes (`Support::Ticket#message_form_variant`: composer vs. a status banner). Replacing it on every update wipes what the user is typing
-- Stale buttons: broadcasts append new messages without re-rendering older ones, so an old "This solved it / Talk to a person" prompt would stay clickable. `conversation_component_controller.js` watches the message list with a `MutationObserver` and hides every `[data-resolution-actions]` block that is not on the latest message. The server still re-validates the transition, so the client hide is only UX
+- Only re-broadcast the composer when its **variant** changes (`Support::Ticket#message_form_variant`: `:composer`, `:ai_analyzing` banner, or the status name; `Support::TicketStatusBannerComponent` renders whenever the ticket is not messageable). Replacing it on every update wipes what the user is typing
+- AI UI: `Support::MessageComponent` (AI badge, article cards, resolution actions) and `Support::AiStatusComponent` (state banner, "Talk to a person" gated with `turbo-show`)
+- Stale buttons: broadcasts append new messages without re-rendering older ones, so an old "This solved it / Talk to a person" prompt would stay clickable. `app/components/support/conversation_component_controller.js` watches the message list with a `MutationObserver` and hides every `[data-resolution-actions]` block that is not on the latest message. The server still re-validates the transition, so the client hide is only UX
 
 ---
 

@@ -154,9 +154,9 @@ Where a query goes:
 ## Background Jobs
 
 - Idempotent. Guards: the record exists and its timestamp matches.
-- No redundant state guards: locked transitions raise `InvalidTransition`, even when the job holds a stale record.
+- No correctness guards: locked transitions raise `InvalidTransition`, even when the job holds a stale record. A cheap early return is allowed only to skip expensive work (an LLM call); the locked step re-checks.
 - Critical jobs get a recurring safety net.
-- A failed enqueue doesn't undo the state change before it.
+- A failed enqueue is logged and doesn't undo the state change before it.
 
 ## Pagination
 
@@ -172,6 +172,7 @@ Where a query goes:
 - A broadcast that reflects record state lives in the model (`broadcasts_to` / `after_commit`), even when conditional: it must fire on every path.
 - A broadcast that exists because of one workflow lives in that interactor. User-specific broadcasts: interactor or controller.
 - Broadcast partials have no `current_account`: their HTML is viewer-neutral. Per-viewer visibility is decided client-side (`<turbo-show>`); authorization stays in the policy, so a hidden or stale control still can't act.
+- A broadcast that replaces an input area (composer) fires only when its variant changes, never on every update, or it wipes what the user is typing.
 - One channel per concern. Turbo Streams for server-to-client HTML; a custom ActionCable channel for bidirectional features (typing, presence).
 
 ## Notifications
