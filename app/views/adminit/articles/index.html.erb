@@ -1,0 +1,19 @@
+<div class="w-full">
+  <div class="flex justify-between items-center pb-2">
+    <h1 class="text-xl font-semibold"><%= t("adminit.navigation.articles") %></h1>
+    <%= render(Core::LinkComponent.new(name: t("adminit.articles.new_article"), url: new_adminit_article_path, style: :as_button, theme: :create, size: :sm, html_options: {data: {turbo_frame: "modal"}})) %>
+  </div>
+  <%= render Core::CardComponent.new do %>
+    <%= render Core::TableComponent.new(
+          rows: @articles,
+          columns: @columns,
+          options: {
+            ids: {tbody: "admin_articles", col_prefix: "admin"},
+            frame_id: "admin_articles_table",
+            pagy: @pagy,
+            sortable: true,
+            filterable: true
+          }
+        ) %>
+  <% end %>
+</div>

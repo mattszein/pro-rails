@@ -55,79 +55,46 @@ class Adminit::TicketsController < Adminit::ApplicationController
   # POST /tickets/1/take
   def take
     authorize! @ticket, to: :take?, with: Adminit::TicketPolicy
-    result = Adminit::Tickets::Take.call(ticket: @ticket, account: current_account)
+    @ticket.take!(by: current_account)
 
     respond_to do |format|
-      if result.success?
-        format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, adminit_ticket_path(@ticket)) }
-        format.html { redirect_to adminit_ticket_path(@ticket), notice: I18n.t("adminit.tickets.assigned") }
-        format.json { render :show, status: :ok, location: @ticket }
-      else
-        format.turbo_stream { render turbo_stream: turbo_stream.replace(ActionView::RecordIdentifier.dom_id(@ticket, "admin"), partial: "adminit/tickets/ticket_row", locals: {ticket: @ticket}), status: :unprocessable_content }
-        format.html { redirect_to adminit_tickets_url, alert: result.error }
-        format.json { render json: {error: result.error}, status: :unprocessable_content }
-      end
+      format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, adminit_ticket_path(@ticket)) }
+      format.html { redirect_to adminit_ticket_path(@ticket), notice: I18n.t("adminit.tickets.assigned") }
+      format.json { render :show, status: :ok, location: @ticket }
     end
   end
 
   # POST /tickets/1/leave
   def leave
     authorize! @ticket, to: :leave?, with: Adminit::TicketPolicy
-    result = Adminit::Tickets::Leave.call(ticket: @ticket, account: current_account)
+    @ticket.unassign!(by: current_account)
 
     respond_to do |format|
-      if result.success?
-        format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, adminit_tickets_path) }
-        format.html { redirect_to adminit_tickets_url, notice: I18n.t("adminit.tickets.left") }
-        format.json { render :show, status: :ok, location: @ticket }
-      else
-        format.turbo_stream { render turbo_stream: turbo_stream.replace(ActionView::RecordIdentifier.dom_id(@ticket, "admin"), partial: "adminit/tickets/ticket_row", locals: {ticket: @ticket}), status: :unprocessable_content }
-        format.html { redirect_to adminit_tickets_url, alert: result.error }
-        format.json { render json: {error: result.error}, status: :unprocessable_content }
-      end
+      format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, adminit_tickets_path) }
+      format.html { redirect_to adminit_tickets_url, notice: I18n.t("adminit.tickets.left") }
+      format.json { render :show, status: :ok, location: @ticket }
     end
   end
 
   # POST /tickets/1/finish
   def finish
     authorize! @ticket, with: Adminit::TicketPolicy
-    result = Adminit::Tickets::Finish.call(ticket: @ticket, account: current_account)
-
-    respond_to do |format|
-      if result.success?
-        format.html { redirect_to adminit_ticket_path(@ticket), notice: I18n.t("adminit.tickets.finished") }
-      else
-        format.html { redirect_to adminit_ticket_path(@ticket), alert: result.error }
-      end
-    end
+    @ticket.finish!(by: current_account)
+    redirect_to adminit_ticket_path(@ticket), notice: I18n.t("adminit.tickets.finished")
   end
 
   # POST /tickets/1/reopen
   def reopen
     authorize! @ticket, with: Adminit::TicketPolicy
-    result = Adminit::Tickets::Reopen.call(ticket: @ticket, account: current_account)
-
-    respond_to do |format|
-      if result.success?
-        format.html { redirect_to adminit_ticket_path(@ticket), notice: I18n.t("adminit.tickets.reopened") }
-      else
-        format.html { redirect_to adminit_ticket_path(@ticket), alert: result.error }
-      end
-    end
+    @ticket.reopen!(by: current_account)
+    redirect_to adminit_ticket_path(@ticket), notice: I18n.t("adminit.tickets.reopened")
   end
 
   # POST /tickets/1/accept_reopen
   def accept_reopen
     authorize! @ticket, with: Adminit::TicketPolicy
-    result = Adminit::Tickets::AcceptReopen.call(ticket: @ticket, account: current_account)
-
-    respond_to do |format|
-      if result.success?
-        format.html { redirect_to adminit_ticket_path(@ticket), notice: I18n.t("adminit.tickets.reopen_accepted") }
-      else
-        format.html { redirect_to adminit_ticket_path(@ticket), alert: result.error }
-      end
-    end
+    @ticket.accept_reopen!(by: current_account)
+    redirect_to adminit_ticket_path(@ticket), notice: I18n.t("adminit.tickets.reopen_accepted")
   end
 
   # GET /tickets/1/reject_reopen
@@ -138,15 +105,11 @@ class Adminit::TicketsController < Adminit::ApplicationController
   # POST /tickets/1/reject_reopen
   def reject_reopen
     authorize! @ticket, with: Adminit::TicketPolicy
-    result = Adminit::Tickets::RejectReopen.call(ticket: @ticket, account: current_account, body: params[:reason])
+    @ticket.reject_reopen!(by: current_account, reason: params[:reason])
 
     respond_to do |format|
       format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, adminit_ticket_path(@ticket)) }
-      if result.success?
-        format.html { redirect_to adminit_ticket_path(@ticket), notice: I18n.t("adminit.tickets.reopen_rejected") }
-      else
-        format.html { redirect_to adminit_ticket_path(@ticket), alert: result.error }
-      end
+      format.html { redirect_to adminit_ticket_path(@ticket), notice: I18n.t("adminit.tickets.reopen_rejected") }
     end
   end
 
@@ -156,7 +119,11 @@ class Adminit::TicketsController < Adminit::ApplicationController
     @ticket = Support::Ticket.find(params[:id])
   end
 
+  def transition_error_path
+    @ticket ? adminit_ticket_path(@ticket) : adminit_tickets_path
+  end
+
   def ticket_params
-    params.require(:support_ticket).permit(:title, :description, :priority, :status, :category, :created_id, :assigned_id)
+    params.require(:support_ticket).permit(:title, :description, :priority, :category)
   end
 end

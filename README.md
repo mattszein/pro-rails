@@ -86,6 +86,8 @@ Full test suite with model specs (Shoulda-Matchers), request specs, policy specs
 
 A full ticket support system built into the app: users can open tickets, and admins handle them from the admin side. Each ticket has a real-time conversation thread powered by AnyCable and Turbo Streams, so both sides see messages appear instantly without a page reload. Designed as a reference implementation of real-time chat you can adapt or extend.
 
+An optional AI assistant can handle the start of each conversation (triage, article suggestions, handoff to a person), driven by admin-managed playbooks. It is off by default: set `SUPPORT_AI_ENABLED=true` and `OPENROUTER_API_KEY` to enable it (see `docs/PROJECT.md`).
+
 ### Appearance & Theming
 
 Users can personalize the look of the application to their preference. The app ships with 40 themes and 8 font choices, each with predefined primary and secondary color palettes. The goal is comfort and accessibility giving users meaningful control over their visual experience.

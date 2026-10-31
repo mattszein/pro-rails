@@ -19,7 +19,8 @@ module Support
     end
 
     def message
-      I18n.t("support.ticket_status_banner.#{ticket.status}", default: I18n.t("support.ticket_status_banner.default"))
+      key = (ticket.open? && ticket.ai_analyzing?) ? "analyzing" : ticket.status
+      I18n.t("support.ticket_status_banner.#{key}", default: I18n.t("support.ticket_status_banner.default"))
     end
   end
 end

@@ -11,9 +11,20 @@
             } %>
       <%= form.button t("shared.buttons.send"), {theme: :primary}, data: {message_form_target: "submit"} %>
     <% end %>
-  <% elsif ticket.finished? && current_account&.id == ticket.created_id %>
-    <%= render Support::ReopenFormComponent.new(ticket: ticket) %>
   <% else %>
-    <%= render Support::TicketStatusBannerComponent.new(ticket: ticket) %>
+    <%# Rendered in broadcasts too (no current_account there): on a finished ticket the requester sees the
+        reopen form and everyone else the status banner, both gated client-side with <turbo-show>. %>
+    <% if ticket.finished? %>
+      <turbo-show when="current-user-id" is="<%= ticket.created_id %>">
+        <%= render Support::ReopenFormComponent.new(ticket: ticket) %>
+      </turbo-show>
+    <% end %>
+    <% if ticket.finished? %>
+      <turbo-show when="current-user-id" is_not="<%= ticket.created_id %>">
+        <%= render Support::TicketStatusBannerComponent.new(ticket: ticket) %>
+      </turbo-show>
+    <% else %>
+      <%= render Support::TicketStatusBannerComponent.new(ticket: ticket) %>
+    <% end %>
   <% end %>
 </div>

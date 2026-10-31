@@ -1,0 +1,3 @@
+<%= render(Core::ModalComponent.new(title: t("adminit.tickets.ai_runs.title"), size: :xl)) do %>
+  <%= render Adminit::Tickets::AiRunTranscriptComponent.new(run: @run) %>
+<% end %>

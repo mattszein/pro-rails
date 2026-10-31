@@ -1,0 +1,63 @@
+<div class="w-full">
+  <div class="flex justify-end items-center pb-2">
+    <div class="flex gap-2 items-center px-4">
+      <% if @article.draft? %>
+        <%= render(Core::LinkComponent.new(name: t("shared.buttons.publish"), url: publish_adminit_article_path(@article),
+              style: :as_button, theme: :edit, size: :sm, html_options: {method: :post, data: {turbo: true, turbo_method: :post}})) %>
+      <% else %>
+        <%= render(Core::LinkComponent.new(name: t("adminit.articles.unpublish"), url: unpublish_adminit_article_path(@article),
+              style: :as_button, theme: :delete, size: :sm, html_options: {method: :post, data: {turbo: true, turbo_method: :post}})) %>
+      <% end %>
+      <%= render(Core::LinkComponent.new(name: t("shared.common.edit"), url: edit_adminit_article_path(@article),
+            style: :as_button, theme: :edit, size: :sm, html_options: {data: {turbo_frame: "modal"}})) %>
+      <%= render(Core::LinkComponent.new(name: t("shared.common.delete"), url: adminit_article_path(@article),
+            style: :as_button, theme: :delete, size: :sm, html_options: {method: :delete,
+                                                                         data: {turbo: true, turbo_method: :delete, turbo_confirm: t("shared.common.are_you_sure")}})) %>
+    </div>
+  </div>
+  <div id="<%= dom_id @article, "admin" %>" class="space-y-4">
+    <%= render(Core::CardComponent.new(classes: "space-y-4")) do %>
+      <div class="flex items-center gap-4">
+        <%= icon "document", {classes: "h-8"} %>
+        <h1><%= @article.title %></h1>
+        <%= render(Core::BadgeComponent.new(label: t("enums.article.status.#{@article.status}"),
+              theme: article_status_theme(@article.status), icon: "info", size: :md)) %>
+      </div>
+
+      <%= render Core::BoxComponent.new do %>
+        <%= render Core::DefinitionListComponent.new(gap: :sm) do |dl| %>
+          <% dl.with_item(term: t("adminit.articles.slug")) do %>
+            <%= @article.slug %>
+          <% end %>
+          <% dl.with_item(term: t("shared.labels.category")) do %>
+            <%= article_category_label(@article) %>
+          <% end %>
+          <% dl.with_item(term: t("adminit.articles.locale")) do %>
+            <%= article_locale_label(@article.locale) %>
+          <% end %>
+          <% dl.with_item(term: t("shared.labels.status")) do %>
+            <%= t("enums.article.status.#{@article.status}") %>
+          <% end %>
+          <% dl.with_item(term: t("shared.labels.author")) do %>
+            <%= @article.author&.email || "-" %>
+          <% end %>
+          <% if @article.published_at.present? %>
+            <% dl.with_item(term: t("shared.labels.published_on")) do %>
+              <%= l(@article.published_at, format: :long) %>
+            <% end %>
+          <% end %>
+          <% dl.with_item(term: t("shared.labels.created_on")) do %>
+            <%= l(@article.created_at, format: :long) %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <%= render(Core::CardComponent.new(classes: "space-y-4")) do %>
+      <p class="text-gray-600 dark:text-gray-400"><%= @article.summary %></p>
+      <div class="prose dark:prose-invert max-w-none">
+        <%= @article.body %>
+      </div>
+    <% end %>
+  </div>
+</div>

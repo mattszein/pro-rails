@@ -3,14 +3,15 @@ module Adminit
     POLICY_RESOURCE = :ticket
     self.identifier = :"Adminit::TicketPolicy"
 
-    # Allow admins to take unassigned tickets regardless of status
+    # Unassigned tickets that are open or waiting on a reopen decision. Finished/closed tickets
+    # go back through the reopen flows instead.
     def take?
-      manage? && record.assigned_id.nil?
+      manage? && record.assigned_id.nil? && (record.open? || record.reopen_requested? || record.reopened?)
     end
 
-    # Allow admins to leave tickets they're assigned to
+    # Assignees can step away from tickets they are actively working on.
     def leave?
-      manage? && record.assigned_id == user.id
+      manage? && record.assigned_id == user.id && (record.in_progress? || record.reopened?)
     end
 
     def finish?

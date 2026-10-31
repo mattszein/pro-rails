@@ -28,14 +28,20 @@ Rails.application.routes.draw do
     resources :announcements, only: [:show]
 
     namespace :support do
-      resources :tickets, except: [:destroy] do
+      resources :tickets, except: [:destroy, :edit, :update] do
         member do
           post :attach_files
           post :request_reopen
+          post :resolve_with_ai
+          post :request_human
         end
         resources :messages, only: [:create]
       end
     end
+
+    get "help" => "support/articles#index", :as => :help_articles
+    get "help/suggestions" => "support/articles#suggestions", :as => :suggestions_help_articles
+    get "help/:slug" => "support/articles#show", :as => :help_article, :constraints => {slug: /[a-z0-9-]+/}
 
     namespace :settings do
       resources :appearance, only: [:index]

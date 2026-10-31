@@ -25,6 +25,21 @@ module Adminit::TicketsHelper
         )
       ),
       Core::Table::Column.new(
+        label: I18n.t("adminit.tickets.ai_state"),
+        renderer: ->(ticket) {
+          next "-" if ticket.ai_off?
+
+          render(Core::BadgeComponent.new(label: I18n.t("enums.ticket.ai_state.#{ticket.ai_state}"),
+            theme: Adminit::TicketInfoComponent::AI_STATE_THEMES.fetch(ticket.ai_state)))
+        },
+        sort_key: :ai_state,
+        filter: Core::Table::Filter.new(
+          type: :select,
+          param: :ai_state,
+          options: -> { Support::Ticket.ai_states.keys.map { |s| [I18n.t("enums.ticket.ai_state.#{s}"), s] } }
+        )
+      ),
+      Core::Table::Column.new(
         label: I18n.t("shared.labels.priority"),
         renderer: ->(ticket) { ticket.priority },
         sort_key: :priority

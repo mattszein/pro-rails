@@ -7,8 +7,8 @@ module AvatarAi
     ].freeze
 
     def suggest(spark_text:, mood_board_selected:)
-      response = ask(build_prompt(spark_text, mood_board_selected))
-      parse_suggestions(response.content)
+      content = ask(build_prompt(spark_text, mood_board_selected))
+      parse_suggestions(content)
     end
 
     private

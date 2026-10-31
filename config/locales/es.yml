@@ -3,6 +3,8 @@ es:
     models:
       account: Cuenta
       announcement: Anuncio
+      support/ai_playbook: Playbook de IA
+      support/article: Artículo
       profile: Perfil
       role: Rol
       ticket: Ticket
@@ -46,10 +48,18 @@ es:
               resource_mismatch: "contiene claves de widget que no coinciden con el recurso del permiso: %{keys}"
         support/ticket:
           attributes:
+            ai_state:
+              engaged_while_assigned: "no puede estar activa mientras el ticket está asignado"
             attachments:
               too_many_files: "no puede exceder %{max_files} archivos"
               file_too_large: "%{filename} es demasiado grande (máx. %{max_size}MB)"
               invalid_file_type: "%{filename} tiene un tipo de archivo no válido"
+        support/ai_playbook:
+          attributes:
+            capabilities:
+              not_registered: "no es una capacidad de IA declarada"
+            base:
+              cannot_destroy_default: "No se puede eliminar el playbook por defecto"
   authentication:
     unauthenticated: "Necesitas iniciar sesión antes de continuar."
   adminit:
@@ -68,6 +78,11 @@ es:
       reopen_requested: "Solicitud de reapertura pendiente de aprobación. Podrás enviar mensajes una vez que un administrador la acepte."
       closed: "Este ticket está cerrado permanentemente."
       default: "Esperando que un administrador tome este ticket. Podrás enviar mensajes una vez que el ticket esté en progreso."
+      analyzing: "Nuestro asistente está analizando tu ticket. Podrás responder en cuanto termine."
+      ai_analyzing: "Nuestro asistente te está ayudando. Un agente de soporte puede unirse en cualquier momento."
+      ai_awaiting_user: "Nuestro asistente te está ayudando. Un agente de soporte puede unirse en cualquier momento."
+      ai_handoff_requested: "Esperando a un agente de soporte."
+      ai_resolved: "Resuelto con nuestro asistente."
   notifiers:
     announcement_notifier:
       notification:
@@ -90,12 +105,51 @@ es:
         reopen_requested: "Reapertura Solicitada"
         reopened: "Reabierto"
         closed: "Cerrado"
+      ai_state:
+        off: "Apagada"
+        analyzing: "Analizando"
+        awaiting_user: "Esperando al usuario"
+        handoff_requested: "Requiere humano"
+        stepped_back: "IA retirada"
+        resolved: "Resuelto por IA"
       category:
         account_access: "Acceso a Cuenta"
         technical_issue: "Problema Técnico"
         billing: "Facturación"
         feature_request: "Solicitud de Función"
         other: "Otro"
+    ai_run:
+      step:
+        triage: "Clasificación"
+        investigate: "Investigación"
+        respond: "Respuesta"
+        draft: "Borrador"
+        handle: "Investigación y respuesta"
+      run_trigger:
+        ticket_created: "Ticket creado"
+        user_message: "Mensaje del usuario"
+        draft_reply: "Borrador de respuesta"
+        idle_reminder: "Recordatorio por inactividad"
+        fallback: "Respaldo"
+      status:
+        succeeded: "Exitosa"
+        failed: "Fallida"
+        discarded: "Descartada"
+    support_ai_playbook:
+      mode:
+        triage_only: "Solo triaje"
+        assist: "Asistencia"
+    article:
+      status:
+        draft: "Borrador"
+        published: "Publicado"
+      category:
+        account_access: "Acceso a Cuenta"
+        technical_issue: "Problema Técnico"
+        billing: "Facturación"
+        feature_request: "Solicitud de Función"
+        other: "Otro"
+        general: "General"
     announcement:
       status:
         draft: "Borrador"
@@ -111,6 +165,10 @@ es:
       can_only_unschedule_scheduled: "Solo se pueden desprogramar anuncios programados"
       already_published: "Ya está publicado"
       must_be_scheduled_first: "Debe estar programado primero"
+  article:
+    transitions:
+      already_published: "Ya está publicado"
+      can_only_unpublish_published: "Solo se pueden despublicar artículos publicados"
   ticket:
     transitions:
       can_only_finish: "Solo se pueden finalizar tickets en progreso o reabiertos"
@@ -118,3 +176,12 @@ es:
       can_only_request_reopen: "Solo se puede solicitar reapertura en tickets finalizados"
       can_only_accept_reopen: "Solo se puede aceptar reapertura en tickets con solicitud de reapertura"
       can_only_reject_reopen: "Solo se puede rechazar reapertura en tickets con solicitud de reapertura"
+      can_only_start_ai_analysis: "El análisis de IA solo puede iniciar cuando la IA está apagada o esperando al usuario"
+      can_only_disable_ai: "Solo se puede desactivar la IA mientras esta analizando"
+      can_only_await_user_reply: "Solo se puede esperar al usuario mientras la IA analiza"
+      can_only_request_ai_handoff: "Solo se puede solicitar traspaso mientras la IA está activa"
+      already_assigned: "El ticket ya está asignado"
+      can_only_take: "Solo se pueden tomar tickets abiertos, con reapertura solicitada o reabiertos"
+      not_assigned: "No estás asignado a este ticket"
+      can_only_unassign: "Solo se pueden dejar tickets en progreso o reabiertos"
+      can_only_resolve_with_ai: "Solo se puede resolver con IA en tickets abiertos esperando al usuario"

@@ -58,6 +58,11 @@ app/components/core/
   sidebar_link_component.html.erb
 ```
 
+### Core Display Components
+
+- `Core::CodeBlockComponent` renders raw text (JSON, transcripts, logs) in a scrollable, escaped `<pre>`: `render Core::CodeBlockComponent.new(text: json, max_height: :md, html_options: {data: {role: "x"}})`. `max_height` is `:sm`, `:md` (default) or `:lg`; `classes` appends extra classes. Do not hand-roll `<pre>` blocks.
+- `Core::ModalComponent` takes `title:` and `size:` (`:md` default, `:xl` for wide content such as the AI run viewer).
+
 ### CustomFormBuilder
 
 `CustomFormBuilder` is the default form builder — set in `ApplicationController`. No need to pass `builder:` explicitly:
@@ -240,6 +245,14 @@ When the backend calls `broadcast_append_later_to "admin_tickets"`, any view sub
 ```
 
 Operators: `is`, `is_not`, `in`, `not_in`, `includes`, `excludes`, `greater_than`, `less_than`.
+
+### Broadcast composer rule (support conversation)
+
+The message form area (composer, status banner, reopen form) is re-rendered by broadcast, with no request, session or `current_user`:
+
+- Partials rendered by a broadcast must not call request-context helpers (`current_user`, `current_account`, `allowed_to?`, `request`). Render for everyone and gate per viewer with `turbo-show` (e.g. `when="current-user-id" is="<%= ticket.created_id %>"`)
+- Only re-broadcast the composer when its **variant** changes (`Support::Ticket#message_form_variant`: composer vs. a status banner). Replacing it on every update wipes what the user is typing
+- Stale buttons: broadcasts append new messages without re-rendering older ones, so an old "This solved it / Talk to a person" prompt would stay clickable. `conversation_component_controller.js` watches the message list with a `MutationObserver` and hides every `[data-resolution-actions]` block that is not on the latest message. The server still re-validates the transition, so the client hide is only UX
 
 ---
 

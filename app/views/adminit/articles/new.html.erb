@@ -1,0 +1,5 @@
+<%= render(Core::ModalComponent.new(title: t("adminit.articles.new_article"))) do %>
+  <%= turbo_frame_tag "article_form" do %>
+    <%= render "form", article: @article %>
+  <% end %>
+<% end %>
