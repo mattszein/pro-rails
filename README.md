@@ -133,32 +133,25 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed patterns, conventions, and d
 ### Architecture & refactoring
 
 - [x] Upgrade all gems to latest versions
-- [ ] Base controller shared between Adminit and Dashboard to reduce duplication
+- [x] Base controller shared between Adminit and Dashboard to reduce duplication
 - [x] Adminit menu: replace `allowed_to?` iteration in the view with a helper that resolves permitted items for the current user
 - [x] Permissions: replace string-based controller references with integer enums
 - [ ] Generator: scaffold a new Adminit resource (controller, views, policy, and specs) in one command
-- [ ] Adminit dashboard: analytics, stats, and quick actions, with role-specific views per role
+- [x] Adminit dashboard: analytics, stats, and quick actions, with role-specific views per role
 - [x] Refactoring view components to use same patterns
-- [ ] Table component should support sorting, filtering, and pagination (client vs server ?)
+- [x] Table component should support sorting, filtering, and pagination (client vs server ?)
 - [x] Fix old adminit components (Roles views, account views)
-- [ ] Components should be refactored to use primary / secondary colors? messages in conversation, box component, notifications
+- [x] Components should be refactored to use primary / secondary colors? messages in conversation, box component, notifications
 - [ ] Lookbook: update previews to cover all core components and recently added features
 
 ### Accounts
 
-- [ ] Add profile with avatar upload
-- [ ] Add AI(rubyllm) to make an example for an image generation for the account avatar
-
-## Roadmap to 2.0
-
-### Payments & subscriptions
-
-- [ ] Plans model and subscription management
-- [ ] Stripe and others payments integration (charges, webhooks, billing portal)
+- [x] Add profile with avatar upload
+- [x] Add AI(rubyllm) to make an example for an image generation for the account avatar
 
 ### Ticket support
 
-- [ ] Conversation chat is managed by AI at beginning. Admnins can take over the
+- [x] Conversation chat is managed by AI at beginning. Admnins can take over the
 conversation at any time, and the AI will step back until the next ticket is
 opened.
 
