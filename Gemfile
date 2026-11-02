@@ -49,7 +49,7 @@ gem "tailwindcss-rails", "~> 4.2"
 gem "inline_svg"
 
 gem "redis", "~> 6.0"
-gem "anyway_config", "~> 2.0"
+gem "anyway_config", "~> 2.9"
 gem "anycable-rails", "~> 1.6"
 gem "action_policy"
 
