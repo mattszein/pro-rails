@@ -43,7 +43,7 @@ gem "lexxy", "~> 1.0"
 
 gem "freezolite" # Freezolite add frozen_string_literals to true to every file in your project
 
-gem "view_component", "~> 4.4"
+gem "view_component", "~> 4.20"
 
 gem "tailwindcss-rails", "~> 4.2"
 gem "inline_svg"
